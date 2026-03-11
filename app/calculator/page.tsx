@@ -1,13 +1,10 @@
+'use client'
+
 import NavBar from '@/components/NavBar'
 import Footer from '@/components/Footer'
 import SilbiCalculator from '@/components/SilbiCalculator'
 import InsurancePremiumCalculator from '@/components/InsurancePremiumCalculator'
 import { useState } from 'react'
-
-export const metadata = {
-    title: '실손보험 세대별 계산기 | 보험다이어트',
-    description: '내가 낸 병원비, 1세대부터 4세대까지 실손보험으로 각각 얼마를 돌려받을 수 있는지 한눈에 비교해보세요.',
-}
 
 export default function CalculatorPage() {
     const [activeTab, setActiveTab] = useState<'silbi' | 'premium'>('silbi')
