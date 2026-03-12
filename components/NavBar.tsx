@@ -1,11 +1,28 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
+import { Bars3Icon, XMarkIcon, UserCircleIcon } from '@heroicons/react/24/outline'
+import { supabase } from '@/lib/supabaseClient'
+import { User } from '@supabase/supabase-js'
 
 export default function NavBar() {
   const [isOpen, setIsOpen] = useState(false)
+  const [user, setUser] = useState<User | null>(null)
+
+  useEffect(() => {
+    // Check initial auth state
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      setUser(user)
+    })
+
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user || null)
+    })
+
+    return () => subscription.unsubscribe()
+  }, [])
 
   return (
     <nav className="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-gray-100">
@@ -32,12 +49,31 @@ export default function NavBar() {
             <Link href="/disease-codes" className="text-primary-600 font-bold hover:text-primary-700 transition-colors">질병코드 검색</Link>
             <Link href="/contacts" className="text-primary-600 font-bold hover:text-primary-700 transition-colors">고객센터</Link>
           </div>
-          <a
-            href="#consultation"
-            className="inline-flex items-center justify-center px-5 py-2.5 text-sm font-semibold text-white bg-gray-900 rounded-full hover:bg-gray-800 transition-colors shadow-sm"
-          >
-            무료 진단받기
-          </a>
+          
+          <div className="flex items-center gap-3">
+            {user ? (
+              <Link
+                href="/dashboard"
+                className="flex items-center gap-2 px-4 py-2 border border-gray-200 rounded-full text-sm font-bold text-gray-700 hover:bg-gray-50 transition-all"
+              >
+                <UserCircleIcon className="w-5 h-5" />
+                대시보드
+              </Link>
+            ) : (
+              <Link
+                href="/login"
+                className="text-sm font-bold text-gray-500 hover:text-gray-900 px-4 py-2 transition-colors"
+              >
+                설계사 로그인
+              </Link>
+            )}
+            <a
+              href="#consultation"
+              className="inline-flex items-center justify-center px-5 py-2.5 text-sm font-semibold text-white bg-gray-900 rounded-full hover:bg-gray-800 transition-colors shadow-sm"
+            >
+              무료 진단받기
+            </a>
+          </div>
         </div>
 
         {/* Mobile Menu Buttons */}
@@ -69,6 +105,7 @@ export default function NavBar() {
             <Link href="/guide/hifu-therapy" onClick={() => setIsOpen(false)} className="text-gray-800 font-bold text-lg hover:text-primary-600 border-b border-gray-50 pb-3">하이푸 시술 안내</Link>
             <Link href="/calculator" onClick={() => setIsOpen(false)} className="text-gray-800 font-bold text-lg hover:text-primary-600 border-b border-gray-50 pb-3">실비 계산기</Link>
             <Link href="/disease-codes" onClick={() => setIsOpen(false)} className="text-gray-800 font-bold text-lg hover:text-primary-600 border-b border-gray-50 pb-3">질병코드 검색</Link>
+            <Link href="/login" onClick={() => setIsOpen(false)} className="text-gray-800 font-bold text-lg hover:text-primary-600 border-b border-gray-50 pb-3">설계사 전용 입구</Link>
             <Link href="/contacts" onClick={() => setIsOpen(false)} className="text-gray-800 font-bold text-lg hover:text-primary-600 pb-2">고객센터 연락처</Link>
           </div>
         </div>
