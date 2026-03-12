@@ -17,6 +17,18 @@ export default function Home() {
   return (
     <main className="min-h-screen flex flex-col">
       <NavBar />
+      
+      {/* Insurance Premium Calculator Section (Moved to top) */}
+      <section id="premium-calculator" className="py-20 bg-gray-50/50 pt-28">
+        <div className="container px-4 mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-5xl font-black text-gray-900 mb-4 tracking-tight">예상 <span className="text-amber-600">보험료 계산기</span></h2>
+            <p className="text-gray-600 max-w-2xl mx-auto break-keep text-lg">성별과 생년월일만 입력하면 암·뇌·심장 진단비와 수술비까지 즉시 확인해 드립니다.</p>
+          </div>
+          <InsurancePremiumCalculator />
+        </div>
+      </section>
+
       <Hero />
       <TrustStrip />
 
@@ -24,18 +36,6 @@ export default function Home() {
         <ConsultationForm id="consultation-top" />
         <Concerns />
         <Services />
-        
-        {/* Insurance Premium Calculator Section */}
-        <section id="premium-calculator" className="py-20 bg-gray-50/50">
-          <div className="container px-4 mx-auto">
-            <div className="text-center mb-12">
-              <h2 className="text-3xl md:text-4xl font-black text-gray-900 mb-4">내 예상 보험료 확인하기</h2>
-              <p className="text-gray-600 max-w-2xl mx-auto">간단한 정보 입력으로 주요 보장에 대한 예상 보험료를 즉시 확인해 보세요.</p>
-            </div>
-            <InsurancePremiumCalculator />
-          </div>
-        </section>
-
         <AdvancedRadiation />
         <Reviews />
         <CaseCollection />

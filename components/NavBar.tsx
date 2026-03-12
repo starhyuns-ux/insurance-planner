@@ -23,12 +23,12 @@ export default function NavBar() {
         {/* Desktop Menu */}
         <div className="hidden md:flex items-center gap-4">
           <div className="flex space-x-6 text-sm font-medium text-gray-600 mr-4">
+            <Link href="/calculator/insurance-premium" className="text-amber-600 font-black hover:text-amber-700 transition-colors">보험료 계산기</Link>
             <Link href="/guide/5th-gen" className="text-primary-600 font-bold hover:text-primary-700 transition-colors">5세대 실손</Link>
             <Link href="/guide/cancer-treatment" className="text-primary-600 font-bold hover:text-primary-700 transition-colors">암 치료 가이드</Link>
             <Link href="/guide/advanced-radiation" className="text-primary-600 font-bold hover:text-primary-700 transition-colors">방사선치료</Link>
             <Link href="/guide/hifu-therapy" className="text-primary-600 font-bold hover:text-primary-700 transition-colors">하이푸시술</Link>
             <Link href="/calculator" className="text-primary-600 font-bold hover:text-primary-700 transition-colors">실비 계산기</Link>
-            <Link href="/calculator/insurance-premium" className="text-primary-600 font-bold hover:text-primary-700 transition-colors">보험료 계산기</Link>
             <Link href="/disease-codes" className="text-primary-600 font-bold hover:text-primary-700 transition-colors">질병코드 검색</Link>
             <Link href="/contacts" className="text-primary-600 font-bold hover:text-primary-700 transition-colors">고객센터</Link>
           </div>
@@ -62,12 +62,12 @@ export default function NavBar() {
       {isOpen && (
         <div className="md:hidden absolute top-16 left-0 w-full bg-white border-b border-gray-100 shadow-xl overflow-hidden py-4 fade-in slide-in-from-top-2 duration-200">
           <div className="flex flex-col container space-y-4 px-4">
+            <Link href="/calculator/insurance-premium" onClick={() => setIsOpen(false)} className="text-amber-600 font-black text-lg hover:text-amber-700 border-b border-gray-50 pb-3">보험료 계산기</Link>
             <Link href="/guide/5th-gen" onClick={() => setIsOpen(false)} className="text-gray-800 font-bold text-lg hover:text-primary-600 border-b border-gray-50 pb-3">5세대 실손 안내</Link>
             <Link href="/guide/cancer-treatment" onClick={() => setIsOpen(false)} className="text-gray-800 font-bold text-lg hover:text-primary-600 border-b border-gray-50 pb-3">암 치료 가이드</Link>
             <Link href="/guide/advanced-radiation" onClick={() => setIsOpen(false)} className="text-gray-800 font-bold text-lg hover:text-primary-600 border-b border-gray-50 pb-3">방사선치료 안내</Link>
             <Link href="/guide/hifu-therapy" onClick={() => setIsOpen(false)} className="text-gray-800 font-bold text-lg hover:text-primary-600 border-b border-gray-50 pb-3">하이푸 시술 안내</Link>
             <Link href="/calculator" onClick={() => setIsOpen(false)} className="text-gray-800 font-bold text-lg hover:text-primary-600 border-b border-gray-50 pb-3">실비 계산기</Link>
-            <Link href="/calculator/insurance-premium" onClick={() => setIsOpen(false)} className="text-gray-800 font-bold text-lg hover:text-primary-600 border-b border-gray-50 pb-3">보험료 계산기</Link>
             <Link href="/disease-codes" onClick={() => setIsOpen(false)} className="text-gray-800 font-bold text-lg hover:text-primary-600 border-b border-gray-50 pb-3">질병코드 검색</Link>
             <Link href="/contacts" onClick={() => setIsOpen(false)} className="text-gray-800 font-bold text-lg hover:text-primary-600 pb-2">고객센터 연락처</Link>
           </div>
