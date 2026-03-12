@@ -24,6 +24,13 @@ type Planner = {
   subscription_status: 'active' | 'inactive'
 }
 
+type Lead = {
+  id: string
+  name: string
+  phone: string
+  created_at: string
+}
+
 type Customer = {
   id: string
   name: string
@@ -33,9 +40,10 @@ type Customer = {
 }
 
 export default function DashboardPage() {
-  const [activeTab, setActiveTab] = useState<'profile' | 'customers' | 'subscription'>('profile')
+  const [activeTab, setActiveTab] = useState<'profile' | 'leads' | 'customers' | 'subscription'>('profile')
   const [planner, setPlanner] = useState<Planner | null>(null)
   const [customers, setCustomers] = useState<Customer[]>([])
+  const [leads, setLeads] = useState<Lead[]>([])
   const [loading, setLoading] = useState(true)
   const router = useRouter()
 
@@ -71,6 +79,7 @@ export default function DashboardPage() {
       setEditPhone(profile.phone || '')
     }
 
+    // Fetch Manual Customers
     const { data: custs } = await supabase
       .from('customers')
       .select('*')
@@ -78,6 +87,16 @@ export default function DashboardPage() {
       .order('created_at', { ascending: false })
 
     if (custs) setCustomers(custs)
+
+    // Fetch Consultation Leads
+    const { data: leadData } = await supabase
+      .from('consultations')
+      .select('*')
+      .eq('planner_id', user.id)
+      .order('created_at', { ascending: false })
+
+    if (leadData) setLeads(leadData)
+    
     setLoading(false)
   }
 
@@ -149,13 +168,22 @@ export default function DashboardPage() {
               내 프로필
             </button>
             <button
+              onClick={() => setActiveTab('leads')}
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl font-bold transition-all ${
+                activeTab === 'leads' ? 'bg-primary-600 text-white shadow-lg' : 'text-gray-600 hover:bg-white hover:shadow-sm'
+              }`}
+            >
+              <UsersIcon className="w-6 h-6" />
+              상담 신청 현황
+            </button>
+            <button
               onClick={() => setActiveTab('customers')}
               className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl font-bold transition-all ${
                 activeTab === 'customers' ? 'bg-primary-600 text-white shadow-lg' : 'text-gray-600 hover:bg-white hover:shadow-sm'
               }`}
             >
               <UsersIcon className="w-6 h-6" />
-              고객 정보 관리
+              내 고객 직접 등록
             </button>
             <button
               onClick={() => setActiveTab('subscription')}
@@ -249,7 +277,45 @@ export default function DashboardPage() {
               </div>
             )}
 
-            {/* Tab: Customers */}
+            {/* Tab: Leads */}
+            {activeTab === 'leads' && (
+              <div className="space-y-6">
+                <div className="bg-white rounded-[2rem] shadow-xl overflow-hidden border border-gray-100">
+                  <div className="px-8 py-6 border-b border-gray-50 flex items-center justify-between">
+                    <h3 className="font-bold text-gray-900 text-xl">실시간 상담 신청 현황</h3>
+                    <span className="text-xs font-bold text-primary-600 bg-primary-50 px-3 py-1 rounded-full">{leads.length}건 접수</span>
+                  </div>
+                  <div className="overflow-x-auto">
+                    <table className="w-full">
+                      <thead>
+                        <tr className="bg-gray-50/50 text-left">
+                          <th className="px-8 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest">이름</th>
+                          <th className="px-8 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest">연락처</th>
+                          <th className="px-8 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest">신청 시각</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-gray-50">
+                        {leads.length === 0 ? (
+                          <tr>
+                            <td colSpan={3} className="px-8 py-12 text-center text-gray-400 font-medium">
+                              아직 접수된 상담 신청이 없습니다.
+                            </td>
+                          </tr>
+                        ) : (
+                          leads.map(l => (
+                            <tr key={l.id} className="hover:bg-gray-50/50 transition-colors">
+                              <td className="px-8 py-5 font-bold text-gray-900">{l.name}</td>
+                              <td className="px-8 py-5 text-gray-600 font-mono tracking-tight">{l.phone.replace(/(\d{3})(\d{4})(\d{4})/, '$1-$2-$3')}</td>
+                              <td className="px-8 py-5 text-gray-400 text-sm">{new Date(l.created_at).toLocaleString()}</td>
+                            </tr>
+                          ))
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            )}
             {activeTab === 'customers' && (
               <div className="space-y-6">
                 <div className="bg-white rounded-[2rem] shadow-xl p-8 border border-gray-100">

@@ -48,6 +48,14 @@ create policy "Anyone can view limited planner info"
   to anon
   using (subscription_status = 'active');
 
+-- consultations 테이블에 planner_id 추가 (선택사항)
+alter table public.consultations add column if not exists planner_id uuid references public.planners(id) on delete set null;
+
+-- Planners가 본인에게 온 상담 신청을 볼 수 있게 RLS 추가
+create policy "Planners can view own leads"
+  on public.consultations for select
+  using (auth.uid() = planner_id);
+
 -- updated_at 자동 갱신 트리거
 create or replace function public.handle_updated_at()
 returns trigger as $$

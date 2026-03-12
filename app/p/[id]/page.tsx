@@ -67,7 +67,11 @@ export default async function PlannerLandingPage({ params }: { params: { id: str
           </div>
         </section>
 
-        <ConsultationForm id="consultation-top" />
+        <ConsultationForm 
+          id="consultation-top" 
+          plannerId={planner.id} 
+          plannerInfo={{ name: planner.name, phone: planner.phone }}
+        />
         <Concerns />
         <Services />
         <AdvancedRadiation />
@@ -87,7 +91,10 @@ export default async function PlannerLandingPage({ params }: { params: { id: str
 
       <div className="bg-white">
         <CommunityLinks />
-        <ConsultationForm />
+        <ConsultationForm 
+          plannerId={planner.id} 
+          plannerInfo={{ name: planner.name, phone: planner.phone }}
+        />
       </div>
 
       <Footer />

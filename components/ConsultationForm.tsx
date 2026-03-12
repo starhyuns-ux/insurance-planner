@@ -4,9 +4,14 @@ import { useState } from 'react'
 
 interface ConsultationFormProps {
   id?: string;
+  plannerId?: string;
+  plannerInfo?: {
+    name: string;
+    phone: string;
+  };
 }
 
-export default function ConsultationForm({ id = "consultation" }: ConsultationFormProps) {
+export default function ConsultationForm({ id = "consultation", plannerId, plannerInfo }: ConsultationFormProps) {
   const [name, setName] = useState('')
   const [phone, setPhone] = useState('')
   const [agree, setAgree] = useState(false)
@@ -41,7 +46,11 @@ export default function ConsultationForm({ id = "consultation" }: ConsultationFo
         body: JSON.stringify({
           name,
           phone: phone.replace(/-/g, ''), // Save without dashes
-          meta: { source: 'landing_page_bottom_form' }
+          planner_id: plannerId || null,
+          meta: { 
+            source: plannerId ? `planner_page_${plannerId}` : 'landing_page_bottom_form',
+            planner_name: plannerInfo?.name
+          }
         })
       })
 
@@ -89,10 +98,11 @@ export default function ConsultationForm({ id = "consultation" }: ConsultationFo
             <div className="absolute top-0 right-0 -mr-16 -mt-16 w-64 h-64 bg-primary-600 rounded-full mix-blend-multiply opacity-20 blur-3xl"></div>
 
             <h3 className="text-3xl font-extrabold mb-4 relative z-10">
-              지금 바로<br />무료 진단 받으세요
+              {plannerInfo ? `${plannerInfo.name} 설계사에게` : '지금 바로'}<br />무료 진단 받으세요
             </h3>
             <p className="text-gray-400 mb-8 leading-relaxed relative z-10">
-              매달 빠져나가는 아까운 보험료,<br />전문가와 함께 10분만 투자하면<br />평생 내는 보험료를 아낄 수 있습니다.
+              {plannerInfo ? '고객님의 입장에서 가장 유리한 보험을' : '매달 빠져나가는 아까운 보험료,'}<br />
+              {plannerInfo ? '객관적으로 분석하고 맞춤 설계해 드립니다.' : '전문가와 함께 10분만 투자하면 평생 내는 보험료를 아낄 수 있습니다.'}
             </p>
 
             <div className="space-y-5 text-sm font-medium relative z-10">

@@ -1,9 +1,10 @@
 import { NextResponse } from 'next/server'
+import { supabaseAdmin } from '@/lib/supabaseServer'
 
 export async function POST(request: Request) {
     try {
         const body = await request.json()
-        const { name, phone, meta } = body
+        const { name, phone, meta, planner_id } = body
 
         if (!name || !phone) {
             return NextResponse.json(
@@ -12,26 +13,35 @@ export async function POST(request: Request) {
             )
         }
 
+        // 1. Supabase DB에 저장
+        const { error: dbError } = await supabaseAdmin
+            .from('consultations')
+            .insert({
+                name,
+                phone,
+                planner_id: planner_id || null,
+                meta: meta || {}
+            })
+
+        if (dbError) {
+            console.error('Supabase DB Insert Error:', dbError)
+        }
+
+        // 2. 구글 앱스 스크립트로 데이터 전송 (기존 로직 유지)
         const scriptUrl = process.env.GOOGLE_WEBAPP_URL
 
         if (scriptUrl) {
-            // 구글 앱스 스크립트로 데이터 전송 (서버사이드라 CORS 문제 없음)
             await fetch(scriptUrl, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     name,
                     phone,
                     source: meta?.source || 'landing_page'
                 })
             })
-        } else {
-            console.log('⚠️ GOOGLE_WEBAPP_URL이 설정되지 않았습니다. 전송된 데이터:', { name, phone })
         }
 
-        // 성공 응답 반환 (프론트엔드에서 카카오톡으로 리다이렉트됨)
         return NextResponse.json({ success: true })
     } catch (err: any) {
         console.error('Consultation POST error:', err)
