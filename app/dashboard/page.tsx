@@ -142,6 +142,46 @@ export default function DashboardPage() {
     setIsSaving(false)
   }
 
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, type: 'profile' | 'card') => {
+    const file = e.target.files?.[0]
+    if (!file || !planner) return
+
+    const fileExt = file.name.split('.').pop()
+    const fileName = `${planner.id}/${type}_${Math.random()}.${fileExt}`
+    const filePath = `${fileName}`
+
+    try {
+      // 1. Upload to Supabase Storage
+      const { error: uploadError } = await supabase.storage
+        .from('planner-assets')
+        .upload(filePath, file, { upsert: true })
+
+      if (uploadError) throw uploadError
+
+      // 2. Get Public URL
+      const { data: { publicUrl } } = supabase.storage
+        .from('planner-assets')
+        .getPublicUrl(filePath)
+
+      // 3. Update Planners table
+      const updateData = type === 'profile' 
+        ? { profile_image_url: publicUrl } 
+        : { business_card_url: publicUrl }
+
+      const { error: updateError } = await supabase
+        .from('planners')
+        .update(updateData)
+        .eq('id', planner.id)
+
+      if (updateError) throw updateError
+
+      alert(`${type === 'profile' ? '프로필 이미지가' : '명함이'} 성공적으로 업로드되었습니다.`)
+      checkUser()
+    } catch (err: any) {
+      alert('업로드 중 오류가 발생했습니다: ' + err.message)
+    }
+  }
+
   const addCustomer = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!planner) return
@@ -291,16 +331,57 @@ export default function DashboardPage() {
                       <div>
                         <label className="block text-sm font-bold text-gray-700 mb-3 ml-1">프로필 이미지 / 명함</label>
                         <div className="grid grid-cols-2 gap-4">
-                          <button className="aspect-[4/5] bg-gray-50 rounded-2xl border-2 border-dashed border-gray-200 flex flex-col items-center justify-center text-gray-400 hover:bg-gray-100 hover:border-primary-300 transition-all gap-2">
-                            <CloudArrowUpIcon className="w-8 h-8" />
-                            <span className="text-xs font-bold font-sans">프로필 업로드</span>
-                          </button>
-                          <button className="aspect-[4/3] bg-gray-50 rounded-2xl border-2 border-dashed border-gray-200 flex flex-col items-center justify-center text-gray-400 hover:bg-gray-100 hover:border-primary-300 transition-all gap-2 my-auto">
-                            <CloudArrowUpIcon className="w-8 h-8" />
-                            <span className="text-xs font-bold font-sans">명함 업로드</span>
-                          </button>
+                          <div className="relative group">
+                            <input
+                              type="file"
+                              accept="image/*"
+                              onChange={(e) => handleFileUpload(e, 'profile')}
+                              className="hidden"
+                              id="profile-upload"
+                            />
+                            <label
+                              htmlFor="profile-upload"
+                              className="aspect-[4/5] bg-gray-50 rounded-2xl border-2 border-dashed border-gray-200 flex flex-col items-center justify-center text-gray-400 hover:bg-gray-100 hover:border-primary-300 transition-all gap-2 cursor-pointer overflow-hidden relative"
+                            >
+                              {planner?.profile_image_url ? (
+                                <img src={planner.profile_image_url} alt="Profile" className="w-full h-full object-cover" />
+                              ) : (
+                                <CloudArrowUpIcon className="w-8 h-8" />
+                              )}
+                              <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white text-xs font-bold">
+                                수정하기
+                              </div>
+                            </label>
+                            <span className="block text-center text-[10px] font-bold text-gray-400 mt-2 lowercase tracking-tighter">프로필 이미지</span>
+                          </div>
+
+                          <div className="relative group">
+                            <input
+                              type="file"
+                              accept="image/*"
+                              onChange={(e) => handleFileUpload(e, 'card')}
+                              className="hidden"
+                              id="card-upload"
+                            />
+                            <label
+                              htmlFor="card-upload"
+                              className="aspect-[4/5] bg-gray-50 rounded-2xl border-2 border-dashed border-gray-200 flex flex-col items-center justify-center text-gray-400 hover:bg-gray-100 hover:border-primary-300 transition-all gap-2 cursor-pointer overflow-hidden relative"
+                            >
+                              {planner?.business_card_url ? (
+                                <img src={planner.business_card_url} alt="Card" className="w-full h-full object-cover" />
+                              ) : (
+                                <CloudArrowUpIcon className="w-8 h-8" />
+                              )}
+                              <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white text-xs font-bold">
+                                수정하기
+                              </div>
+                            </label>
+                            <span className="block text-center text-[10px] font-bold text-gray-400 mt-2 lowercase tracking-tighter">보험 설계사 명함</span>
+                          </div>
                         </div>
-                        <p className="mt-4 text-xs text-gray-400 font-medium">PNG, JPG 파일을 업로드해 주세요.</p>
+                        <p className="mt-6 text-[11px] text-gray-400 font-medium leading-relaxed bg-gray-50 p-4 rounded-xl">
+                          💡 **팁**: 명함이나 신뢰감을 주는 프로필 사진을 등록하면 고객들의 상담 전환율이 높아집니다.
+                        </p>
                       </div>
                     </div>
                   </div>
