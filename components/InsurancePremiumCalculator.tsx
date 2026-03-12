@@ -103,26 +103,26 @@ const injurySurgeryRateTable: Record<number, { male: number; female: number }> =
 };
 
 const diseaseSurgeryRateTable: Record<number, { male: number; female: number }> = {
-  0:{male:5730,female:5730}, 1:{male:5970,female:5970}, 2:{male:6210,female:6210}, 3:{male:6450,female:6450},
-  4:{male:6700,female:6700}, 5:{male:6940,female:6940}, 6:{male:7180,female:7180}, 7:{male:7420,female:7420},
-  8:{male:7660,female:7660}, 9:{male:7900,female:7900}, 10:{male:8140,female:8140}, 11:{male:8390,female:8390},
-  12:{male:8630,female:8630}, 13:{male:8870,female:8870}, 14:{male:9110,female:9110}, 15:{male:9350,female:9350},
-  16:{male:9590,female:9590}, 17:{male:9840,female:9840}, 18:{male:10080,female:10080}, 19:{male:10320,female:10320},
-  20:{male:10560,female:10560},
-  21:{male:10960,female:10960}, 22:{male:11370,female:11370}, 23:{male:11770,female:11770}, 24:{male:12180,female:12180},
-  25:{male:12580,female:12580}, 26:{male:12980,female:12980}, 27:{male:13390,female:13390}, 28:{male:13790,female:13790},
-  29:{male:14200,female:14200}, 30:{male:14600,female:14600}, 31:{male:15010,female:15010}, 32:{male:15420,female:15420},
-  33:{male:15830,female:15830}, 34:{male:16240,female:16240}, 35:{male:16650,female:16650}, 36:{male:17060,female:17060},
-  37:{male:17470,female:17470}, 38:{male:17880,female:17880}, 39:{male:18290,female:18290}, 40:{male:18700,female:18700},
-  41:{male:19110,female:19110}, 42:{male:19520,female:19520}, 43:{male:19930,female:19930}, 44:{male:20340,female:20340},
-  45:{male:20750,female:20750}, 46:{male:21160,female:21160}, 47:{male:21570,female:21570}, 48:{male:21980,female:21980},
-  49:{male:22390,female:22390}, 50:{male:22800,female:22800},
-  51:{male:24000,female:24000}, 52:{male:24000,female:24000}, 53:{male:24000,female:24000}, 54:{male:24000,female:24000},
-  55:{male:24000,female:24000}, 56:{male:24000,female:24000}, 57:{male:24000,female:24000}, 58:{male:24000,female:24000},
-  59:{male:24000,female:24000}, 60:{male:24000,female:24000},
-  61:{male:32000,female:32000}, 62:{male:32000,female:32000}, 63:{male:32000,female:32000}, 64:{male:32000,female:32000},
-  65:{male:32000,female:32000}, 66:{male:32000,female:32000}, 67:{male:32000,female:32000}, 68:{male:32000,female:32000},
-  69:{male:32000,female:32000}, 70:{male:32000,female:32000}
+  0:{male:2865,female:2865}, 1:{male:2985,female:2985}, 2:{male:3105,female:3105}, 3:{male:3225,female:3225},
+  4:{male:3350,female:3350}, 5:{male:3470,female:3470}, 6:{male:3590,female:3590}, 7:{male:3710,female:3710},
+  8:{male:3830,female:3830}, 9:{male:3950,female:3950}, 10:{male:4070,female:4070}, 11:{male:4195,female:4195},
+  12:{male:4315,female:4315}, 13:{male:4435,female:4435}, 14:{male:4555,female:4555}, 15:{male:4675,female:4675},
+  16:{male:4795,female:4795}, 17:{male:4920,female:4920}, 18:{male:5040,female:5040}, 19:{male:5160,female:5160},
+  20:{male:5280,female:5280},
+  21:{male:5480,female:5480}, 22:{male:5685,female:5685}, 23:{male:5885,female:5885}, 24:{male:6090,female:6090},
+  25:{male:6290,female:6290}, 26:{male:6490,female:6490}, 27:{male:6695,female:6695}, 28:{male:6895,female:6895},
+  29:{male:7100,female:7100}, 30:{male:7300,female:7300}, 31:{male:7505,female:7505}, 32:{male:7710,female:7710},
+  33:{male:7915,female:7915}, 34:{male:8120,female:8120}, 35:{male:8325,female:8325}, 36:{male:8530,female:8530},
+  37:{male:8735,female:8735}, 38:{male:8940,female:8940}, 39:{male:9145,female:9145}, 40:{male:9350,female:9350},
+  41:{male:9555,female:9555}, 42:{male:9760,female:9760}, 43:{male:9965,female:9965}, 44:{male:10170,female:10170},
+  45:{male:10375,female:10375}, 46:{male:10580,female:10580}, 47:{male:10785,female:10785}, 48:{male:10990,female:10990},
+  49:{male:11195,female:11195}, 50:{male:11400,female:11400},
+  51:{male:12000,female:12000}, 52:{male:12000,female:12000}, 53:{male:12000,female:12000}, 54:{male:12000,female:12000},
+  55:{male:12000,female:12000}, 56:{male:12000,female:12000}, 57:{male:12000,female:12000}, 58:{male:12000,female:12000},
+  59:{male:12000,female:12000}, 60:{male:12000,female:12000},
+  61:{male:16000,female:16000}, 62:{male:16000,female:16000}, 63:{male:16000,female:16000}, 64:{male:16000,female:16000},
+  65:{male:16000,female:16000}, 66:{male:16000,female:16000}, 67:{male:16000,female:16000}, 68:{male:16000,female:16000},
+  69:{male:16000,female:16000}, 70:{male:16000,female:16000}
 };
 
 const BASE_AMOUNT_MANWON = 1000;
