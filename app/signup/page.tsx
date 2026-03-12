@@ -46,25 +46,19 @@ export default function SignupPage() {
       const { data: { user }, error: signUpError } = await supabase.auth.signUp({
         email: internalEmail,
         password,
+        options: {
+          data: {
+            name,
+            phone: cleanPhone,
+            affiliation,
+            region,
+          }
+        }
       })
 
       if (signUpError) throw signUpError
 
       if (user) {
-        // Create planner profile
-        const { error: profileError } = await supabase
-          .from('planners')
-          .insert({
-            id: user.id,
-            name,
-            phone: cleanPhone,
-            affiliation,
-            region,
-            subscription_status: 'inactive'
-          })
-
-        if (profileError) throw profileError
-
         alert('회원가입이 완료되었습니다! 휴대폰 번호로 로그인해 주세요.')
         router.push('/login')
       }

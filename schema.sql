@@ -66,6 +66,9 @@ create policy "Planners can view own profile" on public.planners for select usin
 drop policy if exists "Planners can update own profile" on public.planners;
 create policy "Planners can update own profile" on public.planners for update using (auth.uid() = id);
 
+drop policy if exists "Individuals can create their own planner profile" on public.planners;
+create policy "Individuals can create their own planner profile" on public.planners for insert with check (auth.uid() = id);
+
 drop policy if exists "Anyone can view limited planner info" on public.planners;
 create policy "Anyone can view limited planner info" on public.planners for select to anon using (subscription_status = 'active');
 
@@ -74,8 +77,29 @@ drop policy if exists "Planners can manage own customers" on public.customers;
 create policy "Planners can manage own customers" on public.customers for all using (auth.uid() = planner_id);
 
 -- ==========================================
--- 자동 갱신 트리거 (updated_at)
+-- 자동 프로필 생성 트리거 (auth.users 가입 시)
 -- ==========================================
+create or replace function public.handle_new_user()
+returns trigger as $$
+begin
+  insert into public.planners (id, name, phone, affiliation, region)
+  values (
+    new.id,
+    coalesce(new.raw_user_meta_data->>'name', '새 설계사'),
+    coalesce(new.raw_user_meta_data->>'phone', ''),
+    coalesce(new.raw_user_meta_data->>'affiliation', ''),
+    coalesce(new.raw_user_meta_data->>'region', '')
+  );
+  return new;
+end;
+$$ language plpgsql security definer;
+
+drop trigger if exists on_auth_user_created on auth.users;
+create trigger on_auth_user_created
+  after insert on auth.users
+  for each row execute procedure public.handle_new_user();
+
+-- updated_at 자동 갱신 트리거
 create or replace function public.handle_updated_at()
 returns trigger as $$
 begin
