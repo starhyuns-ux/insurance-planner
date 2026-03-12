@@ -86,6 +86,8 @@ export default async function PlannerLandingPage({ params }: { params: { id: str
           phone={planner.phone}
           profileImage={planner.profile_image_url}
           businessCard={planner.business_card_url}
+          affiliation={planner.affiliation}
+          region={planner.region}
         />
       </div>
 

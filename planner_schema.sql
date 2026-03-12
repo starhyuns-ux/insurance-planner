@@ -6,6 +6,8 @@ create table if not exists public.planners (
   phone text,
   profile_image_url text,
   business_card_url text,
+  affiliation text, -- 소속 (예: 삼성생명, GA 등)
+  region text,      -- 지역 (예: 서울 강남구, 부산 등)
   subscription_status text not null default 'inactive', -- active, inactive, pending
   subscription_end_date timestamptz,
   created_at timestamptz not null default now(),

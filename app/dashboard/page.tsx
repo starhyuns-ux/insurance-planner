@@ -21,6 +21,8 @@ type Planner = {
   phone: string
   profile_image_url: string | null
   business_card_url: string | null
+  affiliation: string
+  region: string
   subscription_status: 'active' | 'inactive'
 }
 
@@ -50,6 +52,9 @@ export default function DashboardPage() {
   // Profile Edit State
   const [editName, setEditName] = useState('')
   const [editPhone, setEditPhone] = useState('')
+  const [editAffiliation, setEditAffiliation] = useState('')
+  const [editRegion, setEditRegion] = useState('')
+  const [isSaving, setIsSaving] = useState(false)
 
   // New Customer State
   const [newCustName, setNewCustName] = useState('')
@@ -77,6 +82,8 @@ export default function DashboardPage() {
       setPlanner(profile)
       setEditName(profile.name)
       setEditPhone(profile.phone || '')
+      setEditAffiliation(profile.affiliation || '')
+      setEditRegion(profile.region || '')
     }
 
     // Fetch Manual Customers
@@ -107,15 +114,32 @@ export default function DashboardPage() {
 
   const updateProfile = async () => {
     if (!planner) return
-    const { error } = await supabase
-      .from('planners')
-      .update({ name: editName, phone: editPhone })
-      .eq('id', planner.id)
+    setIsSaving(true)
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) {
+      alert('사용자 정보를 찾을 수 없습니다. 다시 로그인해주세요.')
+      setIsSaving(false)
+      router.push('/login')
+      return
+    }
 
-    if (!error) {
+    const { error: updateError } = await supabase
+      .from('planners')
+      .update({
+        name: editName,
+        phone: editPhone,
+        affiliation: editAffiliation,
+        region: editRegion
+      })
+      .eq('id', user.id)
+
+    if (!updateError) {
       alert('프로필이 수정되었습니다.')
       checkUser()
+    } else {
+      alert('프로필 업데이트 중 오류가 발생했습니다: ' + updateError.message)
     }
+    setIsSaving(false)
   }
 
   const addCustomer = async (e: React.FormEvent) => {
@@ -234,11 +258,32 @@ export default function DashboardPage() {
                           className="w-full px-5 py-3.5 bg-gray-50 border border-transparent rounded-2xl focus:bg-white focus:border-primary-500 transition-all outline-none"
                         />
                       </div>
+                      <div>
+                        <label className="block text-sm font-bold text-gray-700 mb-2 ml-1">소속</label>
+                        <input
+                          type="text"
+                          value={editAffiliation}
+                          onChange={(e) => setEditAffiliation(e.target.value)}
+                          placeholder="예: 삼성생명"
+                          className="w-full px-5 py-3.5 bg-gray-50 border border-transparent rounded-2xl focus:bg-white focus:border-primary-500 transition-all outline-none"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-bold text-gray-700 mb-2 ml-1">활동 지역</label>
+                        <input
+                          type="text"
+                          value={editRegion}
+                          onChange={(e) => setEditRegion(e.target.value)}
+                          placeholder="예: 서울 강남구"
+                          className="w-full px-5 py-3.5 bg-gray-50 border border-transparent rounded-2xl focus:bg-white focus:border-primary-500 transition-all outline-none"
+                        />
+                      </div>
                       <button
                         onClick={updateProfile}
-                        className="bg-gray-900 text-white px-8 py-3.5 rounded-2xl font-bold hover:bg-gray-800 transition-all"
+                        disabled={isSaving}
+                        className="bg-gray-900 text-white px-8 py-3.5 rounded-2xl font-bold hover:bg-gray-800 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                       >
-                        저장하기
+                        {isSaving ? '저장 중...' : '저장하기'}
                       </button>
                     </div>
 

@@ -3,9 +3,11 @@ interface AdvisorProfileProps {
   phone?: string;
   profileImage?: string;
   businessCard?: string;
+  affiliation?: string;
+  region?: string;
 }
 
-export default function AdvisorProfile({ name, phone, profileImage, businessCard }: AdvisorProfileProps) {
+export default function AdvisorProfile({ name, phone, profileImage, businessCard, affiliation, region }: AdvisorProfileProps) {
   const points = [
     { title: "특정 보험사 가입 강요 NO", desc: "고객님의 입장에서 30여개 보험사를 객관적으로 비교 분석합니다." },
     { title: "초기부터 끝까지 부담 없는 100% 무료", desc: "초기 상담부터 맞춤 설계 제안까지 모든 과정을 무료로 제공합니다." },
@@ -28,7 +30,9 @@ export default function AdvisorProfile({ name, phone, profileImage, businessCard
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                   </svg>
                 </div>
-                <div className="text-primary-400 font-bold tracking-widest text-sm mb-2 shadow-sm">경력 10년 이상</div>
+                <div className="text-primary-400 font-bold tracking-widest text-sm mb-2 shadow-sm">
+                  {region} | {affiliation}
+                </div>
                 <div className="text-2xl font-extrabold text-white">{name || "상위 1% 전문가"} 배정</div>
               </div>
             )}

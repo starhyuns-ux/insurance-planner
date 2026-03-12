@@ -12,9 +12,25 @@ export default function SignupPage() {
   const [password, setPassword] = useState('')
   const [name, setName] = useState('')
   const [phone, setPhone] = useState('')
+  const [affiliation, setAffiliation] = useState('')
+  const [region, setRegion] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const router = useRouter()
+
+  const handleSocialLogin = async (provider: any) => {
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider,
+        options: {
+          redirectTo: `${window.location.origin}/dashboard`,
+        },
+      })
+      if (error) throw error
+    } catch (err: any) {
+      setError(`${provider} 로그인 중 오류가 발생했습니다.`)
+    }
+  }
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -37,6 +53,8 @@ export default function SignupPage() {
             id: user.id,
             name,
             phone,
+            affiliation,
+            region,
             subscription_status: 'inactive'
           })
 
@@ -99,6 +117,31 @@ export default function SignupPage() {
               />
             </div>
 
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-bold text-gray-700 mb-2 ml-1">소속</label>
+                <input
+                  type="text"
+                  required
+                  value={affiliation}
+                  onChange={(e) => setAffiliation(e.target.value)}
+                  placeholder="예: 삼성생명"
+                  className="w-full px-5 py-3.5 bg-gray-50 border border-transparent rounded-2xl focus:bg-white focus:border-primary-500 transition-all outline-none"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-bold text-gray-700 mb-2 ml-1">지역</label>
+                <input
+                  type="text"
+                  required
+                  value={region}
+                  onChange={(e) => setRegion(e.target.value)}
+                  placeholder="예: 서울 강남구"
+                  className="w-full px-5 py-3.5 bg-gray-50 border border-transparent rounded-2xl focus:bg-white focus:border-primary-500 transition-all outline-none"
+                />
+              </div>
+            </div>
+
             <div>
               <label className="block text-sm font-bold text-gray-700 mb-2 ml-1">비밀번호</label>
               <input
@@ -122,9 +165,39 @@ export default function SignupPage() {
               disabled={loading}
               className="w-full bg-gray-900 text-white py-4 rounded-2xl font-black text-lg shadow-lg hover:bg-gray-800 transition-all disabled:opacity-50"
             >
-              {loading ? '가입 중...' : '회원가입 완료하기'}
+              {loading ? '가입 중...' : '이메일로 가입하기'}
             </button>
           </form>
+
+          <div className="relative my-10">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-gray-100"></div>
+            </div>
+            <div className="relative flex justify-center text-sm">
+              <span className="px-4 bg-white text-gray-400 font-bold">또는 소셜 계정으로 시작하기</span>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-3 gap-4">
+            <button
+              onClick={() => handleSocialLogin('google')}
+              className="flex items-center justify-center py-3.5 border border-gray-100 rounded-2xl hover:bg-gray-50 transition-all font-bold text-sm text-gray-600"
+            >
+              Google
+            </button>
+            <button
+              onClick={() => handleSocialLogin('kakao')}
+              className="flex items-center justify-center py-3.5 bg-[#FEE500] rounded-2xl hover:opacity-90 transition-all font-bold text-sm text-[#000000]"
+            >
+              Kakao
+            </button>
+            <button
+              onClick={() => handleSocialLogin('naver')}
+              className="flex items-center justify-center py-3.5 bg-[#03C75A] rounded-2xl hover:opacity-90 transition-all font-bold text-sm text-white"
+            >
+              Naver
+            </button>
+          </div>
 
           <p className="mt-8 text-center text-sm text-gray-500">
             이미 계정이 있으신가요?{' '}
