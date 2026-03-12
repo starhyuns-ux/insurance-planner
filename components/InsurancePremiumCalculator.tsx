@@ -356,10 +356,10 @@ export default function InsurancePremiumCalculator() {
                       보험나이 {results.age}세
                     </span>
                   </div>
-                  <h2 className="text-2xl font-black text-gray-900">예상 보험료 산출 결과</h2>
+                  <h2 className="text-2xl font-black text-gray-900">보험료 산출 결과</h2>
                 </div>
                 <div className="text-right">
-                  <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">총 월 예상 보험료</p>
+                  <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">총 월 보험료</p>
                   <p className="text-3xl font-black text-primary-600 tracking-tight">{formatMoney(results.total)}</p>
                 </div>
               </div>
