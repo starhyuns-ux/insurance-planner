@@ -70,7 +70,7 @@ drop policy if exists "Individuals can create their own planner profile" on publ
 create policy "Individuals can create their own planner profile" on public.planners for insert with check (auth.uid() = id);
 
 drop policy if exists "Anyone can view limited planner info" on public.planners;
-create policy "Anyone can view limited planner info" on public.planners for select to anon using (subscription_status = 'active');
+create policy "Anyone can view planner profiles" on public.planners for select to public using (true);
 
 -- Customers 정책
 drop policy if exists "Planners can manage own customers" on public.customers;
