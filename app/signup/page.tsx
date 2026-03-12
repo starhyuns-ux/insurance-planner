@@ -37,9 +37,14 @@ export default function SignupPage() {
     setLoading(true)
     setError(null)
 
+    // Clean phone number: remove dashes
+    const cleanPhone = phone.replace(/-/g, '')
+    // Internally use phone@planner.stroy.kr as the email for Supabase Auth
+    const internalEmail = `${cleanPhone}@planner.stroy.kr`
+
     try {
       const { data: { user }, error: signUpError } = await supabase.auth.signUp({
-        email,
+        email: internalEmail,
         password,
       })
 
@@ -52,7 +57,7 @@ export default function SignupPage() {
           .insert({
             id: user.id,
             name,
-            phone,
+            phone: cleanPhone,
             affiliation,
             region,
             subscription_status: 'inactive'
@@ -60,7 +65,7 @@ export default function SignupPage() {
 
         if (profileError) throw profileError
 
-        alert('회원가입이 완료되었습니다! 로그인해 주세요.')
+        alert('회원가입이 완료되었습니다! 휴대폰 번호로 로그인해 주세요.')
         router.push('/login')
       }
     } catch (err: any) {
@@ -77,7 +82,7 @@ export default function SignupPage() {
         <div className="max-w-md w-full bg-white rounded-3xl shadow-xl p-8 border border-gray-100">
           <div className="text-center mb-10">
             <h1 className="text-3xl font-black text-gray-900 mb-2">설계사 전용 가입</h1>
-            <p className="text-gray-500">보험다이어트 플래너로 등록하고 나만의 페이지를 만드세요.</p>
+            <p className="text-gray-500 text-sm">보험다이어트 플래너로 등록하고 나만의 페이지를 만드세요.</p>
           </div>
 
           <form onSubmit={handleSignup} className="space-y-5">
@@ -94,25 +99,13 @@ export default function SignupPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-bold text-gray-700 mb-2 ml-1">연락처</label>
+              <label className="block text-sm font-bold text-gray-700 mb-2 ml-1">휴대폰 번호 (로그인 ID)</label>
               <input
                 type="tel"
                 required
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
                 placeholder="010-1234-5678"
-                className="w-full px-5 py-3.5 bg-gray-50 border border-transparent rounded-2xl focus:bg-white focus:border-primary-500 transition-all outline-none"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-bold text-gray-700 mb-2 ml-1">이메일</label>
-              <input
-                type="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="planner@example.com"
                 className="w-full px-5 py-3.5 bg-gray-50 border border-transparent rounded-2xl focus:bg-white focus:border-primary-500 transition-all outline-none"
               />
             </div>
@@ -165,7 +158,7 @@ export default function SignupPage() {
               disabled={loading}
               className="w-full bg-gray-900 text-white py-4 rounded-2xl font-black text-lg shadow-lg hover:bg-gray-800 transition-all disabled:opacity-50"
             >
-              {loading ? '가입 중...' : '이메일로 가입하기'}
+              {loading ? '가입 중...' : '회원가입 완료하기'}
             </button>
           </form>
 
@@ -178,7 +171,7 @@ export default function SignupPage() {
             </div>
           </div>
 
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-2 gap-4">
             <button
               onClick={() => handleSocialLogin('google')}
               className="flex items-center justify-center py-3.5 border border-gray-100 rounded-2xl hover:bg-gray-50 transition-all font-bold text-sm text-gray-600"
@@ -190,12 +183,6 @@ export default function SignupPage() {
               className="flex items-center justify-center py-3.5 bg-[#FEE500] rounded-2xl hover:opacity-90 transition-all font-bold text-sm text-[#000000]"
             >
               Kakao
-            </button>
-            <button
-              onClick={() => handleSocialLogin('naver')}
-              className="flex items-center justify-center py-3.5 bg-[#03C75A] rounded-2xl hover:opacity-90 transition-all font-bold text-sm text-white"
-            >
-              Naver
             </button>
           </div>
 
