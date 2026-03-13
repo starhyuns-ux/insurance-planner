@@ -60,11 +60,17 @@ export default function DashboardPage() {
   const [editKakaoUrl, setEditKakaoUrl] = useState('')
   const [isSaving, setIsSaving] = useState(false)
 
-  // New Customer State
   const [newCustName, setNewCustName] = useState('')
   const [newCustPhone, setNewCustPhone] = useState('')
   const [newCustAddr, setNewCustAddr] = useState('')
   const [newCustRiders, setNewCustRiders] = useState('')
+
+  // Edit Customer State
+  const [editingId, setEditingId] = useState<string | null>(null)
+  const [editCustName, setEditCustName] = useState('')
+  const [editCustPhone, setEditCustPhone] = useState('')
+  const [editCustAddr, setEditCustAddr] = useState('')
+  const [editCustRiders, setEditCustRiders] = useState('')
 
   useEffect(() => {
     checkUser()
@@ -215,15 +221,63 @@ export default function DashboardPage() {
   }
 
   const incrementTouch = async (id: string, currentCount: number) => {
+    try {
+      const { error } = await supabase
+        .from('customers')
+        .update({ touch_count: currentCount + 1 })
+        .eq('id', id)
+
+      if (!error) {
+        setCustomers(prev => prev.map(c => c.id === id ? { ...c, touch_count: c.touch_count + 1 } : c))
+      } else {
+        console.error('Touch update error:', error)
+        alert('터치 횟수 업데이트 중 오류가 발생했습니다. DB 설정을 확인해주세요.')
+      }
+    } catch (err) {
+      console.error('Touch increment exception:', err)
+      alert('오류가 발생했습니다.')
+    }
+  }
+
+  const startEditing = (customer: Customer) => {
+    setEditingId(customer.id)
+    setEditCustName(customer.name)
+    setEditCustPhone(customer.phone)
+    setEditCustAddr(customer.address)
+    setEditCustRiders(customer.riders.join(', '))
+  }
+
+  const saveEdit = async () => {
+    if (!editingId) return
     const { error } = await supabase
       .from('customers')
-      .update({ touch_count: currentCount + 1 })
+      .update({
+        name: editCustName,
+        phone: editCustPhone,
+        address: editCustAddr,
+        riders: editCustRiders.split(',').map(r => r.trim()).filter(r => r !== '')
+      })
+      .eq('id', editingId)
+
+    if (!error) {
+      setEditingId(null)
+      checkUser()
+    } else {
+      alert('수정 중 오류가 발생했습니다.')
+    }
+  }
+
+  const deleteCustomer = async (id: string) => {
+    if (!confirm('정말로 이 고객 정보를 삭제하시겠습니까?')) return
+    const { error } = await supabase
+      .from('customers')
+      .delete()
       .eq('id', id)
 
     if (!error) {
-      setCustomers(prev => prev.map(c => c.id === id ? { ...c, touch_count: c.touch_count + 1 } : c))
+      checkUser()
     } else {
-      alert('터치 횟수 업데이트 중 오류가 발생했습니다.')
+      alert('삭제 중 오류가 발생했습니다.')
     }
   }
 
@@ -545,42 +599,66 @@ export default function DashboardPage() {
                           <th className="px-8 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest">고객명</th>
                           <th className="px-8 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest">전화번호</th>
                           <th className="px-8 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest">주소</th>
-                          <th className="px-8 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest">터치</th>
                           <th className="px-8 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest">주요 특약</th>
                           <th className="px-8 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest">등록일</th>
+                          <th className="px-8 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest text-right">관리 / 터치</th>
                         </tr>
                       </thead>
-                      <tbody className="divide-y divide-gray-50">
+                      <tbody className="divide-y divide-gray-50 text-sm">
                         {customers.length === 0 ? (
                           <tr>
-                            <td colSpan={4} className="px-8 py-12 text-center text-gray-400 font-medium">
+                            <td colSpan={6} className="px-8 py-12 text-center text-gray-400 font-medium">
                               등록된 고객 정보가 없습니다.
                             </td>
                           </tr>
                         ) : (
                           customers.map(c => (
-                            <tr key={c.id} className="hover:bg-gray-50/50 transition-colors">
-                              <td className="px-8 py-5 font-bold text-gray-900">{c.name}</td>
-                              <td className="px-8 py-5 text-gray-600 font-mono tracking-tight text-sm">{c.phone || '-'}</td>
-                              <td className="px-8 py-5 text-gray-600 text-sm whitespace-nowrap overflow-hidden text-ellipsis max-w-[150px]">{c.address || '-'}</td>
-                              <td className="px-8 py-5">
-                                <button
-                                  onClick={() => incrementTouch(c.id, c.touch_count)}
-                                  className="flex items-center gap-1.5 bg-primary-50 text-primary-600 px-3 py-1.5 rounded-lg hover:bg-primary-100 transition-all active:scale-95 group"
-                                >
-                                  <span className="text-[11px] font-black">{c.touch_count}회</span>
-                                  <PlusIcon className="w-3.5 h-3.5" />
-                                </button>
-                              </td>
-                              <td className="px-8 py-5">
-                                <div className="flex flex-wrap gap-1.5">
-                                  {c.riders.map((r, i) => (
-                                    <span key={i} className="text-[10px] font-bold bg-gray-100 text-gray-500 px-2 py-0.5 rounded-md">{r}</span>
-                                  ))}
-                                  {c.riders.length === 0 && <span className="text-gray-400">-</span>}
-                                </div>
-                              </td>
-                              <td className="px-8 py-5 text-gray-400 text-sm">{new Date(c.created_at).toLocaleDateString()}</td>
+                            <tr key={c.id} className="hover:bg-gray-50/50 transition-colors group">
+                              {editingId === c.id ? (
+                                <>
+                                  <td className="px-4 py-3"><input value={editCustName} onChange={e => setEditCustName(e.target.value)} className="w-full px-3 py-2 bg-white border border-gray-200 rounded-xl focus:border-primary-500 outline-none text-sm font-bold" /></td>
+                                  <td className="px-4 py-3"><input value={editCustPhone} onChange={e => setEditCustPhone(e.target.value)} className="w-full px-3 py-2 bg-white border border-gray-200 rounded-xl focus:border-primary-500 outline-none text-sm font-mono" /></td>
+                                  <td className="px-4 py-3"><input value={editCustAddr} onChange={e => setEditCustAddr(e.target.value)} className="w-full px-3 py-2 bg-white border border-gray-200 rounded-xl focus:border-primary-500 outline-none text-sm" /></td>
+                                  <td className="px-4 py-3"><input value={editCustRiders} onChange={e => setEditCustRiders(e.target.value)} className="w-full px-3 py-2 bg-white border border-gray-200 rounded-xl focus:border-primary-500 outline-none text-sm" /></td>
+                                  <td className="px-4 py-3 text-gray-400">-</td>
+                                  <td className="px-4 py-3 text-right">
+                                    <div className="flex justify-end gap-2">
+                                      <button onClick={saveEdit} className="text-primary-600 font-bold hover:underline">저장</button>
+                                      <button onClick={() => setEditingId(null)} className="text-gray-400 font-bold hover:underline">취소</button>
+                                    </div>
+                                  </td>
+                                </>
+                              ) : (
+                                <>
+                                  <td className="px-8 py-5 font-bold text-gray-900">{c.name}</td>
+                                  <td className="px-8 py-5 text-gray-600 font-mono tracking-tight">{c.phone || '-'}</td>
+                                  <td className="px-8 py-5 text-gray-600 truncate max-w-[120px]">{c.address || '-'}</td>
+                                  <td className="px-8 py-5">
+                                    <div className="flex flex-wrap gap-1.5">
+                                      {c.riders.map((r, i) => (
+                                        <span key={i} className="text-[10px] font-bold bg-gray-100 text-gray-500 px-2 py-0.5 rounded-md">{r}</span>
+                                      ))}
+                                      {c.riders.length === 0 && <span className="text-gray-400">-</span>}
+                                    </div>
+                                  </td>
+                                  <td className="px-8 py-5 text-gray-400 whitespace-nowrap">{new Date(c.created_at).toLocaleDateString()}</td>
+                                  <td className="px-8 py-5 text-right">
+                                    <div className="flex items-center justify-end gap-3">
+                                      <div className="flex gap-2 mr-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                                        <button onClick={() => startEditing(c)} className="text-xs text-gray-400 hover:text-primary-600 font-bold">수정</button>
+                                        <button onClick={() => deleteCustomer(c.id)} className="text-xs text-gray-400 hover:text-rose-600 font-bold">삭제</button>
+                                      </div>
+                                      <button
+                                        onClick={() => incrementTouch(c.id, c.touch_count)}
+                                        className="flex items-center gap-1.5 bg-primary-50 text-primary-600 px-3 py-1.5 rounded-lg hover:bg-primary-100 transition-all active:scale-95 whitespace-nowrap"
+                                      >
+                                        <span className="text-[11px] font-black">{c.touch_count}회</span>
+                                        <PlusIcon className="w-3.5 h-3.5" />
+                                      </button>
+                                    </div>
+                                  </td>
+                                </>
+                              )}
                             </tr>
                           ))
                         )}
