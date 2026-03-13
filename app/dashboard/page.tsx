@@ -198,8 +198,10 @@ export default function DashboardPage() {
       .insert({
         planner_id: planner.id,
         name: newCustName,
+        phone: newCustPhone,
         address: newCustAddr,
-        riders: newCustRiders.split(',').map(r => r.trim()).filter(r => r !== '')
+        riders: newCustRiders.split(',').map(r => r.trim()).filter(r => r !== ''),
+        touch_count: 0
       })
 
     if (!error) {
