@@ -28,7 +28,8 @@ import {
   isSameMonth, 
   isSameDay, 
   addMonths, 
-  subMonths 
+  subMonths,
+  differenceInCalendarDays
 } from 'date-fns'
 import { ko } from 'date-fns/locale'
 
@@ -48,18 +49,26 @@ const safeFormat = (dateStr: string | null | undefined, formatStr: string) => {
 const getInsuranceAge = (birthDateStr: string | null | undefined) => {
   if (!birthDateStr) return null
   try {
-    const birthDate = new Date(birthDateStr)
+    // birthDateStr is typically YYYY-MM-DD
+    const parts = birthDateStr.split('-')
+    if (parts.length !== 3) return null
+    
+    // Use manual date construction to avoid UTC/Local issues with Hyphenated strings
+    const bYear = parseInt(parts[0])
+    const bMonth = parseInt(parts[1]) - 1 // 0-indexed
+    const bDay = parseInt(parts[2])
+    
+    const birthDate = new Date(bYear, bMonth, bDay)
     if (isNaN(birthDate.getTime())) return null
     
     const today = new Date()
     today.setHours(0, 0, 0, 0)
 
     // Standard Insurance Birthday: (Birth Month + 6) % 12
-    // It happens once a year.
-    let targetMonth = (birthDate.getMonth() + 6) % 12
-    let targetDay = birthDate.getDate()
+    let targetMonth = (bMonth + 6) % 12
+    let targetDay = bDay
     
-    // We need to find the next occurrence of this Month/Day
+    // Find the NEXT occurrence of this Month/Day
     let targetYear = today.getFullYear()
     let insDate = new Date(targetYear, targetMonth, targetDay)
     insDate.setHours(0, 0, 0, 0)
@@ -70,11 +79,7 @@ const getInsuranceAge = (birthDateStr: string | null | undefined) => {
       insDate.setHours(0, 0, 0, 0)
     }
 
-    const diffTime = insDate.getTime() - today.getTime()
-    const dDayCount = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
-
-    // Just in case of edge cases (leap years etc), clamp it or ensure it's the closest one
-    // But Birthday + 6 months is always yearly.
+    const dDayCount = differenceInCalendarDays(insDate, today)
     
     return dDayCount === 0 ? 'D-Day' : `D-${dDayCount}`
   } catch (e) {
@@ -739,7 +744,7 @@ export default function DashboardPage() {
                         <tr className="bg-gray-50/50 text-left">
                           <th className="px-8 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest">고객 정보</th>
                           <th className="px-8 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest">연락처/주소</th>
-                          <th className="px-8 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest text-center">보험상령일</th>
+                          <th className="px-8 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest text-center">상령일 (D-Day)</th>
                           <th className="px-8 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest">약속</th>
                           <th className="px-8 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest">주요 특약</th>
                           <th className="px-8 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest text-right">터치 / 관리</th>
