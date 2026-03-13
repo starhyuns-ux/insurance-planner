@@ -417,7 +417,7 @@ export default function DashboardPage() {
         <div className="flex flex-col md:flex-row gap-8">
           
           {/* Sidebar */}
-          <aside className="w-full md:w-64 space-y-2 shrink-0">
+          <aside className="w-full md:w-80 space-y-2 shrink-0">
             <h2 className="px-4 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-4">설계사 메뉴</h2>
             <div className="space-y-1">
               <button
@@ -436,7 +436,7 @@ export default function DashboardPage() {
                 }`}
               >
                 <UsersIcon className="w-5 h-5" />
-                상담 신청 현항
+                상담 신청 현황
               </button>
               <button
                 onClick={() => setActiveTab('customers')}
@@ -445,7 +445,7 @@ export default function DashboardPage() {
                 }`}
               >
                 <UsersIcon className="w-5 h-5" />
-                내 가망 고객 관리
+                내 고객 직접 등록
               </button>
               <button
                 onClick={() => setActiveTab('calendar')}
@@ -454,7 +454,7 @@ export default function DashboardPage() {
                 }`}
               >
                 <CalendarIcon className="w-5 h-5" />
-                방문 일정 (달력)
+                일정 관리 (달력)
               </button>
               <button
                 onClick={() => setActiveTab('subscription')}
