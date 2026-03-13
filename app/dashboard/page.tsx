@@ -417,61 +417,73 @@ export default function DashboardPage() {
         <div className="flex flex-col md:flex-row gap-8">
           
           {/* Sidebar */}
-          <aside className="w-full md:w-64 space-y-2">
-            <h2 className="px-4 text-xs font-bold text-gray-400 uppercase tracking-widest mb-4">설계사 메뉴</h2>
-            <button
-              onClick={() => setActiveTab('profile')}
-              className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl font-bold transition-all ${
-                activeTab === 'profile' ? 'bg-primary-600 text-white shadow-lg' : 'text-gray-600 hover:bg-white hover:shadow-sm'
-              }`}
-            >
-              <UserCircleIcon className="w-6 h-6" />
-              내 프로필
-            </button>
-            <button
-              onClick={() => setActiveTab('leads')}
-              className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl font-bold transition-all ${
-                activeTab === 'leads' ? 'bg-primary-600 text-white shadow-lg' : 'text-gray-600 hover:bg-white hover:shadow-sm'
-              }`}
-            >
-              <UsersIcon className="w-6 h-6" />
-              상담 신청 현황
-            </button>
-            <button
-              onClick={() => setActiveTab('customers')}
-              className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl font-bold transition-all ${
-                activeTab === 'customers' ? 'bg-primary-600 text-white shadow-lg' : 'text-gray-600 hover:bg-white hover:shadow-sm'
-              }`}
-            >
-              <UsersIcon className="w-6 h-6" />
-              내 고객 직접 등록
-            </button>
-            <button
-              onClick={() => setActiveTab('calendar')}
-              className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl font-bold transition-all ${
-                activeTab === 'calendar' ? 'bg-primary-600 text-white shadow-lg' : 'text-gray-600 hover:bg-white hover:shadow-sm'
-              }`}
-            >
-              <CalendarIcon className="w-6 h-6" />
-              일정 관리 (달력)
-            </button>
-            <button
-              onClick={() => setActiveTab('subscription')}
-              className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl font-bold transition-all ${
-                activeTab === 'subscription' ? 'bg-primary-600 text-white shadow-lg' : 'text-gray-600 hover:bg-white hover:shadow-sm'
-              }`}
-            >
-              <CreditCardIcon className="w-6 h-6" />
-              구독 현황
-            </button>
-            
-            <div className="pt-8 border-t border-gray-200 mt-8">
+          <aside className="w-full md:w-64 space-y-2 shrink-0">
+            <h2 className="px-4 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-4">설계사 메뉴</h2>
+            <div className="space-y-1">
+              <button
+                onClick={() => setActiveTab('profile')}
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl font-bold transition-all whitespace-nowrap text-sm ${
+                  activeTab === 'profile' ? 'bg-primary-600 text-white shadow-lg shadow-primary-200' : 'text-gray-600 hover:bg-white hover:shadow-sm'
+                }`}
+              >
+                <UserCircleIcon className="w-5 h-5" />
+                내 프로필 관리
+              </button>
+              <button
+                onClick={() => setActiveTab('leads')}
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl font-bold transition-all whitespace-nowrap text-sm ${
+                  activeTab === 'leads' ? 'bg-primary-600 text-white shadow-lg shadow-primary-200' : 'text-gray-600 hover:bg-white hover:shadow-sm'
+                }`}
+              >
+                <UsersIcon className="w-5 h-5" />
+                상담 신청 현항
+              </button>
+              <button
+                onClick={() => setActiveTab('customers')}
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl font-bold transition-all whitespace-nowrap text-sm ${
+                  activeTab === 'customers' ? 'bg-primary-600 text-white shadow-lg shadow-primary-200' : 'text-gray-600 hover:bg-white hover:shadow-sm'
+                }`}
+              >
+                <UsersIcon className="w-5 h-5" />
+                내 가망 고객 관리
+              </button>
+              <button
+                onClick={() => setActiveTab('calendar')}
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl font-bold transition-all whitespace-nowrap text-sm ${
+                  activeTab === 'calendar' ? 'bg-primary-600 text-white shadow-lg shadow-primary-200' : 'text-gray-600 hover:bg-white hover:shadow-sm'
+                }`}
+              >
+                <CalendarIcon className="w-5 h-5" />
+                방문 일정 (달력)
+              </button>
+              <button
+                onClick={() => setActiveTab('subscription')}
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl font-bold transition-all whitespace-nowrap text-sm ${
+                  activeTab === 'subscription' ? 'bg-primary-600 text-white shadow-lg shadow-primary-200' : 'text-gray-600 hover:bg-white hover:shadow-sm'
+                }`}
+              >
+                <CreditCardIcon className="w-5 h-5" />
+                멤버십 구독 정보
+              </button>
+            </div>
+
+            <div className="pt-6 border-t border-gray-100 mt-6 space-y-1">
+              {planner?.id && (
+                <Link
+                  href={`/p/${planner.id}`}
+                  target="_blank"
+                  className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl font-bold text-gray-500 hover:bg-primary-50 hover:text-primary-600 transition-all text-sm whitespace-nowrap"
+                >
+                  <ArrowRightOnRectangleIcon className="w-5 h-5 rotate-180" />
+                  본인 사이트 보러가기
+                </Link>
+              )}
               <button
                 onClick={handleLogout}
-                className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl font-bold text-rose-600 hover:bg-rose-50 transition-all"
+                className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl font-bold text-rose-500 hover:bg-rose-50 transition-all text-sm whitespace-nowrap"
               >
-                <ArrowRightOnRectangleIcon className="w-6 h-6" />
-                로그아웃
+                <ArrowRightOnRectangleIcon className="w-5 h-5" />
+                시스템 로그아웃
               </button>
             </div>
           </aside>
