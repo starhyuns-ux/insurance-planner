@@ -742,12 +742,12 @@ export default function DashboardPage() {
                     <table className="w-full">
                       <thead>
                         <tr className="bg-gray-50/50 text-left">
-                          <th className="px-8 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest">고객 정보</th>
-                          <th className="px-8 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest">연락처/주소</th>
-                          <th className="px-8 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest text-center">상령일 (D-Day)</th>
-                          <th className="px-8 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest">약속</th>
-                          <th className="px-8 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest">주요 특약</th>
-                          <th className="px-8 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest text-right">터치 / 관리</th>
+                          <th className="px-8 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest whitespace-nowrap">고객 정보</th>
+                          <th className="px-8 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest whitespace-nowrap">연락처/주소</th>
+                          <th className="px-8 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest text-center whitespace-nowrap">상령일 (D-Day)</th>
+                          <th className="px-8 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest whitespace-nowrap">약속</th>
+                          <th className="px-8 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest whitespace-nowrap">주요 특약</th>
+                          <th className="px-8 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest text-right whitespace-nowrap">터치 / 관리</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-gray-50 text-sm">
