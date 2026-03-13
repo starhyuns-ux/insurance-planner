@@ -12,8 +12,25 @@ import {
   CreditCardIcon, 
   ArrowRightOnRectangleIcon,
   CloudArrowUpIcon,
-  PlusIcon
+  PlusIcon,
+  CalendarIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  MinusIcon
 } from '@heroicons/react/24/outline'
+import { 
+  format, 
+  startOfMonth, 
+  endOfMonth, 
+  startOfWeek, 
+  endOfWeek, 
+  eachDayOfInterval, 
+  isSameMonth, 
+  isSameDay, 
+  addMonths, 
+  subMonths 
+} from 'date-fns'
+import { ko } from 'date-fns/locale'
 
 type Planner = {
   id: string
@@ -40,12 +57,14 @@ type Customer = {
   phone: string
   address: string
   touch_count: number
+  last_touch_at: string | null
+  appointment_at: string | null
   riders: string[]
   created_at: string
 }
 
 export default function DashboardPage() {
-  const [activeTab, setActiveTab] = useState<'profile' | 'leads' | 'customers' | 'subscription'>('profile')
+  const [activeTab, setActiveTab] = useState<'profile' | 'leads' | 'customers' | 'calendar' | 'subscription'>('profile')
   const [planner, setPlanner] = useState<Planner | null>(null)
   const [customers, setCustomers] = useState<Customer[]>([])
   const [leads, setLeads] = useState<Lead[]>([])
@@ -64,6 +83,7 @@ export default function DashboardPage() {
   const [newCustPhone, setNewCustPhone] = useState('')
   const [newCustAddr, setNewCustAddr] = useState('')
   const [newCustRiders, setNewCustRiders] = useState('')
+  const [newCustAppt, setNewCustAppt] = useState('')
 
   // Edit Customer State
   const [editingId, setEditingId] = useState<string | null>(null)
@@ -71,6 +91,10 @@ export default function DashboardPage() {
   const [editCustPhone, setEditCustPhone] = useState('')
   const [editCustAddr, setEditCustAddr] = useState('')
   const [editCustRiders, setEditCustRiders] = useState('')
+  const [editCustAppt, setEditCustAppt] = useState('')
+
+  // Calendar State
+  const [currentMonth, setCurrentMonth] = useState(new Date())
 
   useEffect(() => {
     checkUser()
@@ -207,7 +231,8 @@ export default function DashboardPage() {
         phone: newCustPhone,
         address: newCustAddr,
         riders: newCustRiders.split(',').map(r => r.trim()).filter(r => r !== ''),
-        touch_count: 0
+        touch_count: 0,
+        appointment_at: newCustAppt || null
       })
 
     if (!error) {
@@ -216,6 +241,7 @@ export default function DashboardPage() {
       setNewCustPhone('')
       setNewCustAddr('')
       setNewCustRiders('')
+      setNewCustAppt('')
       checkUser()
     }
   }
@@ -224,17 +250,38 @@ export default function DashboardPage() {
     try {
       const { error } = await supabase
         .from('customers')
-        .update({ touch_count: currentCount + 1 })
+        .update({ 
+          touch_count: currentCount + 1,
+          last_touch_at: new Date().toISOString()
+        })
         .eq('id', id)
 
       if (!error) {
-        setCustomers(prev => prev.map(c => c.id === id ? { ...c, touch_count: c.touch_count + 1 } : c))
+        setCustomers(prev => prev.map(c => c.id === id ? { 
+          ...c, 
+          touch_count: c.touch_count + 1,
+          last_touch_at: new Date().toISOString() 
+        } : c))
       } else {
-        console.error('Touch update error:', error)
-        alert('터치 횟수 업데이트 중 오류가 발생했습니다. DB 설정을 확인해주세요.')
+        alert('터치 횟수 업데이트 중 오류가 발생했습니다.')
       }
     } catch (err) {
-      console.error('Touch increment exception:', err)
+      alert('오류가 발생했습니다.')
+    }
+  }
+
+  const decrementTouch = async (id: string, currentCount: number) => {
+    if (currentCount <= 0) return
+    try {
+      const { error } = await supabase
+        .from('customers')
+        .update({ touch_count: currentCount - 1 })
+        .eq('id', id)
+
+      if (!error) {
+        setCustomers(prev => prev.map(c => c.id === id ? { ...c, touch_count: c.touch_count - 1 } : c))
+      }
+    } catch (err) {
       alert('오류가 발생했습니다.')
     }
   }
@@ -245,6 +292,7 @@ export default function DashboardPage() {
     setEditCustPhone(customer.phone)
     setEditCustAddr(customer.address)
     setEditCustRiders(customer.riders.join(', '))
+    setEditCustAppt(customer.appointment_at ? customer.appointment_at.slice(0, 10) : '')
   }
 
   const saveEdit = async () => {
@@ -255,7 +303,8 @@ export default function DashboardPage() {
         name: editCustName,
         phone: editCustPhone,
         address: editCustAddr,
-        riders: editCustRiders.split(',').map(r => r.trim()).filter(r => r !== '')
+        riders: editCustRiders.split(',').map(r => r.trim()).filter(r => r !== ''),
+        appointment_at: editCustAppt || null
       })
       .eq('id', editingId)
 
@@ -325,6 +374,15 @@ export default function DashboardPage() {
             >
               <UsersIcon className="w-6 h-6" />
               내 고객 직접 등록
+            </button>
+            <button
+              onClick={() => setActiveTab('calendar')}
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl font-bold transition-all ${
+                activeTab === 'calendar' ? 'bg-primary-600 text-white shadow-lg' : 'text-gray-600 hover:bg-white hover:shadow-sm'
+              }`}
+            >
+              <CalendarIcon className="w-6 h-6" />
+              일정 관리 (달력)
             </button>
             <button
               onClick={() => setActiveTab('subscription')}
@@ -568,6 +626,15 @@ export default function DashboardPage() {
                       />
                     </div>
                     <div className="md:col-span-1">
+                      <label className="block text-xs font-bold text-gray-400 uppercase mb-2 ml-1">약속 날짜</label>
+                      <input
+                        type="date"
+                        value={newCustAppt}
+                        onChange={(e) => setNewCustAppt(e.target.value)}
+                        className="w-full px-5 py-3.5 bg-gray-50 border border-transparent rounded-2xl focus:bg-white focus:border-primary-500 transition-all outline-none text-sm"
+                      />
+                    </div>
+                    <div className="md:col-span-1">
                       <label className="block text-xs font-bold text-gray-400 uppercase mb-2 ml-1">특약 사항 (콤마로 구분)</label>
                       <input
                         type="text"
@@ -599,9 +666,9 @@ export default function DashboardPage() {
                           <th className="px-8 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest">고객명</th>
                           <th className="px-8 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest">전화번호</th>
                           <th className="px-8 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest">주소</th>
+                          <th className="px-8 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest">약속</th>
                           <th className="px-8 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest">주요 특약</th>
-                          <th className="px-8 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest">등록일</th>
-                          <th className="px-8 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest text-right">관리 / 터치</th>
+                          <th className="px-8 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest text-right">최근 터치 / 터치 횟수</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-gray-50 text-sm">
@@ -619,8 +686,8 @@ export default function DashboardPage() {
                                   <td className="px-4 py-3"><input value={editCustName} onChange={e => setEditCustName(e.target.value)} className="w-full px-3 py-2 bg-white border border-gray-200 rounded-xl focus:border-primary-500 outline-none text-sm font-bold" /></td>
                                   <td className="px-4 py-3"><input value={editCustPhone} onChange={e => setEditCustPhone(e.target.value)} className="w-full px-3 py-2 bg-white border border-gray-200 rounded-xl focus:border-primary-500 outline-none text-sm font-mono" /></td>
                                   <td className="px-4 py-3"><input value={editCustAddr} onChange={e => setEditCustAddr(e.target.value)} className="w-full px-3 py-2 bg-white border border-gray-200 rounded-xl focus:border-primary-500 outline-none text-sm" /></td>
+                                  <td className="px-4 py-3"><input type="date" value={editCustAppt} onChange={e => setEditCustAppt(e.target.value)} className="w-full px-3 py-2 border rounded-xl" /></td>
                                   <td className="px-4 py-3"><input value={editCustRiders} onChange={e => setEditCustRiders(e.target.value)} className="w-full px-3 py-2 bg-white border border-gray-200 rounded-xl focus:border-primary-500 outline-none text-sm" /></td>
-                                  <td className="px-4 py-3 text-gray-400">-</td>
                                   <td className="px-4 py-3 text-right">
                                     <div className="flex justify-end gap-2">
                                       <button onClick={saveEdit} className="text-primary-600 font-bold hover:underline">저장</button>
@@ -633,6 +700,9 @@ export default function DashboardPage() {
                                   <td className="px-8 py-5 font-bold text-gray-900">{c.name}</td>
                                   <td className="px-8 py-5 text-gray-600 font-mono tracking-tight">{c.phone || '-'}</td>
                                   <td className="px-8 py-5 text-gray-600 truncate max-w-[120px]">{c.address || '-'}</td>
+                                  <td className="px-8 py-5 font-bold text-primary-600">
+                                    {c.appointment_at ? format(new Date(c.appointment_at), 'MM-DD') : '-'}
+                                  </td>
                                   <td className="px-8 py-5">
                                     <div className="flex flex-wrap gap-1.5">
                                       {c.riders.map((r, i) => (
@@ -641,20 +711,32 @@ export default function DashboardPage() {
                                       {c.riders.length === 0 && <span className="text-gray-400">-</span>}
                                     </div>
                                   </td>
-                                  <td className="px-8 py-5 text-gray-400 whitespace-nowrap">{new Date(c.created_at).toLocaleDateString()}</td>
                                   <td className="px-8 py-5 text-right">
-                                    <div className="flex items-center justify-end gap-3">
-                                      <div className="flex gap-2 mr-4 opacity-0 group-hover:opacity-100 transition-opacity">
-                                        <button onClick={() => startEditing(c)} className="text-xs text-gray-400 hover:text-primary-600 font-bold">수정</button>
-                                        <button onClick={() => deleteCustomer(c.id)} className="text-xs text-gray-400 hover:text-rose-600 font-bold">삭제</button>
+                                    <div className="flex items-center justify-end gap-4">
+                                      <div className="flex flex-col items-end gap-1">
+                                        <div className="flex gap-2 mr-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                          <button onClick={() => startEditing(c)} className="text-[10px] text-gray-400 hover:text-primary-600 font-bold">수정</button>
+                                          <button onClick={() => deleteCustomer(c.id)} className="text-[10px] text-gray-400 hover:text-rose-600 font-bold">삭제</button>
+                                        </div>
+                                        {c.last_touch_at && (
+                                          <span className="text-[10px] text-gray-400 font-medium">최근: {format(new Date(c.last_touch_at), 'MM-DD')}</span>
+                                        )}
                                       </div>
-                                      <button
-                                        onClick={() => incrementTouch(c.id, c.touch_count)}
-                                        className="flex items-center gap-1.5 bg-primary-50 text-primary-600 px-3 py-1.5 rounded-lg hover:bg-primary-100 transition-all active:scale-95 whitespace-nowrap"
-                                      >
-                                        <span className="text-[11px] font-black">{c.touch_count}회</span>
-                                        <PlusIcon className="w-3.5 h-3.5" />
-                                      </button>
+                                      <div className="flex items-center bg-gray-100 rounded-xl p-1">
+                                        <button
+                                          onClick={() => decrementTouch(c.id, c.touch_count)}
+                                          className="p-1 hover:text-rose-600 transition-colors"
+                                        >
+                                          <MinusIcon className="w-4 h-4" />
+                                        </button>
+                                        <span className="px-3 text-xs font-black text-gray-900 tracking-tighter">{c.touch_count}회</span>
+                                        <button
+                                          onClick={() => incrementTouch(c.id, c.touch_count)}
+                                          className="p-1 hover:text-primary-600 transition-colors"
+                                        >
+                                          <PlusIcon className="w-4 h-4" />
+                                        </button>
+                                      </div>
                                     </div>
                                   </td>
                                 </>
@@ -664,6 +746,66 @@ export default function DashboardPage() {
                         )}
                       </tbody>
                     </table>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Tab: Calendar */}
+            {activeTab === 'calendar' && (
+              <div className="space-y-6">
+                <div className="bg-white rounded-[2rem] shadow-xl p-8 border border-gray-100">
+                  <div className="flex items-center justify-between mb-8">
+                    <h3 className="text-2xl font-black text-gray-900">일정 관리</h3>
+                    <div className="flex items-center gap-4 bg-gray-50 p-2 rounded-2xl">
+                      <button onClick={() => setCurrentMonth(subMonths(currentMonth, 1))} className="p-2 hover:bg-white rounded-xl transition-all shadow-sm">
+                        <ChevronLeftIcon className="w-5 h-5" />
+                      </button>
+                      <span className="font-bold text-lg min-w-[120px] text-center">{format(currentMonth, 'yyyy년 MM월')}</span>
+                      <button onClick={() => setCurrentMonth(addMonths(currentMonth, 1))} className="p-2 hover:bg-white rounded-xl transition-all shadow-sm">
+                        <ChevronRightIcon className="w-5 h-5" />
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-7 border-t border-l border-gray-100">
+                    {['일', '월', '화', '수', '목', '금', '토'].map(day => (
+                      <div key={day} className="px-4 py-3 bg-gray-50/50 border-r border-b border-gray-100 text-center text-xs font-bold text-gray-400 uppercase tracking-widest">
+                        {day}
+                      </div>
+                    ))}
+                    {(() => {
+                      const monthStart = startOfMonth(currentMonth)
+                      const monthEnd = endOfMonth(monthStart)
+                      const startDate = startOfWeek(monthStart)
+                      const endDate = endOfWeek(monthEnd)
+                      const calendarDays = eachDayOfInterval({ start: startDate, end: endDate })
+
+                      return calendarDays.map((day, i) => {
+                        const dayCustomers = customers.filter(c => c.appointment_at && isSameDay(new Date(c.appointment_at), day))
+                        return (
+                          <div
+                            key={i}
+                            className={`min-h-[120px] p-2 border-r border-b border-gray-50 transition-all ${
+                              !isSameMonth(day, monthStart) ? 'bg-gray-50/30 opacity-30 shadow-inner' : 'bg-white hover:bg-gray-50/50'
+                            }`}
+                          >
+                            <span className={`text-xs font-bold ml-1 ${
+                              isSameDay(day, new Date()) ? 'bg-primary-600 text-white w-6 h-6 flex items-center justify-center rounded-full mb-2' : 'text-gray-400'
+                            }`}>
+                              {format(day, 'd')}
+                            </span>
+                            <div className="mt-2 space-y-1">
+                              {dayCustomers.map(cust => (
+                                <div key={cust.id} className="bg-primary-50 text-primary-700 px-2 py-1 rounded text-[10px] font-bold truncate border border-primary-100">
+                                  👤 {cust.name}
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )
+                      })
+                    })()}
                   </div>
                 </div>
               </div>

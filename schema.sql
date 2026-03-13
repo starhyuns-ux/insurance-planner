@@ -35,6 +35,8 @@ create table if not exists public.customers (
   phone text,
   address text,
   touch_count integer not null default 0,
+  last_touch_at timestamptz,
+  appointment_at timestamptz,
   riders jsonb not null default '[]'::jsonb,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
