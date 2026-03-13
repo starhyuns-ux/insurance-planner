@@ -32,7 +32,9 @@ create table if not exists public.customers (
   id uuid primary key default gen_random_uuid(),
   planner_id uuid not null references public.planners(id) on delete cascade,
   name text not null,
+  phone text,
   address text,
+  touch_count integer not null default 0,
   riders jsonb not null default '[]'::jsonb,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()

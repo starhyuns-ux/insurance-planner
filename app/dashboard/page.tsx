@@ -37,7 +37,9 @@ type Lead = {
 type Customer = {
   id: string
   name: string
+  phone: string
   address: string
+  touch_count: number
   riders: string[]
   created_at: string
 }
@@ -60,6 +62,7 @@ export default function DashboardPage() {
 
   // New Customer State
   const [newCustName, setNewCustName] = useState('')
+  const [newCustPhone, setNewCustPhone] = useState('')
   const [newCustAddr, setNewCustAddr] = useState('')
   const [newCustRiders, setNewCustRiders] = useState('')
 
@@ -202,9 +205,23 @@ export default function DashboardPage() {
     if (!error) {
       alert('고객 정보가 등록되었습니다.')
       setNewCustName('')
+      setNewCustPhone('')
       setNewCustAddr('')
       setNewCustRiders('')
       checkUser()
+    }
+  }
+
+  const incrementTouch = async (id: string, currentCount: number) => {
+    const { error } = await supabase
+      .from('customers')
+      .update({ touch_count: currentCount + 1 })
+      .eq('id', id)
+
+    if (!error) {
+      setCustomers(prev => prev.map(c => c.id === id ? { ...c, touch_count: c.touch_count + 1 } : c))
+    } else {
+      alert('터치 횟수 업데이트 중 오류가 발생했습니다.')
     }
   }
 
@@ -475,6 +492,16 @@ export default function DashboardPage() {
                       />
                     </div>
                     <div className="md:col-span-1">
+                      <label className="block text-xs font-bold text-gray-400 uppercase mb-2 ml-1">전화번호</label>
+                      <input
+                        type="tel"
+                        value={newCustPhone}
+                        onChange={(e) => setNewCustPhone(e.target.value)}
+                        placeholder="010-0000-0000"
+                        className="w-full px-5 py-3.5 bg-gray-50 border border-transparent rounded-2xl focus:bg-white focus:border-primary-500 transition-all outline-none text-sm"
+                      />
+                    </div>
+                    <div className="md:col-span-1">
                       <label className="block text-xs font-bold text-gray-400 uppercase mb-2 ml-1">주소</label>
                       <input
                         type="text"
@@ -514,7 +541,9 @@ export default function DashboardPage() {
                       <thead>
                         <tr className="bg-gray-50/50 text-left">
                           <th className="px-8 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest">고객명</th>
+                          <th className="px-8 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest">전화번호</th>
                           <th className="px-8 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest">주소</th>
+                          <th className="px-8 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest">터치</th>
                           <th className="px-8 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest">주요 특약</th>
                           <th className="px-8 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest">등록일</th>
                         </tr>
@@ -530,7 +559,17 @@ export default function DashboardPage() {
                           customers.map(c => (
                             <tr key={c.id} className="hover:bg-gray-50/50 transition-colors">
                               <td className="px-8 py-5 font-bold text-gray-900">{c.name}</td>
-                              <td className="px-8 py-5 text-gray-600 text-sm">{c.address || '-'}</td>
+                              <td className="px-8 py-5 text-gray-600 font-mono tracking-tight text-sm">{c.phone || '-'}</td>
+                              <td className="px-8 py-5 text-gray-600 text-sm whitespace-nowrap overflow-hidden text-ellipsis max-w-[150px]">{c.address || '-'}</td>
+                              <td className="px-8 py-5">
+                                <button
+                                  onClick={() => incrementTouch(c.id, c.touch_count)}
+                                  className="flex items-center gap-1.5 bg-primary-50 text-primary-600 px-3 py-1.5 rounded-lg hover:bg-primary-100 transition-all active:scale-95 group"
+                                >
+                                  <span className="text-[11px] font-black">{c.touch_count}회</span>
+                                  <PlusIcon className="w-3.5 h-3.5" />
+                                </button>
+                              </td>
                               <td className="px-8 py-5">
                                 <div className="flex flex-wrap gap-1.5">
                                   {c.riders.map((r, i) => (
