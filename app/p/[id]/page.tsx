@@ -14,6 +14,39 @@ import CaseCollection from '@/components/CaseCollection'
 import AdvancedRadiation from '@/components/AdvancedRadiation'
 import InsurancePremiumCalculator from '@/components/InsurancePremiumCalculator'
 import { notFound } from 'next/navigation'
+import { Metadata } from 'next'
+
+export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
+  const { id } = await params
+  
+  const { data: planner } = await supabase
+    .from('planners')
+    .select('name, profile_image_url, affiliation')
+    .eq('id', id)
+    .single()
+
+  if (!planner) return {}
+
+  const title = `${planner.name} 설계사 | 보험 리모델링 전문가`
+  const description = `${planner.affiliation} 소속 ${planner.name} 설계사입니다. 정직한 분석과 최적의 보험료 리모델링을 약속드립니다.`
+  const ogImage = planner.profile_image_url || '/og-image.png'
+
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      images: [{ url: ogImage }],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      images: [ogImage],
+    },
+  }
+}
 
 export default async function PlannerLandingPage({ params }: { params: { id: string } }) {
   const { id } = await params
