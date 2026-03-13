@@ -16,7 +16,9 @@ import {
   CalendarIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
-  MinusIcon
+  MinusIcon,
+  PencilIcon,
+  TrashIcon
 } from '@heroicons/react/24/outline'
 import { 
   format, 
@@ -775,7 +777,7 @@ export default function DashboardPage() {
                                     </div>
                                   </td>
                                   <td className="px-4 py-3 text-center">
-                                    <input type="number" min="1" value={editCustFamily} onChange={e => setEditCustFamily(e.target.value)} className="w-16 px-2 py-2 border rounded-xl text-center" />
+                                    <input type="number" min="1" value={editCustFamily} onChange={e => setEditCustFamily(e.target.value)} className="w-full px-2 py-2 border rounded-xl text-center" />
                                     <span className="text-[10px] block mt-1 text-gray-400">가족 수</span>
                                   </td>
                                   <td className="px-4 py-3"><input type="date" value={editCustAppt} onChange={e => setEditCustAppt(e.target.value)} className="w-full px-3 py-2 border rounded-xl" /></td>
@@ -789,20 +791,23 @@ export default function DashboardPage() {
                                 </>
                               ) : (
                                 <>
-                                  <td className="px-8 py-5">
+                                  <td className="px-8 py-5 whitespace-nowrap">
                                     <div className="flex flex-col gap-0.5">
                                       <span className="font-bold text-gray-900">{c.name}</span>
-                                      <span className="text-[11px] text-gray-400 font-medium">생일: {safeFormat(c.birth_date, 'yy.MM.dd')}</span>
-                                      <span className="text-[10px] font-bold text-gray-400">가족: {c.family_count}명</span>
+                                      <div className="flex items-center gap-2 text-[10px] text-gray-400 font-medium">
+                                        <span>생일: {safeFormat(c.birth_date, 'yy.MM.dd')}</span>
+                                        <span className="w-px h-2 bg-gray-200" />
+                                        <span className="font-bold">가족: {c.family_count}명</span>
+                                      </div>
                                     </div>
                                   </td>
-                                  <td className="px-8 py-5">
+                                  <td className="px-8 py-5 whitespace-nowrap">
                                     <div className="flex flex-col gap-0.5">
                                       <span className="font-mono tracking-tighter text-gray-600">{c.phone || '-'}</span>
-                                      <span className="text-[11px] text-gray-400 truncate max-w-[150px]">{c.address || '-'}</span>
+                                      <span className="text-[11px] text-gray-400 truncate max-w-[180px]">{c.address || '-'}</span>
                                     </div>
                                   </td>
-                                  <td className="px-8 py-5 text-center">
+                                  <td className="px-8 py-5 text-center whitespace-nowrap">
                                     {(() => {
                                       const dDay = getInsuranceAge(c.birth_date);
                                       return (
@@ -822,42 +827,48 @@ export default function DashboardPage() {
                                       );
                                     })()}
                                   </td>
-                                  <td className="px-8 py-5 font-bold text-primary-600">
+                                  <td className="px-8 py-5 font-bold text-primary-600 whitespace-nowrap">
                                     {safeFormat(c.appointment_at, 'MM-DD')}
                                   </td>
-                                  <td className="px-8 py-5">
-                                    <div className="flex flex-wrap gap-1.5">
-                                      {(c.riders || []).map((r, i) => (
-                                        <span key={i} className="text-[10px] font-bold bg-gray-100 text-gray-500 px-2 py-0.5 rounded-md">{r}</span>
-                                      ))}
-                                      {(!c.riders || c.riders.length === 0) && <span className="text-gray-400">-</span>}
+                                  <td className="px-8 py-5 text-gray-500 font-medium text-xs whitespace-nowrap">
+                                    <div className="max-w-[150px] truncate">
+                                      {(c.riders || []).join(', ') || '-'}
                                     </div>
                                   </td>
-                                  <td className="px-8 py-5 text-right">
-                                    <div className="flex items-center justify-end gap-4">
-                                      <div className="flex flex-col items-end gap-1.5">
-                                        <div className="flex items-center bg-gray-100 rounded-xl p-0.5">
-                                          <button
+                                  <td className="px-8 py-5 text-right whitespace-nowrap">
+                                    <div className="flex items-center justify-end gap-6">
+                                      <div className="flex flex-col items-end gap-1 group">
+                                        <div className="flex items-center bg-gray-50 rounded-lg p-0.5 border border-gray-100 group-hover:border-primary-200 transition-colors">
+                                          <button 
                                             onClick={() => decrementTouch(c.id, c.touch_count)}
-                                            className="p-1 hover:text-rose-600 transition-colors"
+                                            className="p-1 hover:text-primary-600 text-gray-400 transition-colors"
                                           >
                                             <MinusIcon className="w-3.5 h-3.5" />
                                           </button>
-                                          <span className="px-2 text-[11px] font-black text-gray-900 tracking-tighter">{c.touch_count}회</span>
-                                          <button
+                                          <span className="px-2 text-xs font-black text-primary-600 min-w-[2rem] text-center">
+                                            {c.touch_count}회
+                                          </span>
+                                          <button 
                                             onClick={() => incrementTouch(c.id, c.touch_count)}
-                                            className="p-1 hover:text-primary-600 transition-colors"
+                                            className="p-1 hover:text-primary-600 text-gray-400 transition-colors"
                                           >
                                             <PlusIcon className="w-3.5 h-3.5" />
                                           </button>
                                         </div>
                                         {c.last_touch_at && (
-                                          <span className="text-[10px] text-gray-400 font-black tracking-tight">{safeFormat(c.last_touch_at, 'MM-DD')} 터치함</span>
+                                          <span className="text-[9px] font-bold text-gray-300 group-hover:text-primary-400 transition-colors">
+                                            {safeFormat(c.last_touch_at, 'MM.dd')} 터치함
+                                          </span>
                                         )}
                                       </div>
-                                      <div className="flex flex-col gap-1 opacity-10 group-hover:opacity-100 transition-opacity">
-                                        <button onClick={() => startEditing(c)} className="text-[10px] text-gray-400 hover:text-primary-600 font-bold">수정</button>
-                                        <button onClick={() => deleteCustomer(c.id)} className="text-[10px] text-gray-400 hover:text-rose-600 font-bold">삭제</button>
+                                      
+                                      <div className="flex items-center gap-3 border-l border-gray-100 pl-6">
+                                        <button onClick={() => startEditing(c)} className="text-gray-400 hover:text-primary-600 transition-colors">
+                                          <PencilIcon className="w-4 h-4" />
+                                        </button>
+                                        <button onClick={() => deleteCustomer(c.id)} className="text-gray-400 hover:text-rose-500 transition-colors">
+                                          <TrashIcon className="w-4 h-4" />
+                                        </button>
                                       </div>
                                     </div>
                                   </td>
