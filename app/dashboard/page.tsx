@@ -54,33 +54,29 @@ const getInsuranceAge = (birthDateStr: string | null | undefined) => {
     const today = new Date()
     today.setHours(0, 0, 0, 0)
 
-    // Insurance Birthday is 6 months after actual birthday
-    let insMonth = birthDate.getMonth() + 6
-    let insDay = birthDate.getDate()
-    let insYear = today.getFullYear()
-
-    // Handle month overflow (e.g., Month 12 -> Jan of next year)
-    // Date constructor handles this automatically: new Date(2024, 13, 1) -> 2025-02-01
-    let insDate = new Date(insYear, insMonth, insDay)
+    // Standard Insurance Birthday: (Birth Month + 6) % 12
+    // It happens once a year.
+    let targetMonth = (birthDate.getMonth() + 6) % 12
+    let targetDay = birthDate.getDate()
+    
+    // We need to find the next occurrence of this Month/Day
+    let targetYear = today.getFullYear()
+    let insDate = new Date(targetYear, targetMonth, targetDay)
     insDate.setHours(0, 0, 0, 0)
 
-    // If that date has already passed this year, the next 'Insurance Birthday' is likely 
-    // the next occurrence of (BirthMonth + 6) or (BirthMonth - 6) depending on how you look at it.
-    // Basically, it occurs every 12 months.
-    while (insDate < today) {
-      insYear++
-      insDate = new Date(insYear, insMonth, insDay)
+    // If it already passed this year, the next one is next year
+    if (insDate < today) {
+      insDate = new Date(targetYear + 1, targetMonth, targetDay)
       insDate.setHours(0, 0, 0, 0)
     }
 
-    // Double check: it should also be within 365 days. 
-    // If Birthday + 6 months was yesterday, the next one is 364 days away.
-    
-    // Calculate Days Remaining (D-Day)
     const diffTime = insDate.getTime() - today.getTime()
-    const dDay = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
+    const dDayCount = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
 
-    return dDay === 0 ? 'D-Day' : `D-${dDay}`
+    // Just in case of edge cases (leap years etc), clamp it or ensure it's the closest one
+    // But Birthday + 6 months is always yearly.
+    
+    return dDayCount === 0 ? 'D-Day' : `D-${dDayCount}`
   } catch (e) {
     return null
   }
@@ -807,7 +803,7 @@ export default function DashboardPage() {
                                       return (
                                         <div className="flex flex-col items-center justify-center">
                                           {dDay ? (
-                                            <span className={`text-xs font-black tracking-tight ${
+                                            <span className={`text-[11px] font-black tracking-tight ${
                                               dDay.includes('-') && parseInt(dDay.split('-')[1]) <= 30 
                                                 ? 'text-rose-500 animate-pulse' 
                                                 : dDay === 'D-Day' ? 'text-rose-600 font-bold' : 'text-primary-600'
