@@ -46,34 +46,66 @@ const safeFormat = (dateStr: string | null | undefined, formatStr: string) => {
 
 // Insurance Age Helper (Birthday + 6 months)
 const getInsuranceAge = (birthDateStr: string | null | undefined) => {
-  if (!birthDateStr) return '-'
+  if (!birthDateStr) return { age: '-', dDay: null }
   try {
     const birthDate = new Date(birthDateStr)
-    if (isNaN(birthDate.getTime())) return '-'
+    if (isNaN(birthDate.getTime())) return { age: '-', dDay: null }
     
     const today = new Date()
-    let age = today.getFullYear() - birthDate.getFullYear()
-    const m = today.getMonth() - birthDate.getMonth()
-    
-    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
-      age--
+    today.setHours(0, 0, 0, 0)
+
+    // Calculate real age
+    let realAge = today.getFullYear() - birthDate.getFullYear()
+    const monthDiff = today.getMonth() - birthDate.getMonth()
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+      realAge--
     }
 
-    // Insurance Age adjustment: if 6 months or more have passed since last birthday, add 1 year
-    const birthdayThisYear = new Date(today.getFullYear(), birthDate.getMonth(), birthDate.getDate())
-    const diffMonths = (today.getTime() - birthdayThisYear.getTime()) / (1000 * 60 * 60 * 24 * 30.41)
+    // Find the "Insurance Birthday" (Birthday + 6 months)
+    let insMonth = birthDate.getMonth() + 6
+    let insYear = today.getFullYear()
     
-    // Simplification: if m > 6, or (m=6 and day >= birthDay), or (m < -6) etc.
-    // Standard Korean Insurance Age: If 6 months + 1 day passed from last birthday, age + 1
-    const monthsPassed = (today.getMonth() - birthDate.getMonth() + 12) % 12
-    const daysPassed = today.getDate() - birthDate.getDate()
-    
-    if (monthsPassed > 6 || (monthsPassed === 6 && daysPassed >= 1)) {
-      return `${age + 1}세`
+    // If birth month was July (6) -> 6+6=12 (Jan of next year potentially)
+    // We want the Insurance Birthday that is COMING UP next.
+    let insDate = new Date(insYear, insMonth, birthDate.getDate())
+    insDate.setHours(0, 0, 0, 0)
+
+    // If the insurance birthday for this year has already passed, look at next year
+    if (insDate < today) {
+      insDate = new Date(insYear + 1, insMonth, birthDate.getDate())
+      insDate.setHours(0, 0, 0, 0)
     }
-    return `${age}세`
+
+    // Calculate Days Remaining (D-Day)
+    const diffTime = insDate.getTime() - today.getTime()
+    const dDay = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
+
+    // Determine current insurance age
+    // If today is within 6 months of birthday -> realAge
+    // If today is 6+ months from birthday (but less than next birthday) -> realAge + 1
+    // Actually, the insurance age increases ON the Insurance Birthday.
+    
+    // Check if we are currently in the "plus one" period
+    const birthdayThisYear = new Date(today.getFullYear(), birthDate.getMonth(), birthDate.getDate())
+    let insuranceAge = realAge
+    
+    // If today is >= (Birthday + 6 months) AND today < (Next Birthday)
+    // We can just check if the NEXT Insurance Birthday is more than 6 months away? No.
+    // Simpler: If the date is between (BirthDay + 6mo) and (BirthDay + 12mo), age is realAge + 1
+    // Wait, the standard rule is: (Today - Birthday) rounded to nearest year.
+    // If (months + days) >= 6 months, age = realAge + 1.
+    
+    let monthsFromBirth = (today.getMonth() - birthDate.getMonth() + 12) % 12
+    if (monthsFromBirth > 6 || (monthsFromBirth === 6 && today.getDate() >= birthDate.getDate())) {
+      insuranceAge = realAge + 1
+    }
+
+    return { 
+      age: `${insuranceAge}세`, 
+      dDay: dDay === 0 ? 'D-Day' : `D-${dDay}` 
+    }
   } catch (e) {
-    return '-'
+    return { age: '-', dDay: null }
   }
 }
 
@@ -793,9 +825,17 @@ export default function DashboardPage() {
                                     </div>
                                   </td>
                                   <td className="px-8 py-5 text-center">
-                                    <div className="bg-primary-50 rounded-xl py-2 px-3 inline-block">
-                                      <span className="text-primary-700 font-black text-xs">{getInsuranceAge(c.birth_date)}</span>
-                                    </div>
+                                    {(() => {
+                                      const { age, dDay } = getInsuranceAge(c.birth_date);
+                                      return (
+                                        <div className="flex flex-col items-center gap-1">
+                                          <div className="bg-primary-50 rounded-xl py-1 px-3 inline-block">
+                                            <span className="text-primary-700 font-black text-xs">{age}</span>
+                                          </div>
+                                          {dDay && <span className="text-[10px] font-bold text-rose-500 animate-pulse">{dDay}</span>}
+                                        </div>
+                                      );
+                                    })()}
                                   </td>
                                   <td className="px-8 py-5 font-bold text-primary-600">
                                     {safeFormat(c.appointment_at, 'MM-DD')}
