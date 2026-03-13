@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import NavBar from '@/components/NavBar'
 import Footer from '@/components/Footer'
+import PlannerBranding from '@/components/PlannerBranding'
 import DiseaseCodeSearch from '@/components/DiseaseCodeSearch'
 
 export const metadata: Metadata = {
@@ -58,6 +59,7 @@ export default function DiseaseCodesPage() {
                 </div>
             </div>
 
+            <PlannerBranding />
             <Footer />
         </main>
     )

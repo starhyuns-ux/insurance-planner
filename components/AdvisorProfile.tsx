@@ -5,9 +5,10 @@ interface AdvisorProfileProps {
   businessCard?: string;
   affiliation?: string;
   region?: string;
+  kakaoUrl?: string;
 }
 
-export default function AdvisorProfile({ name, phone, profileImage, businessCard, affiliation, region }: AdvisorProfileProps) {
+export default function AdvisorProfile({ name, phone, profileImage, businessCard, affiliation, region, kakaoUrl }: AdvisorProfileProps) {
   const points = [
     { title: "특정 보험사 가입 강요 NO", desc: "고객님의 입장에서 30여개 보험사를 객관적으로 비교 분석합니다." },
     { title: "초기부터 끝까지 부담 없는 100% 무료", desc: "초기 상담부터 맞춤 설계 제안까지 모든 과정을 무료로 제공합니다." },
@@ -70,6 +71,23 @@ export default function AdvisorProfile({ name, phone, profileImage, businessCard
                 </div>
               ))}
               
+              {kakaoUrl && (
+                <div className="mt-8 pt-6 border-t border-gray-800">
+                  <a 
+                    href={kakaoUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-3 bg-[#FEE500] text-gray-900 px-8 py-4 rounded-2xl font-black text-lg hover:bg-[#FADB00] transition-all shadow-xl shadow-yellow-900/20 w-fit"
+                  >
+                    <svg className="w-7 h-7" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M12 3C6.477 3 2 6.477 2 10.75c0 2.766 1.91 5.148 4.755 6.477-.168 1.488-1.503 3.51-1.637 3.68-.13.167-.17.34-.044.47.126.13.29.145.42.103.13-.042 1.956-.843 4.156-2.316.435.05.88.086 1.35.086 5.523 0 10-3.477 10-7.75S17.523 3 12 3z"/>
+                    </svg>
+                    카카오톡 1:1 실시간 상담
+                  </a>
+                  <p className="mt-3 text-gray-500 text-xs font-bold pl-1 font-sans">※ 톡 채널 또는 오픈채팅으로 연결됩니다.</p>
+                </div>
+              )}
+
               {businessCard && (
                 <div className="mt-8 pt-8 border-t border-gray-800">
                   <p className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-4">온라인 명함</p>

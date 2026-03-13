@@ -1,6 +1,7 @@
 "use client"
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useAttribution } from '@/lib/attribution'
 
 interface ConsultationFormProps {
   id?: string;
@@ -17,6 +18,12 @@ export default function ConsultationForm({ id = "consultation", plannerId, plann
   const [agree, setAgree] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState('')
+  const { planner: sessionPlanner } = useAttribution()
+
+  // Determine final planner info
+  const finalPlannerId = plannerId || sessionPlanner?.id
+  const finalPlannerName = plannerInfo?.name || sessionPlanner?.name
+  const finalKakaoUrl = sessionPlanner?.kakao_url || 'https://open.kakao.com/o/sdWFlvYh'
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -46,10 +53,10 @@ export default function ConsultationForm({ id = "consultation", plannerId, plann
         body: JSON.stringify({
           name,
           phone: phone.replace(/-/g, ''), // Save without dashes
-          planner_id: plannerId || null,
+          planner_id: finalPlannerId || null,
           meta: { 
-            source: plannerId ? `planner_page_${plannerId}` : 'landing_page_bottom_form',
-            planner_name: plannerInfo?.name
+            source: finalPlannerId ? `planner_page_${finalPlannerId}` : 'landing_page_bottom_form',
+            planner_name: finalPlannerName
           }
         })
       })
@@ -66,7 +73,7 @@ export default function ConsultationForm({ id = "consultation", plannerId, plann
         setAgree(false)
 
         // 이동 (오픈채팅 채널 링크로 리다이렉트)
-        window.location.href = 'https://open.kakao.com/o/sdWFlvYh'
+        window.location.href = finalKakaoUrl
       } else {
         setError(data.error || '접수 중 오류가 발생했습니다. 다시 시도해주세요.')
       }
@@ -98,11 +105,11 @@ export default function ConsultationForm({ id = "consultation", plannerId, plann
             <div className="absolute top-0 right-0 -mr-16 -mt-16 w-64 h-64 bg-primary-600 rounded-full mix-blend-multiply opacity-20 blur-3xl"></div>
 
             <h3 className="text-3xl font-extrabold mb-4 relative z-10">
-              {plannerInfo ? `${plannerInfo.name} 설계사에게` : '지금 바로'}<br />무료 진단 받으세요
+              {finalPlannerName ? `${finalPlannerName} 설계사에게` : '지금 바로'}<br />무료 진단 받으세요
             </h3>
             <p className="text-gray-400 mb-8 leading-relaxed relative z-10">
-              {plannerInfo ? '고객님의 입장에서 가장 유리한 보험을' : '매달 빠져나가는 아까운 보험료,'}<br />
-              {plannerInfo ? '객관적으로 분석하고 맞춤 설계해 드립니다.' : '전문가와 함께 10분만 투자하면 평생 내는 보험료를 아낄 수 있습니다.'}
+              {finalPlannerName ? '고객님의 입장에서 가장 유리한 보험을' : '매달 빠져나가는 아까운 보험료,'}<br />
+              {finalPlannerName ? '객관적으로 분석하고 맞춤 설계해 드립니다.' : '전문가와 함께 10분만 투자하면 평생 내는 보험료를 아낄 수 있습니다.'}
             </p>
 
             <div className="space-y-5 text-sm font-medium relative z-10">

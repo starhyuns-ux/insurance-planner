@@ -5,10 +5,12 @@ import Link from 'next/link'
 import { Bars3Icon, XMarkIcon, UserCircleIcon } from '@heroicons/react/24/outline'
 import { supabase } from '@/lib/supabaseClient'
 import { User } from '@supabase/supabase-js'
+import { useAttribution } from '@/lib/attribution'
 
 export default function NavBar() {
   const [isOpen, setIsOpen] = useState(false)
   const [user, setUser] = useState<User | null>(null)
+  const { planner, loading: attrLoading } = useAttribution()
 
   useEffect(() => {
     // Check initial auth state
@@ -35,6 +37,12 @@ export default function NavBar() {
             </svg>
           </div>
           <span className="font-bold text-xl tracking-tight text-gray-900">보험<span className="text-primary-600">다이어트</span></span>
+          {planner && (
+            <div className="hidden sm:flex items-center gap-2 ml-4 px-3 py-1 bg-primary-50 rounded-full border border-primary-100">
+              <span className="text-[10px] font-bold text-primary-600 uppercase tracking-tighter">Attributed to</span>
+              <span className="text-xs font-black text-primary-700">{planner.name} 설계사</span>
+            </div>
+          )}
         </Link>
 
         {/* Desktop Menu */}
@@ -68,10 +76,12 @@ export default function NavBar() {
               </Link>
             )}
             <a
-              href="#consultation"
+              href={planner?.kakao_url || "#consultation"}
+              target={planner?.kakao_url ? "_blank" : undefined}
+              rel={planner?.kakao_url ? "noopener noreferrer" : undefined}
               className="inline-flex items-center justify-center px-5 py-2.5 text-sm font-semibold text-white bg-gray-900 rounded-full hover:bg-gray-800 transition-colors shadow-sm"
             >
-              무료 진단받기
+              {planner ? '1:1 실시간 상담' : '무료 진단받기'}
             </a>
           </div>
         </div>

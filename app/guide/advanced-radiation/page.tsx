@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import NavBar from '@/components/NavBar'
 import Footer from '@/components/Footer'
+import PlannerBranding from '@/components/PlannerBranding'
 import Image from 'next/image'
 import Link from 'next/link'
 
@@ -201,6 +202,7 @@ export default function AdvancedRadiationGuidePage() {
                 </div>
             </div >
 
+            <PlannerBranding />
             <Footer />
         </main >
     )

@@ -15,6 +15,7 @@ import AdvancedRadiation from '@/components/AdvancedRadiation'
 import InsurancePremiumCalculator from '@/components/InsurancePremiumCalculator'
 import { notFound } from 'next/navigation'
 import { Metadata } from 'next'
+import AttributionSetter from '@/components/AttributionSetter'
 
 export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
   const { id } = await params
@@ -83,6 +84,7 @@ export default async function PlannerLandingPage({ params }: { params: { id: str
 
   return (
     <main className="min-h-screen flex flex-col">
+      <AttributionSetter plannerId={planner.id} />
       <NavBar />
       
       <Hero />
@@ -121,6 +123,7 @@ export default async function PlannerLandingPage({ params }: { params: { id: str
           businessCard={planner.business_card_url}
           affiliation={planner.affiliation}
           region={planner.region}
+          kakaoUrl={planner.kakao_url}
         />
       </div>
 

@@ -1,5 +1,6 @@
 import NavBar from '@/components/NavBar'
 import Footer from '@/components/Footer'
+import PlannerBranding from '@/components/PlannerBranding'
 import SilbiCalculator from '@/components/SilbiCalculator'
 
 export const metadata = {
@@ -33,6 +34,7 @@ export default function CalculatorPage() {
 
             </div>
 
+            <PlannerBranding />
             <Footer />
         </main>
     )

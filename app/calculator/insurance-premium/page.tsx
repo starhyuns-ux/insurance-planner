@@ -1,6 +1,7 @@
 import NavBar from '@/components/NavBar'
 import Footer from '@/components/Footer'
 import InsurancePremiumCalculator from '@/components/InsurancePremiumCalculator'
+import PlannerBranding from '@/components/PlannerBranding'
 
 export const metadata = {
     title: '보험료 계산기 | 보험다이어트',
@@ -28,11 +29,13 @@ export default function InsurancePremiumPage() {
                     </p>
                 </div>
 
+
                 {/* Calculator Component */}
                 <InsurancePremiumCalculator />
 
             </div>
 
+            <PlannerBranding />
             <Footer />
         </main>
     )

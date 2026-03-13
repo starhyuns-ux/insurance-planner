@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import NavBar from '@/components/NavBar'
 import Footer from '@/components/Footer'
+import PlannerBranding from '@/components/PlannerBranding'
 import { PhoneIcon, BuildingOffice2Icon, BuildingLibraryIcon, BriefcaseIcon } from '@heroicons/react/24/outline'
 
 export const metadata: Metadata = {
@@ -133,6 +134,7 @@ export default function ContactsPage() {
 
             </div>
 
+            <PlannerBranding />
             <Footer />
         </main>
     )

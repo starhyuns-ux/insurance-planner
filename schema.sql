@@ -20,6 +20,7 @@ create table if not exists public.planners (
   business_card_url text,
   affiliation text, -- 소속
   region text,      -- 활동 지역
+  kakao_url text,   -- 카톡 주소
   subscription_status text not null default 'inactive', -- active, inactive
   subscription_end_date timestamptz,
   created_at timestamptz not null default now(),
@@ -88,7 +89,8 @@ begin
     coalesce(new.raw_user_meta_data->>'name', '새 설계사'),
     coalesce(new.raw_user_meta_data->>'phone', ''),
     coalesce(new.raw_user_meta_data->>'affiliation', ''),
-    coalesce(new.raw_user_meta_data->>'region', '')
+    coalesce(new.raw_user_meta_data->>'region', ''),
+    coalesce(new.raw_user_meta_data->>'kakao_url', '')
   );
   return new;
 end;

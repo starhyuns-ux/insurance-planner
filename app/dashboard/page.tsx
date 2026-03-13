@@ -23,6 +23,7 @@ type Planner = {
   business_card_url: string | null
   affiliation: string
   region: string
+  kakao_url: string
   subscription_status: 'active' | 'inactive'
 }
 
@@ -54,6 +55,7 @@ export default function DashboardPage() {
   const [editPhone, setEditPhone] = useState('')
   const [editAffiliation, setEditAffiliation] = useState('')
   const [editRegion, setEditRegion] = useState('')
+  const [editKakaoUrl, setEditKakaoUrl] = useState('')
   const [isSaving, setIsSaving] = useState(false)
 
   // New Customer State
@@ -84,6 +86,7 @@ export default function DashboardPage() {
       setEditPhone(profile.phone || '')
       setEditAffiliation(profile.affiliation || '')
       setEditRegion(profile.region || '')
+      setEditKakaoUrl(profile.kakao_url || '')
     }
 
     // Fetch Manual Customers
@@ -129,7 +132,8 @@ export default function DashboardPage() {
         name: editName,
         phone: editPhone,
         affiliation: editAffiliation,
-        region: editRegion
+        region: editRegion,
+        kakao_url: editKakaoUrl
       })
       .eq('id', user.id)
 
@@ -315,6 +319,16 @@ export default function DashboardPage() {
                           value={editRegion}
                           onChange={(e) => setEditRegion(e.target.value)}
                           placeholder="예: 서울 강남구"
+                          className="w-full px-5 py-3.5 bg-gray-50 border border-transparent rounded-2xl focus:bg-white focus:border-primary-500 transition-all outline-none"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-bold text-gray-700 mb-2 ml-1">카카오톡 오픈채팅 주소</label>
+                        <input
+                          type="url"
+                          value={editKakaoUrl}
+                          onChange={(e) => setEditKakaoUrl(e.target.value)}
+                          placeholder="https://open.kakao.com/..."
                           className="w-full px-5 py-3.5 bg-gray-50 border border-transparent rounded-2xl focus:bg-white focus:border-primary-500 transition-all outline-none"
                         />
                       </div>

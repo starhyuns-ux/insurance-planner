@@ -1,6 +1,7 @@
 import NavBar from '@/components/NavBar'
 import Footer from '@/components/Footer'
 import Link from 'next/link'
+import PlannerBranding from '@/components/PlannerBranding'
 
 export const metadata = {
     title: '5세대 실손보험 가이드 | 보험다이어트',
@@ -326,6 +327,7 @@ export default function FifthGenGuidePage() {
                 </div>
             </div>
 
+            <PlannerBranding />
             <Footer />
         </main>
     )

@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import NavBar from '@/components/NavBar'
 import Footer from '@/components/Footer'
+import PlannerBranding from '@/components/PlannerBranding'
 import Link from 'next/link'
 import Image from 'next/image'
 
@@ -196,6 +197,7 @@ export default function HifuTherapyGuidePage() {
                 </div>
             </div>
 
+            <PlannerBranding />
             <Footer />
         </main>
     )

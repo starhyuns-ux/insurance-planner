@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import NavBar from '@/components/NavBar'
 import Footer from '@/components/Footer'
+import PlannerBranding from '@/components/PlannerBranding'
 import Link from 'next/link'
 
 export const metadata: Metadata = {
@@ -249,6 +250,7 @@ export default function CancerTreatmentGuidePage() {
                 </div>
             </div>
 
+            <PlannerBranding />
             <Footer />
         </main>
     )

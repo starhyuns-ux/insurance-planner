@@ -12,6 +12,7 @@ import Footer from '@/components/Footer'
 import CaseCollection from '@/components/CaseCollection'
 import AdvancedRadiation from '@/components/AdvancedRadiation'
 import InsurancePremiumCalculator from '@/components/InsurancePremiumCalculator'
+import PlannerBranding from '@/components/PlannerBranding'
 
 export default function Home() {
   return (
@@ -49,6 +50,7 @@ export default function Home() {
       <div className="bg-white">
         <CommunityLinks />
         <ConsultationForm />
+        <PlannerBranding />
       </div>
 
       <Footer />
