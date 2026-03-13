@@ -37,12 +37,6 @@ export default function NavBar() {
             </svg>
           </div>
           <span className="font-bold text-xl tracking-tight text-gray-900">보험<span className="text-primary-600">다이어트</span></span>
-          {planner && (
-            <div className="hidden sm:flex items-center gap-2 ml-4 px-3 py-1 bg-primary-50 rounded-full border border-primary-100">
-              <span className="text-[10px] font-bold text-primary-600 uppercase tracking-tighter">Attributed to</span>
-              <span className="text-xs font-black text-primary-700">{planner.name} 설계사</span>
-            </div>
-          )}
         </Link>
 
         {/* Desktop Menu */}

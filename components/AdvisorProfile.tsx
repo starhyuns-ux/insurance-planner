@@ -1,3 +1,6 @@
+import { useState } from 'react';
+import { ShareIcon, CheckIcon } from '@heroicons/react/24/outline';
+
 interface AdvisorProfileProps {
   name?: string;
   phone?: string;
@@ -9,6 +12,15 @@ interface AdvisorProfileProps {
 }
 
 export default function AdvisorProfile({ name, phone, profileImage, businessCard, affiliation, region, kakaoUrl }: AdvisorProfileProps) {
+  const [copied, setCopied] = useState(false);
+
+  const handleCopyLink = () => {
+    if (typeof window === 'undefined') return;
+    navigator.clipboard.writeText(window.location.href);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
   const points = [
     { title: "특정 보험사 가입 강요 NO", desc: "고객님의 입장에서 30여개 보험사를 객관적으로 비교 분석합니다." },
     { title: "초기부터 끝까지 부담 없는 100% 무료", desc: "초기 상담부터 맞춤 설계 제안까지 모든 과정을 무료로 제공합니다." },
@@ -90,8 +102,28 @@ export default function AdvisorProfile({ name, phone, profileImage, businessCard
 
               {businessCard && (
                 <div className="mt-8 pt-8 border-t border-gray-800">
-                  <p className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-4">온라인 명함</p>
-                  <img src={businessCard} alt="명함" className="max-w-xs w-full rounded-xl shadow-lg border border-gray-700" />
+                  <div className="flex items-center justify-between mb-4">
+                    <p className="text-xs font-bold text-gray-500 uppercase tracking-widest">온라인 명함</p>
+                    <button 
+                      onClick={handleCopyLink}
+                      className="text-xs font-bold text-primary-400 hover:text-primary-300 transition-colors flex items-center gap-1.5"
+                    >
+                      {copied ? <CheckIcon className="w-3.5 h-3.5" /> : <ShareIcon className="w-3.5 h-3.5" />}
+                      {copied ? "링크 복사됨" : "명함 링크 복사하기"}
+                    </button>
+                  </div>
+                  <div 
+                    onClick={handleCopyLink}
+                    className="group relative cursor-pointer overflow-hidden rounded-xl shadow-lg border border-gray-700 max-w-xs transition-transform hover:scale-[1.02]"
+                  >
+                    <img src={businessCard} alt="명함" className="w-full h-auto" />
+                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                      <div className="bg-white/10 backdrop-blur-md px-4 py-2 rounded-full border border-white/20 text-sm font-bold text-white flex items-center gap-2">
+                        <ShareIcon className="w-4 h-4" />
+                        주소 복사
+                      </div>
+                    </div>
+                  </div>
                 </div>
               )}
             </div>
