@@ -32,6 +32,18 @@ import {
 } from 'date-fns'
 import { ko } from 'date-fns/locale'
 
+// Safe Date Formatter helper
+const safeFormat = (dateStr: string | null | undefined, formatStr: string) => {
+  if (!dateStr) return '-'
+  try {
+    const d = new Date(dateStr)
+    if (isNaN(d.getTime())) return '-'
+    return format(d, formatStr)
+  } catch (e) {
+    return '-'
+  }
+}
+
 type Planner = {
   id: string
   name: string
@@ -701,14 +713,14 @@ export default function DashboardPage() {
                                   <td className="px-8 py-5 text-gray-600 font-mono tracking-tight">{c.phone || '-'}</td>
                                   <td className="px-8 py-5 text-gray-600 truncate max-w-[120px]">{c.address || '-'}</td>
                                   <td className="px-8 py-5 font-bold text-primary-600">
-                                    {c.appointment_at ? format(new Date(c.appointment_at), 'MM-DD') : '-'}
+                                    {safeFormat(c.appointment_at, 'MM-DD')}
                                   </td>
                                   <td className="px-8 py-5">
                                     <div className="flex flex-wrap gap-1.5">
-                                      {c.riders.map((r, i) => (
+                                      {(c.riders || []).map((r, i) => (
                                         <span key={i} className="text-[10px] font-bold bg-gray-100 text-gray-500 px-2 py-0.5 rounded-md">{r}</span>
                                       ))}
-                                      {c.riders.length === 0 && <span className="text-gray-400">-</span>}
+                                      {(!c.riders || c.riders.length === 0) && <span className="text-gray-400">-</span>}
                                     </div>
                                   </td>
                                   <td className="px-8 py-5 text-right">
@@ -719,7 +731,7 @@ export default function DashboardPage() {
                                           <button onClick={() => deleteCustomer(c.id)} className="text-[10px] text-gray-400 hover:text-rose-600 font-bold">삭제</button>
                                         </div>
                                         {c.last_touch_at && (
-                                          <span className="text-[10px] text-gray-400 font-medium">최근: {format(new Date(c.last_touch_at), 'MM-DD')}</span>
+                                          <span className="text-[10px] text-gray-400 font-medium">최근: {safeFormat(c.last_touch_at, 'MM-DD')}</span>
                                         )}
                                       </div>
                                       <div className="flex items-center bg-gray-100 rounded-xl p-1">
@@ -782,7 +794,11 @@ export default function DashboardPage() {
                       const calendarDays = eachDayOfInterval({ start: startDate, end: endDate })
 
                       return calendarDays.map((day, i) => {
-                        const dayCustomers = customers.filter(c => c.appointment_at && isSameDay(new Date(c.appointment_at), day))
+                        const dayCustomers = customers.filter(c => {
+                          if (!c.appointment_at) return false
+                          const d = new Date(c.appointment_at)
+                          return !isNaN(d.getTime()) && isSameDay(d, day)
+                        })
                         return (
                           <div
                             key={i}
