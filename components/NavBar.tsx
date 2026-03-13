@@ -29,14 +29,21 @@ export default function NavBar() {
   return (
     <nav className="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-gray-100">
       <div className="container flex items-center justify-between h-16 relative">
-        <Link href="/" className="flex items-center gap-2 z-50" onClick={() => setIsOpen(false)}>
-          {/* Shield Icon styling */}
-          <div className="bg-primary-50 p-1.5 rounded-lg text-primary-600">
-            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-            </svg>
+        <Link href="/" className="flex flex-col items-start z-50 group -my-1" onClick={() => setIsOpen(false)}>
+          <div className="flex items-center gap-1.5">
+            <div className="bg-primary-50 p-1 rounded-lg text-primary-600 transition-colors group-hover:bg-primary-100">
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+              </svg>
+            </div>
+            <span className="font-bold text-lg tracking-tight text-gray-900 leading-none">보험<span className="text-primary-600">다이어트</span></span>
           </div>
-          <span className="font-bold text-xl tracking-tight text-gray-900">보험<span className="text-primary-600">다이어트</span></span>
+          {planner && (
+            <div className="mt-0.5 ml-0.5 flex items-center gap-1 leading-none">
+              <span className="text-[8px] font-bold text-gray-400 uppercase tracking-tighter">Attributed to</span>
+              <span className="text-[9px] font-black text-primary-600/70 italic">{planner.name}</span>
+            </div>
+          )}
         </Link>
 
         {/* Desktop Menu */}
