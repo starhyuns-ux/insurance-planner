@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { Bars3Icon, XMarkIcon, UserCircleIcon } from '@heroicons/react/24/outline'
+import { Bars3Icon, XMarkIcon, UserCircleIcon, ChevronDownIcon } from '@heroicons/react/24/outline'
 import { supabase } from '@/lib/supabaseClient'
 import { User } from '@supabase/supabase-js'
 import { useAttribution } from '@/lib/attribution'
@@ -46,16 +46,27 @@ export default function NavBar() {
         </Link>
 
         {/* Desktop Menu */}
-        <div className="hidden md:flex items-center gap-4">
-          <div className="flex space-x-6 text-sm font-medium text-gray-600 mr-4">
-            <Link href="/calculator/insurance-premium" className="text-amber-600 font-black hover:text-amber-700 transition-colors">보험료 계산기</Link>
-            <Link href="/guide/5th-gen" className="text-primary-600 font-bold hover:text-primary-700 transition-colors">5세대 실손</Link>
-            <Link href="/guide/cancer-treatment" className="text-primary-600 font-bold hover:text-primary-700 transition-colors">암 치료 가이드</Link>
-            <Link href="/guide/advanced-radiation" className="text-primary-600 font-bold hover:text-primary-700 transition-colors">방사선치료</Link>
-            <Link href="/guide/hifu-therapy" className="text-primary-600 font-bold hover:text-primary-700 transition-colors">하이푸시술</Link>
-            <Link href="/calculator" className="text-primary-600 font-bold hover:text-primary-700 transition-colors">실비 계산기</Link>
-            <Link href="/disease-codes" className="text-primary-600 font-bold hover:text-primary-700 transition-colors">질병코드 검색</Link>
-            <Link href="/contacts" className="text-primary-600 font-bold hover:text-primary-700 transition-colors">고객센터</Link>
+        <div className="hidden lg:flex items-center gap-4">
+          <div className="flex items-center space-x-5 text-[13px] lg:text-sm font-medium text-gray-600 mr-2">
+            <Link href="/calculator/insurance-premium" className="text-amber-600 font-black hover:text-amber-700 transition-colors whitespace-nowrap">보험료 계산기</Link>
+            <Link href="/guide/5th-gen" className="text-primary-600 font-bold hover:text-primary-700 transition-colors whitespace-nowrap">5세대 실손</Link>
+            
+            {/* Cancer Treatment Dropdown */}
+            <div className="relative group py-5">
+              <button className="flex items-center gap-1 text-primary-600 font-bold hover:text-primary-700 transition-colors whitespace-nowrap outline-none">
+                암 치료 방법
+                <ChevronDownIcon className="w-3.5 h-3.5 transition-transform group-hover:rotate-180" />
+              </button>
+              <div className="absolute top-full left-1/2 -translate-x-1/2 w-48 bg-white border border-gray-100 rounded-2xl shadow-xl py-2 opacity-0 invisible translate-y-2 group-hover:opacity-100 group-hover:visible group-hover:translate-y-0 transition-all z-50">
+                <Link href="/guide/cancer-treatment" className="block px-4 py-2.5 text-sm hover:bg-gray-50 text-gray-700 hover:text-primary-600 transition-colors">암 치료 가이드</Link>
+                <Link href="/guide/advanced-radiation" className="block px-4 py-2.5 text-sm hover:bg-gray-50 text-gray-700 hover:text-primary-600 transition-colors">방사선치료</Link>
+                <Link href="/guide/hifu-therapy" className="block px-4 py-2.5 text-sm hover:bg-gray-50 text-gray-700 hover:text-primary-600 transition-colors">하이푸시술</Link>
+              </div>
+            </div>
+
+            <Link href="/calculator" className="text-primary-600 font-bold hover:text-primary-700 transition-colors whitespace-nowrap">실비 계산기</Link>
+            <Link href="/disease-codes" className="text-primary-600 font-bold hover:text-primary-700 transition-colors whitespace-nowrap">질병코드 검색</Link>
+            <Link href="/contacts" className="text-primary-600 font-bold hover:text-primary-700 transition-colors whitespace-nowrap">보험사별 고객센터</Link>
           </div>
           
           <div className="flex items-center gap-3">
@@ -79,7 +90,7 @@ export default function NavBar() {
               href={planner?.kakao_url || "#consultation"}
               target={planner?.kakao_url ? "_blank" : undefined}
               rel={planner?.kakao_url ? "noopener noreferrer" : undefined}
-              className="inline-flex items-center justify-center px-5 py-2.5 text-sm font-semibold text-white bg-gray-900 rounded-full hover:bg-gray-800 transition-colors shadow-sm"
+              className="inline-flex items-center justify-center px-5 py-2.5 text-sm font-semibold text-white bg-gray-900 rounded-full hover:bg-gray-800 transition-colors shadow-sm whitespace-nowrap"
             >
               {planner ? '1:1 실시간 상담' : '무료 진단받기'}
             </a>
@@ -87,7 +98,7 @@ export default function NavBar() {
         </div>
 
         {/* Mobile Menu Buttons */}
-        <div className="flex items-center md:hidden gap-3 z-50">
+        <div className="flex items-center lg:hidden gap-3 z-50">
           <a
             href="#consultation"
             className="inline-flex items-center justify-center px-4 py-2 text-xs font-semibold text-white bg-gray-900 rounded-full hover:bg-gray-800 transition-colors"
@@ -106,17 +117,34 @@ export default function NavBar() {
 
       {/* Mobile Menu Dropdown */}
       {isOpen && (
-        <div className="md:hidden absolute top-16 left-0 w-full bg-white border-b border-gray-100 shadow-xl overflow-hidden py-4 fade-in slide-in-from-top-2 duration-200">
-          <div className="flex flex-col container space-y-4 px-4">
-            <Link href="/calculator/insurance-premium" onClick={() => setIsOpen(false)} className="text-amber-600 font-black text-lg hover:text-amber-700 border-b border-gray-50 pb-3">보험료 계산기</Link>
-            <Link href="/guide/5th-gen" onClick={() => setIsOpen(false)} className="text-gray-800 font-bold text-lg hover:text-primary-600 border-b border-gray-50 pb-3">5세대 실손 안내</Link>
-            <Link href="/guide/cancer-treatment" onClick={() => setIsOpen(false)} className="text-gray-800 font-bold text-lg hover:text-primary-600 border-b border-gray-50 pb-3">암 치료 가이드</Link>
-            <Link href="/guide/advanced-radiation" onClick={() => setIsOpen(false)} className="text-gray-800 font-bold text-lg hover:text-primary-600 border-b border-gray-50 pb-3">방사선치료 안내</Link>
-            <Link href="/guide/hifu-therapy" onClick={() => setIsOpen(false)} className="text-gray-800 font-bold text-lg hover:text-primary-600 border-b border-gray-50 pb-3">하이푸 시술 안내</Link>
-            <Link href="/calculator" onClick={() => setIsOpen(false)} className="text-gray-800 font-bold text-lg hover:text-primary-600 border-b border-gray-50 pb-3">실비 계산기</Link>
-            <Link href="/disease-codes" onClick={() => setIsOpen(false)} className="text-gray-800 font-bold text-lg hover:text-primary-600 border-b border-gray-50 pb-3">질병코드 검색</Link>
-            <Link href="/login" onClick={() => setIsOpen(false)} className="text-gray-800 font-bold text-lg hover:text-primary-600 border-b border-gray-50 pb-3">설계사 전용 입구</Link>
-            <Link href="/contacts" onClick={() => setIsOpen(false)} className="text-gray-800 font-bold text-lg hover:text-primary-600 pb-2">고객센터 연락처</Link>
+        <div className="lg:hidden absolute top-16 left-0 w-full bg-white border-b border-gray-100 shadow-xl overflow-y-auto max-h-[calc(100vh-4rem)] py-6 fade-in slide-in-from-top-2 duration-200">
+          <div className="flex flex-col container space-y-5 px-6">
+            <Link href="/calculator/insurance-premium" onClick={() => setIsOpen(false)} className="text-amber-600 font-black text-xl hover:text-amber-700">보험료 계산기</Link>
+            <Link href="/guide/5th-gen" onClick={() => setIsOpen(false)} className="text-gray-800 font-bold text-lg hover:text-primary-600">5세대 실손 안내</Link>
+            
+            <div className="space-y-3 pt-2">
+              <span className="text-xs font-black text-gray-400 uppercase tracking-widest pl-1">암 치료 방법</span>
+              <div className="flex flex-col gap-3 pl-4 border-l-2 border-gray-100 italic">
+                <Link href="/guide/cancer-treatment" onClick={() => setIsOpen(false)} className="text-gray-600 font-bold text-base hover:text-primary-600">암 치료 가이드</Link>
+                <Link href="/guide/advanced-radiation" onClick={() => setIsOpen(false)} className="text-gray-600 font-bold text-base hover:text-primary-600">방사선치료 안내</Link>
+                <Link href="/guide/hifu-therapy" onClick={() => setIsOpen(false)} className="text-gray-600 font-bold text-base hover:text-primary-600">하이푸 시술 안내</Link>
+              </div>
+            </div>
+
+            <Link href="/calculator" onClick={() => setIsOpen(false)} className="text-gray-800 font-bold text-lg hover:text-primary-600">실비 계산기</Link>
+            <Link href="/disease-codes" onClick={() => setIsOpen(false)} className="text-gray-800 font-bold text-lg hover:text-primary-600">질병코드 검색</Link>
+            <Link href="/contacts" onClick={() => setIsOpen(false)} className="text-gray-800 font-bold text-lg hover:text-primary-600">보험사별 고객센터</Link>
+            
+            <div className="pt-4 mt-4 border-t border-gray-50 flex flex-col gap-4">
+              {user ? (
+                <Link href="/dashboard" onClick={() => setIsOpen(false)} className="flex items-center gap-2 text-gray-600 font-bold hover:text-gray-900">
+                  <UserCircleIcon className="w-6 h-6" />
+                  플래너 대시보드
+                </Link>
+              ) : (
+                <Link href="/login" onClick={() => setIsOpen(false)} className="text-primary-600 font-black hover:text-primary-700">설계사 전용 입구</Link>
+              )}
+            </div>
           </div>
         </div>
       )}
