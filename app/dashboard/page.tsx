@@ -44,6 +44,39 @@ const safeFormat = (dateStr: string | null | undefined, formatStr: string) => {
   }
 }
 
+// Insurance Age Helper (Birthday + 6 months)
+const getInsuranceAge = (birthDateStr: string | null | undefined) => {
+  if (!birthDateStr) return '-'
+  try {
+    const birthDate = new Date(birthDateStr)
+    if (isNaN(birthDate.getTime())) return '-'
+    
+    const today = new Date()
+    let age = today.getFullYear() - birthDate.getFullYear()
+    const m = today.getMonth() - birthDate.getMonth()
+    
+    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+      age--
+    }
+
+    // Insurance Age adjustment: if 6 months or more have passed since last birthday, add 1 year
+    const birthdayThisYear = new Date(today.getFullYear(), birthDate.getMonth(), birthDate.getDate())
+    const diffMonths = (today.getTime() - birthdayThisYear.getTime()) / (1000 * 60 * 60 * 24 * 30.41)
+    
+    // Simplification: if m > 6, or (m=6 and day >= birthDay), or (m < -6) etc.
+    // Standard Korean Insurance Age: If 6 months + 1 day passed from last birthday, age + 1
+    const monthsPassed = (today.getMonth() - birthDate.getMonth() + 12) % 12
+    const daysPassed = today.getDate() - birthDate.getDate()
+    
+    if (monthsPassed > 6 || (monthsPassed === 6 && daysPassed >= 1)) {
+      return `${age + 1}세`
+    }
+    return `${age}세`
+  } catch (e) {
+    return '-'
+  }
+}
+
 type Planner = {
   id: string
   name: string
@@ -68,6 +101,8 @@ type Customer = {
   name: string
   phone: string
   address: string
+  birth_date: string | null
+  family_count: number
   touch_count: number
   last_touch_at: string | null
   appointment_at: string | null
@@ -94,6 +129,8 @@ export default function DashboardPage() {
   const [newCustName, setNewCustName] = useState('')
   const [newCustPhone, setNewCustPhone] = useState('')
   const [newCustAddr, setNewCustAddr] = useState('')
+  const [newCustBirth, setNewCustBirth] = useState('')
+  const [newCustFamily, setNewCustFamily] = useState('1')
   const [newCustRiders, setNewCustRiders] = useState('')
   const [newCustAppt, setNewCustAppt] = useState('')
 
@@ -102,6 +139,8 @@ export default function DashboardPage() {
   const [editCustName, setEditCustName] = useState('')
   const [editCustPhone, setEditCustPhone] = useState('')
   const [editCustAddr, setEditCustAddr] = useState('')
+  const [editCustBirth, setEditCustBirth] = useState('')
+  const [editCustFamily, setEditCustFamily] = useState('1')
   const [editCustRiders, setEditCustRiders] = useState('')
   const [editCustAppt, setEditCustAppt] = useState('')
 
@@ -242,9 +281,11 @@ export default function DashboardPage() {
         name: newCustName,
         phone: newCustPhone,
         address: newCustAddr,
+        birth_date: newCustBirth || null,
+        family_count: parseInt(newCustFamily) || 1,
         riders: newCustRiders.split(',').map(r => r.trim()).filter(r => r !== ''),
         touch_count: 0,
-        appointment_at: newCustAppt || null
+        appointment_at: null
       })
 
     if (!error) {
@@ -252,6 +293,8 @@ export default function DashboardPage() {
       setNewCustName('')
       setNewCustPhone('')
       setNewCustAddr('')
+      setNewCustBirth('')
+      setNewCustFamily('1')
       setNewCustRiders('')
       setNewCustAppt('')
       checkUser()
@@ -303,6 +346,8 @@ export default function DashboardPage() {
     setEditCustName(customer.name)
     setEditCustPhone(customer.phone)
     setEditCustAddr(customer.address)
+    setEditCustBirth(customer.birth_date ? customer.birth_date.slice(0, 10) : '')
+    setEditCustFamily(customer.family_count.toString())
     setEditCustRiders(customer.riders.join(', '))
     setEditCustAppt(customer.appointment_at ? customer.appointment_at.slice(0, 10) : '')
   }
@@ -315,6 +360,8 @@ export default function DashboardPage() {
         name: editCustName,
         phone: editCustPhone,
         address: editCustAddr,
+        birth_date: editCustBirth || null,
+        family_count: parseInt(editCustFamily) || 1,
         riders: editCustRiders.split(',').map(r => r.trim()).filter(r => r !== ''),
         appointment_at: editCustAppt || null
       })
@@ -638,11 +685,21 @@ export default function DashboardPage() {
                       />
                     </div>
                     <div className="md:col-span-1">
-                      <label className="block text-xs font-bold text-gray-400 uppercase mb-2 ml-1">약속 날짜</label>
+                      <label className="block text-xs font-bold text-gray-400 uppercase mb-2 ml-1">생년월일</label>
                       <input
                         type="date"
-                        value={newCustAppt}
-                        onChange={(e) => setNewCustAppt(e.target.value)}
+                        value={newCustBirth}
+                        onChange={(e) => setNewCustBirth(e.target.value)}
+                        className="w-full px-5 py-3.5 bg-gray-50 border border-transparent rounded-2xl focus:bg-white focus:border-primary-500 transition-all outline-none text-sm"
+                      />
+                    </div>
+                    <div className="md:col-span-1">
+                      <label className="block text-xs font-bold text-gray-400 uppercase mb-2 ml-1">가족 수</label>
+                      <input
+                        type="number"
+                        min="1"
+                        value={newCustFamily}
+                        onChange={(e) => setNewCustFamily(e.target.value)}
                         className="w-full px-5 py-3.5 bg-gray-50 border border-transparent rounded-2xl focus:bg-white focus:border-primary-500 transition-all outline-none text-sm"
                       />
                     </div>
@@ -675,12 +732,12 @@ export default function DashboardPage() {
                     <table className="w-full">
                       <thead>
                         <tr className="bg-gray-50/50 text-left">
-                          <th className="px-8 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest">고객명</th>
-                          <th className="px-8 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest">전화번호</th>
-                          <th className="px-8 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest">주소</th>
+                          <th className="px-8 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest">고객 정보</th>
+                          <th className="px-8 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest">연락처/주소</th>
+                          <th className="px-8 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest text-center">보험상령일</th>
                           <th className="px-8 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest">약속</th>
                           <th className="px-8 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest">주요 특약</th>
-                          <th className="px-8 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest text-right">최근 터치 / 터치 횟수</th>
+                          <th className="px-8 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest text-right">터치 / 관리</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-gray-50 text-sm">
@@ -695,11 +752,24 @@ export default function DashboardPage() {
                             <tr key={c.id} className="hover:bg-gray-50/50 transition-colors group">
                               {editingId === c.id ? (
                                 <>
-                                  <td className="px-4 py-3"><input value={editCustName} onChange={e => setEditCustName(e.target.value)} className="w-full px-3 py-2 bg-white border border-gray-200 rounded-xl focus:border-primary-500 outline-none text-sm font-bold" /></td>
-                                  <td className="px-4 py-3"><input value={editCustPhone} onChange={e => setEditCustPhone(e.target.value)} className="w-full px-3 py-2 bg-white border border-gray-200 rounded-xl focus:border-primary-500 outline-none text-sm font-mono" /></td>
-                                  <td className="px-4 py-3"><input value={editCustAddr} onChange={e => setEditCustAddr(e.target.value)} className="w-full px-3 py-2 bg-white border border-gray-200 rounded-xl focus:border-primary-500 outline-none text-sm" /></td>
+                                  <td className="px-4 py-3">
+                                    <div className="space-y-2">
+                                      <input value={editCustName} onChange={e => setEditCustName(e.target.value)} placeholder="이름" className="w-full px-3 py-2 border rounded-xl" />
+                                      <input type="date" value={editCustBirth} onChange={e => setEditCustBirth(e.target.value)} className="w-full px-3 py-2 border rounded-xl" />
+                                    </div>
+                                  </td>
+                                  <td className="px-4 py-3">
+                                    <div className="space-y-2">
+                                      <input value={editCustPhone} onChange={e => setEditCustPhone(e.target.value)} placeholder="전화번호" className="w-full px-3 py-2 border rounded-xl" />
+                                      <input value={editCustAddr} onChange={e => setEditCustAddr(e.target.value)} placeholder="주소" className="w-full px-3 py-2 border rounded-xl" />
+                                    </div>
+                                  </td>
+                                  <td className="px-4 py-3 text-center">
+                                    <input type="number" min="1" value={editCustFamily} onChange={e => setEditCustFamily(e.target.value)} className="w-16 px-2 py-2 border rounded-xl text-center" />
+                                    <span className="text-[10px] block mt-1 text-gray-400">가족 수</span>
+                                  </td>
                                   <td className="px-4 py-3"><input type="date" value={editCustAppt} onChange={e => setEditCustAppt(e.target.value)} className="w-full px-3 py-2 border rounded-xl" /></td>
-                                  <td className="px-4 py-3"><input value={editCustRiders} onChange={e => setEditCustRiders(e.target.value)} className="w-full px-3 py-2 bg-white border border-gray-200 rounded-xl focus:border-primary-500 outline-none text-sm" /></td>
+                                  <td className="px-4 py-3"><input value={editCustRiders} onChange={e => setEditCustRiders(e.target.value)} placeholder="특약 사항" className="w-full px-3 py-2 border rounded-xl" /></td>
                                   <td className="px-4 py-3 text-right">
                                     <div className="flex justify-end gap-2">
                                       <button onClick={saveEdit} className="text-primary-600 font-bold hover:underline">저장</button>
@@ -709,9 +779,24 @@ export default function DashboardPage() {
                                 </>
                               ) : (
                                 <>
-                                  <td className="px-8 py-5 font-bold text-gray-900">{c.name}</td>
-                                  <td className="px-8 py-5 text-gray-600 font-mono tracking-tight">{c.phone || '-'}</td>
-                                  <td className="px-8 py-5 text-gray-600 truncate max-w-[120px]">{c.address || '-'}</td>
+                                  <td className="px-8 py-5">
+                                    <div className="flex flex-col gap-0.5">
+                                      <span className="font-bold text-gray-900">{c.name}</span>
+                                      <span className="text-[11px] text-gray-400 font-medium">생일: {safeFormat(c.birth_date, 'yy.MM.dd')}</span>
+                                      <span className="text-[10px] font-bold text-gray-400">가족: {c.family_count}명</span>
+                                    </div>
+                                  </td>
+                                  <td className="px-8 py-5">
+                                    <div className="flex flex-col gap-0.5">
+                                      <span className="font-mono tracking-tighter text-gray-600">{c.phone || '-'}</span>
+                                      <span className="text-[11px] text-gray-400 truncate max-w-[150px]">{c.address || '-'}</span>
+                                    </div>
+                                  </td>
+                                  <td className="px-8 py-5 text-center">
+                                    <div className="bg-primary-50 rounded-xl py-2 px-3 inline-block">
+                                      <span className="text-primary-700 font-black text-xs">{getInsuranceAge(c.birth_date)}</span>
+                                    </div>
+                                  </td>
                                   <td className="px-8 py-5 font-bold text-primary-600">
                                     {safeFormat(c.appointment_at, 'MM-DD')}
                                   </td>
@@ -725,29 +810,29 @@ export default function DashboardPage() {
                                   </td>
                                   <td className="px-8 py-5 text-right">
                                     <div className="flex items-center justify-end gap-4">
-                                      <div className="flex flex-col items-end gap-1">
-                                        <div className="flex gap-2 mr-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                          <button onClick={() => startEditing(c)} className="text-[10px] text-gray-400 hover:text-primary-600 font-bold">수정</button>
-                                          <button onClick={() => deleteCustomer(c.id)} className="text-[10px] text-gray-400 hover:text-rose-600 font-bold">삭제</button>
+                                      <div className="flex flex-col items-end gap-1.5">
+                                        <div className="flex items-center bg-gray-100 rounded-xl p-0.5">
+                                          <button
+                                            onClick={() => decrementTouch(c.id, c.touch_count)}
+                                            className="p-1 hover:text-rose-600 transition-colors"
+                                          >
+                                            <MinusIcon className="w-3.5 h-3.5" />
+                                          </button>
+                                          <span className="px-2 text-[11px] font-black text-gray-900 tracking-tighter">{c.touch_count}회</span>
+                                          <button
+                                            onClick={() => incrementTouch(c.id, c.touch_count)}
+                                            className="p-1 hover:text-primary-600 transition-colors"
+                                          >
+                                            <PlusIcon className="w-3.5 h-3.5" />
+                                          </button>
                                         </div>
                                         {c.last_touch_at && (
-                                          <span className="text-[10px] text-gray-400 font-medium">최근: {safeFormat(c.last_touch_at, 'MM-DD')}</span>
+                                          <span className="text-[10px] text-gray-400 font-black tracking-tight">{safeFormat(c.last_touch_at, 'MM-DD')} 터치함</span>
                                         )}
                                       </div>
-                                      <div className="flex items-center bg-gray-100 rounded-xl p-1">
-                                        <button
-                                          onClick={() => decrementTouch(c.id, c.touch_count)}
-                                          className="p-1 hover:text-rose-600 transition-colors"
-                                        >
-                                          <MinusIcon className="w-4 h-4" />
-                                        </button>
-                                        <span className="px-3 text-xs font-black text-gray-900 tracking-tighter">{c.touch_count}회</span>
-                                        <button
-                                          onClick={() => incrementTouch(c.id, c.touch_count)}
-                                          className="p-1 hover:text-primary-600 transition-colors"
-                                        >
-                                          <PlusIcon className="w-4 h-4" />
-                                        </button>
+                                      <div className="flex flex-col gap-1 opacity-10 group-hover:opacity-100 transition-opacity">
+                                        <button onClick={() => startEditing(c)} className="text-[10px] text-gray-400 hover:text-primary-600 font-bold">수정</button>
+                                        <button onClick={() => deleteCustomer(c.id)} className="text-[10px] text-gray-400 hover:text-rose-600 font-bold">삭제</button>
                                       </div>
                                     </div>
                                   </td>

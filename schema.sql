@@ -34,6 +34,8 @@ create table if not exists public.customers (
   name text not null,
   phone text,
   address text,
+  birth_date date,
+  family_count integer not null default 1,
   touch_count integer not null default 0,
   last_touch_at timestamptz,
   appointment_at timestamptz,
