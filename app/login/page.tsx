@@ -14,20 +14,6 @@ export default function LoginPage() {
   const [error, setError] = useState<string | null>(null)
   const router = useRouter()
 
-  const handleSocialLogin = async (provider: any) => {
-    try {
-      const { error: socialError } = await supabase.auth.signInWithOAuth({
-        provider,
-        options: {
-          redirectTo: `${window.location.origin}/dashboard`,
-        },
-      })
-      if (socialError) throw socialError
-    } catch (err: any) {
-      setError(`${provider} 로그인 중 오류가 발생했습니다.`)
-    }
-  }
-
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
@@ -102,30 +88,6 @@ export default function LoginPage() {
               {loading ? '로그인 중...' : '로그인하기'}
             </button>
           </form>
-
-          <div className="relative my-10">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-100"></div>
-            </div>
-            <div className="relative flex justify-center text-sm">
-              <span className="px-4 bg-white text-gray-400 font-bold">또는 소셜 계정으로 시작하기</span>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <button
-              onClick={() => handleSocialLogin('google')}
-              className="flex items-center justify-center py-3.5 border border-gray-100 rounded-2xl hover:bg-gray-50 transition-all font-bold text-sm text-gray-600"
-            >
-              Google
-            </button>
-            <button
-              onClick={() => handleSocialLogin('kakao')}
-              className="flex items-center justify-center py-3.5 bg-[#FEE500] rounded-2xl hover:opacity-90 transition-all font-bold text-sm text-[#000000]"
-            >
-              Kakao
-            </button>
-          </div>
 
           <p className="mt-8 text-center text-sm text-gray-500">
             아직 계정이 없으신가요?{' '}

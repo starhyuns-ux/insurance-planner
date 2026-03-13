@@ -18,8 +18,7 @@ import {
   ChevronRightIcon,
   MinusIcon,
   PencilIcon,
-  TrashIcon,
-  CheckCircleIcon
+  TrashIcon
 } from '@heroicons/react/24/outline'
 import { 
   format, 
@@ -138,7 +137,6 @@ export default function DashboardPage() {
   const [editRegion, setEditRegion] = useState('')
   const [editKakaoUrl, setEditKakaoUrl] = useState('')
   const [isSaving, setIsSaving] = useState(false)
-  const [identities, setIdentities] = useState<any[]>([])
 
   const [newCustName, setNewCustName] = useState('')
   const [newCustPhone, setNewCustPhone] = useState('')
@@ -171,8 +169,6 @@ export default function DashboardPage() {
       router.push('/login')
       return
     }
-
-    setIdentities(user.identities || [])
 
     const { data: profile } = await supabase
       .from('planners')
@@ -213,23 +209,6 @@ export default function DashboardPage() {
   const handleLogout = async () => {
     await supabase.auth.signOut()
     router.push('/')
-  }
-
-  const isLinked = (provider: string) => identities.some(id => id.provider === provider)
-
-  const linkSocialAccount = async (provider: 'google' | 'kakao') => {
-    try {
-      const { error } = await supabase.auth.linkIdentity({
-        provider,
-        options: {
-          redirectTo: `${window.location.origin}/dashboard`
-        }
-      })
-      if (error) throw error
-    } catch (err: any) {
-      console.error(`Error linking ${provider}:`, err)
-      alert(`${provider} 계정 연동 중 오류가 발생했습니다. 이미 다른 계정에 연동되어 있을 수 있습니다.`)
-    }
   }
 
   const updateProfile = async () => {
@@ -632,61 +611,6 @@ export default function DashboardPage() {
                           💡 **팁**: 명함이나 신뢰감을 주는 프로필 사진을 등록하면 고객들의 상담 전환율이 높아집니다.
                         </p>
                       </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="bg-white rounded-[2rem] shadow-xl p-8 border border-gray-100">
-                  <div className="flex items-center justify-between mb-8">
-                    <h3 className="text-2xl font-black text-gray-900">연동된 계정</h3>
-                    <p className="text-sm text-gray-500 font-bold">소셜 계정을 연결하면 다음부터 더 간편하게 로그인할 수 있습니다.</p>
-                  </div>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="flex items-center justify-between p-5 bg-gray-50 rounded-2xl border border-transparent hover:border-gray-100 transition-all">
-                      <div className="flex items-center gap-4">
-                        <div className="w-10 h-10 bg-[#FEE500] rounded-xl flex items-center justify-center font-bold text-xs">K</div>
-                        <div>
-                          <p className="text-sm font-black text-gray-900">카카오톡</p>
-                          <p className="text-[11px] font-bold text-gray-400">카카오 계정 연동</p>
-                        </div>
-                      </div>
-                      {isLinked('kakao') ? (
-                        <div className="flex items-center gap-1.5 text-primary-600 bg-primary-50 px-3 py-1.5 rounded-full">
-                          <CheckCircleIcon className="w-4 h-4" />
-                          <span className="text-xs font-black">연동됨</span>
-                        </div>
-                      ) : (
-                        <button 
-                          onClick={() => linkSocialAccount('kakao')}
-                          className="bg-white text-gray-900 border border-gray-200 px-4 py-2 rounded-xl text-xs font-black hover:bg-gray-900 hover:text-white transition-all shadow-sm"
-                        >
-                          연동하기
-                        </button>
-                      )}
-                    </div>
-
-                    <div className="flex items-center justify-between p-5 bg-gray-50 rounded-2xl border border-transparent hover:border-gray-100 transition-all">
-                      <div className="flex items-center gap-4">
-                        <div className="w-10 h-10 bg-white border border-gray-100 rounded-xl flex items-center justify-center font-bold text-xs shadow-sm">G</div>
-                        <div>
-                          <p className="text-sm font-black text-gray-900">구글 (Google)</p>
-                          <p className="text-[11px] font-bold text-gray-400">구글 계정 연동</p>
-                        </div>
-                      </div>
-                      {isLinked('google') ? (
-                        <div className="flex items-center gap-1.5 text-primary-600 bg-primary-50 px-3 py-1.5 rounded-full">
-                          <CheckCircleIcon className="w-4 h-4" />
-                          <span className="text-xs font-black">연동됨</span>
-                        </div>
-                      ) : (
-                        <button 
-                          onClick={() => linkSocialAccount('google')}
-                          className="bg-white text-gray-900 border border-gray-200 px-4 py-2 rounded-xl text-xs font-black hover:bg-gray-900 hover:text-white transition-all shadow-sm"
-                        >
-                          연동하기
-                        </button>
-                      )}
                     </div>
                   </div>
                 </div>
