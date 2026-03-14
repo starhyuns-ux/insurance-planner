@@ -8,6 +8,14 @@ const notoSansKr = Noto_Sans_KR({
   variable: '--font-noto-sans-kr',
 })
 
+import { Dancing_Script } from 'next/font/google'
+
+const dancingScript = Dancing_Script({
+  subsets: ['latin'],
+  weight: ['400', '700'],
+  variable: '--font-dancing-script',
+})
+
 export const metadata: Metadata = {
   metadataBase: new URL('https://stroy.kr'),
   title: '보험 리모델링 | 5세대 실손보험 가이드',
@@ -61,7 +69,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ko">
-      <body className={`${notoSansKr.variable} font-sans antialiased bg-gray-50 text-gray-900`}>
+      <body className={`${notoSansKr.variable} ${dancingScript.variable} font-sans antialiased bg-gray-50 text-gray-900`}>
         {children}
       </body>
     </html>

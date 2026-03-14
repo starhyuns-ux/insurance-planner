@@ -13,6 +13,7 @@
   --color-primary-900: #312e81;
 
   --font-sans: var(--font-noto-sans-kr), ui-sans-serif, system-ui, sans-serif;
+  --font-cursive: var(--font-dancing-script), cursive;
 
   --animate-blob: blob 7s infinite;
 

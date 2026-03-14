@@ -418,6 +418,14 @@ export default function DashboardPage() {
           
           {/* Sidebar */}
           <aside className="w-full md:w-80 space-y-2 shrink-0">
+            <div className="px-5 py-4 mb-2">
+              <p className="font-cursive text-xl text-primary-600/80 leading-tight">
+                "I can do all this through him who gives me strength."
+              </p>
+              <p className="font-cursive text-sm text-gray-400 mt-1">
+                Philippians 4:13
+              </p>
+            </div>
             <h2 className="px-4 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-4">설계사 메뉴</h2>
             <div className="space-y-1">
               <button
