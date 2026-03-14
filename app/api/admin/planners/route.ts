@@ -5,7 +5,8 @@ import { supabase } from '@/lib/supabaseClient'
 // Define admin phone numbers here
 const ADMIN_PHONES = [
   '010-6303-5561',
-  '01063035561'
+  '01063035561',
+  '63035561'
 ]
 
 export async function GET() {
