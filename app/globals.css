@@ -72,6 +72,10 @@
   max-width: 1200px;
 }
 
+@utility font-cursive {
+  font-family: var(--font-dancing-script), cursive;
+}
+
 /* Custom scrollbar */
 ::-webkit-scrollbar {
   width: 8px;

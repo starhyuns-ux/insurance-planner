@@ -2,13 +2,13 @@ import type { Metadata } from 'next'
 import { Noto_Sans_KR } from 'next/font/google'
 import './globals.css'
 
+import { Dancing_Script } from 'next/font/google'
+
 const notoSansKr = Noto_Sans_KR({
   subsets: ['latin'],
   weight: ['400', '500', '700', '900'],
   variable: '--font-noto-sans-kr',
 })
-
-import { Dancing_Script } from 'next/font/google'
 
 const dancingScript = Dancing_Script({
   subsets: ['latin'],
