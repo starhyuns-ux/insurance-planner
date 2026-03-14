@@ -18,7 +18,8 @@ import {
   ChevronRightIcon,
   MinusIcon,
   PencilIcon,
-  TrashIcon
+  TrashIcon,
+  GlobeAltIcon
 } from '@heroicons/react/24/outline'
 import { 
   format, 
@@ -426,6 +427,24 @@ export default function DashboardPage() {
                 Philippians 4:13
               </p>
             </div>
+
+            <div className="px-4 mb-6">
+              <a 
+                href="http://www.gasupport.co.kr/Gasys/mega/inc/pop_insuCon.asp" 
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group flex items-center gap-4 px-5 py-4 bg-gradient-to-br from-gray-900 to-gray-800 rounded-2xl shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all text-white border border-gray-700/50"
+              >
+                <div className="p-2.5 bg-white/10 rounded-xl group-hover:bg-white/20 transition-colors">
+                  <GlobeAltIcon className="w-5 h-5 text-primary-300" />
+                </div>
+                <div>
+                  <p className="text-xs font-black text-primary-200 tracking-widest uppercase mb-0.5">Insurance Hub</p>
+                  <p className="text-sm font-black text-white">전보험사 바로가기</p>
+                </div>
+              </a>
+            </div>
+
             <h2 className="px-4 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-4">설계사 메뉴</h2>
             <div className="space-y-1">
               <button
