@@ -190,7 +190,9 @@ export default function DashboardPage() {
       .single()
 
     if (profile) {
-      setPlanner(profile)
+      // BETA TEST OVERRIDE: Always treat as active subscriber
+      const betaProfile = { ...profile, subscription_status: 'active' }
+      setPlanner(betaProfile)
       setEditName(profile.name)
       setEditPhone(profile.phone || '')
       setEditAffiliation(profile.affiliation || '')
@@ -1157,23 +1159,31 @@ export default function DashboardPage() {
                 <div className="bg-white rounded-[2rem] shadow-xl p-8 border border-gray-100">
                   <h3 className="text-2xl font-black text-gray-900 mb-8">구독 정보</h3>
                   
-                  <div className="bg-gradient-to-br from-gray-900 to-gray-800 rounded-3xl p-8 text-white relative overflow-hidden group">
-                    <div className="absolute top-0 right-0 -mr-16 -mt-16 w-64 h-64 bg-primary-500/10 rounded-full blur-3xl group-hover:bg-primary-500/20 transition-all duration-700" />
+                  <div className="bg-gradient-to-br from-primary-900 to-primary-800 rounded-3xl p-8 text-white relative overflow-hidden group">
+                    <div className="absolute top-0 right-0 -mr-16 -mt-16 w-64 h-64 bg-white/10 rounded-full blur-3xl group-hover:bg-white/20 transition-all duration-700" />
                     
                     <div className="relative z-10">
                       <div className="flex items-center gap-3 mb-4">
-                        <span className={`px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-widest ${
-                          planner?.subscription_status === 'active' ? 'bg-green-500 text-white' : 'bg-gray-700 text-gray-300'
-                        }`}>
-                          {planner?.subscription_status === 'active' ? '구독 중' : '미구독'}
+                        <span className="px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-widest bg-amber-500 text-white shadow-xl shadow-amber-500/20 animate-pulse">
+                          BETA TEST PERIOD
+                        </span>
+                        <span className="px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-widest bg-white/20 text-white backdrop-blur-md">
+                          무료 체험 중
                         </span>
                       </div>
                       <h4 className="text-3xl font-black mb-2">프리미엄 설계사 플랜</h4>
-                      <p className="text-gray-400 mb-8 font-medium">나만의 랜딩 페이지와 고객 관리 도구를 모두 이용해 보세요.</p>
+                      <p className="text-white/70 mb-8 font-medium">현재 베타 테스트 기간으로 **모든 기능을 제한 없이 무료**로 이용하실 수 있습니다.</p>
                       
-                      <button className="bg-primary-600 text-white px-8 py-4 rounded-2xl font-black shadow-xl shadow-primary-950/20 hover:bg-primary-500 transition-all">
-                        {planner?.subscription_status === 'active' ? '구독 정보 확인' : '지금 구독 시작하기 (월 29,900원)'}
-                      </button>
+                      <div className="flex flex-wrap gap-4">
+                        <div className="px-6 py-4 bg-white/10 rounded-2xl backdrop-blur-md border border-white/10">
+                          <p className="text-[10px] font-black text-white/50 uppercase tracking-widest mb-1">현재 상태</p>
+                          <p className="text-lg font-black text-white">무제한 이용 가능</p>
+                        </div>
+                        <div className="px-6 py-4 bg-white/10 rounded-2xl backdrop-blur-md border border-white/10">
+                          <p className="text-[10px] font-black text-white/50 uppercase tracking-widest mb-1">결제 예정일</p>
+                          <p className="text-lg font-black text-white">베타 종료 후 공지</p>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
