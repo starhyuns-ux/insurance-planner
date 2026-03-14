@@ -41,8 +41,9 @@ export default function AdminPage() {
 
       if (!res.ok) {
         if (res.status === 401 || res.status === 403) {
-          setError('관리자 권한이 없습니다.')
-          setTimeout(() => router.push('/dashboard'), 2000)
+          setError(result.error || '관리자 권한이 없습니다.')
+          // Remove auto-redirect for debugging
+          // setTimeout(() => router.push('/dashboard'), 2000)
         } else {
           throw new Error(result.error || '데이터를 불러오는데 실패했습니다.')
         }
