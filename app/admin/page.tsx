@@ -36,7 +36,15 @@ export default function AdminPage() {
   const fetchPlanners = async () => {
     try {
       setLoading(true)
-      const res = await fetch('/api/admin/planners')
+      
+      // Get session for token
+      const { data: { session } } = await supabase.auth.getSession()
+      
+      const res = await fetch('/api/admin/planners', {
+        headers: {
+          'Authorization': session ? `Bearer ${session.access_token}` : ''
+        }
+      })
       const result = await res.json()
 
       if (!res.ok) {

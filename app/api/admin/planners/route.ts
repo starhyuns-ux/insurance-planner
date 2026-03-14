@@ -9,13 +9,20 @@ const ADMIN_PHONES = [
   '63035561'
 ]
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
     // 1. Get the current user from the session
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
+    const authHeader = request.headers.get('Authorization')
+    const token = authHeader?.replace('Bearer ', '')
+
+    if (!token) {
+       return NextResponse.json({ error: 'Auth failed: No token provided' }, { status: 401 })
+    }
+
+    const { data: { user }, error: authError } = await supabase.auth.getUser(token)
     
     if (authError || !user) {
-      return NextResponse.json({ error: 'Auth failed' }, { status: 401 })
+      return NextResponse.json({ error: 'Auth failed: Invalid session' }, { status: 401 })
     }
 
     // 2. Fetch the planner profile to check the phone number
