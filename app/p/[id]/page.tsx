@@ -16,10 +16,6 @@ import InsurancePremiumCalculator from '@/components/InsurancePremiumCalculator'
 import { notFound } from 'next/navigation'
 import { Metadata } from 'next'
 import AttributionSetter from '@/components/AttributionSetter'
-import Link from 'next/link'
-import QuickLinks from '@/components/QuickLinks'
-import SilbiCalculator from '@/components/SilbiCalculator'
-import CustomerCenter from '@/components/CustomerCenter'
 
 export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
   const { id } = await params
@@ -118,24 +114,14 @@ export default async function PlannerLandingPage({ params }: { params: { id: str
           region={planner.region}
           kakaoUrl={planner.kakao_url}
           message={planner.advisor_message}
+          plannerId={planner.id}
         />
 
-        <div className="container mx-auto px-4 max-w-4xl">
-          <QuickLinks />
-
-          <div id="premium-calc" className="scroll-mt-24 mb-16">
-            <div className="text-center mb-10">
-              <h3 className="text-2xl md:text-3xl font-black text-gray-900 mb-2">보장성 보험료 계산</h3>
-              <p className="text-sm font-bold text-gray-400">나의 예상 보험료를 1분 만에 확인하세요.</p>
-            </div>
-            <div className="bg-white rounded-[2.5rem] shadow-xl p-6 md:p-10 border border-gray-100">
-              <InsurancePremiumCalculator />
-            </div>
-          </div>
-
-          <SilbiCalculator />
-          
-          <CustomerCenter />
+        <div className="container mx-auto px-4 max-w-4xl py-12">
+          <ConsultationForm 
+            plannerId={planner.id} 
+            plannerInfo={{ name: planner.name, phone: planner.phone }}
+          />
         </div>
       </div>
 

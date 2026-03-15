@@ -12,9 +12,20 @@ interface AdvisorProfileProps {
   region?: string;
   kakaoUrl?: string;
   message?: string | null;
+  plannerId?: string;
 }
 
-export default function AdvisorProfile({ name, phone, profileImage, businessCard, affiliation, region, kakaoUrl, message }: AdvisorProfileProps) {
+export default function AdvisorProfile({ 
+  name, 
+  phone, 
+  profileImage, 
+  businessCard, 
+  affiliation, 
+  region, 
+  kakaoUrl, 
+  message,
+  plannerId 
+}: AdvisorProfileProps) {
   const [copied, setCopied] = useState(false);
 
   const handleCopyLink = () => {
@@ -53,7 +64,6 @@ export default function AdvisorProfile({ name, phone, profileImage, businessCard
               </div>
             )}
 
-            {/* Visual gradient effect for image placeholder - only show when no profile image */}
             {!profileImage && (
               <>
                 <div className="absolute inset-0 bg-gradient-to-br from-gray-700 via-gray-800 to-gray-900 opacity-50 pointer-events-none"></div>
@@ -137,6 +147,55 @@ export default function AdvisorProfile({ name, phone, profileImage, businessCard
             </div>
           </div>
         </div>
+
+        {/* Navigation Buttons to Tools Page */}
+        {plannerId && (
+          <div className="mt-20 pt-12 border-t border-gray-800">
+            <p className="text-sm font-black text-primary-400 uppercase tracking-[0.3em] mb-8 text-center">
+              전문가 전용 보험 솔루션
+            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+              <a 
+                href={`/p/${plannerId}/tools#premium-calc`}
+                className="flex flex-col items-center justify-center p-8 bg-gray-800/40 rounded-[2rem] border border-gray-700 hover:border-primary-500 hover:bg-gray-800/60 transition-all group lg:p-10"
+              >
+                <div className="w-14 h-14 bg-primary-900/50 text-primary-400 rounded-2xl flex items-center justify-center mb-4 group-hover:bg-primary-500 group-hover:text-white transition-all shadow-lg">
+                  <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                  </svg>
+                </div>
+                <p className="text-lg font-black text-white">보험료 계산기</p>
+                <p className="text-xs font-bold text-gray-500 mt-2">3대 진단비 즉시 확인</p>
+              </a>
+
+              <a 
+                href={`/p/${plannerId}/tools#silbi-calc`}
+                className="flex flex-col items-center justify-center p-8 bg-gray-800/40 rounded-[2rem] border border-gray-700 hover:border-amber-500 hover:bg-gray-800/60 transition-all group lg:p-10"
+              >
+                <div className="w-14 h-14 bg-amber-900/50 text-amber-400 rounded-2xl flex items-center justify-center mb-4 group-hover:bg-amber-500 group-hover:text-white transition-all shadow-lg">
+                  <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
+                </div>
+                <p className="text-lg font-black text-white">실비 계산기</p>
+                <p className="text-xs font-bold text-gray-500 mt-2">4세대 실손의료비 산출</p>
+              </a>
+
+              <a 
+                href={`/p/${plannerId}/tools#customer-center`}
+                className="flex flex-col items-center justify-center p-8 bg-gray-800/40 rounded-[2rem] border border-gray-700 hover:border-blue-500 hover:bg-gray-800/60 transition-all group lg:p-10"
+              >
+                <div className="w-14 h-14 bg-blue-900/50 text-blue-400 rounded-2xl flex items-center justify-center mb-4 group-hover:bg-blue-500 group-hover:text-white transition-all shadow-lg">
+                  <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                  </svg>
+                </div>
+                <p className="text-lg font-black text-white">전용 고객센터</p>
+                <p className="text-xs font-bold text-gray-500 mt-2">원클릭 보험사 연결</p>
+              </a>
+            </div>
+          </div>
+        )}
       </div>
     </section>
   )
