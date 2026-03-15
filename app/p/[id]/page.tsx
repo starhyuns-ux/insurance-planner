@@ -1,4 +1,4 @@
-import { supabase } from '@/lib/supabaseClient'
+import { supabaseAdmin } from '@/lib/supabaseServer'
 import NavBar from '@/components/NavBar'
 import Hero from '@/components/Hero'
 import TrustStrip from '@/components/TrustStrip'
@@ -16,11 +16,15 @@ import InsurancePremiumCalculator from '@/components/InsurancePremiumCalculator'
 import { notFound } from 'next/navigation'
 import { Metadata } from 'next'
 import AttributionSetter from '@/components/AttributionSetter'
+import Link from 'next/link'
+import QuickLinks from '@/components/QuickLinks'
+import SilbiCalculator from '@/components/SilbiCalculator'
+import CustomerCenter from '@/components/CustomerCenter'
 
 export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
   const { id } = await params
   
-  const { data: planner } = await supabase
+  const { data: planner } = await supabaseAdmin
     .from('planners')
     .select('name, profile_image_url, affiliation')
     .eq('id', id)
@@ -53,7 +57,7 @@ export default async function PlannerLandingPage({ params }: { params: { id: str
   const { id } = await params
 
   // Fetch planner info
-  const { data: planner, error } = await supabase
+  const { data: planner, error } = await supabaseAdmin
     .from('planners')
     .select('*')
     .eq('id', id)
@@ -71,7 +75,7 @@ export default async function PlannerLandingPage({ params }: { params: { id: str
         <div className="text-center max-w-md">
           <div className="bg-amber-50 p-6 rounded-full inline-block mb-6">
             <svg className="w-12 h-12 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.33.192 3 1.732 3z" />
             </svg>
           </div>
           <h1 className="text-2xl font-black text-gray-900 mb-4">비활성화된 페이지입니다</h1>
@@ -91,17 +95,6 @@ export default async function PlannerLandingPage({ params }: { params: { id: str
       <TrustStrip />
 
       <div className="bg-white">
-        {/* Insurance Premium Calculator Section */}
-        <section id="premium-calculator" className="py-20 bg-gray-50/50">
-          <div className="container px-4 mx-auto">
-            <div className="text-center mb-12">
-              <h2 className="text-3xl md:text-5xl font-black text-gray-900 mb-4 tracking-tight">보험료 계산기</h2>
-              <p className="text-gray-600 max-w-2xl mx-auto break-keep text-lg">성별과 생년월일만 입력하면 암·뇌·심장 진단비와 수술비까지 즉시 확인해 드립니다.</p>
-            </div>
-            <InsurancePremiumCalculator />
-          </div>
-        </section>
-
         <ConsultationForm 
           id="consultation-top" 
           plannerId={planner.id} 
@@ -126,6 +119,24 @@ export default async function PlannerLandingPage({ params }: { params: { id: str
           kakaoUrl={planner.kakao_url}
           message={planner.advisor_message}
         />
+
+        <div className="container mx-auto px-4 max-w-4xl">
+          <QuickLinks />
+
+          <div id="premium-calc" className="scroll-mt-24 mb-16">
+            <div className="text-center mb-10">
+              <h3 className="text-2xl md:text-3xl font-black text-gray-900 mb-2">보장성 보험료 계산</h3>
+              <p className="text-sm font-bold text-gray-400">나의 예상 보험료를 1분 만에 확인하세요.</p>
+            </div>
+            <div className="bg-white rounded-[2.5rem] shadow-xl p-6 md:p-10 border border-gray-100">
+              <InsurancePremiumCalculator />
+            </div>
+          </div>
+
+          <SilbiCalculator />
+          
+          <CustomerCenter />
+        </div>
       </div>
 
       <div className="bg-white">
