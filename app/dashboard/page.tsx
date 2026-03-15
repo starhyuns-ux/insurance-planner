@@ -140,6 +140,8 @@ export default function DashboardPage() {
   const [todos, setTodos] = useState<Todo[]>([])
   const [newTodoContent, setNewTodoContent] = useState('')
   const [todoDate, setTodoDate] = useState(format(new Date(), 'yyyy-MM-dd'))
+  const [editingTodoId, setEditingTodoId] = useState<string | null>(null)
+  const [editTodoContent, setEditTodoContent] = useState('')
   const [loading, setLoading] = useState(true)
   const router = useRouter()
   const todoSectionRef = useRef<HTMLDivElement>(null)
@@ -275,6 +277,29 @@ export default function DashboardPage() {
     if (!error) {
       setTodos(todos.filter(t => t.id !== id))
     }
+  }
+
+  const startEditingTodo = (todo: Todo) => {
+    setEditingTodoId(todo.id)
+    setEditTodoContent(todo.content)
+  }
+
+  const saveTodoEdit = async (id: string) => {
+    if (!editTodoContent.trim()) return
+    const { error } = await supabase
+      .from('todos')
+      .update({ content: editTodoContent.trim() })
+      .eq('id', id)
+    
+    if (!error) {
+      setTodos(todos.map(t => t.id === id ? { ...t, content: editTodoContent.trim() } : t))
+      setEditingTodoId(null)
+    }
+  }
+
+  const cancelEditingTodo = () => {
+    setEditingTodoId(null)
+    setEditTodoContent('')
   }
 
   const handleLogout = async () => {
@@ -1138,32 +1163,70 @@ export default function DashboardPage() {
                       ) : (
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           {todos.filter(t => isSameDay(new Date(t.target_date), new Date(todoDate))).map(todo => (
-                            <div 
-                              key={todo.id} 
-                              className={`flex items-center gap-3 p-4 rounded-3xl border transition-all group ${
-                                todo.is_completed ? 'bg-gray-50 border-gray-100' : 'bg-white border-gray-100 hover:shadow-md hover:border-primary-100'
-                              }`}
-                            >
-                              <button 
-                                onClick={() => toggleTodo(todo.id, todo.is_completed)}
-                                className={`w-6 h-6 rounded-lg flex items-center justify-center transition-all ${
-                                  todo.is_completed ? 'bg-green-500 text-white shadow-green-100' : 'bg-gray-100 text-transparent hover:bg-gray-200'
-                                } shadow-lg`}
+                              <div 
+                                key={todo.id} 
+                                className={`flex items-center gap-3 p-4 rounded-3xl border transition-all group ${
+                                  todo.is_completed ? 'bg-gray-50 border-gray-100' : 'bg-white border-gray-100 hover:shadow-md hover:border-primary-100'
+                                }`}
                               >
-                                <span className="text-[10px] font-black">✓</span>
-                              </button>
-                              <span className={`flex-1 text-sm font-bold transition-all ${
-                                todo.is_completed ? 'text-gray-400 line-through' : 'text-gray-700'
-                              }`}>
-                                {todo.content}
-                              </span>
-                              <button 
-                                onClick={() => deleteTodo(todo.id)}
-                                className="opacity-0 group-hover:opacity-100 p-1 text-gray-300 hover:text-rose-500 transition-all"
-                              >
-                                <TrashIcon className="w-4 h-4" />
-                              </button>
-                            </div>
+                                <button 
+                                  onClick={() => toggleTodo(todo.id, todo.is_completed)}
+                                  className={`w-6 h-6 rounded-lg flex items-center justify-center transition-all ${
+                                    todo.is_completed ? 'bg-green-500 text-white shadow-green-100' : 'bg-gray-100 text-transparent hover:bg-gray-200'
+                                  } shadow-lg`}
+                                >
+                                  <span className="text-[10px] font-black">✓</span>
+                                </button>
+                                
+                                {editingTodoId === todo.id ? (
+                                  <div className="flex-1 flex gap-2">
+                                    <input 
+                                      type="text"
+                                      value={editTodoContent}
+                                      onChange={(e) => setEditTodoContent(e.target.value)}
+                                      onKeyDown={(e) => e.key === 'Enter' && saveTodoEdit(todo.id)}
+                                      className="flex-1 px-3 py-1 bg-gray-50 border-none rounded-xl text-sm font-bold focus:ring-2 focus:ring-primary-500 transition-all outline-none"
+                                      autoFocus
+                                    />
+                                    <div className="flex gap-1">
+                                      <button 
+                                        onClick={() => saveTodoEdit(todo.id)}
+                                        className="p-1 text-primary-600 hover:text-primary-700 font-black text-xs"
+                                      >
+                                        저장
+                                      </button>
+                                      <button 
+                                        onClick={cancelEditingTodo}
+                                        className="p-1 text-gray-400 hover:text-gray-600 font-black text-xs"
+                                      >
+                                        취소
+                                      </button>
+                                    </div>
+                                  </div>
+                                ) : (
+                                  <>
+                                    <span className={`flex-1 text-sm font-bold transition-all ${
+                                      todo.is_completed ? 'text-gray-400 line-through' : 'text-gray-700'
+                                    }`}>
+                                      {todo.content}
+                                    </span>
+                                    <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-all">
+                                      <button 
+                                        onClick={() => startEditingTodo(todo)}
+                                        className="p-1 text-gray-300 hover:text-primary-500 transition-all"
+                                      >
+                                        <PencilIcon className="w-4 h-4" />
+                                      </button>
+                                      <button 
+                                        onClick={() => deleteTodo(todo.id)}
+                                        className="p-1 text-gray-300 hover:text-rose-500 transition-all"
+                                      >
+                                        <TrashIcon className="w-4 h-4" />
+                                      </button>
+                                    </div>
+                                  </>
+                                )}
+                              </div>
                           ))}
                         </div>
                       )}
