@@ -16,6 +16,7 @@ import {
   CalendarIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
+  CheckIcon,
   MinusIcon,
   PencilIcon,
   TrashIcon,
@@ -157,6 +158,7 @@ export default function DashboardPage() {
   const [editKakaoUrl, setEditKakaoUrl] = useState('')
   const [editMessage, setEditMessage] = useState('')
   const [isSaving, setIsSaving] = useState(false)
+  const [urlCopied, setUrlCopied] = useState(false)
 
   const [newCustName, setNewCustName] = useState('')
   const [newCustPhone, setNewCustPhone] = useState('')
@@ -305,6 +307,13 @@ export default function DashboardPage() {
   const cancelEditingTodo = () => {
     setEditingTodoId(null)
     setEditTodoContent('')
+  }
+
+  const handleCopyUrl = (id: string) => {
+    const url = `https://stroy.kr/p/${id}`
+    navigator.clipboard.writeText(url)
+    setUrlCopied(true)
+    setTimeout(() => setUrlCopied(false), 2000)
   }
 
   const shareCard = async (targetName: string, targetPhone?: string) => {
@@ -771,8 +780,28 @@ export default function DashboardPage() {
                          </h4>
                          <p className="text-xs text-primary-200 mb-6 italic opacity-80">고객들에게 공유할 설계사님만의 고유 페이지입니다.</p>
                          <div className="flex flex-col gap-3">
-                           <div className="bg-white/10 backdrop-blur-md rounded-xl p-3 border border-white/10 font-mono text-xs truncate">
-                             stroy.kr/p/{planner?.id}
+                           <div className="flex items-center gap-2">
+                             <div className="flex-1 bg-white/10 backdrop-blur-md rounded-xl p-3 border border-white/10 font-mono text-xs truncate">
+                               stroy.kr/p/{planner?.id}
+                             </div>
+                             <button
+                               onClick={() => planner?.id && handleCopyUrl(planner.id)}
+                               className={`shrink-0 p-3 rounded-xl border border-white/20 transition-all flex items-center justify-center gap-2 font-bold text-xs ${
+                                 urlCopied ? 'bg-green-500 text-white border-green-400' : 'bg-white/10 text-white hover:bg-white/20'
+                               }`}
+                             >
+                               {urlCopied ? (
+                                 <>
+                                   <CheckIcon className="w-4 h-4" />
+                                   복사됨
+                                 </>
+                                ) : (
+                                 <>
+                                   <ShareIcon className="w-4 h-4" />
+                                   주소 복사
+                                 </>
+                               )}
+                             </button>
                            </div>
                            <Link 
                              href={`/p/${planner?.id}`} 
