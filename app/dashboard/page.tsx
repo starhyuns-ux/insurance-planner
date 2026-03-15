@@ -1058,17 +1058,27 @@ export default function DashboardPage() {
                             }`}>
                               {format(day, 'd')}
                             </span>
-                            <div className="mt-2 space-y-1">
+                            {/* Desktop View: Show detailed text */}
+                            <div className="mt-2 space-y-1 hidden md:block">
                               {dayCustomers.map(cust => (
                                 <div key={cust.id} className="bg-primary-50 text-primary-700 px-2 py-1 rounded text-[10px] font-bold truncate border border-primary-100">
                                   👤 {cust.name}
                                 </div>
                               ))}
                               {dayTodos.map(todo => (
-                                <div key={todo.id} className={`${todo.is_completed ? 'bg-gray-50 text-gray-400 line-through' : 'bg-amber-50 text-amber-700'} px-2 py-1 rounded text-[10px] font-bold truncate border ${todo.is_completed ? 'border-gray-100' : 'border-amber-100'}`}>
+                                <div key={todo.id} className={`${todo.is_completed ? 'bg-gray-50 text-gray-400 line-through' : 'bg-amber-50 text-amber-700'} px-2 py-1 rounded text-[10px] font-black truncate border ${todo.is_completed ? 'border-gray-100' : 'border-amber-100'}`}>
                                   📝 {todo.content}
                                 </div>
                               ))}
+                            </div>
+
+                            {/* Mobile View: Show simple checkmark indicator */}
+                            <div className="mt-1 flex flex-wrap gap-0.5 justify-center md:hidden">
+                              {(dayCustomers.length > 0 || dayTodos.length > 0) && (
+                                <div className="w-5 h-5 bg-primary-100 text-primary-700 rounded-lg flex items-center justify-center border border-primary-200">
+                                  <span className="text-[10px] font-black">✓</span>
+                                </div>
+                              )}
                             </div>
                           </div>
                         )
