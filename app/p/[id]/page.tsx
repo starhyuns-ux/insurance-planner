@@ -114,7 +114,6 @@ export default async function PlannerLandingPage({ params }: { params: { id: str
           region={planner.region}
           kakaoUrl={planner.kakao_url}
           message={planner.advisor_message}
-          plannerId={planner.id}
         />
 
         <div className="container mx-auto px-4 max-w-4xl py-12">

@@ -1,8 +1,7 @@
 'use client'
 
 import { useState } from 'react';
-import { ShareIcon, CheckIcon, WrenchScrewdriverIcon } from '@heroicons/react/24/outline';
-import Link from 'next/link';
+import { ShareIcon, CheckIcon } from '@heroicons/react/24/outline';
 
 interface AdvisorProfileProps {
   name?: string;
@@ -13,20 +12,9 @@ interface AdvisorProfileProps {
   region?: string;
   kakaoUrl?: string;
   message?: string | null;
-  plannerId?: string;
 }
 
-export default function AdvisorProfile({ 
-  name, 
-  phone, 
-  profileImage, 
-  businessCard, 
-  affiliation, 
-  region, 
-  kakaoUrl, 
-  message,
-  plannerId 
-}: AdvisorProfileProps) {
+export default function AdvisorProfile({ name, phone, profileImage, businessCard, affiliation, region, kakaoUrl, message }: AdvisorProfileProps) {
   const [copied, setCopied] = useState(false);
 
   const handleCopyLink = () => {
@@ -102,31 +90,22 @@ export default function AdvisorProfile({
                 </div>
               ))}
               
-              <div className="mt-8 pt-8 flex flex-col sm:flex-row gap-4">
-                {kakaoUrl && (
+              {kakaoUrl && (
+                <div className="mt-8 pt-6 border-t border-gray-800">
                   <a 
                     href={kakaoUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex-1 inline-flex items-center justify-center gap-3 bg-[#FEE500] text-gray-900 px-6 py-4 rounded-2xl font-black text-lg hover:bg-[#FADB00] transition-all shadow-xl shadow-yellow-900/20"
+                    className="inline-flex items-center gap-3 bg-[#FEE500] text-gray-900 px-8 py-4 rounded-2xl font-black text-lg hover:bg-[#FADB00] transition-all shadow-xl shadow-yellow-900/20 w-fit"
                   >
-                    <svg className="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
+                    <svg className="w-7 h-7" viewBox="0 0 24 24" fill="currentColor">
                       <path d="M12 3C6.477 3 2 6.477 2 10.75c0 2.766 1.91 5.148 4.755 6.477-.168 1.488-1.503 3.51-1.637 3.68-.13.167-.17.34-.044.47.126.13.29.145.42.103.13-.042 1.956-.843 4.156-2.316.435.05.88.086 1.35.086 5.523 0 10-3.477 10-7.75S17.523 3 12 3z"/>
                     </svg>
-                    1:1 실시간 상담
+                    카카오톡 1:1 실시간 상담
                   </a>
-                )}
-
-                {plannerId && (
-                  <Link
-                    href={`/p/${plannerId}/tools`}
-                    className="flex-1 inline-flex items-center justify-center gap-3 bg-white/10 text-white px-6 py-4 rounded-2xl font-black text-lg hover:bg-white/20 transition-all border border-white/10 backdrop-blur-md"
-                  >
-                    <WrenchScrewdriverIcon className="w-6 h-6 text-primary-400" />
-                    전문가 도구함
-                  </Link>
-                )}
-              </div>
+                  <p className="mt-3 text-gray-500 text-xs font-bold pl-1 font-sans">※ 톡 채널 또는 오픈채팅으로 연결됩니다.</p>
+                </div>
+              )}
 
               {businessCard && (
                 <div className="mt-8 pt-8 border-t border-gray-800">
