@@ -6,7 +6,7 @@ import AdvisorProfile from '@/components/AdvisorProfile'
 import NavBar from '@/components/NavBar'
 import Footer from '@/components/Footer'
 
-export default async function AdvisorIntroPage({ params }: { params: { id: string } }) {
+export default async function DigitalBusinessCardPage({ params }: { params: { id: string } }) {
   const { id } = await params
 
   // Fetch planner info
@@ -53,7 +53,7 @@ export default async function AdvisorIntroPage({ params }: { params: { id: strin
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               {/* Tool 1: Premium Calc */}
               <Link 
-                href={`/p/${id}/tools/premium`}
+                href={`/p/${id}/card/tools/premium`}
                 className="group relative bg-white p-8 rounded-[2.5rem] shadow-xl border border-gray-100 hover:border-primary-500 hover:-translate-y-2 transition-all duration-300 flex flex-col items-center text-center"
               >
                 <div className="w-20 h-20 bg-primary-50 text-primary-600 rounded-3xl flex items-center justify-center mb-6 group-hover:bg-primary-600 group-hover:text-white transition-all duration-300 shadow-lg shadow-primary-100">
@@ -70,7 +70,7 @@ export default async function AdvisorIntroPage({ params }: { params: { id: strin
 
               {/* Tool 2: Silbi Calc */}
               <Link 
-                href={`/p/${id}/tools/silbi`}
+                href={`/p/${id}/card/tools/silbi`}
                 className="group relative bg-white p-8 rounded-[2.5rem] shadow-xl border border-gray-100 hover:border-amber-500 hover:-translate-y-2 transition-all duration-300 flex flex-col items-center text-center"
               >
                 <div className="w-20 h-20 bg-amber-50 text-amber-600 rounded-3xl flex items-center justify-center mb-6 group-hover:bg-amber-600 group-hover:text-white transition-all duration-300 shadow-lg shadow-amber-100">
@@ -87,7 +87,7 @@ export default async function AdvisorIntroPage({ params }: { params: { id: strin
 
               {/* Tool 3: Customer Center */}
               <Link 
-                href={`/p/${id}/tools/customer-center`}
+                href={`/p/${id}/card/tools/customer-center`}
                 className="group relative bg-white p-8 rounded-[2.5rem] shadow-xl border border-gray-100 hover:border-blue-500 hover:-translate-y-2 transition-all duration-300 flex flex-col items-center text-center"
               >
                 <div className="w-20 h-20 bg-blue-50 text-blue-600 rounded-3xl flex items-center justify-center mb-6 group-hover:bg-blue-600 group-hover:text-white transition-all duration-300 shadow-lg shadow-blue-100">
