@@ -124,6 +124,7 @@ export default async function PlannerLandingPage({ params }: { params: { id: str
           affiliation={planner.affiliation}
           region={planner.region}
           kakaoUrl={planner.kakao_url}
+          message={planner.advisor_message}
         />
       </div>
 

@@ -11,9 +11,10 @@ interface AdvisorProfileProps {
   affiliation?: string;
   region?: string;
   kakaoUrl?: string;
+  message?: string | null;
 }
 
-export default function AdvisorProfile({ name, phone, profileImage, businessCard, affiliation, region, kakaoUrl }: AdvisorProfileProps) {
+export default function AdvisorProfile({ name, phone, profileImage, businessCard, affiliation, region, kakaoUrl, message }: AdvisorProfileProps) {
   const [copied, setCopied] = useState(false);
 
   const handleCopyLink = () => {
@@ -69,7 +70,8 @@ export default function AdvisorProfile({ name, phone, profileImage, businessCard
 
           <div className="md:col-span-3">
             <h2 className="text-3xl md:text-4xl lg:text-[2.5rem] font-extrabold mb-8 tracking-tight leading-tight">
-              {name ? `${name} 설계사는` : "실적만을 쫓는 영업은"}<br /> <span className="text-primary-400">{name ? "정직과 신뢰를 약속합니다." : "하지 않겠습니다."}</span>
+              {message || (name ? `${name} 설계사는` : "실적만을 쫓는 영업은")}
+              {!message && <><br /> <span className="text-primary-400">{name ? "정직과 신뢰를 약속합니다." : "하지 않겠습니다."}</span></>}
             </h2>
 
             <div className="space-y-6">

@@ -101,6 +101,7 @@ type Planner = {
   affiliation: string
   region: string
   kakao_url: string
+  advisor_message: string | null
   subscription_status: 'active' | 'inactive'
 }
 
@@ -135,7 +136,7 @@ interface Todo {
 }
 
 export default function DashboardPage() {
-  const [activeTab, setActiveTab] = useState<'profile' | 'leads' | 'customers' | 'calendar' | 'subscription'>('profile')
+  const [activeTab, setActiveTab] = useState<'profile' | 'leads' | 'customers' | 'calendar' | 'subscription' | 'card'>('card')
   const [planner, setPlanner] = useState<Planner | null>(null)
   const [customers, setCustomers] = useState<Customer[]>([])
   const [leads, setLeads] = useState<Lead[]>([])
@@ -154,6 +155,7 @@ export default function DashboardPage() {
   const [editAffiliation, setEditAffiliation] = useState('')
   const [editRegion, setEditRegion] = useState('')
   const [editKakaoUrl, setEditKakaoUrl] = useState('')
+  const [editMessage, setEditMessage] = useState('')
   const [isSaving, setIsSaving] = useState(false)
 
   const [newCustName, setNewCustName] = useState('')
@@ -203,6 +205,7 @@ export default function DashboardPage() {
       setEditAffiliation(profile.affiliation || '')
       setEditRegion(profile.region || '')
       setEditKakaoUrl(profile.kakao_url || '')
+      setEditMessage(profile.advisor_message || '')
     }
 
     // Fetch Manual Customers
@@ -342,7 +345,8 @@ export default function DashboardPage() {
         phone: editPhone,
         affiliation: editAffiliation,
         region: editRegion,
-        kakao_url: editKakaoUrl
+        kakao_url: editKakaoUrl,
+        advisor_message: editMessage
       })
       .eq('id', user.id)
 
@@ -570,6 +574,15 @@ export default function DashboardPage() {
                 내 고객 직접 등록
               </button>
               <button
+                onClick={() => setActiveTab('card')}
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl font-bold transition-all whitespace-nowrap text-sm ${
+                  activeTab === 'card' ? 'bg-primary-600 text-white shadow-lg shadow-primary-200' : 'text-gray-600 hover:bg-white hover:shadow-sm'
+                }`}
+              >
+                <IdentificationIcon className="w-5 h-5" />
+                명함 만들기
+              </button>
+              <button
                 onClick={() => setActiveTab('calendar')}
                 className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl font-bold transition-all whitespace-nowrap text-sm ${
                   activeTab === 'calendar' ? 'bg-primary-600 text-white shadow-lg shadow-primary-200' : 'text-gray-600 hover:bg-white hover:shadow-sm'
@@ -631,141 +644,167 @@ export default function DashboardPage() {
           <div className="flex-1 space-y-8">
             
             {/* Tab: Profile */}
-            {activeTab === 'profile' && (
+            {activeTab === 'card' && (
               <div className="space-y-6">
                 <div className="bg-white rounded-[2rem] shadow-xl p-8 border border-gray-100">
-                  <h3 className="text-2xl font-black text-gray-900 mb-8">내 프로필 관리</h3>
-                  <div className="grid md:grid-cols-2 gap-8">
+                  <div className="flex items-center gap-3 mb-8">
+                    <div className="w-10 h-10 bg-primary-100 rounded-2xl flex items-center justify-center text-primary-600">
+                      <IdentificationIcon className="w-6 h-6" />
+                    </div>
+                    <h3 className="text-2xl font-black text-gray-900">명함 정보 만들기</h3>
+                  </div>
+
+                  <div className="grid md:grid-cols-2 gap-12">
                     <div className="space-y-6">
-                      <div>
-                        <label className="block text-sm font-bold text-gray-700 mb-2 ml-1">이름</label>
-                        <input
-                          type="text"
-                          value={editName}
-                          onChange={(e) => setEditName(e.target.value)}
-                          className="w-full px-5 py-3.5 bg-gray-50 border border-transparent rounded-2xl focus:bg-white focus:border-primary-500 transition-all outline-none"
-                        />
+                      <div className="grid grid-cols-1 gap-6">
+                        <div>
+                          <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1 mb-2">성함</label>
+                          <input
+                            type="text"
+                            value={editName}
+                            onChange={(e) => setEditName(e.target.value)}
+                            placeholder="성함을 입력하세요"
+                            className="w-full px-5 py-4 bg-gray-50 border border-transparent rounded-2xl focus:bg-white focus:border-primary-500 transition-all outline-none text-sm font-bold shadow-inner"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1 mb-2">소속 (회사명)</label>
+                          <input
+                            type="text"
+                            value={editAffiliation}
+                            onChange={(e) => setEditAffiliation(e.target.value)}
+                            placeholder="예: 삼성생명 / 메리츠화재"
+                            className="w-full px-5 py-4 bg-gray-50 border border-transparent rounded-2xl focus:bg-white focus:border-primary-500 transition-all outline-none text-sm font-bold shadow-inner"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1 mb-2">활동 지역 / 주소</label>
+                          <input
+                            type="text"
+                            value={editRegion}
+                            onChange={(e) => setEditRegion(e.target.value)}
+                            placeholder="예: 서울 강남구 / 전국 상담 가능"
+                            className="w-full px-5 py-4 bg-gray-50 border border-transparent rounded-2xl focus:bg-white focus:border-primary-500 transition-all outline-none text-sm font-bold shadow-inner"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1 mb-2">연락처</label>
+                          <input
+                            type="text"
+                            value={editPhone}
+                            onChange={(e) => setEditPhone(e.target.value)}
+                            className="w-full px-5 py-4 bg-gray-50 border border-transparent rounded-2xl focus:bg-white focus:border-primary-500 transition-all outline-none text-sm font-bold shadow-inner"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1 mb-2">설계사 한마디 (랜딩 페이지 인사말)</label>
+                          <textarea
+                            rows={3}
+                            value={editMessage}
+                            onChange={(e) => setEditMessage(e.target.value)}
+                            placeholder="정직하게 분석하고 고객님의 소중한 보험료를 아껴드립니다."
+                            className="w-full px-5 py-4 bg-gray-50 border border-transparent rounded-2xl focus:bg-white focus:border-primary-500 transition-all outline-none text-sm font-bold shadow-inner resize-none leading-relaxed"
+                          />
+                        </div>
                       </div>
-                      <div>
-                        <label className="block text-sm font-bold text-gray-700 mb-2 ml-1">연락처</label>
-                        <input
-                          type="text"
-                          value={editPhone}
-                          onChange={(e) => setEditPhone(e.target.value)}
-                          className="w-full px-5 py-3.5 bg-gray-50 border border-transparent rounded-2xl focus:bg-white focus:border-primary-500 transition-all outline-none"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-bold text-gray-700 mb-2 ml-1">소속</label>
-                        <input
-                          type="text"
-                          value={editAffiliation}
-                          onChange={(e) => setEditAffiliation(e.target.value)}
-                          placeholder="예: 삼성생명"
-                          className="w-full px-5 py-3.5 bg-gray-50 border border-transparent rounded-2xl focus:bg-white focus:border-primary-500 transition-all outline-none"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-bold text-gray-700 mb-2 ml-1">활동 지역</label>
-                        <input
-                          type="text"
-                          value={editRegion}
-                          onChange={(e) => setEditRegion(e.target.value)}
-                          placeholder="예: 서울 강남구"
-                          className="w-full px-5 py-3.5 bg-gray-50 border border-transparent rounded-2xl focus:bg-white focus:border-primary-500 transition-all outline-none"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-bold text-gray-700 mb-2 ml-1">카카오톡 오픈채팅 주소</label>
-                        <input
-                          type="url"
-                          value={editKakaoUrl}
-                          onChange={(e) => setEditKakaoUrl(e.target.value)}
-                          placeholder="https://open.kakao.com/..."
-                          className="w-full px-5 py-3.5 bg-gray-50 border border-transparent rounded-2xl focus:bg-white focus:border-primary-500 transition-all outline-none"
-                        />
-                      </div>
+
                       <button
                         onClick={updateProfile}
                         disabled={isSaving}
-                        className="bg-gray-900 text-white px-8 py-3.5 rounded-2xl font-bold hover:bg-gray-800 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="w-full bg-primary-600 text-white px-8 py-5 rounded-2xl font-black text-lg hover:bg-primary-700 transition-all shadow-xl shadow-primary-200 hover:shadow-primary-300 disabled:opacity-50 disabled:cursor-not-allowed group flex items-center justify-center gap-2"
                       >
-                        {isSaving ? '저장 중...' : '저장하기'}
+                        {isSaving ? '정보 저장 중...' : '명함 정보 저장하기'}
+                        <ArrowRightOnRectangleIcon className="w-5 h-5 group-hover:translate-x-1 transition-transform rotate-180" />
                       </button>
                     </div>
 
-                    <div className="space-y-6">
-                      <div>
-                        <label className="block text-sm font-bold text-gray-700 mb-3 ml-1">프로필 이미지 / 명함</label>
-                        <div className="grid grid-cols-2 gap-4">
-                          <div className="relative group">
-                            <input
-                              type="file"
-                              accept="image/*"
-                              onChange={(e) => handleFileUpload(e, 'profile')}
-                              className="hidden"
-                              id="profile-upload"
-                            />
-                            <label
-                              htmlFor="profile-upload"
-                              className="aspect-[4/5] bg-gray-50 rounded-2xl border-2 border-dashed border-gray-200 flex flex-col items-center justify-center text-gray-400 hover:bg-gray-100 hover:border-primary-300 transition-all gap-2 cursor-pointer overflow-hidden relative"
-                            >
-                              {planner?.profile_image_url ? (
-                                <img src={planner.profile_image_url} alt="Profile" className="w-full h-full object-cover" />
-                              ) : (
-                                <CloudArrowUpIcon className="w-8 h-8" />
-                              )}
-                              <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white text-xs font-bold">
-                                수정하기
-                              </div>
-                            </label>
-                            <span className="block text-center text-[10px] font-bold text-gray-400 mt-2 lowercase tracking-tighter">프로필 이미지</span>
-                          </div>
+                    <div className="space-y-8">
+                       <div className="bg-gray-50 rounded-[2rem] p-8 border border-gray-100">
+                         <h4 className="text-xs font-black text-gray-800 uppercase tracking-widest mb-6 flex items-center gap-2">
+                           <CloudArrowUpIcon className="w-4 h-4 text-primary-500" />
+                           프로필 이미지 & 명함 등록
+                         </h4>
+                         <div className="grid grid-cols-2 gap-6">
+                           <div className="relative group">
+                             <input type="file" accept="image/*" onChange={(e) => handleFileUpload(e, 'profile')} className="hidden" id="card-profile-upload" />
+                             <label htmlFor="card-profile-upload" className="aspect-[4/5] bg-white rounded-2xl border-2 border-dashed border-gray-200 flex flex-col items-center justify-center text-gray-400 hover:bg-white hover:border-primary-300 transition-all gap-2 cursor-pointer overflow-hidden relative shadow-sm">
+                               {planner?.profile_image_url ? (
+                                 <img src={planner.profile_image_url} alt="Profile" className="w-full h-full object-cover" />
+                               ) : (
+                                 <div className="text-center p-4">
+                                   <UserCircleIcon className="w-10 h-10 mx-auto opacity-20 mb-2" />
+                                   <p className="text-[10px] font-bold leading-tight">프로필 사진<br/>업로드</p>
+                                 </div>
+                               )}
+                               <div className="absolute inset-0 bg-primary-600/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white text-xs font-bold backdrop-blur-sm">
+                                 이미지 변경
+                               </div>
+                             </label>
+                           </div>
 
-                          <div className="relative group">
-                            <input
-                              type="file"
-                              accept="image/*"
-                              onChange={(e) => handleFileUpload(e, 'card')}
-                              className="hidden"
-                              id="card-upload"
-                            />
-                            <label
-                              htmlFor="card-upload"
-                              className="aspect-[4/5] bg-gray-50 rounded-2xl border-2 border-dashed border-gray-200 flex flex-col items-center justify-center text-gray-400 hover:bg-gray-100 hover:border-primary-300 transition-all gap-2 cursor-pointer overflow-hidden relative"
-                            >
-                              {planner?.business_card_url ? (
-                                <img src={planner.business_card_url} alt="Card" className="w-full h-full object-cover" />
-                              ) : (
-                                <CloudArrowUpIcon className="w-8 h-8" />
-                              )}
-                              <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white text-xs font-bold">
-                                수정하기
-                              </div>
-                            </label>
-                            <span className="block text-center text-[10px] font-bold text-gray-400 mt-2 lowercase tracking-tighter">보험 설계사 명함</span>
-                          </div>
-                        </div>
-                        <p className="mt-6 text-[11px] text-gray-400 font-medium leading-relaxed bg-gray-50 p-4 rounded-xl">
-                          💡 **팁**: 명함이나 신뢰감을 주는 프로필 사진을 등록하면 고객들의 상담 전환율이 높아집니다.
-                        </p>
-                      </div>
+                           <div className="relative group">
+                             <input type="file" accept="image/*" onChange={(e) => handleFileUpload(e, 'card')} className="hidden" id="card-card-upload" />
+                             <label htmlFor="card-card-upload" className="aspect-[4/5] bg-white rounded-2xl border-2 border-dashed border-gray-200 flex flex-col items-center justify-center text-gray-400 hover:bg-white hover:border-primary-300 transition-all gap-2 cursor-pointer overflow-hidden relative shadow-sm">
+                               {planner?.business_card_url ? (
+                                 <img src={planner.business_card_url} alt="Card" className="w-full h-full object-cover" />
+                               ) : (
+                                 <div className="text-center p-4">
+                                   <IdentificationIcon className="w-10 h-10 mx-auto opacity-20 mb-2" />
+                                   <p className="text-[10px] font-bold leading-tight">실제 명함<br/>업로드</p>
+                                 </div>
+                               )}
+                               <div className="absolute inset-0 bg-primary-600/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white text-xs font-bold backdrop-blur-sm">
+                                 이미지 변경
+                               </div>
+                             </label>
+                           </div>
+                         </div>
+                         <p className="mt-6 text-[11px] text-gray-400 font-bold leading-relaxed">
+                            💡 명함이나 신뢰감을 주는 프로필 사진을 등록하면 상담 전환율이 높아집니다.
+                         </p>
+                       </div>
+
+                       <div className="bg-primary-900 rounded-[2rem] p-8 text-white shadow-2xl relative overflow-hidden">
+                         <div className="absolute top-0 right-0 -mr-8 -mt-8 w-32 h-32 bg-primary-600 rounded-full opacity-20 blur-2xl"></div>
+                         <h4 className="text-sm font-black mb-2 flex items-center gap-2">
+                           내 명함 주소 (랜딩 페이지)
+                         </h4>
+                         <p className="text-xs text-primary-200 mb-6 italic opacity-80">고객들에게 공유할 설계사님만의 고유 페이지입니다.</p>
+                         <div className="flex flex-col gap-3">
+                           <div className="bg-white/10 backdrop-blur-md rounded-xl p-3 border border-white/10 font-mono text-xs truncate">
+                             stroy.kr/p/{planner?.id}
+                           </div>
+                           <Link 
+                             href={`/p/${planner?.id}`} 
+                             target="_blank"
+                             className="w-full bg-white text-primary-900 py-3 rounded-xl font-black text-sm text-center hover:bg-primary-50 transition-all flex items-center justify-center gap-2"
+                           >
+                             <GlobeAltIcon className="w-4 h-4" />
+                             공개 페이지 확인하기
+                           </Link>
+                         </div>
+                       </div>
                     </div>
                   </div>
                 </div>
+              </div>
+            )}
 
-                <div className="bg-primary-50 rounded-3xl p-6 border border-primary-100 flex items-center justify-between">
-                  <div>
-                    <h4 className="font-bold text-primary-900">내 공개 페이지 미리보기</h4>
-                    <p className="text-sm text-primary-700">설계사님의 정보가 반영된 고유 주소입니다.</p>
+            {activeTab === 'profile' && (
+              <div className="space-y-6">
+                <div className="bg-white rounded-[2rem] shadow-xl p-8 border border-gray-100">
+                  <h3 className="text-2xl font-black text-gray-900 mb-8">기본 정보 관리</h3>
+                  <div className="max-w-md space-y-6">
+                    <div>
+                      <label className="block text-sm font-bold text-gray-700 mb-2 ml-1">이름</label>
+                      <input type="text" value={editName} readOnly className="w-full px-5 py-3.5 bg-gray-50 border border-transparent rounded-2xl text-gray-500 outline-none" />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-bold text-gray-700 mb-2 ml-1">연락처</label>
+                      <input type="text" value={editPhone} readOnly className="w-full px-5 py-3.5 bg-gray-50 border border-transparent rounded-2xl text-gray-500 outline-none" />
+                    </div>
+                    <p className="text-sm text-gray-400 font-medium">※ 이름과 연락처는 계정 정보 보호를 위해 명함 만들기 탭에서 수정하실 수 있습니다.</p>
                   </div>
-                  <Link 
-                    href={`/p/${planner?.id}`} 
-                    target="_blank"
-                    className="bg-white text-primary-600 px-5 py-2.5 rounded-xl font-bold shadow-sm hover:shadow-md transition-all text-sm"
-                  >
-                    페이지 열기
-                  </Link>
                 </div>
               </div>
             )}
