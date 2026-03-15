@@ -19,7 +19,9 @@ import {
   MinusIcon,
   PencilIcon,
   TrashIcon,
-  GlobeAltIcon
+  GlobeAltIcon,
+  IdentificationIcon,
+  ShareIcon
 } from '@heroicons/react/24/outline'
 import { 
   format, 
@@ -300,6 +302,21 @@ export default function DashboardPage() {
   const cancelEditingTodo = () => {
     setEditingTodoId(null)
     setEditTodoContent('')
+  }
+
+  const shareCard = async (targetName: string, targetPhone?: string) => {
+    if (!planner) return
+
+    const cardUrl = `https://stroy.kr/p/${planner.id}`
+    const message = `[${planner.name} 설계사] 안녕하세요, ${targetName}님! 제 모바일 명함을 보내드립니다.\n\n🔗 명함 보기: ${cardUrl}`
+
+    try {
+      await navigator.clipboard.writeText(message)
+      alert('명함 홍보 메시지가 클립보드에 복사되었습니다! ✅\n\n카카오톡이나 문자 메시지에 붙여넣어(Ctrl+V) 전송해 주세요.')
+    } catch (err) {
+      console.error('Clipboard copy failed:', err)
+      alert(`메시지 복사에 실패했습니다.\n\n직접 복사해서 보내주세요:\n${message}`)
+    }
   }
 
   const handleLogout = async () => {
@@ -768,6 +785,7 @@ export default function DashboardPage() {
                           <th className="px-8 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest">이름</th>
                           <th className="px-8 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest">연락처</th>
                           <th className="px-8 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest">신청 시각</th>
+                          <th className="px-8 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest text-right">명함 전송</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-gray-50">
@@ -783,6 +801,16 @@ export default function DashboardPage() {
                               <td className="px-8 py-5 font-bold text-gray-900">{l.name}</td>
                               <td className="px-8 py-5 text-gray-600 font-mono tracking-tight">{l.phone.replace(/(\d{3})(\d{4})(\d{4})/, '$1-$2-$3')}</td>
                               <td className="px-8 py-5 text-gray-400 text-sm">{new Date(l.created_at).toLocaleString()}</td>
+                              <td className="px-8 py-5 text-right">
+                                <button 
+                                  onClick={() => shareCard(l.name, l.phone)}
+                                  className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-primary-50 text-primary-600 rounded-lg font-bold text-xs hover:bg-primary-100 transition-colors"
+                                  title="명함 메시지 복사"
+                                >
+                                  <ShareIcon className="w-4 h-4" />
+                                  전송
+                                </button>
+                              </td>
                             </tr>
                           ))
                         )}
@@ -997,6 +1025,13 @@ export default function DashboardPage() {
                                       </div>
                                       
                                       <div className="flex items-center gap-3 border-l border-gray-100 pl-6">
+                                        <button 
+                                          onClick={() => shareCard(c.name, c.phone)}
+                                          className="text-gray-400 hover:text-primary-600 transition-colors"
+                                          title="명함 메시지 복사"
+                                        >
+                                          <ShareIcon className="w-5 h-5" />
+                                        </button>
                                         <button onClick={() => startEditing(c)} className="text-gray-400 hover:text-primary-600 transition-colors">
                                           <PencilIcon className="w-4 h-4" />
                                         </button>
