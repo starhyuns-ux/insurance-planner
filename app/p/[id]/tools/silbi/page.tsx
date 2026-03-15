@@ -16,7 +16,7 @@ export default async function PlannerCardSilbiPage({ params }: { params: { id: s
     <main className="min-h-screen flex flex-col bg-gray-50">
       <NavBar />
       <div className="flex-1 container mx-auto px-4 py-8 max-w-5xl">
-        <Link href={`/p/${id}/card`} className="flex items-center gap-2 text-gray-500 hover:text-gray-900 font-bold mb-8">
+        <Link href={`/p/${id}/intro`} className="flex items-center gap-2 text-gray-500 hover:text-gray-900 font-bold mb-8">
           <ArrowLeftIcon className="w-5 h-5" /> 명함으로 돌아가기
         </Link>
         <div className="text-center mb-10">

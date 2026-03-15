@@ -1,5 +1,7 @@
 import { supabaseAdmin } from '@/lib/supabaseServer'
 import { notFound } from 'next/navigation'
+import Link from 'next/link'
+import { CalculatorIcon, AdjustmentsHorizontalIcon, PhoneIcon } from '@heroicons/react/24/outline'
 import AdvisorProfile from '@/components/AdvisorProfile'
 import NavBar from '@/components/NavBar'
 import Footer from '@/components/Footer'
@@ -23,21 +25,7 @@ export default async function AdvisorIntroPage({ params }: { params: { id: strin
       <NavBar />
       
       <div className="flex-1">
-        {/* Focused Introduction Section */}
-        <div className="py-12 bg-white border-b border-gray-100">
-          <div className="container mx-auto px-4 text-center">
-            <span className="text-[10px] font-black text-primary-600 bg-primary-50 px-3 py-1.5 rounded-full uppercase tracking-[0.2em] mb-4 inline-block">
-              Expert Introduction
-            </span>
-            <h1 className="text-3xl md:text-4xl font-black text-gray-900 tracking-tight">
-              전문 설계사 상세 프로필
-            </h1>
-            <p className="mt-4 text-gray-500 font-bold max-w-xl mx-auto leading-relaxed">
-              고객님의 소중한 자산과 미래를 함께 설계할 전문 파트너를 소개합니다.
-            </p>
-          </div>
-        </div>
-
+        {/* Profile Section */}
         <AdvisorProfile 
           name={planner.name}
           phone={planner.phone}
@@ -48,8 +36,76 @@ export default async function AdvisorIntroPage({ params }: { params: { id: strin
           kakaoUrl={planner.kakao_url}
           message={planner.advisor_message}
         />
+
+        {/* Tools Menu Section - Integrated as requested */}
+        <div className="bg-white border-t border-gray-100 py-24">
+          <div className="container mx-auto px-4 max-w-4xl">
+            <div className="text-center mb-16">
+              <span className="text-[10px] font-black text-primary-600 bg-primary-50 px-3 py-1.5 rounded-full uppercase tracking-[0.2em] mb-4 inline-block">
+                Professional Toolkit
+              </span>
+              <h2 className="text-3xl md:text-4xl font-black text-gray-900 tracking-tight mb-4">전문가 보험 솔루션 메뉴</h2>
+              <p className="text-gray-500 font-bold max-w-xl mx-auto leading-relaxed">
+                {planner.name} 설계사가 제공하는 스마트 분석 도구입니다.<br/>원하시는 도구를 선택해 보세요.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {/* Tool 1: Premium Calc */}
+              <Link 
+                href={`/p/${id}/tools/premium`}
+                className="group relative bg-white p-8 rounded-[2.5rem] shadow-xl border border-gray-100 hover:border-primary-500 hover:-translate-y-2 transition-all duration-300 flex flex-col items-center text-center"
+              >
+                <div className="w-20 h-20 bg-primary-50 text-primary-600 rounded-3xl flex items-center justify-center mb-6 group-hover:bg-primary-600 group-hover:text-white transition-all duration-300 shadow-lg shadow-primary-100">
+                  <CalculatorIcon className="w-10 h-10" />
+                </div>
+                <h3 className="text-xl font-black text-gray-900 mb-2">보험료 계산기</h3>
+                <p className="text-sm font-bold text-gray-400 leading-relaxed">
+                  3대 진단비(암, 뇌, 심장)<br/>내 예상 보험료 확인
+                </p>
+                <div className="mt-8 text-primary-600 font-black text-xs flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                  실행하기 →
+                </div>
+              </Link>
+
+              {/* Tool 2: Silbi Calc */}
+              <Link 
+                href={`/p/${id}/tools/silbi`}
+                className="group relative bg-white p-8 rounded-[2.5rem] shadow-xl border border-gray-100 hover:border-amber-500 hover:-translate-y-2 transition-all duration-300 flex flex-col items-center text-center"
+              >
+                <div className="w-20 h-20 bg-amber-50 text-amber-600 rounded-3xl flex items-center justify-center mb-6 group-hover:bg-amber-600 group-hover:text-white transition-all duration-300 shadow-lg shadow-amber-100">
+                  <AdjustmentsHorizontalIcon className="w-10 h-10" />
+                </div>
+                <h3 className="text-xl font-black text-gray-900 mb-2">실비 계산기</h3>
+                <p className="text-sm font-bold text-gray-400 leading-relaxed">
+                  1세대부터 4세대까지<br/>내 실손 보험금 비교
+                </p>
+                <div className="mt-8 text-amber-600 font-black text-xs flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                  실행하기 →
+                </div>
+              </Link>
+
+              {/* Tool 3: Customer Center */}
+              <Link 
+                href={`/p/${id}/tools/customer-center`}
+                className="group relative bg-white p-8 rounded-[2.5rem] shadow-xl border border-gray-100 hover:border-blue-500 hover:-translate-y-2 transition-all duration-300 flex flex-col items-center text-center"
+              >
+                <div className="w-20 h-20 bg-blue-50 text-blue-600 rounded-3xl flex items-center justify-center mb-6 group-hover:bg-blue-600 group-hover:text-white transition-all duration-300 shadow-lg shadow-blue-100">
+                  <PhoneIcon className="w-10 h-10" />
+                </div>
+                <h3 className="text-xl font-black text-gray-900 mb-2">전용 고객센터</h3>
+                <p className="text-sm font-bold text-gray-400 leading-relaxed">
+                  전 보험사 고객센터<br/>원클릭 전화 연결 서비스
+                </p>
+                <div className="mt-8 text-blue-600 font-black text-xs flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                  실행하기 →
+                </div>
+              </Link>
+            </div>
+          </div>
+        </div>
         
-        {/* Additional Trust Section for this dedicated page */}
+        {/* Additional Trust Section */}
         <div className="bg-gray-50 py-24">
           <div className="container mx-auto px-4 max-w-4xl text-center">
             <h2 className="text-2xl font-black text-gray-900 mb-12">설계사 인증 정보</h2>

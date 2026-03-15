@@ -310,7 +310,7 @@ export default function DashboardPage() {
   }
 
   const handleCopyUrl = (id: string) => {
-    const url = `https://stroy.kr/p/${id}/card`
+    const url = `https://stroy.kr/p/${id}/intro`
     navigator.clipboard.writeText(url)
     setUrlCopied(true)
     setTimeout(() => setUrlCopied(false), 2000)
@@ -319,7 +319,7 @@ export default function DashboardPage() {
   const shareCard = async (targetName: string, targetPhone?: string) => {
     if (!planner) return
 
-    const cardUrl = `https://stroy.kr/p/${planner.id}/card`
+    const cardUrl = `https://stroy.kr/p/${planner.id}/intro`
     const message = `[${planner.name} 설계사] 안녕하세요, ${targetName}님! 제 모바일 명함을 보내드립니다.\n\n🔗 명함 보기: ${cardUrl}`
 
     try {
@@ -782,7 +782,7 @@ export default function DashboardPage() {
                          <div className="flex flex-col gap-3">
                            <div className="flex items-center gap-2">
                              <div className="flex-1 bg-white/10 backdrop-blur-md rounded-xl p-3 border border-white/10 font-mono text-xs truncate">
-                               stroy.kr/p/{planner?.id}/card
+                               stroy.kr/p/{planner?.id}/intro
                              </div>
                              <button
                                onClick={() => planner?.id && handleCopyUrl(planner.id)}
