@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { supabase } from '@/lib/supabaseClient'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
@@ -142,6 +142,7 @@ export default function DashboardPage() {
   const [todoDate, setTodoDate] = useState(format(new Date(), 'yyyy-MM-dd'))
   const [loading, setLoading] = useState(true)
   const router = useRouter()
+  const todoSectionRef = useRef<HTMLDivElement>(null)
 
   // Profile Edit State
   const [editName, setEditName] = useState('')
@@ -1012,7 +1013,7 @@ export default function DashboardPage() {
 
                   <div className="grid grid-cols-7 border-t border-l border-gray-100">
                     {['일', '월', '화', '수', '목', '금', '토'].map(day => (
-                      <div key={day} className="px-4 py-3 bg-gray-50/50 border-r border-b border-gray-100 text-center text-xs font-bold text-gray-400 uppercase tracking-widest">
+                      <div key={day} className="px-1 md:px-4 py-3 bg-gray-50/50 border-r border-b border-gray-100 text-center text-[10px] md:text-xs font-bold text-gray-400 uppercase tracking-widest">
                         {day}
                       </div>
                     ))}
@@ -1038,13 +1039,22 @@ export default function DashboardPage() {
                         return (
                           <div
                             key={i}
-                            className={`min-h-[140px] p-2 border-r border-b border-gray-50 transition-all cursor-pointer ${
-                              !isSameMonth(day, monthStart) ? 'bg-gray-50/30 opacity-30 shadow-inner' : 'bg-white hover:bg-gray-50/50'
+                            className={`min-h-[100px] md:min-h-[140px] p-1 md:p-2 border-r border-b border-gray-50 transition-all cursor-pointer ${
+                              !isSameMonth(day, monthStart) ? 'bg-gray-50/30 opacity-30 shadow-inner' : 
+                              isSameDay(day, new Date(todoDate)) ? 'bg-primary-50/50 ring-1 ring-inset ring-primary-200 z-10' :
+                              'bg-white hover:bg-gray-50/50'
                             }`}
-                            onClick={() => setTodoDate(format(day, 'yyyy-MM-dd'))}
+                            onClick={() => {
+                              setTodoDate(format(day, 'yyyy-MM-dd'))
+                              if (window.innerWidth < 768) {
+                                todoSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+                              }
+                            }}
                           >
-                            <span className={`text-xs font-bold ml-1 flex items-center justify-center w-6 h-6 rounded-full ${
-                              isSameDay(day, new Date()) ? 'bg-primary-600 text-white' : 'text-gray-400'
+                            <span className={`text-[10px] md:text-xs font-bold ml-1 flex items-center justify-center w-5 h-5 md:w-6 md:h-6 rounded-full ${
+                              isSameDay(day, new Date()) ? 'bg-primary-600 text-white' : 
+                              isSameDay(day, new Date(todoDate)) ? 'bg-primary-100 text-primary-700' :
+                              'text-gray-400'
                             }`}>
                               {format(day, 'd')}
                             </span>
@@ -1068,7 +1078,7 @@ export default function DashboardPage() {
                 </div>
 
                 {/* Todo List Content */}
-                <div className="bg-white rounded-[2rem] shadow-xl p-8 border border-gray-100">
+                <div ref={todoSectionRef} className="bg-white rounded-[2rem] shadow-xl p-4 md:p-8 border border-gray-100">
                   <div className="max-w-3xl mx-auto">
                     <h3 className="text-xl font-black text-gray-900 mb-6 flex items-center gap-2">
                        To-do List
@@ -1090,7 +1100,7 @@ export default function DashboardPage() {
                       </div>
                       <div className="md:col-span-3">
                         <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1 mb-1 block">새로운 할 일</label>
-                        <div className="flex gap-2">
+                        <div className="flex flex-col md:flex-row gap-2">
                           <input 
                             type="text" 
                             placeholder="할 일을 입력하세요..."
@@ -1101,7 +1111,7 @@ export default function DashboardPage() {
                           />
                           <button 
                             onClick={addTodo}
-                            className="px-6 bg-primary-600 text-white rounded-2xl shadow-lg shadow-primary-200 hover:bg-primary-500 transition-all group font-black text-sm whitespace-nowrap"
+                            className="w-full md:w-auto px-6 py-4 md:py-0 bg-primary-600 text-white rounded-2xl shadow-lg shadow-primary-200 hover:bg-primary-500 transition-all group font-black text-sm whitespace-nowrap"
                           >
                             추가하기
                           </button>
