@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { ShareIcon, CheckIcon } from '@heroicons/react/24/outline';
+import { useLanguage } from '@/lib/contexts/LanguageContext';
 
 interface AdvisorProfileProps {
   name?: string;
@@ -16,6 +17,7 @@ interface AdvisorProfileProps {
 
 export default function AdvisorProfile({ name, phone, profileImage, businessCard, affiliation, region, kakaoUrl, message }: AdvisorProfileProps) {
   const [copied, setCopied] = useState(false);
+  const { t, locale } = useLanguage();
 
   const handleCopyLink = () => {
     if (typeof window === 'undefined') return;
@@ -24,7 +26,15 @@ export default function AdvisorProfile({ name, phone, profileImage, businessCard
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const points = [
+  const points = locale === 'en' ? [
+    { title: "No Forced Recommendations", desc: "I objectively compare 30+ insurance companies from your perspective." },
+    { title: "100% Free From Start to End", desc: "Every step, from initial consultation to design proposal, is free." },
+    { title: "Thorough Post-Care", desc: "Care after signing is even more important. I manage everything from claims to benefits." }
+  ] : locale === 'cn' ? [
+    { title: "不强迫购买特定保险", desc: "站在客的角度，客观对比分析30家以上的保险公司。" },
+    { title: "从头到尾 100% 免费", desc: "从初始咨询到定制方案设计，全过程均免费提供。" },
+    { title: "投保后完善的售后管理", desc: "投保后的管理更重要。从理赔代办到检查额外权益，提供持续管理。" }
+  ] : [
     { title: "특정 보험사 가입 강요 NO", desc: "고객님의 입장에서 30여개 보험사를 객관적으로 비교 분석합니다." },
     { title: "초기부터 끝까지 부담 없는 100% 무료", desc: "초기 상담부터 맞춤 설계 제안까지 모든 과정을 무료로 제공합니다." },
     { title: "가입 후에도 철저한 사후 관리", desc: "보험은 가입 후가 더 중요합니다. 청구 대행부터 추가 혜택 체크까지 지속 관리해드립니다." }
@@ -49,7 +59,7 @@ export default function AdvisorProfile({ name, phone, profileImage, businessCard
                 <div className="text-primary-400 font-bold tracking-widest text-sm mb-2 shadow-sm">
                   {region} | {affiliation}
                 </div>
-                <div className="text-2xl font-extrabold text-white">{name || "상위 1% 전문가"} 배정</div>
+                <div className="text-2xl font-extrabold text-white">{name ? `${name} ${locale === 'ko' ? '' : ' '}${t('regStatusVal')}` : t('experienceVal')}</div>
               </div>
             )}
 
@@ -63,7 +73,7 @@ export default function AdvisorProfile({ name, phone, profileImage, businessCard
 
             <div className="absolute bottom-6 inset-x-0 text-center text-sm font-medium text-gray-400 z-10 flex items-center justify-center gap-2">
               <svg className="w-4 h-4 text-green-400" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" /></svg>
-              보험협회 정식 등록 설계사 {phone && `(${phone})`}
+              {t('regStatusVal')} {phone && `(${phone})`}
             </div>
           </div>
 
@@ -101,7 +111,7 @@ export default function AdvisorProfile({ name, phone, profileImage, businessCard
                     <svg className="w-7 h-7" viewBox="0 0 24 24" fill="currentColor">
                       <path d="M12 3C6.477 3 2 6.477 2 10.75c0 2.766 1.91 5.148 4.755 6.477-.168 1.488-1.503 3.51-1.637 3.68-.13.167-.17.34-.044.47.126.13.29.145.42.103.13-.042 1.956-.843 4.156-2.316.435.05.88.086 1.35.086 5.523 0 10-3.477 10-7.75S17.523 3 12 3z"/>
                     </svg>
-                    카카오톡 1:1 실시간 상담
+                    {t('kakaoTalk')}
                   </a>
                   <p className="mt-3 text-gray-500 text-xs font-bold pl-1 font-sans">※ 톡 채널 또는 오픈채팅으로 연결됩니다.</p>
                 </div>

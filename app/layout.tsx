@@ -62,6 +62,8 @@ export const metadata: Metadata = {
   },
 }
 
+import { LanguageProvider } from '@/lib/contexts/LanguageContext'
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -70,7 +72,9 @@ export default function RootLayout({
   return (
     <html lang="ko">
       <body className={`${notoSansKr.variable} ${dancingScript.variable} font-sans antialiased bg-gray-50 text-gray-900`}>
-        {children}
+        <LanguageProvider>
+          {children}
+        </LanguageProvider>
       </body>
     </html>
   )

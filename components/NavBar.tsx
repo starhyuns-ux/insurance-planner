@@ -6,6 +6,7 @@ import { Bars3Icon, XMarkIcon, UserCircleIcon, ChevronDownIcon } from '@heroicon
 import { supabase } from '@/lib/supabaseClient'
 import { User } from '@supabase/supabase-js'
 import { useAttribution } from '@/lib/attribution'
+import LanguageSwitcher from './LanguageSwitcher'
 
 export default function NavBar() {
   const [isOpen, setIsOpen] = useState(false)
@@ -95,6 +96,8 @@ export default function NavBar() {
             >
               {planner ? '1:1 실시간 상담' : '무료 진단받기'}
             </a>
+            
+            <LanguageSwitcher />
           </div>
         </div>
 
@@ -106,6 +109,7 @@ export default function NavBar() {
           >
             무료 진단
           </a>
+          <LanguageSwitcher />
           <button
             onClick={() => setIsOpen(!isOpen)}
             className="p-1 -mr-2 text-gray-600 hover:text-gray-900 focus:outline-none"

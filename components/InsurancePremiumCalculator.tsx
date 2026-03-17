@@ -12,6 +12,7 @@ import {
   HeartIcon,
   BoltIcon
 } from '@heroicons/react/24/outline'
+import { useLanguage } from '@/lib/contexts/LanguageContext'
 
 // --- Rate Tables ---
 
@@ -149,13 +150,10 @@ function calcPremium(amountManwon: number, premiumPer1000: number): number {
   return (amountManwon / BASE_AMOUNT_MANWON) * premiumPer1000;
 }
 
-function formatMoney(value: number): string {
-  return Math.round(value).toLocaleString('ko-KR') + '원';
-}
-
 // --- Component ---
 
 export default function InsurancePremiumCalculator() {
+  const { t, locale } = useLanguage();
   const [gender, setGender] = useState<'male' | 'female'>('male');
   const [birthDate, setBirthDate] = useState<string>('');
   const [cancerAmount, setCancerAmount] = useState<number>(5000);
@@ -186,24 +184,29 @@ export default function InsurancePremiumCalculator() {
       premiums,
       total,
       age: insuranceAge,
-      genderLabel: gender === 'male' ? '남성' : '여성'
+      genderLabel: gender === 'male' ? t('male') : t('female')
     };
-  }, [gender, insuranceAge, cancerAmount, brainAmount, heartAmount, injurySurgeryAmount, diseaseSurgeryAmount]);
+  }, [gender, insuranceAge, cancerAmount, brainAmount, heartAmount, injurySurgeryAmount, diseaseSurgeryAmount, t]);
+
+  const formatMoney = (amount: number) => {
+    if (amount <= 0) return locale === 'ko' ? '0원' : '0 KRW'
+    if (locale !== 'ko') return `${Math.round(amount).toLocaleString()} KRW`
+    return Math.round(amount).toLocaleString('ko-KR') + '원';
+  }
 
   const handleCalculate = () => {
     if (!birthDate) {
-      alert('생년월일을 입력해 주세요.');
+      alert(locale === 'ko' ? '생년월일을 입력해 주세요.' : locale === 'en' ? 'Please enter birth date.' : '请输入出生日期。');
       return;
     }
     if (insuranceAge === null || insuranceAge < 0 || insuranceAge > 70) {
-      alert('보험 가능 연령(0~70세)이 아닙니다.');
+      alert(locale === 'ko' ? '보험 가능 연령(0~70세)이 아닙니다.' : locale === 'en' ? 'Age (0-70) not eligible.' : '不符合参保年龄(0~70岁)。');
       return;
     }
     
     setIsCalculated(true);
     setShowResults(true);
     
-    // Scroll to results
     setTimeout(() => {
       const element = document.getElementById('calculation-results');
       if (element) {
@@ -226,13 +229,13 @@ export default function InsurancePremiumCalculator() {
           <div className="bg-white rounded-3xl shadow-xl shadow-gray-200/50 p-6 md:p-8 border border-gray-100">
             <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
               <CalculatorIcon className="w-6 h-6 text-primary-600" />
-              가입 정보 입력
+              {t('inputInfo')}
             </h2>
             
             <div className="space-y-6">
               {/* Gender Selection */}
               <div>
-                <label className="block text-sm font-bold text-gray-700 mb-3 ml-1">성별</label>
+                <label className="block text-sm font-bold text-gray-700 mb-3 ml-1">{t('gender')}</label>
                 <div className="grid grid-cols-2 gap-3">
                   <button
                     onClick={() => setGender('male')}
@@ -243,7 +246,7 @@ export default function InsurancePremiumCalculator() {
                     }`}
                   >
                     <UserIcon className="w-5 h-5" />
-                    남성
+                    {t('male')}
                   </button>
                   <button
                     onClick={() => setGender('female')}
@@ -254,7 +257,7 @@ export default function InsurancePremiumCalculator() {
                     }`}
                   >
                     <UserIcon className="w-5 h-5" />
-                    여성
+                    {t('female')}
                   </button>
                 </div>
               </div>
@@ -262,7 +265,7 @@ export default function InsurancePremiumCalculator() {
               {/* Birth Date */}
               <div>
                 <label htmlFor="birthDate" className="block text-sm font-bold text-gray-700 mb-2 ml-1">
-                  생년월일
+                  {t('birthDate')}
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
@@ -279,7 +282,7 @@ export default function InsurancePremiumCalculator() {
                 </div>
                 {insuranceAge !== null && insuranceAge >= 0 && (
                   <p className="mt-2 text-sm font-medium text-primary-600 ml-1">
-                    보험나이: {insuranceAge}세
+                    {t('insuranceAge')}: {insuranceAge}{locale === 'ko' ? '세' : (locale === 'en' ? ' yrs' : '岁')}
                   </p>
                 )}
               </div>
@@ -288,15 +291,15 @@ export default function InsurancePremiumCalculator() {
 
               {/* Coverage Amounts */}
               <div className="space-y-4">
-                <h3 className="text-sm font-bold text-gray-400 uppercase tracking-wider ml-1">보장 금액 설정 (만원)</h3>
+                <h3 className="text-sm font-bold text-gray-400 uppercase tracking-wider ml-1">{t('coverageSettings')}</h3>
                 
                 <div className="space-y-4">
                   {[
-                    { id: 'cancer', label: '암진단금', value: cancerAmount, setter: setCancerAmount, icon: ShieldCheckIcon, color: 'text-amber-500' },
-                    { id: 'brain', label: '뇌혈관진단금', value: brainAmount, setter: setBrainAmount, icon: BoltIcon, color: 'text-blue-500' },
-                    { id: 'heart', label: '허혈성심장진단비', value: heartAmount, setter: setHeartAmount, icon: HeartIcon, color: 'text-rose-500' },
-                    { id: 'injury', label: '상해 1~5종 수술비', value: injurySurgeryAmount, setter: setInjurySurgeryAmount, icon: BoltIcon, color: 'text-green-500' },
-                    { id: 'disease', label: '질병 1~5종 수술비', value: diseaseSurgeryAmount, setter: setDiseaseSurgeryAmount, icon: ShieldCheckIcon, color: 'text-indigo-500' },
+                    { id: 'cancer', label: t('cancerLabel'), value: cancerAmount, setter: setCancerAmount, icon: ShieldCheckIcon, color: 'text-amber-500' },
+                    { id: 'brain', label: t('brainLabel'), value: brainAmount, setter: setBrainAmount, icon: BoltIcon, color: 'text-blue-500' },
+                    { id: 'heart', label: t('heartLabel'), value: heartAmount, setter: setHeartAmount, icon: HeartIcon, color: 'text-rose-500' },
+                    { id: 'injury', label: t('injurySurgery'), value: injurySurgeryAmount, setter: setInjurySurgeryAmount, icon: BoltIcon, color: 'text-green-500' },
+                    { id: 'disease', label: t('diseaseSurgery'), value: diseaseSurgeryAmount, setter: setDiseaseSurgeryAmount, icon: ShieldCheckIcon, color: 'text-indigo-500' },
                   ].map((item) => (
                     <div key={item.id}>
                       <div className="flex justify-between items-center mb-1.5 ml-1">
@@ -304,7 +307,7 @@ export default function InsurancePremiumCalculator() {
                           <item.icon className={`w-4 h-4 ${item.color}`} />
                           {item.label}
                         </label>
-                        <span className="text-xs font-bold text-gray-400">{item.value.toLocaleString()}만원</span>
+                        <span className="text-xs font-bold text-gray-400">{item.value.toLocaleString()} {locale === 'ko' ? '만원' : (locale === 'en' ? '0k KRW' : '万韩원')}</span>
                       </div>
                       <input
                         type="number"
@@ -324,7 +327,7 @@ export default function InsurancePremiumCalculator() {
                 onClick={handleCalculate}
                 className="w-full bg-gray-900 text-white py-4 rounded-2xl font-black text-lg shadow-lg hover:bg-gray-800 transition-all hover:-translate-y-1 active:translate-y-0"
               >
-                보험료 계산하기
+                {t('calculatePremium')}
               </button>
             </div>
           </div>
@@ -337,9 +340,11 @@ export default function InsurancePremiumCalculator() {
               <div className="bg-white p-6 rounded-full shadow-sm mb-6">
                 <CalculatorIcon className="w-12 h-12 text-gray-300" />
               </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-2">계산 결과가 여기에 표시됩니다</h3>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">
+                {locale === 'ko' ? '계산 결과가 여기에 표시됩니다' : locale === 'en' ? 'Results will appear here' : '测算结果将在此显示'}
+              </h3>
               <p className="text-gray-500 max-w-xs mx-auto">
-                가입 정보를 입력하고 '보험료 계산하기' 버튼을 눌러주세요.
+                {locale === 'ko' ? "가입 정보를 입력하고 '보험료 계산하기' 버튼을 눌러주세요." : locale === 'en' ? "Enter info and click 'Calculate Premium'." : "请输入信息并点击“测算保费”按钮。"}
               </p>
             </div>
           ) : (
@@ -353,24 +358,24 @@ export default function InsurancePremiumCalculator() {
                       {results.genderLabel}
                     </span>
                     <span className="px-3 py-1 rounded-full bg-gray-100 text-gray-600 text-xs font-bold">
-                      보험나이 {results.age}세
+                       {t('insuranceAge')} {results.age}{locale === 'ko' ? '세' : (locale === 'en' ? ' yrs' : '岁')}
                     </span>
                   </div>
-                  <h2 className="text-2xl font-black text-gray-900">보험료 산출 결과</h2>
+                  <h2 className="text-2xl font-black text-gray-900">{t('calcResults')}</h2>
                 </div>
                 <div className="text-right">
-                  <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">총 월 보험료</p>
+                  <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">{t('totalMonthly')}</p>
                   <p className="text-3xl font-black text-primary-600 tracking-tight">{formatMoney(results.total)}</p>
                 </div>
               </div>
 
               <div className="space-y-4 flex-1">
                 {[
-                  { label: '암진단비', amount: cancerAmount, premium: results.premiums.cancer, icon: ShieldCheckIcon, bg: 'bg-amber-50', text: 'text-amber-700', iconColor: 'text-amber-500' },
-                  { label: '뇌혈관질환 진단비', amount: brainAmount, premium: results.premiums.brain, icon: BoltIcon, bg: 'bg-blue-50', text: 'text-blue-700', iconColor: 'text-blue-500' },
-                  { label: '허혈성심장질환 진단비', amount: heartAmount, premium: results.premiums.heart, icon: HeartIcon, bg: 'bg-rose-50', text: 'text-rose-700', iconColor: 'text-rose-500' },
-                  { label: '상해 1~5종 수술비', amount: injurySurgeryAmount, premium: results.premiums.injurySurgery, icon: BoltIcon, bg: 'bg-green-50', text: 'text-green-700', iconColor: 'text-green-500' },
-                  { label: '질병 1~5종 수술비', amount: diseaseSurgeryAmount, premium: results.premiums.diseaseSurgery, icon: ShieldCheckIcon, bg: 'bg-indigo-50', text: 'text-indigo-700', iconColor: 'text-indigo-500' },
+                  { label: t('cancerLabel'), amount: cancerAmount, premium: results.premiums.cancer, icon: ShieldCheckIcon, bg: 'bg-amber-50', text: 'text-amber-700', iconColor: 'text-amber-500' },
+                  { label: t('brainLabel'), amount: brainAmount, premium: results.premiums.brain, icon: BoltIcon, bg: 'bg-blue-50', text: 'text-blue-700', iconColor: 'text-blue-500' },
+                  { label: t('heartLabel'), amount: heartAmount, premium: results.premiums.heart, icon: HeartIcon, bg: 'bg-rose-50', text: 'text-rose-700', iconColor: 'text-rose-500' },
+                  { label: t('injurySurgery'), amount: injurySurgeryAmount, premium: results.premiums.injurySurgery, icon: BoltIcon, bg: 'bg-green-50', text: 'text-green-700', iconColor: 'text-green-500' },
+                  { label: t('diseaseSurgery'), amount: diseaseSurgeryAmount, premium: results.premiums.diseaseSurgery, icon: ShieldCheckIcon, bg: 'bg-indigo-50', text: 'text-indigo-700', iconColor: 'text-indigo-500' },
                 ].map((item, idx) => (
                   <div key={idx} className="group p-5 rounded-2xl bg-gray-50 border border-transparent hover:border-gray-200 transition-all">
                     <div className="flex items-center justify-between mb-3">
@@ -380,7 +385,9 @@ export default function InsurancePremiumCalculator() {
                         </div>
                         <div>
                           <p className="text-sm font-bold text-gray-900">{item.label}</p>
-                          <p className="text-[11px] font-bold text-gray-400">가입금액: {item.amount.toLocaleString()}만원</p>
+                          <p className="text-[11px] font-bold text-gray-400">
+                             {locale === 'ko' ? '가입금액' : (locale === 'en' ? 'Limit' : '保额')}: {item.amount.toLocaleString()}{locale === 'ko' ? '만원' : (locale === 'en' ? '0k KRW' : '万韩元')}
+                          </p>
                         </div>
                       </div>
                       <div className="text-right">
@@ -402,13 +409,15 @@ export default function InsurancePremiumCalculator() {
                 <div className="absolute top-0 right-0 -mr-10 -mt-10 w-40 h-40 bg-white/10 rounded-full blur-3xl group-hover:bg-white/20 transition-all duration-700" />
                 <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
                   <div>
-                    <h4 className="text-lg font-black mb-1">나에게 딱 맞는 보험료인가요?</h4>
+                    <h4 className="text-lg font-black mb-1">
+                      {locale === 'ko' ? '나에게 딱 맞는 보험료인가요?' : (locale === 'en' ? 'Is this the right premium for you?' : '这是适合您的保费吗？')}
+                    </h4>
                     <p className="text-white/80 text-sm font-medium">
-                      고객님만을 위한 보험 다이어트 전문가가<br className="hidden md:block" /> 1:1 맞춤형 보장 분석을 도와드립니다.
+                       {locale === 'ko' ? '고객님만을 위한 보험 다이어트 전문가가 1:1 맞춤형 보장 분석을 도와드립니다.' : (locale === 'en' ? 'Our experts will provide a 1:1 customized coverage analysis.' : '我们的专家将为您提供 1:1 定制化的保障 analysis。')}
                     </p>
                   </div>
                   <a href="/#consultation" className="bg-white text-primary-600 px-6 py-3 rounded-xl font-black text-sm shadow-xl hover:shadow-white/20 transition-all whitespace-nowrap">
-                    전문가 상담 신청
+                    {locale === 'ko' ? '전문가 상담 신청' : (locale === 'en' ? 'Request Consultation' : '申请专家咨询')}
                   </a>
                 </div>
               </div>
@@ -418,7 +427,7 @@ export default function InsurancePremiumCalculator() {
                 className="mt-6 text-sm font-bold text-gray-400 hover:text-gray-600 transition-colors flex items-center justify-center gap-2"
               >
                 <ArrowPathIcon className="w-4 h-4" />
-                다시 계산하기
+                {t('resetCalc')}
               </button>
             </div>
           )}
@@ -426,12 +435,30 @@ export default function InsurancePremiumCalculator() {
           <div className="mt-8 bg-amber-50/50 rounded-2xl p-6 border border-amber-100 flex items-start gap-4">
             <InformationCircleIcon className="w-6 h-6 text-amber-500 shrink-0 mt-0.5" />
             <div>
-              <h4 className="font-bold text-amber-900 mb-2">안내드립니다</h4>
+              <h4 className="font-bold text-amber-900 mb-2">{locale === 'ko' ? '안내드립니다' : 'Notice'}</h4>
               <ul className="text-sm text-amber-800/80 space-y-1.5 list-disc list-inside break-keep">
-                <li>본 계산기는 요율표를 기반으로 한 <strong>단순 예상치</strong>이며, 실제 보험료는 가입 연령, 직업, 건강 상태, 회사별 할인 혜택 등에 따라 달라질 수 있습니다.</li>
-                <li>암진단금 등 각 보장 항목의 가입 금액은 가입하시는 목적에 따라 조절이 필요합니다.</li>
-                <li>보험나이는 만나이와는 다르며, 실제 생일에서 6개월을 기준으로 산출됩니다.</li>
-                <li>더 정확한 보험료와 보장 범위는 <strong>보험 다이어트 상담</strong>을 통해 확인해 보시기 바랍니다.</li>
+                {locale === 'ko' ? (
+                  <>
+                    <li>본 계산기는 요율표를 기반으로 한 <strong>단순 예상치</strong>이며, 실제 보험료는 가입 연령, 직업, 건강 상태, 회사별 할인 혜택 등에 따라 달라질 수 있습니다.</li>
+                    <li>암진단금 등 각 보장 항목의 가입 금액은 가입하시는 목적에 따라 조절이 필요합니다.</li>
+                    <li>보험나이는 만나이와는 다르며, 실제 생일에서 6개월을 기준으로 산출됩니다.</li>
+                    <li>더 정확한 보험료와 보장 범위는 <strong>보험 다이어트 상담</strong>을 통해 확인해 보시기 바랍니다.</li>
+                  </>
+                ) : (locale === 'en' ? (
+                  <>
+                    <li>These results are <strong>simple estimates</strong> based on standard rates. Actual premiums vary by age, occupation, health, etc.</li>
+                    <li>Coverage limits should be adjusted based on your specific needs.</li>
+                    <li>Insurance age differs from actual age; it's calculated based on a 6-month threshold from your birthday.</li>
+                    <li>For exact details, please <strong>request a consultation</strong> with our experts.</li>
+                  </>
+                ) : (
+                  <>
+                    <li>本测算结果仅为基于费率表的<strong>简单预估值</strong>，实际保费取决于年龄、职业、健康状况等。</li>
+                    <li>保额应根据您的具体需求进行调整。</li>
+                    <li>保险年龄与实际周岁不同，以生日后 6 个月为基准计算。</li>
+                    <li>如需准确信息，请<strong>向专家申请咨询</strong>。</li>
+                  </>
+                ))}
               </ul>
             </div>
           </div>
