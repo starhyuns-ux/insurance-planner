@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import { Bars3Icon, XMarkIcon, UserCircleIcon, ChevronDownIcon } from '@heroicons/react/24/outline'
 import { supabase } from '@/lib/supabaseClient'
 import { User } from '@supabase/supabase-js'
@@ -12,6 +13,9 @@ export default function NavBar() {
   const [isOpen, setIsOpen] = useState(false)
   const [user, setUser] = useState<User | null>(null)
   const { planner, loading: attrLoading } = useAttribution()
+  const pathname = usePathname()
+
+  const isPlannerPage = pathname?.startsWith('/p/')
 
   useEffect(() => {
     // Check initial auth state
@@ -80,7 +84,7 @@ export default function NavBar() {
                 <UserCircleIcon className="w-5 h-5" />
                 대시보드
               </Link>
-            ) : (
+            ) : !isPlannerPage && (
               <Link
                 href="/login"
                 className="text-sm font-bold text-gray-500 hover:text-gray-900 px-4 py-2 transition-colors"
@@ -146,7 +150,7 @@ export default function NavBar() {
                   <UserCircleIcon className="w-6 h-6" />
                   플래너 대시보드
                 </Link>
-              ) : (
+              ) : !isPlannerPage && (
                 <Link href="/login" onClick={() => setIsOpen(false)} className="text-primary-600 font-black hover:text-primary-700">설계사 전용 입구</Link>
               )}
             </div>

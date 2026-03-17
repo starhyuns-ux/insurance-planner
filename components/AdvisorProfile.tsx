@@ -21,7 +21,9 @@ export default function AdvisorProfile({ name, phone, profileImage, businessCard
 
   const handleCopyLink = () => {
     if (typeof window === 'undefined') return;
-    navigator.clipboard.writeText(window.location.href);
+    // Strip hash fragments and query parameters for a clean shared link
+    const cleanUrl = window.location.origin + window.location.pathname;
+    navigator.clipboard.writeText(cleanUrl);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
