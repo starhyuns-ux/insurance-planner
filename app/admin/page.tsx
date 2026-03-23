@@ -11,7 +11,9 @@ import {
   ArrowTopRightOnSquareIcon,
   ChartBarIcon,
   CurrencyDollarIcon,
-  GiftIcon
+  GiftIcon,
+  GlobeAltIcon,
+  CursorArrowRaysIcon
 } from '@heroicons/react/24/outline'
 
 interface Planner {
@@ -53,6 +55,7 @@ export default function AdminPage() {
   const [activeTab, setActiveTab] = useState<'planners' | 'referrals'>('planners')
   const [planners, setPlanners] = useState<Planner[]>([])
   const [referrals, setReferrals] = useState<Referral[]>([])
+  const [siteVisits, setSiteVisits] = useState({ today: 0, total: 0 })
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const router = useRouter()
@@ -60,7 +63,23 @@ export default function AdminPage() {
   useEffect(() => {
     fetchPlanners()
     fetchReferrals()
+    fetchSiteVisits()
   }, [])
+
+  const fetchSiteVisits = async () => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession()
+      const res = await fetch('/api/admin/site-visits', {
+        headers: { 'Authorization': session ? `Bearer ${session.access_token}` : '' }
+      })
+      const result = await res.json()
+      if (res.ok && result.data) {
+        setSiteVisits(result.data)
+      }
+    } catch (err) {
+      console.error('Failed to fetch site visits:', err)
+    }
+  }
 
   const fetchReferrals = async () => {
     try {
@@ -193,7 +212,7 @@ export default function AdminPage() {
 
       <main className="max-w-7xl mx-auto px-6 py-10">
         {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
           <div className="bg-white p-8 rounded-[2rem] shadow-sm border border-gray-100 flex items-center gap-6 group hover:shadow-md transition-all">
             <div className="w-16 h-16 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform">
               <UsersIcon className="w-8 h-8" />
@@ -229,8 +248,28 @@ export default function AdminPage() {
               <ChartBarIcon className="w-8 h-8 text-white" />
             </div>
             <div>
-              <p className="text-xs font-black text-indigo-200 uppercase tracking-widest mb-1">총 명함 방문수</p>
+              <p className="text-xs font-black text-indigo-200 uppercase tracking-widest mb-1">총 명함 조회수</p>
               <h3 className="text-3xl font-black">{planners.reduce((acc, p) => acc + (p.visit_count || 0), 0).toLocaleString()}회</h3>
+            </div>
+          </div>
+
+          <div className="bg-white p-8 rounded-[2rem] shadow-sm border border-gray-100 flex items-center gap-6 group hover:shadow-md transition-all">
+            <div className="w-16 h-16 bg-rose-50 text-rose-600 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform">
+              <CursorArrowRaysIcon className="w-8 h-8" />
+            </div>
+            <div>
+              <p className="text-xs font-black text-gray-400 uppercase tracking-widest mb-1">오늘 홈페이지 방문 (유입)</p>
+              <h3 className="text-3xl font-black text-rose-600">{siteVisits.today.toLocaleString()}명</h3>
+            </div>
+          </div>
+
+          <div className="bg-white p-8 rounded-[2rem] shadow-sm border border-gray-100 flex items-center gap-6 group hover:shadow-md transition-all">
+            <div className="w-16 h-16 bg-purple-50 text-purple-600 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform">
+              <GlobeAltIcon className="w-8 h-8" />
+            </div>
+            <div>
+              <p className="text-xs font-black text-gray-400 uppercase tracking-widest mb-1">총 홈페이지 누적 유입</p>
+              <h3 className="text-3xl font-black text-purple-600">{siteVisits.total.toLocaleString()}명</h3>
             </div>
           </div>
         </div>

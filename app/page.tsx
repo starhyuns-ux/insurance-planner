@@ -11,10 +11,12 @@ import Footer from '@/components/Footer'
 import CaseCollection from '@/components/CaseCollection'
 import AdvancedRadiation from '@/components/AdvancedRadiation'
 import PlannerBranding from '@/components/PlannerBranding'
+import PageTracker from '@/components/PageTracker'
 
 export default function Home() {
   return (
     <main className="min-h-screen flex flex-col">
+      <PageTracker />
       <NavBar />
       
       <Hero />
