@@ -19,8 +19,12 @@ const dancingScript = Dancing_Script({
 export const metadata: Metadata = {
   metadataBase: new URL('https://stroy.kr'),
   title: '보험 리모델링 | 5세대 실손보험 가이드',
-  description: '전문가의 맞춤형 보험 리모델링으로 새는 보험료를 막아드립니다. 무료 진단 및 맞춤 상담을 신청하세요.',
-  keywords: ['보험전문가', '보험리모델링', '보험료절약', '실손의료보험', '종신보험정리', '무료보험진단'],
+  description: '전문가의 보험 리모델링으로 새는 보험료를 막아드립니다. 상담을 통해 합리적인 보장을 안내해 드립니다.',
+  keywords: [
+    '보험전문가', '보험리모델링', '보험료절약', '실손의료보험', '종신보험정리', '무료보험진단',
+    '암보험', '수술비보험', '표적항암제', '질병코드', 'ICD', '보험다이어트', '보험설계사', 
+    '치매보험', '간병보험', '태아보험', '어린이보험', '종합보험', '보장분석', '보험가입'
+  ],
   openGraph: {
     title: '보험 리모델링 | 5세대 실손보험 가이드',
     description: '전문가의 맞춤형 보험 리모델링으로 새는 보험료를 막아드립니다. 10분 투자로 평생 내는 보험료를 아끼세요.',
@@ -63,6 +67,9 @@ export const metadata: Metadata = {
 }
 
 import { LanguageProvider } from '@/lib/contexts/LanguageContext'
+import ChatWidget from '@/components/ChatWidget'
+import ReferralTracker from '@/components/ReferralTracker'
+import { Suspense } from 'react'
 
 export default function RootLayout({
   children,
@@ -73,7 +80,11 @@ export default function RootLayout({
     <html lang="ko">
       <body className={`${notoSansKr.variable} ${dancingScript.variable} font-sans antialiased bg-gray-50 text-gray-900`}>
         <LanguageProvider>
+          <Suspense fallback={null}>
+            <ReferralTracker />
+          </Suspense>
           {children}
+          <ChatWidget />
         </LanguageProvider>
       </body>
     </html>

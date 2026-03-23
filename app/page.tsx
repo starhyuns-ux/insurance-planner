@@ -1,6 +1,5 @@
 import NavBar from '@/components/NavBar'
 import Hero from '@/components/Hero'
-import TrustStrip from '@/components/TrustStrip'
 import Concerns from '@/components/Concerns'
 import Services from '@/components/Services'
 import Reviews from '@/components/Reviews'
@@ -11,7 +10,6 @@ import ConsultationForm from '@/components/ConsultationForm'
 import Footer from '@/components/Footer'
 import CaseCollection from '@/components/CaseCollection'
 import AdvancedRadiation from '@/components/AdvancedRadiation'
-import InsurancePremiumCalculator from '@/components/InsurancePremiumCalculator'
 import PlannerBranding from '@/components/PlannerBranding'
 
 export default function Home() {
@@ -20,20 +18,8 @@ export default function Home() {
       <NavBar />
       
       <Hero />
-      <TrustStrip />
 
       <div className="bg-white">
-        {/* Insurance Premium Calculator Section (Moved above Consultation Form) */}
-        <section id="premium-calculator" className="py-20 bg-gray-50/50">
-          <div className="container px-4 mx-auto">
-            <div className="text-center mb-12">
-              <h2 className="text-3xl md:text-5xl font-black text-gray-900 mb-4 tracking-tight">보험료 계산기</h2>
-              <p className="text-gray-600 max-w-2xl mx-auto break-keep text-lg">성별과 생년월일만 입력하면 암·뇌·심장 진단비와 수술비까지 즉시 확인해 드립니다.</p>
-            </div>
-            <InsurancePremiumCalculator />
-          </div>
-        </section>
-
         <ConsultationForm id="consultation-top" />
         <Concerns />
         <Services />
@@ -49,7 +35,6 @@ export default function Home() {
 
       <div className="bg-white">
         <CommunityLinks />
-        <ConsultationForm />
         <PlannerBranding />
       </div>
 

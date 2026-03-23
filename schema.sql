@@ -23,6 +23,7 @@ create table if not exists public.planners (
   kakao_url text,   -- 카톡 주소
   subscription_status text not null default 'inactive', -- active, inactive
   subscription_end_date timestamptz,
+  visit_count bigint not null default 0,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
@@ -40,6 +41,7 @@ create table if not exists public.customers (
   last_touch_at timestamptz,
   appointment_at timestamptz,
   riders jsonb not null default '[]'::jsonb,
+  memo text,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
@@ -52,12 +54,23 @@ begin
   end if;
 end $$;
 
+-- 5. 할 일(Todo) 관리 테이블
+create table if not exists public.todos (
+  id uuid primary key default gen_random_uuid(),
+  planner_id uuid not null references public.planners(id) on delete cascade,
+  content text not null,
+  is_completed boolean not null default false,
+  target_date date not null default current_date,
+  created_at timestamptz not null default now()
+);
+
 -- ==========================================
 -- Row Level Security (RLS) 및 보안 정책
 -- ==========================================
 alter table public.consultations enable row level security;
 alter table public.planners enable row level security;
 alter table public.customers enable row level security;
+alter table public.todos enable row level security;
 
 -- Consultations 정책
 drop policy if exists "Allow public insert" on public.consultations;
@@ -83,6 +96,10 @@ create policy "Anyone can view planner profiles" on public.planners for select t
 drop policy if exists "Planners can manage own customers" on public.customers;
 create policy "Planners can manage own customers" on public.customers for all using (auth.uid() = planner_id);
 
+-- Todos 정책
+drop policy if exists "Planners can manage own todos" on public.todos;
+create policy "Planners can manage own todos" on public.todos for all using (auth.uid() = planner_id);
+
 -- ==========================================
 -- 자동 프로필 생성 트리거 (auth.users 가입 시)
 -- ==========================================
@@ -95,8 +112,7 @@ begin
     coalesce(new.raw_user_meta_data->>'name', '새 설계사'),
     coalesce(new.raw_user_meta_data->>'phone', ''),
     coalesce(new.raw_user_meta_data->>'affiliation', ''),
-    coalesce(new.raw_user_meta_data->>'region', ''),
-    coalesce(new.raw_user_meta_data->>'kakao_url', '')
+    coalesce(new.raw_user_meta_data->>'region', '')
   );
   return new;
 end;
@@ -125,3 +141,13 @@ drop trigger if exists set_customers_updated_at on public.customers;
 create trigger set_customers_updated_at
   before update on public.customers
   for each row execute procedure public.handle_updated_at();
+
+-- 5. 방문자 수 증가 RPC 함수
+create or replace function public.increment_visit_count(planner_id uuid)
+returns void as $$
+begin
+  update public.planners
+  set visit_count = visit_count + 1
+  where id = planner_id;
+end;
+$$ language plpgsql security definer;

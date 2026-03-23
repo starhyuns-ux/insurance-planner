@@ -194,7 +194,7 @@ export default function AdvancedRadiationGuidePage() {
                                 중복된 특약은 빼고 부족한 고액 보장은 채워드립니다.
                             </p>
                             <Link href="/#consultation" className="inline-block bg-primary-600 text-white font-bold px-8 py-4 rounded-xl shadow-lg hover:bg-primary-700 transition-colors">
-                                내 암보험 무료 진단 받기
+                                내 암보험 추가 안내 받기
                             </Link>
                         </div>
 

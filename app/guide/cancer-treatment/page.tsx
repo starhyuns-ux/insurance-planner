@@ -3,6 +3,7 @@ import NavBar from '@/components/NavBar'
 import Footer from '@/components/Footer'
 import PlannerBranding from '@/components/PlannerBranding'
 import CancerTreatmentGuide from '@/components/CancerTreatmentGuide'
+import TargetedAnticancerMatrix from '@/components/TargetedAnticancerMatrix'
 import Link from 'next/link'
 import { LanguageProvider } from '@/lib/contexts/LanguageContext'
 
@@ -25,6 +26,11 @@ export default function CancerTreatmentGuidePage() {
                 <div className="container max-w-5xl px-4 py-20 mb-24">
                     <div className="bg-white rounded-[3rem] shadow-xl overflow-hidden border border-gray-100 p-6 md:p-12">
                         <CancerTreatmentGuide />
+                        
+                        {/* 69 Targeted Anticancer Drug Matrix */}
+                        <div className="mt-12 pt-12 border-t border-gray-100">
+                            <TargetedAnticancerMatrix />
+                        </div>
                         
                         {/* CTA Section */}
                         <div className="bg-slate-900 p-10 md:p-14 rounded-[2.5rem] text-center relative overflow-hidden text-white mt-16">

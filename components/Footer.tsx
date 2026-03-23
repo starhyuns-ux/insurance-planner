@@ -1,16 +1,22 @@
+'use client'
+
 import Link from 'next/link'
+import { useLanguage } from '@/lib/contexts/LanguageContext'
 
 export default function Footer() {
+  const { t } = useLanguage()
+  const year = new Date().getFullYear()
+
   return (
     <footer className="bg-gray-50 border-t border-gray-200 pt-16 pb-8 text-sm">
       <div className="container max-w-6xl">
         <div className="grid md:grid-cols-4 gap-8 mb-12">
           <div className="md:col-span-2 pr-4">
             <Link href="/" className="inline-block font-bold text-[1.5rem] tracking-tight text-gray-900 mb-4">
-              보험<span className="text-primary-600">다이어트</span>
+              {t('brandName').split('다이어트')[0]}<span className="text-primary-600">{t('brandName').includes('다이어트') ? '다이어트' : t('brandName')}</span>
             </Link>
             <p className="text-gray-500 mb-6 leading-relaxed max-w-sm text-[15px]">
-              거품 낀 보험료는 줄이고, 꼭 필요한 보장은 든든하게 채우는 스마트한 보험 리모델링 서비스. 우리 가족의 소중한 자산을 지켜드립니다.
+              {t('footerDesc')}
             </p>
             <div className="flex gap-4">
               {/* Social Icons */}
@@ -23,27 +29,28 @@ export default function Footer() {
           </div>
 
           <div>
-            <h4 className="font-bold text-gray-900 mb-5">빠른 메뉴</h4>
+            <h4 className="font-bold text-gray-900 mb-5">{t('footerQuickMenu')}</h4>
             <ul className="space-y-3.5 text-gray-500 font-medium">
-              <li><Link href="/#about" className="hover:text-primary-600 transition-colors">리모델링이란?</Link></li>
-              <li><Link href="/#services" className="hover:text-primary-600 transition-colors">진행 과정</Link></li>
-              <li><Link href="/#reviews" className="hover:text-primary-600 transition-colors">실제 절감 사례</Link></li>
-              <li><Link href="/#faq" className="hover:text-primary-600 transition-colors">자주 묻는 질문</Link></li>
-              <li><Link href="/guide/5th-gen" className="text-primary-600 font-bold hover:text-primary-700 transition-colors">5세대 실손의료보험 가이드</Link></li>
-              <li><Link href="/guide/advanced-radiation" className="text-primary-600 font-bold hover:text-primary-700 transition-colors">첨단 방사선 치료 가이드</Link></li>
-              <li><Link href="/guide/hifu-therapy" className="text-primary-600 font-bold hover:text-primary-700 transition-colors">하이푸(HIFU) 시술 안내</Link></li>
+              <li><Link href="/#about" className="hover:text-primary-600 transition-colors">{t('footerMenuAbout')}</Link></li>
+              <li><Link href="/#services" className="hover:text-primary-600 transition-colors">{t('footerMenuProcess')}</Link></li>
+              <li><Link href="/#reviews" className="hover:text-primary-600 transition-colors">{t('footerMenuCases')}</Link></li>
+              <li><Link href="/#faq" className="hover:text-primary-600 transition-colors">{t('footerMenuFaq')}</Link></li>
+              <li><Link href="/guide/5th-gen" className="text-primary-600 font-bold hover:text-primary-700 transition-colors">{t('footerMenuSilbi5')}</Link></li>
+              <li><Link href="/guide/critical-illness-relief" className="text-primary-600 font-bold hover:text-primary-700 transition-colors">{t('footerMenuCriticalIllness')}</Link></li>
+              <li><Link href="/guide/advanced-radiation" className="text-primary-600 font-bold hover:text-primary-700 transition-colors">{t('footerMenuRadiation')}</Link></li>
+              <li><Link href="/guide/hifu-therapy" className="text-primary-600 font-bold hover:text-primary-700 transition-colors">{t('footerMenuHifu')}</Link></li>
             </ul>
           </div>
 
           <div>
-            <h4 className="font-bold text-gray-900 mb-5">고객 센터</h4>
+            <h4 className="font-bold text-gray-900 mb-5">{t('footerCustomerCenter')}</h4>
             <ul className="space-y-2 text-gray-600">
               <li className="font-extrabold text-2xl text-gray-900 tracking-tight">010-6303-5561</li>
-              <li className="text-xs text-gray-400 mt-1 mb-4">평일 09:00 - 18:00 (주말 휴무)</li>
+              <li className="text-xs text-gray-400 mt-1 mb-4">{t('footerHours')}</li>
               <li className="pt-2">
                 <a href="https://open.kakao.com/o/sdWFlvYh" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 bg-[#FEE500] text-[#371D1E] px-4 py-2 rounded-xl font-bold hover:bg-[#FEE500]/90 transition-colors shadow-sm w-full justify-center">
                   <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 3c-5.523 0-10 3.51-10 7.842 0 2.766 1.838 5.176 4.542 6.551-.25.867-.905 3.128-.94 3.266-.044.175.056.173.12.13.082-.055 3.444-2.288 4.02-2.694A10.887 10.887 0 0012 18.685c5.523 0 10-3.51 10-7.843C22 6.51 17.523 3 12 3z" /></svg>
-                  카카오톡 1:1 문의
+                  {t('footerKakaoConsult')}
                 </a>
               </li>
             </ul>
@@ -52,14 +59,14 @@ export default function Footer() {
 
         <div className="pt-8 border-t border-gray-200 flex flex-col md:flex-row justify-between md:items-center gap-6 text-xs text-gray-400 leading-relaxed">
           <div>
-            <p className="mb-1"><span className="text-gray-500 font-medium">(주)인터커스텀</span> | 대표: 이광현 | 사업자등록번호: 207-30-62021</p>
-            <p className="mb-3">주소: 서울시 광진구 광나루로56길 85, 17층 17호 | 개인정보보호책임자: 이광현</p>
-            <p className="opacity-70">© {new Date().getFullYear()} 인터커스텀. All rights reserved. <br className="md:hidden" />본 사이트의 모든 컨텐츠는 저작권법의 보호를 받습니다.</p>
+            <p className="mb-1"><span className="text-gray-500 font-medium">{t('footerCompany')}</span> | {t('footerCEO').includes('대표') ? t('footerCEO') : `대표: ${t('footerCEO')}`} | {t('footerBusinessNum').includes('등록번호') ? t('footerBusinessNum') : `사업자등록번호: ${t('footerBusinessNum')}`}</p>
+            <p className="mb-3">{t('footerAddress')} | {t('footerPrivacyOfficer').includes('책임자') ? t('footerPrivacyOfficer') : `개인정보보호책임자: ${t('footerPrivacyOfficer')}`}</p>
+            <p className="opacity-70">{t('footerCopyright')(year)} <br className="md:hidden" />{t('footerCopyrightNotice')}</p>
           </div>
           <div className="flex gap-4 md:self-end">
-            <a href="#" className="hover:text-gray-600 transition-colors">이용약관</a>
+            <a href="#" className="hover:text-gray-600 transition-colors">{t('footerTerms')}</a>
             <div className="w-px h-3 bg-gray-300 rounded self-center"></div>
-            <a href="#" className="font-bold text-gray-600 hover:text-gray-800 transition-colors">개인정보처리방침</a>
+            <a href="#" className="font-bold text-gray-600 hover:text-gray-800 transition-colors">{t('footerPrivacy')}</a>
           </div>
         </div>
       </div>

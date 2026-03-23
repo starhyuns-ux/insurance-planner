@@ -18,7 +18,7 @@ export default function SilbiCalculator() {
     // Inputs
     const [treatmentType, setTreatmentType] = useState<'hospital' | 'outpatient'>('hospital')
     const [coveredAmount, setCoveredAmount] = useState<string>('') // 급여
-    const [uncoveredAmount, setUncoveredAmount] = useState<string>('') // 비중증/일반 비급여
+    const [uncoveredAmount, setUncoveredAmount] = useState<string>('') // 비급여
     const [threeMajorAmount, setThreeMajorAmount] = useState<string>('') // 3대 비급여 (도수/MRI/주사)
 
     const calculateResults = useMemo(() => {
@@ -31,26 +31,26 @@ export default function SilbiCalculator() {
         if (total === 0) return []
 
         const genLabels = {
-            '1세대': locale === 'en' ? 'Gen 1' : locale === 'cn' ? '第1代' : '1세대',
-            '2세대': locale === 'en' ? 'Gen 2' : locale === 'cn' ? '第2代' : '2세대',
-            '3세대': locale === 'en' ? 'Gen 3' : locale === 'cn' ? '第3代' : '3세대',
-            '4세대': locale === 'en' ? 'Gen 4' : locale === 'cn' ? '第4代' : '4세대',
+            '1세대': t('gen1'),
+            '2세대': t('gen2'),
+            '3세대': t('gen3'),
+            '4세대': t('gen4'),
         };
 
         const descriptions = {
             hospital: {
-                gen1: locale === 'ko' ? '자기부담금 0% (대부분 100% 보상)' : locale === 'en' ? '0% Self-pay (100% reimbursed)' : '0% 自付 (100% 赔付)',
-                gen2: locale === 'ko' ? '급여/비급여 통합 10% 본인 부담' : locale === 'en' ? '10% Integrated self-pay' : '医保/非医保 10% 自付',
-                gen3: locale === 'ko' ? '급여 10%, 비급여 20%, 3대비급여 30% 부담' : locale === 'en' ? 'Gov 10%, Gen 20%, Major 30% self-pay' : '医保10%, 非医保20%, 三大类30% 自付',
-                gen4: locale === 'ko' ? '급여 20%, 비급여 30% 본인 부담' : locale === 'en' ? 'Gov 20%, Non-gov 30% self-pay' : '医保20%, 非医保30% 自付',
+                gen1: t('silbiHospitalGen1'),
+                gen2: t('silbiHospitalGen2'),
+                gen3: t('silbiHospitalGen3'),
+                gen4: t('silbiHospitalGen4'),
             },
             outpatient: {
-                gen1: locale === 'ko' ? '1일당 5,000원 정액 공제' : locale === 'en' ? 'Fixed 5,000 KRW deduction' : '每日 5,000 韩元定额扣除',
-                gen2: locale === 'ko' ? '보통 1~2만원 정액 공제' : locale === 'en' ? '10,000-20,000 KRW fixed deduction' : '约 1~2万 韩元定额扣除',
-                gen3: locale === 'ko' ? '정액(1.5만) 또는 정률 중 큰 금액 공제' : locale === 'en' ? 'Greater of fixed or percentage' : '定额(1.5万)或按比例 择大扣除',
-                gen4: locale === 'ko' ? '급여 20%, 비급여 30% 중 큰 금액 공제' : locale === 'en' ? 'Greater of Gov 20% or Non-gov 30%' : '医保20%或非医保30% 择大扣除',
+                gen1: t('silbiOutpatientGen1'),
+                gen2: t('silbiOutpatientGen2'),
+                gen3: t('silbiOutpatientGen3'),
+                gen4: t('silbiOutpatientGen4'),
             },
-            zero: locale === 'ko' ? '통원 최소 공제금액 미달로 보상 불가' : locale === 'en' ? 'Below minimum claim amount' : '未达门诊最低起赔额'
+            zero: t('alertBirthDate')
         };
 
         // 통원시 최소 공제금액 미달 체크 (의원급 기준 약 1만원)
@@ -130,14 +130,14 @@ export default function SilbiCalculator() {
         }
 
         return results
-    }, [coveredAmount, uncoveredAmount, threeMajorAmount, treatmentType, locale])
+    }, [coveredAmount, uncoveredAmount, threeMajorAmount, treatmentType, t])
 
 
     const formatMoney = (amount: number) => {
-        if (amount <= 0) return locale === 'ko' ? '0원' : '0 KRW'
+        if (amount <= 0) return `0 ${t('currencyUnit')}`
         
         if (locale !== 'ko') {
-            return `${Math.round(amount).toLocaleString()} KRW`
+            return `${Math.round(amount).toLocaleString()} ${t('currencyUnit')}`
         }
 
         const manwon = Math.floor(amount / 10000)
@@ -199,7 +199,7 @@ export default function SilbiCalculator() {
                                     onChange={(e) => setCoveredAmount(e.target.value)}
                                 />
                                 <div className="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none text-gray-500 font-medium whitespace-nowrap">
-                                    {locale === 'ko' ? '원' : 'KRW'}
+                                    {t('currencyUnit')}
                                 </div>
                             </div>
                         </div>
@@ -220,7 +220,7 @@ export default function SilbiCalculator() {
                                     onChange={(e) => setUncoveredAmount(e.target.value)}
                                 />
                                 <div className="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none text-gray-500 font-medium whitespace-nowrap">
-                                    {locale === 'ko' ? '원' : 'KRW'}
+                                    {t('currencyUnit')}
                                 </div>
                             </div>
                         </div>
@@ -241,7 +241,7 @@ export default function SilbiCalculator() {
                                     onChange={(e) => setThreeMajorAmount(e.target.value)}
                                 />
                                 <div className="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none text-gray-500 font-medium whitespace-nowrap">
-                                    {locale === 'ko' ? '원' : 'KRW'}
+                                    {t('currencyUnit')}
                                 </div>
                             </div>
                         </div>
@@ -317,10 +317,10 @@ export default function SilbiCalculator() {
                                     </div>
                                     <div className="flex justify-between mt-1.5 px-0.5">
                                         <span className={`text-[10px] font-black ${result.highlight ? 'text-primary-600' : 'text-gray-500'}`}>
-                                            {locale === 'ko' ? '보상' : locale === 'en' ? 'Reimb.' : '赔付'} {totalExpense > 0 ? Math.round((result.reimbursement / totalExpense) * 100) : 0}%
+                                            {t('reimbLabel')} {totalExpense > 0 ? Math.round((result.reimbursement / totalExpense) * 100) : 0}%
                                         </span>
                                         <span className="text-[10px] font-black text-rose-500">
-                                            {locale === 'ko' ? '부담' : locale === 'en' ? 'Pay' : '自付'} {totalExpense > 0 ? Math.round((result.selfPay / totalExpense) * 100) : 0}%
+                                            {t('payLabel')} {totalExpense > 0 ? Math.round((result.selfPay / totalExpense) * 100) : 0}%
                                         </span>
                                     </div>
 
@@ -334,17 +334,21 @@ export default function SilbiCalculator() {
             <div className="mt-8 bg-blue-50/50 rounded-3xl p-6 md:p-8 border border-blue-100 flex flex-col md:flex-row items-start gap-6">
                 <InformationCircleIcon className="w-8 h-8 text-blue-500 shrink-0" />
                 <div>
-                    <h4 className="font-black text-blue-900 mb-3 text-lg">💡 {locale === 'ko' ? '중요 안내 사항' : locale === 'en' ? 'Important Notice' : '重要提示'}</h4>
+                    <h4 className="font-black text-blue-900 mb-3 text-lg">💡 {t('noticeTitle')}</h4>
                     <ul className="text-sm text-blue-800/80 space-y-2.5 list-disc list-inside font-bold leading-relaxed">
-                        <li>{locale === 'ko' ? '위 결과는 세대별 기본 보장 비율 기준의 예상치입니다.' : locale === 'en' ? 'Results are estimates based on standard generation ratios.' : '以上结果是基于各代标准赔付比例的估算值。'}</li>
-                        <li>{locale === 'ko' ? '실제 보상금액은 약관 및 병원 이용 환경에 따라 다를 수 있습니다.' : locale === 'en' ? 'Actual payout may vary based on policy terms and hospital type.' : '实际赔付款可能因保险条款和就医环境而异。'}</li>
+                        <li>{t('noticeSilbi')}</li>
+                    </ul>
+                    <ul className="mt-3 text-xs text-blue-700/60 space-y-1 list-disc list-inside">
+                        <li>본 계산 결과는 참고용입니다.</li>
+                        <li>상품 추천 또는 가입 권유 목적이 아닙니다.</li>
+                        <li>실제 보험료는 조건에 따라 달라질 수 있습니다.</li>
                     </ul>
                 </div>
             </div>
             
             <div className="mt-12 text-center">
                  <a href="/#consultation" className="inline-flex items-center gap-3 bg-gray-900 text-white font-black px-10 py-5 rounded-2xl shadow-2xl hover:bg-gray-800 transition-all hover:scale-105 active:scale-95 text-lg">
-                    {locale === 'ko' ? '전문가에게 무료 상담 신청하기' : locale === 'en' ? 'Apply for Free Expert Advice' : '点击申请专家免费咨询'}
+                    {t('requestConsultation')}
                     <ArrowRightIcon className="w-5 h-5" />
                  </a>
             </div>

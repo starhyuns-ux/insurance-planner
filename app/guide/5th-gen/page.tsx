@@ -23,7 +23,7 @@ export default function FifthGenGuidePage() {
                             
                             <div className="text-center pt-8 mt-12 border-t border-gray-100">
                                 <Link href="/#consultation" className="inline-block bg-blue-600 text-white font-bold px-8 py-4 rounded-xl shadow-lg hover:bg-blue-700 transition-colors">
-                                    내 보험 무료 진단 받기
+                                    내 보험 추가 안내 받기
                                 </Link>
                             </div>
                         </div>

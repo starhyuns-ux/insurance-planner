@@ -1,13 +1,19 @@
+'use client'
+
+import { useLanguage } from '@/lib/contexts/LanguageContext'
+
 export default function About() {
+  const { t } = useLanguage()
+
   return (
     <section className="py-24 bg-white">
       <div className="container max-w-5xl">
         <div className="text-center mb-16">
           <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900 mb-4 tracking-tight">
-            보험은 가입보다 <span className="text-primary-600">유지와 관리가 핵심입니다</span>
+            {t('aboutTitle')}
           </h2>
           <p className="text-lg text-gray-500 max-w-2xl mx-auto">
-            나이, 건강상태, 직업, 가족 구성원이 변했다면 보험도 그에 맞게 옷을 갈아입혀야 합니다. 이를 '보험 리모델링'이라고 합니다.
+            {t('aboutDesc')}
           </p>
         </div>
 
@@ -23,21 +29,15 @@ export default function About() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
                   </svg>
                 </div>
-                잘못된 예전 고정관념
+                {t('aboutOldMindsetTitle')}
               </h3>
               <ul className="space-y-4 text-gray-600 font-medium tracking-tight">
-                <li className="flex items-start gap-3 opacity-70">
-                  <span className="text-red-400 mt-0.5">✗</span>
-                  <span>지인이 추천해서 믿고 가입하면 끝</span>
-                </li>
-                <li className="flex items-start gap-3 opacity-70">
-                  <span className="text-red-400 mt-0.5">✗</span>
-                  <span>보험료는 비쌀수록 무조건 좋은 거다</span>
-                </li>
-                <li className="flex items-start gap-3 opacity-70">
-                  <span className="text-red-400 mt-0.5">✗</span>
-                  <span>한 번 가입한 보험은 무조건 유지해야 손해 안본다</span>
-                </li>
+                {(t('aboutOldItems') as string[]).map((item, idx) => (
+                  <li key={idx} className="flex items-start gap-3 opacity-70">
+                    <span className="text-red-400 mt-0.5">✗</span>
+                    <span>{item}</span>
+                  </li>
+                ))}
               </ul>
             </div>
 
@@ -48,21 +48,19 @@ export default function About() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
                   </svg>
                 </div>
-                스마트한 리모델링 공식
+                {t('aboutNewMindsetTitle')}
               </h3>
               <ul className="space-y-4 text-gray-700 font-medium">
-                <li className="flex items-start gap-3 bg-white p-4 rounded-2xl shadow-sm border border-primary-50">
-                  <span className="text-primary-500 mt-0.5 bg-primary-50 p-1 rounded-full"><svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg></span>
-                  <span>내 상황과 소득에 맞는 적정 보험료 산출</span>
-                </li>
-                <li className="flex items-start gap-3 bg-white p-4 rounded-2xl shadow-sm border border-primary-50">
-                  <span className="text-primary-500 mt-0.5 bg-primary-50 p-1 rounded-full"><svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg></span>
-                  <span>중복 보장/사망 보장보다는 생존 시 혜택 집중</span>
-                </li>
-                <li className="flex items-start gap-3 bg-white p-4 rounded-2xl shadow-sm border border-primary-50">
-                  <span className="text-primary-500 mt-0.5 bg-primary-50 p-1 rounded-full"><svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg></span>
-                  <span>3대 진단비(암, 뇌, 심장)와 가족력 필수 대비</span>
-                </li>
+                {(t('aboutNewItems') as string[]).map((item, idx) => (
+                  <li key={idx} className="flex items-start gap-3 bg-white p-4 rounded-2xl shadow-sm border border-primary-50">
+                    <span className="text-primary-500 mt-0.5 bg-primary-50 p-1 rounded-full">
+                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                      </svg>
+                    </span>
+                    <span>{item}</span>
+                  </li>
+                ))}
               </ul>
             </div>
           </div>

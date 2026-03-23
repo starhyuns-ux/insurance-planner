@@ -28,19 +28,7 @@ export default function AdvisorProfile({ name, phone, profileImage, businessCard
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const points = locale === 'en' ? [
-    { title: "No Forced Recommendations", desc: "I objectively compare 30+ insurance companies from your perspective." },
-    { title: "100% Free From Start to End", desc: "Every step, from initial consultation to design proposal, is free." },
-    { title: "Thorough Post-Care", desc: "Care after signing is even more important. I manage everything from claims to benefits." }
-  ] : locale === 'cn' ? [
-    { title: "不强迫购买特定保险", desc: "站在客的角度，客观对比分析30家以上的保险公司。" },
-    { title: "从头到尾 100% 免费", desc: "从初始咨询到定制方案设计，全过程均免费提供。" },
-    { title: "投保后完善的售后管理", desc: "投保后的管理更重要。从理赔代办到检查额外权益，提供持续管理。" }
-  ] : [
-    { title: "특정 보험사 가입 강요 NO", desc: "고객님의 입장에서 30여개 보험사를 객관적으로 비교 분석합니다." },
-    { title: "초기부터 끝까지 부담 없는 100% 무료", desc: "초기 상담부터 맞춤 설계 제안까지 모든 과정을 무료로 제공합니다." },
-    { title: "가입 후에도 철저한 사후 관리", desc: "보험은 가입 후가 더 중요합니다. 청구 대행부터 추가 혜택 체크까지 지속 관리해드립니다." }
-  ]
+  const points = t('profilePoints') as { title: string, desc: string }[];
 
   return (
     <section className="py-24 bg-gray-900 text-white relative overflow-hidden">
@@ -50,7 +38,7 @@ export default function AdvisorProfile({ name, phone, profileImage, businessCard
         <div className="grid md:grid-cols-5 gap-12 lg:gap-16 items-center">
           <div className="md:col-span-2 relative mx-auto md:mx-0 w-64 h-64 md:w-full md:h-auto md:aspect-[4/5] rounded-[2rem] overflow-hidden border border-gray-700 bg-gray-800 shadow-2xl">
             {profileImage ? (
-              <img src={profileImage} alt={name || "전문가"} className="absolute inset-0 w-full h-full object-cover" />
+              <img src={profileImage} alt={name || t('profileExpert')} className="absolute inset-0 w-full h-full object-cover" />
             ) : (
               <div className="absolute inset-0 flex flex-col items-center justify-center p-6 text-center z-10">
                 <div className="bg-gray-700/50 p-4 rounded-full backdrop-blur-md mb-6 border border-gray-600">
@@ -61,7 +49,9 @@ export default function AdvisorProfile({ name, phone, profileImage, businessCard
                 <div className="text-primary-400 font-bold tracking-widest text-sm mb-2 shadow-sm">
                   {region} | {affiliation}
                 </div>
-                <div className="text-2xl font-extrabold text-white">{name ? `${name} ${locale === 'ko' ? '' : ' '}${t('regStatusVal')}` : t('experienceVal')}</div>
+                <div className="text-2xl font-extrabold text-white">
+                  {name ? `${name}${locale === 'ko' ? '' : ' '}${t('regStatusVal')}` : t('experienceVal')}
+                </div>
               </div>
             )}
 
@@ -81,12 +71,19 @@ export default function AdvisorProfile({ name, phone, profileImage, businessCard
 
           <div className="md:col-span-3">
             <h2 className="text-3xl md:text-4xl lg:text-[2.5rem] font-extrabold mb-8 tracking-tight leading-tight">
-              {message || (name ? `${name} 설계사는` : "실적만을 쫓는 영업은")}
-              {!message && <><br /> <span className="text-primary-400">{name ? "정직과 신뢰를 약속합니다." : "하지 않겠습니다."}</span></>}
+              {message || (name ? t('profileTitlePlanner')(name) : t('profileTitleDefault'))}
+              {!message && (
+                <>
+                  <br /> 
+                  <span className="text-primary-400">
+                    {name ? t('profilePromisePlanner') : t('profilePromiseDefault')}
+                  </span>
+                </>
+              )}
             </h2>
 
             <div className="space-y-6">
-              {points.map((p, idx) => (
+              {Array.isArray(points) && points.map((p, idx) => (
                 <div key={idx} className="flex items-start gap-5">
                   <div className="mt-1 bg-gray-800/80 p-2.5 rounded-xl text-primary-400 shrink-0 border border-gray-700 shadow-md">
                     <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -115,31 +112,31 @@ export default function AdvisorProfile({ name, phone, profileImage, businessCard
                     </svg>
                     {t('kakaoTalk')}
                   </a>
-                  <p className="mt-3 text-gray-500 text-xs font-bold pl-1 font-sans">※ 톡 채널 또는 오픈채팅으로 연결됩니다.</p>
+                  <p className="mt-3 text-gray-500 text-xs font-bold pl-1 font-sans">※ {t('profileKakaoNotice')}</p>
                 </div>
               )}
 
               {businessCard && (
                 <div className="mt-8 pt-8 border-t border-gray-800">
                   <div className="flex items-center justify-between mb-4">
-                    <p className="text-xs font-bold text-gray-500 uppercase tracking-widest">온라인 명함</p>
+                    <p className="text-xs font-bold text-gray-500 uppercase tracking-widest">{t('profileBusinessCard')}</p>
                     <button 
                       onClick={handleCopyLink}
                       className="text-xs font-bold text-primary-400 hover:text-primary-300 transition-colors flex items-center gap-1.5"
                     >
                       {copied ? <CheckIcon className="w-3.5 h-3.5" /> : <ShareIcon className="w-3.5 h-3.5" />}
-                      {copied ? "링크 복사됨" : "명함 링크 복사하기"}
+                      {copied ? t('profileCopied') : t('profileCopyCard')}
                     </button>
                   </div>
                   <div 
                     onClick={handleCopyLink}
                     className="group relative cursor-pointer overflow-hidden rounded-xl shadow-lg border border-gray-700 max-w-xs transition-transform hover:scale-[1.02]"
                   >
-                    <img src={businessCard} alt="명함" className="w-full h-auto" />
+                    <img src={businessCard} alt={t('profileCardAlt')} className="w-full h-auto" />
                     <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                       <div className="bg-white/10 backdrop-blur-md px-4 py-2 rounded-full border border-white/20 text-sm font-bold text-white flex items-center gap-2">
                         <ShareIcon className="w-4 h-4" />
-                        주소 복사
+                        {t('profileCopyAddress')}
                       </div>
                     </div>
                   </div>

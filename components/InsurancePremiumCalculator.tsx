@@ -154,18 +154,29 @@ function calcPremium(amountManwon: number, premiumPer1000: number): number {
 
 export default function InsurancePremiumCalculator() {
   const { t, locale } = useLanguage();
+  const [inputType, setInputType] = useState<'birthDate' | 'age'>('birthDate');
+  const [directAge, setDirectAge] = useState<string>('');
   const [gender, setGender] = useState<'male' | 'female'>('male');
   const [birthDate, setBirthDate] = useState<string>('');
+  
   const [cancerAmount, setCancerAmount] = useState<number>(5000);
   const [brainAmount, setBrainAmount] = useState<number>(2000);
   const [heartAmount, setHeartAmount] = useState<number>(2000);
   const [injurySurgeryAmount, setInjurySurgeryAmount] = useState<number>(1500);
   const [diseaseSurgeryAmount, setDiseaseSurgeryAmount] = useState<number>(2000);
+  const [cancerTreatmentAmount, setCancerTreatmentAmount] = useState<number>(5000);
+  const [cancerTreatmentDiscountAmount, setCancerTreatmentDiscountAmount] = useState<number>(5000);
   
   const [isCalculated, setIsCalculated] = useState(false);
   const [showResults, setShowResults] = useState(false);
 
-  const insuranceAge = useMemo(() => getInsuranceAge(birthDate), [birthDate]);
+  const insuranceAge = useMemo(() => {
+    if (inputType === 'age') {
+      const parsedAge = parseInt(directAge, 10);
+      return isNaN(parsedAge) ? null : parsedAge;
+    }
+    return getInsuranceAge(birthDate);
+  }, [inputType, directAge, birthDate]);
 
   const results = useMemo(() => {
     if (insuranceAge === null || insuranceAge < 0 || insuranceAge > 70) return null;
@@ -176,6 +187,8 @@ export default function InsurancePremiumCalculator() {
       heart: calcPremium(heartAmount, heartRateTable[insuranceAge][gender]),
       injurySurgery: calcPremium(injurySurgeryAmount, injurySurgeryRateTable[insuranceAge][gender]),
       diseaseSurgery: calcPremium(diseaseSurgeryAmount, diseaseSurgeryRateTable[insuranceAge][gender]),
+      cancerTreatment: calcPremium(cancerTreatmentAmount, cancerRateTable[insuranceAge][gender]),
+      cancerTreatmentDiscount: calcPremium(cancerTreatmentDiscountAmount, cancerRateTable[insuranceAge][gender]) * 0.83,
     };
 
     const total = Object.values(premiums).reduce((acc, curr) => acc + curr, 0);
@@ -186,21 +199,24 @@ export default function InsurancePremiumCalculator() {
       age: insuranceAge,
       genderLabel: gender === 'male' ? t('male') : t('female')
     };
-  }, [gender, insuranceAge, cancerAmount, brainAmount, heartAmount, injurySurgeryAmount, diseaseSurgeryAmount, t]);
+  }, [gender, insuranceAge, cancerAmount, brainAmount, heartAmount, injurySurgeryAmount, diseaseSurgeryAmount, cancerTreatmentAmount, cancerTreatmentDiscountAmount, t]);
 
   const formatMoney = (amount: number) => {
-    if (amount <= 0) return locale === 'ko' ? '0원' : '0 KRW'
-    if (locale !== 'ko') return `${Math.round(amount).toLocaleString()} KRW`
-    return Math.round(amount).toLocaleString('ko-KR') + '원';
+    if (amount <= 0) return `0 ${t('currencyUnit')}`
+    return `${Math.round(amount).toLocaleString()} ${t('currencyUnit')}`;
   }
 
   const handleCalculate = () => {
-    if (!birthDate) {
-      alert(locale === 'ko' ? '생년월일을 입력해 주세요.' : locale === 'en' ? 'Please enter birth date.' : '请输入出生日期。');
+    if (inputType === 'birthDate' && !birthDate) {
+      alert(t('alertBirthDate'));
+      return;
+    }
+    if (inputType === 'age' && !directAge) {
+      alert(t('alertAgeEligible'));
       return;
     }
     if (insuranceAge === null || insuranceAge < 0 || insuranceAge > 70) {
-      alert(locale === 'ko' ? '보험 가능 연령(0~70세)이 아닙니다.' : locale === 'en' ? 'Age (0-70) not eligible.' : '不符合参保年龄(0~70岁)。');
+      alert(t('alertAgeEligible'));
       return;
     }
     
@@ -262,28 +278,74 @@ export default function InsurancePremiumCalculator() {
                 </div>
               </div>
 
-              {/* Birth Date */}
+              {/* Input Type Toggle */}
               <div>
-                <label htmlFor="birthDate" className="block text-sm font-bold text-gray-700 mb-2 ml-1">
-                  {t('birthDate')}
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                    <CalendarIcon className="h-5 w-5 text-gray-400" />
-                  </div>
-                  <input
-                    type="date"
-                    id="birthDate"
-                    value={birthDate}
-                    onChange={(e) => setBirthDate(e.target.value)}
-                    className="block w-full pl-11 pr-4 py-3.5 bg-gray-50 border-2 border-transparent focus:border-primary-500 focus:bg-white rounded-2xl text-gray-900 font-medium transition-all outline-none"
-                    placeholder="YYYY-MM-DD"
-                  />
+                <label className="block text-sm font-bold text-gray-700 mb-3 ml-1">{t('inputTypeTitle')}</label>
+                <div className="grid grid-cols-2 gap-3 mb-4">
+                  <button
+                    onClick={() => setInputType('birthDate')}
+                    className={`flex items-center justify-center gap-2 py-3 rounded-2xl font-bold transition-all border-2 ${
+                      inputType === 'birthDate' 
+                        ? 'bg-primary-50 border-primary-500 text-primary-700 shadow-sm' 
+                        : 'bg-gray-50 border-transparent text-gray-500 hover:bg-gray-100'
+                    }`}
+                  >
+                    <CalendarIcon className="w-5 h-5" />
+                    {t('inputTypeBirthDate')}
+                  </button>
+                  <button
+                    onClick={() => setInputType('age')}
+                    className={`flex items-center justify-center gap-2 py-3 rounded-2xl font-bold transition-all border-2 ${
+                      inputType === 'age' 
+                        ? 'bg-emerald-50 border-emerald-500 text-emerald-700 shadow-sm' 
+                        : 'bg-gray-50 border-transparent text-gray-500 hover:bg-gray-100'
+                    }`}
+                  >
+                    <UserIcon className="w-5 h-5" />
+                    {t('inputTypeAge')}
+                  </button>
                 </div>
-                {insuranceAge !== null && insuranceAge >= 0 && (
-                  <p className="mt-2 text-sm font-medium text-primary-600 ml-1">
-                    {t('insuranceAge')}: {insuranceAge}{locale === 'ko' ? '세' : (locale === 'en' ? ' yrs' : '岁')}
-                  </p>
+
+                {/* Age Input Dynamic Render */}
+                {inputType === 'birthDate' ? (
+                  <div>
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                        <CalendarIcon className="h-5 w-5 text-gray-400" />
+                      </div>
+                      <input
+                        type="date"
+                        id="birthDate"
+                        value={birthDate}
+                        onChange={(e) => setBirthDate(e.target.value)}
+                        className="block w-full pl-11 pr-4 py-3.5 bg-gray-50 border-2 border-transparent focus:border-primary-500 focus:bg-white rounded-2xl text-gray-900 font-medium transition-all outline-none"
+                        placeholder="YYYY-MM-DD"
+                      />
+                    </div>
+                    {insuranceAge !== null && insuranceAge >= 0 && (
+                      <p className="mt-2 text-sm font-medium text-primary-600 ml-1">
+                        {t('insuranceAge')}: {insuranceAge} {t('ageUnit')}
+                      </p>
+                    )}
+                  </div>
+                ) : (
+                  <div>
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                        <UserIcon className="h-5 w-5 text-gray-400" />
+                      </div>
+                      <input
+                        type="number"
+                        id="directAge"
+                        value={directAge}
+                        onChange={(e) => setDirectAge(e.target.value)}
+                        className="block w-full pl-11 pr-4 py-3.5 bg-gray-50 border-2 border-transparent focus:border-emerald-500 focus:bg-white rounded-2xl text-gray-900 font-medium transition-all outline-none"
+                        placeholder={t('inputAgePlaceholder') || '0~70'}
+                        min="0"
+                        max="70"
+                      />
+                    </div>
+                  </div>
                 )}
               </div>
 
@@ -300,6 +362,8 @@ export default function InsurancePremiumCalculator() {
                     { id: 'heart', label: t('heartLabel'), value: heartAmount, setter: setHeartAmount, icon: HeartIcon, color: 'text-rose-500' },
                     { id: 'injury', label: t('injurySurgery'), value: injurySurgeryAmount, setter: setInjurySurgeryAmount, icon: BoltIcon, color: 'text-green-500' },
                     { id: 'disease', label: t('diseaseSurgery'), value: diseaseSurgeryAmount, setter: setDiseaseSurgeryAmount, icon: ShieldCheckIcon, color: 'text-indigo-500' },
+                    { id: 'cancerTreatment', label: t('cancerTreatmentLabel') || '비급여 암주요치료비', value: cancerTreatmentAmount, setter: setCancerTreatmentAmount, icon: ShieldCheckIcon, color: 'text-purple-500' },
+                    { id: 'cancerTreatmentDiscount', label: t('cancerTreatmentDiscountLabel') || '비급여 암주요치료비 (17% 할인)', value: cancerTreatmentDiscountAmount, setter: setCancerTreatmentDiscountAmount, icon: ShieldCheckIcon, color: 'text-fuchsia-500' },
                   ].map((item) => (
                     <div key={item.id}>
                       <div className="flex justify-between items-center mb-1.5 ml-1">
@@ -307,7 +371,7 @@ export default function InsurancePremiumCalculator() {
                           <item.icon className={`w-4 h-4 ${item.color}`} />
                           {item.label}
                         </label>
-                        <span className="text-xs font-bold text-gray-400">{item.value.toLocaleString()} {locale === 'ko' ? '만원' : (locale === 'en' ? '0k KRW' : '万韩원')}</span>
+                        <span className="text-xs font-bold text-gray-400">{item.value.toLocaleString()} {t('manwonUnit')}</span>
                       </div>
                       <input
                         type="number"
@@ -341,10 +405,10 @@ export default function InsurancePremiumCalculator() {
                 <CalculatorIcon className="w-12 h-12 text-gray-300" />
               </div>
               <h3 className="text-xl font-bold text-gray-900 mb-2">
-                {locale === 'ko' ? '계산 결과가 여기에 표시됩니다' : locale === 'en' ? 'Results will appear here' : '测算结果将在此显示'}
+                {t('calcPlaceholderTitle')}
               </h3>
               <p className="text-gray-500 max-w-xs mx-auto">
-                {locale === 'ko' ? "가입 정보를 입력하고 '보험료 계산하기' 버튼을 눌러주세요." : locale === 'en' ? "Enter info and click 'Calculate Premium'." : "请输入信息并点击“测算保费”按钮。"}
+                {t('calcPlaceholderDesc')}
               </p>
             </div>
           ) : (
@@ -358,7 +422,7 @@ export default function InsurancePremiumCalculator() {
                       {results.genderLabel}
                     </span>
                     <span className="px-3 py-1 rounded-full bg-gray-100 text-gray-600 text-xs font-bold">
-                       {t('insuranceAge')} {results.age}{locale === 'ko' ? '세' : (locale === 'en' ? ' yrs' : '岁')}
+                       {t('insuranceAge')} {results.age} {t('ageUnit')}
                     </span>
                   </div>
                   <h2 className="text-2xl font-black text-gray-900">{t('calcResults')}</h2>
@@ -376,6 +440,8 @@ export default function InsurancePremiumCalculator() {
                   { label: t('heartLabel'), amount: heartAmount, premium: results.premiums.heart, icon: HeartIcon, bg: 'bg-rose-50', text: 'text-rose-700', iconColor: 'text-rose-500' },
                   { label: t('injurySurgery'), amount: injurySurgeryAmount, premium: results.premiums.injurySurgery, icon: BoltIcon, bg: 'bg-green-50', text: 'text-green-700', iconColor: 'text-green-500' },
                   { label: t('diseaseSurgery'), amount: diseaseSurgeryAmount, premium: results.premiums.diseaseSurgery, icon: ShieldCheckIcon, bg: 'bg-indigo-50', text: 'text-indigo-700', iconColor: 'text-indigo-500' },
+                  { label: t('cancerTreatmentLabel') || '비급여 암주요치료비', amount: cancerTreatmentAmount, premium: results.premiums.cancerTreatment, icon: ShieldCheckIcon, bg: 'bg-purple-50', text: 'text-purple-700', iconColor: 'text-purple-500' },
+                  { label: t('cancerTreatmentDiscountLabel') || '비급여 암주요치료비 (17% 할인)', amount: cancerTreatmentDiscountAmount, premium: results.premiums.cancerTreatmentDiscount, icon: ShieldCheckIcon, bg: 'bg-fuchsia-50', text: 'text-fuchsia-700', iconColor: 'text-fuchsia-500' },
                 ].map((item, idx) => (
                   <div key={idx} className="group p-5 rounded-2xl bg-gray-50 border border-transparent hover:border-gray-200 transition-all">
                     <div className="flex items-center justify-between mb-3">
@@ -386,7 +452,7 @@ export default function InsurancePremiumCalculator() {
                         <div>
                           <p className="text-sm font-bold text-gray-900">{item.label}</p>
                           <p className="text-[11px] font-bold text-gray-400">
-                             {locale === 'ko' ? '가입금액' : (locale === 'en' ? 'Limit' : '保额')}: {item.amount.toLocaleString()}{locale === 'ko' ? '만원' : (locale === 'en' ? '0k KRW' : '万韩元')}
+                             {t('limitVal') || (locale === 'ko' ? '가입금액' : (locale === 'en' ? 'Limit' : '保额'))}: {item.amount.toLocaleString()} {t('manwonUnit')}
                           </p>
                         </div>
                       </div>
@@ -410,14 +476,14 @@ export default function InsurancePremiumCalculator() {
                 <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
                   <div>
                     <h4 className="text-lg font-black mb-1">
-                      {locale === 'ko' ? '나에게 딱 맞는 보험료인가요?' : (locale === 'en' ? 'Is this the right premium for you?' : '这是适合您的保费吗？')}
+                      {t('consultationTitle')}
                     </h4>
                     <p className="text-white/80 text-sm font-medium">
-                       {locale === 'ko' ? '고객님만을 위한 보험 다이어트 전문가가 1:1 맞춤형 보장 분석을 도와드립니다.' : (locale === 'en' ? 'Our experts will provide a 1:1 customized coverage analysis.' : '我们的专家将为您提供 1:1 定制化的保障 analysis。')}
+                       {t('consultationDesc')}
                     </p>
                   </div>
                   <a href="/#consultation" className="bg-white text-primary-600 px-6 py-3 rounded-xl font-black text-sm shadow-xl hover:shadow-white/20 transition-all whitespace-nowrap">
-                    {locale === 'ko' ? '전문가 상담 신청' : (locale === 'en' ? 'Request Consultation' : '申请专家咨询')}
+                    {t('requestConsultation')}
                   </a>
                 </div>
               </div>
@@ -435,30 +501,14 @@ export default function InsurancePremiumCalculator() {
           <div className="mt-8 bg-amber-50/50 rounded-2xl p-6 border border-amber-100 flex items-start gap-4">
             <InformationCircleIcon className="w-6 h-6 text-amber-500 shrink-0 mt-0.5" />
             <div>
-              <h4 className="font-bold text-amber-900 mb-2">{locale === 'ko' ? '안내드립니다' : 'Notice'}</h4>
-              <ul className="text-sm text-amber-800/80 space-y-1.5 list-disc list-inside break-keep">
-                {locale === 'ko' ? (
-                  <>
-                    <li>본 계산기는 요율표를 기반으로 한 <strong>단순 예상치</strong>이며, 실제 보험료는 가입 연령, 직업, 건강 상태, 회사별 할인 혜택 등에 따라 달라질 수 있습니다.</li>
-                    <li>암진단금 등 각 보장 항목의 가입 금액은 가입하시는 목적에 따라 조절이 필요합니다.</li>
-                    <li>보험나이는 만나이와는 다르며, 실제 생일에서 6개월을 기준으로 산출됩니다.</li>
-                    <li>더 정확한 보험료와 보장 범위는 <strong>보험 다이어트 상담</strong>을 통해 확인해 보시기 바랍니다.</li>
-                  </>
-                ) : (locale === 'en' ? (
-                  <>
-                    <li>These results are <strong>simple estimates</strong> based on standard rates. Actual premiums vary by age, occupation, health, etc.</li>
-                    <li>Coverage limits should be adjusted based on your specific needs.</li>
-                    <li>Insurance age differs from actual age; it's calculated based on a 6-month threshold from your birthday.</li>
-                    <li>For exact details, please <strong>request a consultation</strong> with our experts.</li>
-                  </>
-                ) : (
-                  <>
-                    <li>本测算结果仅为基于费率表的<strong>简单预估值</strong>，实际保费取决于年龄、职业、健康状况等。</li>
-                    <li>保额应根据您的具体需求进行调整。</li>
-                    <li>保险年龄与实际周岁不同，以生日后 6 个月为基准计算。</li>
-                    <li>如需准确信息，请<strong>向专家申请咨询</strong>。</li>
-                  </>
-                ))}
+              <h4 className="font-bold text-amber-900 mb-2">{t('noticeTitle')}</h4>
+              <p className="text-sm text-amber-800/80 leading-relaxed break-keep">
+                {t('noticePremium')}
+              </p>
+              <ul className="mt-3 text-xs text-amber-800/70 space-y-1 list-disc list-inside">
+                <li>본 계산 결과는 참고용입니다.</li>
+                <li>상품 추천 또는 가입 권유 목적이 아닙니다.</li>
+                <li>실제 보험료는 조건에 따라 달라질 수 있습니다.</li>
               </ul>
             </div>
           </div>

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useAttribution } from '@/lib/attribution'
+import { useLanguage } from '@/lib/contexts/LanguageContext'
 
 interface ConsultationFormProps {
   id?: string;
@@ -19,6 +20,7 @@ export default function ConsultationForm({ id = "consultation", plannerId, plann
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState('')
   const { planner: sessionPlanner } = useAttribution()
+  const { t } = useLanguage()
 
   // Determine final planner info
   const finalPlannerId = plannerId || sessionPlanner?.id
@@ -31,16 +33,16 @@ export default function ConsultationForm({ id = "consultation", plannerId, plann
 
     // Validation
     if (!name.trim()) {
-      setError('이름을 입력해주세요.')
+      setError(t('formAlertName'))
       return
     }
     const phoneRegex = /^01[016789]-?\d{3,4}-?\d{4}$/
     if (!phone.replace(/-/g, '').match(phoneRegex)) {
-      setError('올바른 휴대폰 번호를 입력해주세요. (예: 01012345678)')
+      setError(t('formAlertPhone'))
       return
     }
     if (!agree) {
-      setError('개인정보 수집 및 이용에 동의해주세요.')
+      setError(t('formAlertAgree'))
       return
     }
 
@@ -56,7 +58,8 @@ export default function ConsultationForm({ id = "consultation", plannerId, plann
           planner_id: finalPlannerId || null,
           meta: { 
             source: finalPlannerId ? `planner_page_${finalPlannerId}` : 'landing_page_bottom_form',
-            planner_name: finalPlannerName
+            planner_name: finalPlannerName,
+            referrer_code: typeof window !== 'undefined' ? localStorage.getItem('referral_code') : null
           }
         })
       })
@@ -65,7 +68,7 @@ export default function ConsultationForm({ id = "consultation", plannerId, plann
 
       if (data.success) {
         // 성공 시 클립보드 복사(선택적) 또는 카카오톡 안내 후 이동
-        alert('상담 신청이 접수되었습니다! ✅\n\n조금 더 빠른 상담 진행을 위해\n[카카오톡 1:1 채팅방]으로 바로 이동합니다.')
+        alert(t('formSuccessMessage'))
 
         // Form reset
         setName('')
@@ -75,11 +78,11 @@ export default function ConsultationForm({ id = "consultation", plannerId, plann
         // 이동 (오픈채팅 채널 링크로 리다이렉트)
         window.location.href = finalKakaoUrl
       } else {
-        setError(data.error || '접수 중 오류가 발생했습니다. 다시 시도해주세요.')
+        setError(data.error || t('formErrorMessage'))
       }
     } catch (err) {
       console.error(err)
-      setError('서버와 통신 중 문제가 발생했습니다.')
+      setError(t('formNetworkError'))
     } finally {
       setIsSubmitting(false)
     }
@@ -105,11 +108,10 @@ export default function ConsultationForm({ id = "consultation", plannerId, plann
             <div className="absolute top-0 right-0 -mr-16 -mt-16 w-64 h-64 bg-primary-600 rounded-full mix-blend-multiply opacity-20 blur-3xl"></div>
 
             <h3 className="text-3xl font-extrabold mb-4 relative z-10">
-              {finalPlannerName ? `${finalPlannerName} 설계사에게` : '지금 바로'}<br />무료 진단 받으세요
+              {finalPlannerName ? t('formTitleWithPlanner')(finalPlannerName) : t('formTitle')}
             </h3>
             <p className="text-gray-400 mb-8 leading-relaxed relative z-10">
-              {finalPlannerName ? '고객님의 입장에서 가장 유리한 보험을' : '매달 빠져나가는 아까운 보험료,'}<br />
-              {finalPlannerName ? '객관적으로 분석하고 맞춤 설계해 드립니다.' : '전문가와 함께 10분만 투자하면 평생 내는 보험료를 아낄 수 있습니다.'}
+              {finalPlannerName ? t('formDescWithPlanner') : t('formDesc')}
             </p>
 
             <div className="space-y-5 text-sm font-medium relative z-10">
@@ -117,19 +119,19 @@ export default function ConsultationForm({ id = "consultation", plannerId, plann
                 <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center shrink-0">
                   <span className="text-primary-400 text-lg">1</span>
                 </div>
-                <span>전문가 1:1 맞춤 분석</span>
+                <span>{t('formStep1')}</span>
               </div>
               <div className="flex items-center gap-4">
                 <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center shrink-0">
                   <span className="text-primary-400 text-lg">2</span>
                 </div>
-                <span>중복/불필요 특약 제거</span>
+                <span>{t('formStep2')}</span>
               </div>
               <div className="flex items-center gap-4">
                 <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center shrink-0">
                   <span className="text-primary-400 text-lg">3</span>
                 </div>
-                <span>필수 핵심 보장 보완</span>
+                <span>{t('formStep3')}</span>
               </div>
             </div>
           </div>
@@ -138,12 +140,12 @@ export default function ConsultationForm({ id = "consultation", plannerId, plann
           <div className="p-10 md:w-7/12">
             <h4 className="text-xl font-bold text-gray-900 mb-6 flex items-center">
               <div className="w-2 h-6 bg-primary-500 rounded-full mr-3"></div>
-              상담 신청하기
+              {t('formSubmitTitle')}
             </h4>
 
             <form onSubmit={handleSubmit} className="space-y-5">
               <div>
-                <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">이름</label>
+                <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">{t('formName')}</label>
                 <input
                   type="text"
                   id="name"
@@ -156,7 +158,7 @@ export default function ConsultationForm({ id = "consultation", plannerId, plann
               </div>
 
               <div>
-                <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1">휴대폰 번호</label>
+                <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1">{t('formPhone')}</label>
                 <input
                   type="tel"
                   id="phone"
@@ -179,11 +181,11 @@ export default function ConsultationForm({ id = "consultation", plannerId, plann
                     />
                   </div>
                   <div className="text-sm text-gray-600">
-                    <span className="font-semibold text-gray-800">개인정보 수집 및 이용 동의 (필수)</span>
+                    <span className="font-semibold text-gray-800">{t('formAgree')}</span>
                     <div className="mt-2 p-3 bg-gray-50 rounded-lg text-xs text-gray-500 border border-gray-100">
-                      수집목적: 보험 리모델링 상담<br />
-                      수집항목: 이름, 연락처<br />
-                      보유기간: 상담 완료 후 3개월 내 파기
+                      {t('formPrivacyPurpose')}<br />
+                      {t('formPrivacyItems')}<br />
+                      {t('formPrivacyPeriod')}
                     </div>
                   </div>
                 </label>
@@ -200,14 +202,14 @@ export default function ConsultationForm({ id = "consultation", plannerId, plann
                 disabled={isSubmitting}
                 className="w-full py-4 mt-2 text-lg font-bold text-white bg-primary-600 rounded-xl shadow-lg shadow-primary-500/30 hover:bg-primary-700 hover:shadow-primary-500/50 hover:-translate-y-0.5 focus:outline-none focus:ring-4 focus:ring-primary-200 transition-all disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none"
               >
-                {isSubmitting ? '접수 중...' : '맞춤 진단 신청하기'}
+                {isSubmitting ? t('formBtnSubmitting') : t('formBtnApply')}
               </button>
 
               <p className="text-center text-xs text-gray-400 mt-4 flex items-center justify-center gap-1">
                 <svg className="w-4 h-4 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                 </svg>
-                상담 신청 시 스팸 문자나 가입 강요는 절대 없습니다.
+                {t('formSpamNotice')}
               </p>
             </form>
           </div>

@@ -5,7 +5,7 @@ import PlannerBranding from '@/components/PlannerBranding'
 
 export const metadata = {
     title: '보험료 계산기 | 보험다이어트',
-    description: '성별, 생년월일만 입력하면 암, 뇌, 심장 진단비부터 수술비까지 내 보험료를 즉시 확인해보세요.',
+    description: '성별, 생년월일만 입력하면 암, 뇌, 심장 진단비부터 수술비까지 예상 보험료를 확인해 보세요.',
 }
 
 export default function InsurancePremiumPage() {
@@ -18,7 +18,7 @@ export default function InsurancePremiumPage() {
                 {/* Hero Section */}
                 <div className="max-w-4xl mx-auto text-center mb-12">
                     <div className="inline-block bg-primary-100 text-primary-800 font-bold px-4 py-1.5 rounded-full text-sm mb-4">
-                        내 보험료 즉시 확인
+                        예상 보험료 확인
                     </div>
                     <h1 className="text-3xl md:text-5xl font-extrabold text-gray-900 tracking-tight mb-6">
                         보험료 계산기

@@ -52,6 +52,7 @@ export default function SignupPage() {
             phone: cleanPhone,
             affiliation,
             region,
+            referrer_code: typeof window !== 'undefined' ? localStorage.getItem('referral_code') : null
           }
         }
       })

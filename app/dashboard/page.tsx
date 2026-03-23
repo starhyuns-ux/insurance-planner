@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect, useRef, Fragment } from 'react'
 import { supabase } from '@/lib/supabaseClient'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
@@ -22,8 +22,12 @@ import {
   TrashIcon,
   GlobeAltIcon,
   IdentificationIcon,
-  ShareIcon
+  ShareIcon,
+  ChatBubbleLeftEllipsisIcon,
+  ChatBubbleLeftRightIcon,
+  GiftIcon
 } from '@heroicons/react/24/outline'
+import BoardPage from '@/components/BoardPage'
 import { 
   format, 
   startOfMonth, 
@@ -35,9 +39,92 @@ import {
   isSameDay, 
   addMonths, 
   subMonths,
-  differenceInCalendarDays
+  addDays,
+  differenceInCalendarDays,
+  getDay 
 } from 'date-fns'
 import { ko } from 'date-fns/locale'
+
+const HOLIDAYS: Record<string, string> = {
+  '2024-01-01': '신정',
+  '2024-02-09': '설날',
+  '2024-02-10': '설날',
+  '2024-02-11': '설날',
+  '2024-02-12': '대체공휴일',
+  '2024-03-01': '삼일절',
+  '2024-04-10': '총선',
+  '2024-05-05': '어린이날',
+  '2024-05-06': '대체공휴일',
+  '2024-05-15': '부처님오신날',
+  '2024-06-06': '현충일',
+  '2024-08-15': '광복절',
+  '2024-09-16': '추석',
+  '2024-09-17': '추석',
+  '2024-09-18': '추석',
+  '2024-10-01': '임시공휴일',
+  '2024-10-03': '개천절',
+  '2024-10-09': '한글날',
+  '2024-12-25': '성탄절',
+  '2025-01-01': '신정',
+  '2025-01-28': '설날',
+  '2025-01-29': '설날',
+  '2025-01-30': '설날',
+  '2025-03-01': '삼일절',
+  '2025-03-03': '대체공휴일',
+  '2025-05-05': '어린이날/부처님오신날',
+  '2025-05-06': '대체공휴일',
+  '2025-06-06': '현충일',
+  '2025-08-15': '광복절',
+  '2025-10-03': '개천절',
+  '2025-10-05': '추석',
+  '2025-10-06': '추석/개천절',
+  '2025-10-07': '추석',
+  '2025-10-08': '대체공휴일',
+  '2025-10-09': '한글날',
+  '2025-12-25': '성탄절',
+  '2026-01-01': '신정',
+  '2026-02-16': '설날',
+  '2026-02-17': '설날',
+  '2026-02-18': '설날',
+  '2026-03-01': '삼일절',
+  '2026-03-02': '대체공휴일',
+  '2026-05-05': '어린이날',
+  '2026-05-24': '부처님오신날',
+  '2026-05-25': '대체공휴일',
+  '2026-06-03': '지방선거',
+  '2026-06-06': '현충일',
+  '2026-08-15': '광복절',
+  '2026-08-17': '대체공휴일',
+  '2026-09-24': '추석',
+  '2026-09-25': '추석',
+  '2026-09-26': '추석',
+  '2026-09-28': '대체공휴일',
+  '2026-10-03': '개천절',
+  '2026-10-05': '대체공휴일',
+  '2026-10-09': '한글날',
+  '2026-12-25': '성탄절',
+  '2027-01-01': '신정',
+  '2027-02-06': '설날',
+  '2027-02-07': '설날',
+  '2027-02-08': '설날',
+  '2027-02-09': '대체공휴일',
+  '2027-03-01': '삼일절',
+  '2027-03-03': '대통령선거',
+  '2027-05-05': '어린이날',
+  '2027-05-13': '부처님오신날',
+  '2027-06-06': '현충일',
+  '2027-08-15': '광복절',
+  '2027-08-16': '대체공휴일',
+  '2027-09-14': '추석',
+  '2027-09-15': '추석',
+  '2027-09-16': '추석',
+  '2027-10-03': '개천절',
+  '2027-10-04': '대체공휴일',
+  '2027-10-09': '한글날',
+  '2027-10-11': '대체공휴일',
+  '2027-12-25': '성탄절',
+  '2027-12-27': '대체공휴일',
+}
 
 // Safe Date Formatter helper
 const safeFormat = (dateStr: string | null | undefined, formatStr: string) => {
@@ -104,6 +191,9 @@ type Planner = {
   kakao_url: string
   advisor_message: string | null
   subscription_status: 'active' | 'inactive'
+  notification_email: string | null
+  gmail_app_password: string | null
+  referral_code?: string
 }
 
 type Lead = {
@@ -122,9 +212,10 @@ type Customer = {
   family_count: number
   touch_count: number
   last_touch_at: string | null
-  appointment_at: string | null
-  riders: string[]
-  created_at: string
+  appointment_at: string | null;
+  riders: string[];
+  memo?: string;
+  created_at: string;
 }
 
 interface Todo {
@@ -136,14 +227,137 @@ interface Todo {
   created_at: string;
 }
 
+interface Referral {
+  id: string;
+  referee_name: string;
+  referee_phone: string;
+  referee_type: 'CONSULTATION' | 'SIGNUP';
+  status: 'PENDING' | 'APPROVED' | 'PAID' | 'REJECTED';
+  reward_amount: number;
+  created_at: string;
+}
+
+// ── 1:1 Chat Inbox Panel ──────────────────────────────────
+function ChatInboxPanel({ plannerId, plannerName }: { plannerId: string | null; plannerName: string }) {
+  const [sessions, setSessions] = useState<any[]>([])
+  const [selectedSession, setSelectedSession] = useState<any | null>(null)
+  const [messages, setMessages] = useState<any[]>([])
+  const [replyInput, setReplyInput] = useState('')
+  const [sending, setSending] = useState(false)
+  const bottomRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => { fetchSessions() }, [plannerId])
+  useEffect(() => {
+    if (!selectedSession) return
+    fetchMessages(selectedSession.id)
+    const ch = supabase.channel(`inbox_${selectedSession.id}`)
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'chat_messages', filter: `session_id=eq.${selectedSession.id}` }, p => {
+        setMessages(prev => [...prev, p.new])
+      })
+      .subscribe()
+    return () => { supabase.removeChannel(ch) }
+  }, [selectedSession?.id])
+  useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: 'smooth' }) }, [messages])
+
+  const fetchSessions = async () => {
+    const { data } = await supabase.from('chat_sessions').select('*').order('last_message_at', { ascending: false, nullsFirst: false })
+    if (data) setSessions(data)
+  }
+  const fetchMessages = async (sid: string) => {
+    const { data } = await supabase.from('chat_messages').select('*').eq('session_id', sid).order('created_at')
+    if (data) setMessages(data)
+  }
+  const sendReply = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!replyInput.trim() || !selectedSession) return
+    setSending(true)
+    await supabase.from('chat_messages').insert({ session_id: selectedSession.id, sender_type: 'planner', content: replyInput.trim() })
+    await supabase.from('chat_sessions').update({ last_message_at: new Date().toISOString() }).eq('id', selectedSession.id)
+    setReplyInput('')
+    setSending(false)
+    fetchSessions()
+  }
+  const safeDate = (str: string) => { try { return format(new Date(str), 'M/d HH:mm') } catch { return '' } }
+
+  return (
+    <div className="bg-white rounded-[2rem] shadow-xl border border-gray-100 overflow-hidden flex" style={{ height: '72vh', minHeight: '500px' }}>
+      {/* Session List */}
+      <div className="w-64 shrink-0 border-r border-gray-100 flex flex-col">
+        <div className="px-5 py-4 border-b border-gray-100 flex items-center gap-2">
+          <span className="text-sm font-black text-gray-800">1:1 채팅 인박스</span>
+          <span className="ml-auto text-xs text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">{sessions.length}</span>
+        </div>
+        <div className="flex-1 overflow-y-auto">
+          {sessions.length === 0 ? (
+            <div className="flex items-center justify-center h-full text-gray-300 text-sm px-4 text-center">아직 채팅 문의가 없습니다.</div>
+          ) : sessions.map(s => (
+            <button key={s.id} onClick={() => setSelectedSession(s)}
+              className={`w-full text-left px-4 py-3 border-b border-gray-50 hover:bg-gray-50 transition-colors ${selectedSession?.id === s.id ? 'bg-primary-50' : ''}`}>
+              <p className="font-bold text-sm text-gray-900 truncate">{s.visitor_name}</p>
+              {s.visitor_phone && <p className="text-xs text-gray-400">{s.visitor_phone}</p>}
+              <p className="text-[10px] text-gray-300 mt-0.5">{safeDate(s.last_message_at || s.created_at)}</p>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Chat Area */}
+      <div className="flex-1 flex flex-col">
+        {!selectedSession ? (
+          <div className="flex-1 flex items-center justify-center text-gray-300 flex-col gap-2">
+            <span className="text-4xl">💬</span>
+            <span className="text-sm">세션을 선택하면 채팅이 표시됩니다.</span>
+          </div>
+        ) : (
+          <>
+            <div className="px-6 py-3 border-b border-gray-100 bg-gray-50/50 flex items-center gap-3">
+              <div className="w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center text-primary-600 font-black text-sm">{selectedSession.visitor_name.charAt(0)}</div>
+              <div>
+                <p className="font-bold text-sm text-gray-900">{selectedSession.visitor_name}</p>
+                {selectedSession.visitor_phone && <p className="text-xs text-gray-400">{selectedSession.visitor_phone}</p>}
+              </div>
+            </div>
+            <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-gray-50/20">
+              {messages.map(msg => (
+                <div key={msg.id} className={`flex ${msg.sender_type === 'planner' ? 'justify-end' : 'justify-start'}`}>
+                  {msg.sender_type === 'visitor' && (
+                    <div className="w-7 h-7 bg-gray-100 rounded-full flex items-center justify-center text-xs font-bold text-gray-500 mr-2 shrink-0 mt-1">{selectedSession.visitor_name.charAt(0)}</div>
+                  )}
+                  <div className="max-w-[75%]">
+                    <div className={`rounded-2xl px-3.5 py-2.5 text-sm whitespace-pre-wrap break-words ${
+                      msg.sender_type === 'planner' ? 'bg-primary-600 text-white rounded-tr-sm' : 'bg-white text-gray-800 rounded-tl-sm shadow-sm border border-gray-100'
+                    }`}>{msg.content}</div>
+                    <p className={`text-[10px] text-gray-300 mt-0.5 ${msg.sender_type === 'planner' ? 'text-right' : ''}`}>{safeDate(msg.created_at)}</p>
+                  </div>
+                </div>
+              ))}
+              <div ref={bottomRef} />
+            </div>
+            <form onSubmit={sendReply} className="p-3 border-t border-gray-100 flex gap-2 items-end bg-gray-50/50">
+              <textarea value={replyInput} onChange={e => setReplyInput(e.target.value)}
+                onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendReply(e as any) } }}
+                rows={2} placeholder={`${plannerName}으로 답변... (Enter 전송)`}
+                className="flex-1 border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-300 resize-none bg-white" />
+              <button type="submit" disabled={sending || !replyInput.trim()}
+                className="px-4 py-2.5 bg-primary-600 text-white rounded-xl text-sm font-bold hover:bg-primary-700 disabled:opacity-40 shrink-0">전송</button>
+            </form>
+          </>
+        )}
+      </div>
+    </div>
+  )
+}
+// ─────────────────────────────────────────────────────────────────
+
 export default function DashboardPage() {
-  const [activeTab, setActiveTab] = useState<'profile' | 'leads' | 'customers' | 'calendar' | 'subscription' | 'card'>('card')
+  const [activeTab, setActiveTab] = useState<'profile' | 'leads' | 'customers' | 'calendar' | 'subscription' | 'card' | 'notification' | 'guide' | 'chat' | 'freeboard' | 'referrals'>('calendar')
   const [planner, setPlanner] = useState<Planner | null>(null)
   const [customers, setCustomers] = useState<Customer[]>([])
   const [leads, setLeads] = useState<Lead[]>([])
   const [todos, setTodos] = useState<Todo[]>([])
   const [newTodoContent, setNewTodoContent] = useState('')
   const [todoDate, setTodoDate] = useState(format(new Date(), 'yyyy-MM-dd'))
+  const [referrals, setReferrals] = useState<Referral[]>([])
   const [editingTodoId, setEditingTodoId] = useState<string | null>(null)
   const [editTodoContent, setEditTodoContent] = useState('')
   const [loading, setLoading] = useState(true)
@@ -160,6 +374,17 @@ export default function DashboardPage() {
   const [isSaving, setIsSaving] = useState(false)
   const [urlCopied, setUrlCopied] = useState(false)
 
+  // Notification Settings State
+  const [editNotificationEmail, setEditNotificationEmail] = useState('')
+  const [editGmailAppPassword, setEditGmailAppPassword] = useState('')
+  const [isNotifSaving, setIsNotifSaving] = useState(false)
+  const [notifTestResult, setNotifTestResult] = useState<string | null>(null)
+  const [pushEnabled, setPushEnabled] = useState(false)
+  const [pushLoading, setPushLoading] = useState(false)
+  const [recentConsultations, setRecentConsultations] = useState<any[]>([])
+  const [unreadCount, setUnreadCount] = useState(0)
+  const [lastSeenAt, setLastSeenAt] = useState<string | null>(null)
+
   const [newCustName, setNewCustName] = useState('')
   const [newCustPhone, setNewCustPhone] = useState('')
   const [newCustAddr, setNewCustAddr] = useState('')
@@ -170,6 +395,8 @@ export default function DashboardPage() {
 
   // Edit Customer State
   const [editingId, setEditingId] = useState<string | null>(null)
+  const [expandedMemoId, setExpandedMemoId] = useState<string | null>(null)
+  const [memoValue, setMemoValue] = useState('')
   const [editCustName, setEditCustName] = useState('')
   const [editCustPhone, setEditCustPhone] = useState('')
   const [editCustAddr, setEditCustAddr] = useState('')
@@ -177,13 +404,44 @@ export default function DashboardPage() {
   const [editCustFamily, setEditCustFamily] = useState('1')
   const [editCustRiders, setEditCustRiders] = useState('')
   const [editCustAppt, setEditCustAppt] = useState('')
+  const [hasNewBoardPost, setHasNewBoardPost] = useState(false)
 
   // Calendar State
   const [currentMonth, setCurrentMonth] = useState(new Date())
 
   useEffect(() => {
     checkUser()
+    checkFreeBoardNewPost()
   }, [])
+
+  const checkFreeBoardNewPost = async () => {
+    try {
+      const { data } = await supabase
+        .from('board_posts')
+        .select('created_at')
+        .eq('board_type', 'free')
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle()
+
+      if (data) {
+        const lastSeen = localStorage.getItem('last_seen_free_board')
+        if (!lastSeen || new Date(data.created_at) > new Date(lastSeen)) {
+          setHasNewBoardPost(true)
+        }
+      }
+    } catch (e) {
+      console.error('Error checking new board posts:', e)
+    }
+  }
+
+  const handleTabChange = (tab: any) => {
+    setActiveTab(tab)
+    if (tab === 'freeboard') {
+      setHasNewBoardPost(false)
+      localStorage.setItem('last_seen_free_board', new Date().toISOString())
+    }
+  }
 
   const checkUser = async () => {
     const { data: { user } } = await supabase.auth.getUser()
@@ -208,6 +466,8 @@ export default function DashboardPage() {
       setEditRegion(profile.region || '')
       setEditKakaoUrl(profile.kakao_url || '')
       setEditMessage(profile.advisor_message || '')
+      setEditNotificationEmail(profile.notification_email || '')
+      setEditGmailAppPassword(profile.gmail_app_password || '')
     }
 
     // Fetch Manual Customers
@@ -226,7 +486,20 @@ export default function DashboardPage() {
       .eq('planner_id', user.id)
       .order('created_at', { ascending: false })
 
-    if (leadData) setLeads(leadData)
+    if (leadData) {
+      setLeads(leadData)
+      setRecentConsultations(leadData.slice(0, 10))
+
+      // Calculate unread count
+      const lastSeen = localStorage.getItem('notif_last_seen')
+      setLastSeenAt(lastSeen)
+      if (lastSeen) {
+        const unread = leadData.filter((l: any) => new Date(l.created_at) > new Date(lastSeen)).length
+        setUnreadCount(unread)
+      } else {
+        setUnreadCount(leadData.length)
+      }
+    }
 
     // Fetch Todos
     const { data: todoData } = await supabase
@@ -236,6 +509,31 @@ export default function DashboardPage() {
       .order('created_at', { ascending: true })
 
     if (todoData) setTodos(todoData)
+
+    // Fetch Referrals
+    const { data: { session } } = await supabase.auth.getSession()
+    if (session) {
+      const refRes = await fetch('/api/referrals/me', {
+        headers: {
+          'Authorization': `Bearer ${session.access_token}`
+        }
+      })
+      if (refRes.ok) {
+        const refData = await refRes.json()
+        setReferrals(refData.data || [])
+      }
+    }
+
+    // Check push subscription status
+    if ('serviceWorker' in navigator && 'PushManager' in window) {
+      try {
+        const registration = await navigator.serviceWorker.register('/sw.js')
+        const subscription = await registration.pushManager.getSubscription()
+        setPushEnabled(!!subscription)
+      } catch (err) {
+        console.log('Service worker registration skipped:', err)
+      }
+    }
     
     setLoading(false)
   }
@@ -354,8 +652,7 @@ export default function DashboardPage() {
         phone: editPhone,
         affiliation: editAffiliation,
         region: editRegion,
-        kakao_url: editKakaoUrl,
-        advisor_message: editMessage
+        kakao_url: editKakaoUrl
       })
       .eq('id', user.id)
 
@@ -479,6 +776,34 @@ export default function DashboardPage() {
     }
   }
 
+  const toggleMemo = (customer: any) => {
+    if (expandedMemoId === customer.id) {
+      setExpandedMemoId(null)
+      setMemoValue('')
+    } else {
+      setExpandedMemoId(customer.id)
+      setMemoValue(customer.memo || '')
+    }
+  }
+
+  const saveMemo = async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from('customers')
+        .update({ memo: memoValue })
+        .eq('id', id)
+      
+      if (error) throw error
+      
+      setCustomers(prev => prev.map(c => c.id === id ? { ...c, memo: memoValue } : c))
+      setExpandedMemoId(null)
+      setMemoValue('')
+    } catch (err) {
+      console.error('Error saving memo:', err)
+      alert('메모 저장 중 오류가 발생했습니다.')
+    }
+  }
+
   const startEditing = (customer: Customer) => {
     setEditingId(customer.id)
     setEditCustName(customer.name)
@@ -536,117 +861,215 @@ export default function DashboardPage() {
   }
 
   return (
-    <main className="min-h-screen flex flex-col bg-gray-50 pb-20">
+    <main className="min-h-screen flex flex-col bg-gray-50 pb-24 lg:pb-0">
       <NavBar />
       
       <div className="flex-1 container py-12">
-        <div className="flex flex-col md:flex-row gap-8">
+        <div className="flex flex-col lg:flex-row gap-8">
           
           {/* Sidebar */}
-          <aside className="w-full md:w-80 space-y-2 shrink-0">
-            <div className="px-5 py-4 mb-2">
-              <p className="font-cursive text-xl text-primary-600/80 leading-tight">
-                "I can do all this through him who gives me strength."
+          <aside className="hidden lg:block w-full lg:w-72 shrink-0 space-y-3">
+
+
+            {/* ── 홈 ── */}
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+              <div className="flex items-center gap-2 px-4 py-2.5 bg-gray-50 border-b border-gray-100">
+                <span className="w-1 h-4 rounded-full bg-primary-500 inline-block" />
+                <span className="text-[10px] font-black text-gray-500 uppercase tracking-[0.18em]">홈</span>
+              </div>
+              <div className="p-2">
+                <button
+                  onClick={() => setActiveTab('calendar')}
+                  className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-semibold transition-all text-sm ${
+                    activeTab === 'calendar' ? 'bg-primary-600 text-white shadow-md' : 'text-gray-600 hover:bg-gray-50'
+                  }`}
+                >
+                  <CalendarIcon className="w-4 h-4 shrink-0" />
+                  일정 관리 (달력)
+                </button>
+              </div>
+            </div>
+
+            {/* ── 영업 관리 ── */}
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+              <div className="flex items-center gap-2 px-4 py-2.5 bg-gray-50 border-b border-gray-100">
+                <span className="w-1 h-4 rounded-full bg-blue-500 inline-block" />
+                <span className="text-[10px] font-black text-gray-500 uppercase tracking-[0.18em]">영업 관리</span>
+              </div>
+              <div className="p-2 space-y-0.5">
+                <button
+                  onClick={() => { setActiveTab('notification'); setUnreadCount(0); localStorage.setItem('notif_last_seen', new Date().toISOString()); }}
+                  className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-semibold transition-all text-sm ${
+                    activeTab === 'notification' ? 'bg-primary-600 text-white shadow-md' : 'text-gray-600 hover:bg-gray-50'
+                  }`}
+                >
+                  <div className="relative shrink-0">
+                    <UsersIcon className="w-4 h-4" />
+                    {unreadCount > 0 && (
+                      <span className="absolute -top-1.5 -right-1.5 w-3.5 h-3.5 bg-red-500 text-white text-[8px] font-black rounded-full flex items-center justify-center animate-pulse">
+                        {unreadCount > 9 ? '9+' : unreadCount}
+                      </span>
+                    )}
+                  </div>
+                  <span className="flex-1 text-left">상담 알림 / 현황</span>
+                  {unreadCount > 0 && (
+                    <span className="bg-red-100 text-red-600 text-[10px] font-black px-1.5 py-0.5 rounded-full">{unreadCount}건</span>
+                  )}
+                </button>
+                <button
+                  onClick={() => setActiveTab('customers')}
+                  className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-semibold transition-all text-sm ${
+                    activeTab === 'customers' ? 'bg-primary-600 text-white shadow-md' : 'text-gray-600 hover:bg-gray-50'
+                  }`}
+                >
+                  <UsersIcon className="w-4 h-4 shrink-0" />
+                  고객 관리
+                </button>
+              </div>
+            </div>
+
+            {/* ── 내 설정 ── */}
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+              <div className="flex items-center gap-2 px-4 py-2.5 bg-gray-50 border-b border-gray-100">
+                <span className="w-1 h-4 rounded-full bg-indigo-500 inline-block" />
+                <span className="text-[10px] font-black text-gray-500 uppercase tracking-[0.18em]">내 설정</span>
+              </div>
+              <div className="p-2 space-y-0.5">
+                <button
+                  onClick={() => setActiveTab('profile')}
+                  className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-semibold transition-all text-sm ${
+                    activeTab === 'profile' ? 'bg-primary-600 text-white shadow-md' : 'text-gray-600 hover:bg-gray-50'
+                  }`}
+                >
+                  <UserCircleIcon className="w-4 h-4 shrink-0" />
+                  프로필 관리
+                </button>
+                <button
+                  onClick={() => setActiveTab('card')}
+                  className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-semibold transition-all text-sm ${
+                    activeTab === 'card' ? 'bg-primary-600 text-white shadow-md' : 'text-gray-600 hover:bg-gray-50'
+                  }`}
+                >
+                  <IdentificationIcon className="w-4 h-4 shrink-0" />
+                  명함 만들기
+                </button>
+              </div>
+            </div>
+
+            {/* ── 커뮤니티 ── */}
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+              <div className="flex items-center gap-2 px-4 py-2.5 bg-gray-50 border-b border-gray-100">
+                <span className="w-1 h-4 rounded-full bg-green-500 inline-block" />
+                <span className="text-[10px] font-black text-gray-500 uppercase tracking-[0.18em]">커뮤니티</span>
+              </div>
+              <div className="p-2 space-y-0.5">
+                <Link
+                  href="/board/qna"
+                  className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-semibold transition-all text-sm text-gray-600 hover:bg-gray-50"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4 shrink-0 text-green-500">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 5.25h.008v.008H12v-.008Z" />
+                  </svg>
+                  Q&amp;A 게시판
+                </Link>
+                <Link
+                  href="/board/free"
+                  className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-semibold transition-all text-sm text-gray-600 hover:bg-gray-50"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4 shrink-0 text-teal-500">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 0 1 .865-.501 48.172 48.172 0 0 0 3.423-.379c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z" />
+                  </svg>
+                  자유 게시판
+                </Link>
+                <button
+                  onClick={() => handleTabChange('chat')}
+                  className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-semibold transition-all text-sm ${
+                    activeTab === 'chat' ? 'bg-primary-600 text-white shadow-md' : 'text-gray-600 hover:bg-gray-50'
+                  }`}
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={`w-4 h-4 shrink-0 ${activeTab === 'chat' ? 'text-white' : 'text-violet-500'}`}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M20.25 8.511c.884.284 1.5 1.128 1.5 2.097v4.286c0 1.136-.847 2.1-1.98 2.193-.34.027-.68.052-1.02.072v3.091l-3-3c-1.354 0-2.694-.055-4.02-.163a2.115 2.115 0 0 1-.825-.242m9.345-8.334a2.126 2.126 0 0 0-.476-.095 48.64 48.64 0 0 0-8.048 0c-1.131.094-1.976 1.057-1.976 2.192v4.286c0 .837.46 1.58 1.155 1.951m9.345-8.334V6.637c0-1.621-1.152-3.026-2.76-3.235A48.455 48.455 0 0 0 11.25 3c-2.115 0-4.198.137-6.24.402-1.608.209-2.76 1.614-2.76 3.235v6.226c0 1.621 1.152 3.026 2.76 3.235.577.075 1.157.14 1.74.194V21l4.155-4.155" />
+                  </svg>
+                  1:1 채팅 인박스
+                </button>
+              </div>
+            </div>
+
+            {/* ── 시스템 ── */}
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+              <div className="flex items-center gap-2 px-4 py-2.5 bg-gray-50 border-b border-gray-100">
+                <span className="w-1 h-4 rounded-full bg-gray-400 inline-block" />
+                <span className="text-[10px] font-black text-gray-500 uppercase tracking-[0.18em]">시스템</span>
+              </div>
+              <div className="p-2 space-y-0.5">
+                <button
+                  onClick={() => setActiveTab('subscription')}
+                  className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-semibold transition-all text-sm ${
+                    activeTab === 'subscription' ? 'bg-primary-600 text-white shadow-md' : 'text-gray-600 hover:bg-gray-50'
+                  }`}
+                >
+                  <CreditCardIcon className="w-4 h-4 shrink-0" />
+                  멤버십 구독
+                </button>
+                <button
+                  onClick={() => setActiveTab('guide')}
+                  className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-semibold transition-all text-sm ${
+                    activeTab === 'guide' ? 'bg-primary-600 text-white shadow-md' : 'text-gray-600 hover:bg-gray-50'
+                  }`}
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4 shrink-0"><path strokeLinecap="round" strokeLinejoin="round" d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25" /></svg>
+                  사용 가이드
+                </button>
+                <button
+                  onClick={() => setActiveTab('referrals')}
+                  className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-semibold transition-all text-sm ${
+                    activeTab === 'referrals' ? 'bg-primary-600 text-white shadow-md' : 'text-gray-600 hover:bg-gray-50'
+                  }`}
+                >
+                  <GiftIcon className="w-4 h-4 shrink-0" />
+                  친구추천 리워드
+                </button>
+                <a
+                  href="http://www.gasupport.co.kr/Gasys/mega/inc/pop_insuCon.asp"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-semibold transition-all text-sm text-gray-600 hover:bg-gray-50"
+                >
+                  <GlobeAltIcon className="w-4 h-4 shrink-0 text-gray-400" />
+                  전보험사 바로가기
+                </a>
+              </div>
+            </div>
+
+            {/* Planner Info Card */}
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 px-5 py-4">
+              <p className="font-cursive text-lg text-primary-600/80 leading-tight">
+                &ldquo;I can do all this through him who gives me strength.&rdquo;
               </p>
-              <p className="font-cursive text-sm text-gray-400 mt-1">
-                Philippians 4:13
-              </p>
+              <p className="font-cursive text-xs text-gray-400 mt-1">Philippians 4:13</p>
             </div>
 
-            <h2 className="px-4 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-4">설계사 메뉴</h2>
-            <div className="space-y-1">
-              <button
-                onClick={() => setActiveTab('profile')}
-                className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl font-bold transition-all whitespace-nowrap text-sm ${
-                  activeTab === 'profile' ? 'bg-primary-600 text-white shadow-lg shadow-primary-200' : 'text-gray-600 hover:bg-white hover:shadow-sm'
-                }`}
-              >
-                <UserCircleIcon className="w-5 h-5" />
-                내 프로필 관리
-              </button>
-              <button
-                onClick={() => setActiveTab('leads')}
-                className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl font-bold transition-all whitespace-nowrap text-sm ${
-                  activeTab === 'leads' ? 'bg-primary-600 text-white shadow-lg shadow-primary-200' : 'text-gray-600 hover:bg-white hover:shadow-sm'
-                }`}
-              >
-                <UsersIcon className="w-5 h-5" />
-                상담 신청 현황
-              </button>
-              <button
-                onClick={() => setActiveTab('customers')}
-                className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl font-bold transition-all whitespace-nowrap text-sm ${
-                  activeTab === 'customers' ? 'bg-primary-600 text-white shadow-lg shadow-primary-200' : 'text-gray-600 hover:bg-white hover:shadow-sm'
-                }`}
-              >
-                <UsersIcon className="w-5 h-5" />
-                내 고객 직접 등록
-              </button>
-              <button
-                onClick={() => setActiveTab('card')}
-                className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl font-bold transition-all whitespace-nowrap text-sm ${
-                  activeTab === 'card' ? 'bg-primary-600 text-white shadow-lg shadow-primary-200' : 'text-gray-600 hover:bg-white hover:shadow-sm'
-                }`}
-              >
-                <IdentificationIcon className="w-5 h-5" />
-                명함 만들기
-              </button>
-              <button
-                onClick={() => setActiveTab('calendar')}
-                className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl font-bold transition-all whitespace-nowrap text-sm ${
-                  activeTab === 'calendar' ? 'bg-primary-600 text-white shadow-lg shadow-primary-200' : 'text-gray-600 hover:bg-white hover:shadow-sm'
-                }`}
-              >
-                <CalendarIcon className="w-5 h-5" />
-                일정 관리 (달력)
-              </button>
-              <button
-                onClick={() => setActiveTab('subscription')}
-                className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl font-bold transition-all whitespace-nowrap text-sm ${
-                  activeTab === 'subscription' ? 'bg-primary-600 text-white shadow-lg shadow-primary-200' : 'text-gray-600 hover:bg-white hover:shadow-sm'
-                }`}
-              >
-                <CreditCardIcon className="w-5 h-5" />
-                멤버십 구독 정보
-              </button>
-            </div>
-
-            <div className="px-4 mt-6">
-              <a 
-                href="http://www.gasupport.co.kr/Gasys/mega/inc/pop_insuCon.asp" 
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group flex items-center gap-4 px-5 py-4 bg-gradient-to-br from-gray-900 to-gray-800 rounded-2xl shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all text-white border border-gray-700/50"
-              >
-                <div className="p-2.5 bg-white/10 rounded-xl group-hover:bg-white/20 transition-colors">
-                  <GlobeAltIcon className="w-5 h-5 text-primary-300" />
-                </div>
-                <div>
-                  <p className="text-xs font-black text-primary-200 tracking-widest uppercase mb-0.5">Insurance Hub</p>
-                  <p className="text-sm font-black text-white">전보험사 바로가기</p>
-                </div>
-              </a>
-            </div>
-
-            <div className="pt-6 border-t border-gray-100 mt-6 space-y-1">
+            {/* Footer actions */}
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-2 space-y-0.5">
               {planner?.id && (
                 <Link
                   href={`/p/${planner.id}`}
                   target="_blank"
-                  className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl font-bold text-gray-500 hover:bg-primary-50 hover:text-primary-600 transition-all text-sm whitespace-nowrap"
+                  className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-semibold text-gray-500 hover:bg-primary-50 hover:text-primary-600 transition-all text-sm"
                 >
-                  <ArrowRightOnRectangleIcon className="w-5 h-5 rotate-180" />
+                  <ArrowRightOnRectangleIcon className="w-4 h-4 rotate-180 shrink-0" />
                   본인 사이트 보러가기
                 </Link>
               )}
               <button
                 onClick={handleLogout}
-                className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl font-bold text-rose-500 hover:bg-rose-50 transition-all text-sm whitespace-nowrap"
+                className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-semibold text-rose-500 hover:bg-rose-50 transition-all text-sm"
               >
-                <ArrowRightOnRectangleIcon className="w-5 h-5" />
-                시스템 로그아웃
+                <ArrowRightOnRectangleIcon className="w-4 h-4 shrink-0" />
+                로그아웃
               </button>
             </div>
+
           </aside>
 
           {/* Main Content Area */}
@@ -663,157 +1086,147 @@ export default function DashboardPage() {
                     <h3 className="text-2xl font-black text-gray-900">명함 정보 만들기</h3>
                   </div>
 
-                  <div className="grid md:grid-cols-2 gap-12">
-                    <div className="space-y-6">
-                      <div className="grid grid-cols-1 gap-6">
-                        <div>
-                          <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1 mb-2">성함</label>
-                          <input
-                            type="text"
-                            value={editName}
-                            onChange={(e) => setEditName(e.target.value)}
-                            placeholder="성함을 입력하세요"
-                            className="w-full px-5 py-4 bg-gray-50 border border-transparent rounded-2xl focus:bg-white focus:border-primary-500 transition-all outline-none text-sm font-bold shadow-inner"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1 mb-2">소속 (회사명)</label>
-                          <input
-                            type="text"
-                            value={editAffiliation}
-                            onChange={(e) => setEditAffiliation(e.target.value)}
-                            placeholder="예: 삼성생명 / 메리츠화재"
-                            className="w-full px-5 py-4 bg-gray-50 border border-transparent rounded-2xl focus:bg-white focus:border-primary-500 transition-all outline-none text-sm font-bold shadow-inner"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1 mb-2">활동 지역 / 주소</label>
-                          <input
-                            type="text"
-                            value={editRegion}
-                            onChange={(e) => setEditRegion(e.target.value)}
-                            placeholder="예: 서울 강남구 / 전국 상담 가능"
-                            className="w-full px-5 py-4 bg-gray-50 border border-transparent rounded-2xl focus:bg-white focus:border-primary-500 transition-all outline-none text-sm font-bold shadow-inner"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1 mb-2">연락처</label>
-                          <input
-                            type="text"
-                            value={editPhone}
-                            onChange={(e) => setEditPhone(e.target.value)}
-                            className="w-full px-5 py-4 bg-gray-50 border border-transparent rounded-2xl focus:bg-white focus:border-primary-500 transition-all outline-none text-sm font-bold shadow-inner"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1 mb-2">설계사 한마디 (랜딩 페이지 인사말)</label>
-                          <textarea
-                            rows={3}
-                            value={editMessage}
-                            onChange={(e) => setEditMessage(e.target.value)}
-                            placeholder="정직하게 분석하고 고객님의 소중한 보험료를 아껴드립니다."
-                            className="w-full px-5 py-4 bg-gray-50 border border-transparent rounded-2xl focus:bg-white focus:border-primary-500 transition-all outline-none text-sm font-bold shadow-inner resize-none leading-relaxed"
-                          />
-                        </div>
+                  {/* 1. Profile Photo - resume style, bigger */}
+                  <div className="mb-8">
+                    <h4 className="text-xs font-black text-gray-400 uppercase tracking-widest mb-4 flex items-center gap-2">
+                      <UserCircleIcon className="w-4 h-4 text-primary-500" />
+                      프로필 사진
+                    </h4>
+                    <div className="flex items-center gap-6">
+                      <div className="relative group">
+                        <input type="file" accept="image/*" onChange={(e) => handleFileUpload(e, 'profile')} className="hidden" id="card-profile-upload" />
+                        <label htmlFor="card-profile-upload" className="w-36 h-44 bg-gray-50 rounded-2xl border-2 border-dashed border-gray-200 flex flex-col items-center justify-center text-gray-400 hover:border-primary-300 transition-all cursor-pointer overflow-hidden relative shadow-sm">
+                          {planner?.profile_image_url ? (
+                            <img src={planner.profile_image_url} alt="Profile" className="w-full h-full object-cover" />
+                          ) : (
+                            <div className="text-center p-3">
+                              <UserCircleIcon className="w-14 h-14 mx-auto opacity-20 mb-2" />
+                              <p className="text-xs font-bold">사진 업로드</p>
+                            </div>
+                          )}
+                          <div className="absolute inset-0 bg-primary-600/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white text-sm font-bold backdrop-blur-sm rounded-2xl">
+                            변경
+                          </div>
+                        </label>
                       </div>
+                      <div className="text-sm text-gray-500">
+                        <p className="font-bold text-gray-700 mb-1">프로필 사진을 업로드하세요</p>
+                        <p className="text-xs text-gray-400 leading-relaxed">이력서용 증명사진이나 신뢰감을 주는 사진을 추천합니다.<br/>명함 URL 공유 시 이 사진이 미리보기에 표시됩니다.</p>
+                      </div>
+                    </div>
+                  </div>
 
+                  {/* 2. 성함 / 소속 */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                    <div>
+                      <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1 mb-2">성함</label>
+                      <input type="text" value={editName} onChange={(e) => setEditName(e.target.value)} placeholder="성함을 입력하세요" className="w-full px-5 py-4 bg-gray-50 border border-transparent rounded-2xl focus:bg-white focus:border-primary-500 transition-all outline-none text-sm font-bold shadow-inner" />
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1 mb-2">소속 (회사명)</label>
+                      <input type="text" value={editAffiliation} onChange={(e) => setEditAffiliation(e.target.value)} placeholder="예: 삼성생명 / 메리츠화재" className="w-full px-5 py-4 bg-gray-50 border border-transparent rounded-2xl focus:bg-white focus:border-primary-500 transition-all outline-none text-sm font-bold shadow-inner" />
+                    </div>
+                  </div>
+
+                  {/* 3. 활동지역 / 연락처 */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                    <div>
+                      <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1 mb-2">활동 지역 / 주소</label>
+                      <input type="text" value={editRegion} onChange={(e) => setEditRegion(e.target.value)} placeholder="예: 서울 강남구 / 전국 상담 가능" className="w-full px-5 py-4 bg-gray-50 border border-transparent rounded-2xl focus:bg-white focus:border-primary-500 transition-all outline-none text-sm font-bold shadow-inner" />
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1 mb-2">연락처</label>
+                      <input type="text" value={editPhone} onChange={(e) => setEditPhone(e.target.value)} className="w-full px-5 py-4 bg-gray-50 border border-transparent rounded-2xl focus:bg-white focus:border-primary-500 transition-all outline-none text-sm font-bold shadow-inner" />
+                    </div>
+                  </div>
+
+                  {/* 4. 설계사 한마디 */}
+                  <div className="mb-6">
+                    <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1 mb-2">설계사 한마디 (인사말)</label>
+                    <input type="text" value={editMessage} onChange={(e) => setEditMessage(e.target.value)} placeholder="정직하게 분석하고 고객님의 소중한 보험료를 아껴드립니다." className="w-full px-5 py-4 bg-gray-50 border border-transparent rounded-2xl focus:bg-white focus:border-primary-500 transition-all outline-none text-sm font-bold shadow-inner" />
+                  </div>
+
+                  {/* 5. 카카오톡 오픈채팅 주소 */}
+                  <div className="mb-8">
+                    <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1 mb-2">카카오톡 오픈채팅 주소</label>
+                    <input type="text" value={editKakaoUrl} onChange={(e) => setEditKakaoUrl(e.target.value)} placeholder="https://open.kakao.com/o/..." className="w-full px-5 py-4 bg-gray-50 border border-transparent rounded-2xl focus:bg-white focus:border-primary-500 transition-all outline-none text-sm font-bold shadow-inner" />
+                  </div>
+
+                  {/* Save Button */}
+                  <button
+                    onClick={updateProfile}
+                    disabled={isSaving}
+                    className="w-full bg-primary-600 text-white px-8 py-5 rounded-2xl font-black text-lg hover:bg-primary-700 transition-all shadow-xl shadow-primary-200 hover:shadow-primary-300 disabled:opacity-50 disabled:cursor-not-allowed group flex items-center justify-center gap-2"
+                  >
+                    {isSaving ? '정보 저장 중...' : '명함 정보 저장하기'}
+                    <ArrowRightOnRectangleIcon className="w-5 h-5 group-hover:translate-x-1 transition-transform rotate-180" />
+                  </button>
+                </div>
+
+                {/* 6. Business Card Upload - landscape, separate card */}
+                <div className="bg-white rounded-[2rem] shadow-xl p-8 border border-gray-100">
+                  <h4 className="text-xs font-black text-gray-400 uppercase tracking-widest mb-4 flex items-center gap-2">
+                    <IdentificationIcon className="w-4 h-4 text-primary-500" />
+                    실제 명함 업로드
+                  </h4>
+                  <div className="relative group max-w-lg">
+                    <input type="file" accept="image/*" onChange={(e) => handleFileUpload(e, 'card')} className="hidden" id="card-card-upload" />
+                    <label htmlFor="card-card-upload" className="block aspect-[9/5] bg-gray-50 rounded-2xl border-2 border-dashed border-gray-200 flex flex-col items-center justify-center text-gray-400 hover:border-primary-300 transition-all cursor-pointer overflow-hidden relative shadow-sm">
+                      {planner?.business_card_url ? (
+                        <img src={planner.business_card_url} alt="Card" className="w-full h-full object-cover" />
+                      ) : (
+                        <div className="text-center p-6">
+                          <IdentificationIcon className="w-12 h-12 mx-auto opacity-20 mb-3" />
+                          <p className="text-sm font-bold text-gray-400">실제 명함 이미지를 업로드하세요</p>
+                          <p className="text-xs text-gray-300 mt-1">가로 형태의 명함 이미지를 권장합니다</p>
+                        </div>
+                      )}
+                      <div className="absolute inset-0 bg-primary-600/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white text-sm font-bold backdrop-blur-sm rounded-2xl">
+                        이미지 변경
+                      </div>
+                    </label>
+                  </div>
+                </div>
+
+                {/* Card URL Section */}
+                <div className="bg-primary-900 rounded-[2rem] p-8 text-white shadow-2xl relative overflow-hidden">
+                  <div className="absolute top-0 right-0 -mr-8 -mt-8 w-32 h-32 bg-primary-600 rounded-full opacity-20 blur-2xl"></div>
+                  <h4 className="text-sm font-black mb-2 flex items-center gap-2">
+                    내 명함 주소 (랜딩 페이지)
+                  </h4>
+                  <p className="text-xs text-primary-200 mb-6 italic opacity-80">고객들에게 공유할 설계사님만의 고유 페이지입니다.</p>
+                  <div className="flex flex-col gap-3">
+                    <div className="flex items-center gap-2">
+                      <div className="flex-1 bg-white/10 backdrop-blur-md rounded-xl p-3 border border-white/10 font-mono text-xs truncate">
+                        stroy.kr/p/{planner?.id}/card
+                      </div>
                       <button
-                        onClick={updateProfile}
-                        disabled={isSaving}
-                        className="w-full bg-primary-600 text-white px-8 py-5 rounded-2xl font-black text-lg hover:bg-primary-700 transition-all shadow-xl shadow-primary-200 hover:shadow-primary-300 disabled:opacity-50 disabled:cursor-not-allowed group flex items-center justify-center gap-2"
+                        onClick={() => planner?.id && handleCopyUrl(planner.id)}
+                        className={`shrink-0 p-3 rounded-xl border border-white/20 transition-all flex items-center justify-center gap-2 font-bold text-xs ${
+                          urlCopied ? 'bg-green-500 text-white border-green-400' : 'bg-white/10 text-white hover:bg-white/20'
+                        }`}
                       >
-                        {isSaving ? '정보 저장 중...' : '명함 정보 저장하기'}
-                        <ArrowRightOnRectangleIcon className="w-5 h-5 group-hover:translate-x-1 transition-transform rotate-180" />
+                        {urlCopied ? (
+                          <>
+                            <CheckIcon className="w-4 h-4" />
+                            복사됨
+                          </>
+                         ) : (
+                          <>
+                            <ShareIcon className="w-4 h-4" />
+                            주소 복사
+                          </>
+                        )}
                       </button>
                     </div>
-
-                    <div className="space-y-8">
-                       <div className="bg-gray-50 rounded-[2rem] p-8 border border-gray-100">
-                         <h4 className="text-xs font-black text-gray-800 uppercase tracking-widest mb-6 flex items-center gap-2">
-                           <CloudArrowUpIcon className="w-4 h-4 text-primary-500" />
-                           프로필 이미지 & 명함 등록
-                         </h4>
-                         <div className="grid grid-cols-2 gap-6">
-                           <div className="relative group">
-                             <input type="file" accept="image/*" onChange={(e) => handleFileUpload(e, 'profile')} className="hidden" id="card-profile-upload" />
-                             <label htmlFor="card-profile-upload" className="aspect-[4/5] bg-white rounded-2xl border-2 border-dashed border-gray-200 flex flex-col items-center justify-center text-gray-400 hover:bg-white hover:border-primary-300 transition-all gap-2 cursor-pointer overflow-hidden relative shadow-sm">
-                               {planner?.profile_image_url ? (
-                                 <img src={planner.profile_image_url} alt="Profile" className="w-full h-full object-cover" />
-                               ) : (
-                                 <div className="text-center p-4">
-                                   <UserCircleIcon className="w-10 h-10 mx-auto opacity-20 mb-2" />
-                                   <p className="text-[10px] font-bold leading-tight">프로필 사진<br/>업로드</p>
-                                 </div>
-                               )}
-                               <div className="absolute inset-0 bg-primary-600/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white text-xs font-bold backdrop-blur-sm">
-                                 이미지 변경
-                               </div>
-                             </label>
-                           </div>
-
-                           <div className="relative group">
-                             <input type="file" accept="image/*" onChange={(e) => handleFileUpload(e, 'card')} className="hidden" id="card-card-upload" />
-                             <label htmlFor="card-card-upload" className="aspect-[4/5] bg-white rounded-2xl border-2 border-dashed border-gray-200 flex flex-col items-center justify-center text-gray-400 hover:bg-white hover:border-primary-300 transition-all gap-2 cursor-pointer overflow-hidden relative shadow-sm">
-                               {planner?.business_card_url ? (
-                                 <img src={planner.business_card_url} alt="Card" className="w-full h-full object-cover" />
-                               ) : (
-                                 <div className="text-center p-4">
-                                   <IdentificationIcon className="w-10 h-10 mx-auto opacity-20 mb-2" />
-                                   <p className="text-[10px] font-bold leading-tight">실제 명함<br/>업로드</p>
-                                 </div>
-                               )}
-                               <div className="absolute inset-0 bg-primary-600/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white text-xs font-bold backdrop-blur-sm">
-                                 이미지 변경
-                               </div>
-                             </label>
-                           </div>
-                         </div>
-                         <p className="mt-6 text-[11px] text-gray-400 font-bold leading-relaxed">
-                            💡 명함이나 신뢰감을 주는 프로필 사진을 등록하면 상담 전환율이 높아집니다.
-                         </p>
-                       </div>
-
-                       <div className="bg-primary-900 rounded-[2rem] p-8 text-white shadow-2xl relative overflow-hidden">
-                         <div className="absolute top-0 right-0 -mr-8 -mt-8 w-32 h-32 bg-primary-600 rounded-full opacity-20 blur-2xl"></div>
-                         <h4 className="text-sm font-black mb-2 flex items-center gap-2">
-                           내 명함 주소 (랜딩 페이지)
-                         </h4>
-                         <p className="text-xs text-primary-200 mb-6 italic opacity-80">고객들에게 공유할 설계사님만의 고유 페이지입니다.</p>
-                         <div className="flex flex-col gap-3">
-                           <div className="flex items-center gap-2">
-                             <div className="flex-1 bg-white/10 backdrop-blur-md rounded-xl p-3 border border-white/10 font-mono text-xs truncate">
-                               stroy.kr/p/{planner?.id}/card
-                             </div>
-                             <button
-                               onClick={() => planner?.id && handleCopyUrl(planner.id)}
-                               className={`shrink-0 p-3 rounded-xl border border-white/20 transition-all flex items-center justify-center gap-2 font-bold text-xs ${
-                                 urlCopied ? 'bg-green-500 text-white border-green-400' : 'bg-white/10 text-white hover:bg-white/20'
-                               }`}
-                             >
-                               {urlCopied ? (
-                                 <>
-                                   <CheckIcon className="w-4 h-4" />
-                                   복사됨
-                                 </>
-                                ) : (
-                                 <>
-                                   <ShareIcon className="w-4 h-4" />
-                                   주소 복사
-                                 </>
-                               )}
-                             </button>
-                           </div>
-                           <Link 
-                             href={`/p/${planner?.id}/card`} 
-                             target="_blank"
-                             className="w-full bg-white text-primary-900 py-3 rounded-xl font-black text-sm text-center hover:bg-primary-50 transition-all flex items-center justify-center gap-2"
-                           >
-                             <GlobeAltIcon className="w-4 h-4" />
-                             공개 페이지 확인하기
-                           </Link>
-                         </div>
-                       </div>
-                    </div>
+                    <Link 
+                      href={`/p/${planner?.id}/card`} 
+                      target="_blank"
+                      className="w-full bg-white text-primary-900 py-3 rounded-xl font-black text-sm text-center hover:bg-primary-50 transition-all flex items-center justify-center gap-2"
+                    >
+                      <GlobeAltIcon className="w-4 h-4" />
+                      공개 페이지 확인하기
+                    </Link>
                   </div>
                 </div>
               </div>
@@ -838,56 +1251,7 @@ export default function DashboardPage() {
               </div>
             )}
 
-            {/* Tab: Leads */}
-            {activeTab === 'leads' && (
-              <div className="space-y-6">
-                <div className="bg-white rounded-[2rem] shadow-xl overflow-hidden border border-gray-100">
-                  <div className="px-8 py-6 border-b border-gray-50 flex items-center justify-between">
-                    <h3 className="font-bold text-gray-900 text-xl">실시간 상담 신청 현황</h3>
-                    <span className="text-xs font-bold text-primary-600 bg-primary-50 px-3 py-1 rounded-full">{leads.length}건 접수</span>
-                  </div>
-                  <div className="overflow-x-auto">
-                    <table className="w-full">
-                      <thead>
-                        <tr className="bg-gray-50/50 text-left">
-                          <th className="px-8 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest">이름</th>
-                          <th className="px-8 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest">연락처</th>
-                          <th className="px-8 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest">신청 시각</th>
-                          <th className="px-8 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest text-right">명함 전송</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-gray-50">
-                        {leads.length === 0 ? (
-                          <tr>
-                            <td colSpan={3} className="px-8 py-12 text-center text-gray-400 font-medium">
-                              아직 접수된 상담 신청이 없습니다.
-                            </td>
-                          </tr>
-                        ) : (
-                          leads.map(l => (
-                            <tr key={l.id} className="hover:bg-gray-50/50 transition-colors">
-                              <td className="px-8 py-5 font-bold text-gray-900">{l.name}</td>
-                              <td className="px-8 py-5 text-gray-600 font-mono tracking-tight">{l.phone.replace(/(\d{3})(\d{4})(\d{4})/, '$1-$2-$3')}</td>
-                              <td className="px-8 py-5 text-gray-400 text-sm">{new Date(l.created_at).toLocaleString()}</td>
-                              <td className="px-8 py-5 text-right">
-                                <button 
-                                  onClick={() => shareCard(l.name, l.phone)}
-                                  className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-primary-50 text-primary-600 rounded-lg font-bold text-xs hover:bg-primary-100 transition-colors"
-                                  title="명함 메시지 복사"
-                                >
-                                  <ShareIcon className="w-4 h-4" />
-                                  전송
-                                </button>
-                              </td>
-                            </tr>
-                          ))
-                        )}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              </div>
-            )}
+
             {activeTab === 'customers' && (
               <div className="space-y-6">
                 <div className="bg-white rounded-[2rem] shadow-xl p-8 border border-gray-100">
@@ -991,7 +1355,8 @@ export default function DashboardPage() {
                           </tr>
                         ) : (
                           customers.map(c => (
-                            <tr key={c.id} className="hover:bg-gray-50/50 transition-colors group">
+                            <Fragment key={c.id}>
+                              <tr className="hover:bg-gray-50/50 transition-colors group">
                               {editingId === c.id ? (
                                 <>
                                   <td className="px-4 py-3">
@@ -1094,6 +1459,13 @@ export default function DashboardPage() {
                                       
                                       <div className="flex items-center gap-3 border-l border-gray-100 pl-6">
                                         <button 
+                                          onClick={() => toggleMemo(c)}
+                                          className={`${expandedMemoId === c.id ? 'text-primary-600' : 'text-gray-400'} hover:text-primary-600 transition-colors`}
+                                          title="메모 작성"
+                                        >
+                                          <ChatBubbleLeftEllipsisIcon className="w-5 h-5" />
+                                        </button>
+                                        <button 
                                           onClick={() => shareCard(c.name, c.phone)}
                                           className="text-gray-400 hover:text-primary-600 transition-colors"
                                           title="명함 메시지 복사"
@@ -1112,6 +1484,38 @@ export default function DashboardPage() {
                                 </>
                               )}
                             </tr>
+                            {expandedMemoId === c.id && (
+                              <tr className="bg-primary-50/30">
+                                <td colSpan={6} className="px-8 py-4">
+                                  <div className="flex flex-col gap-3">
+                                    <div className="flex items-center justify-between">
+                                      <span className="text-xs font-black text-primary-600 uppercase tracking-widest">고객 메모 ({c.name})</span>
+                                      <button 
+                                        onClick={() => setExpandedMemoId(null)}
+                                        className="text-[10px] font-bold text-gray-400 hover:text-gray-600"
+                                      >
+                                        닫기
+                                      </button>
+                                    </div>
+                                    <textarea
+                                      value={memoValue}
+                                      onChange={(e) => setMemoValue(e.target.value)}
+                                      placeholder="이 고객에 대한 메모를 입력하세요 (예: 가족관계, 관심 상품, 상담 특이사항 등)"
+                                      className="w-full h-24 p-4 text-sm border-0 focus:ring-2 focus:ring-primary-500 rounded-2xl bg-white shadow-sm resize-none"
+                                    />
+                                    <div className="flex justify-end">
+                                      <button 
+                                        onClick={() => saveMemo(c.id)}
+                                        className="px-6 py-2 bg-primary-600 text-white text-xs font-black rounded-xl shadow-lg shadow-primary-100 hover:bg-primary-700 transition-all"
+                                      >
+                                        메모 저장하기
+                                      </button>
+                                    </div>
+                                  </div>
+                                </td>
+                              </tr>
+                            )}
+                          </Fragment>
                           ))
                         )}
                       </tbody>
@@ -1124,94 +1528,133 @@ export default function DashboardPage() {
             {/* Tab: Calendar */}
             {activeTab === 'calendar' && (
               <div className="space-y-8">
-                {/* Calendar View */}
-                <div className="bg-white rounded-[2rem] shadow-xl p-8 border border-gray-100">
-                  <div className="flex items-center justify-between mb-8">
-                    <h3 className="text-2xl font-black text-gray-900">일정 관리</h3>
-                    <div className="flex items-center gap-4 bg-gray-50 p-2 rounded-2xl">
+                {/* Calendar View — 2 months */}
+                <div className="bg-white rounded-[2rem] shadow-xl p-6 md:p-8 border border-gray-100">
+                  {/* Header */}
+                  <div className="flex flex-col md:flex-row items-center justify-between gap-4 mb-6">
+                    <h3 className="text-xl md:text-2xl font-black text-gray-900">일정 관리</h3>
+                    <div className="flex items-center gap-3 bg-gray-50 p-2 rounded-2xl">
                       <button onClick={() => setCurrentMonth(subMonths(currentMonth, 1))} className="p-2 hover:bg-white rounded-xl transition-all shadow-sm">
                         <ChevronLeftIcon className="w-5 h-5" />
                       </button>
-                      <span className="font-bold text-lg min-w-[120px] text-center">{format(currentMonth, 'yyyy년 MM월')}</span>
+                      <span className="font-bold text-sm md:text-base min-w-[180px] text-center">
+                        {format(currentMonth, 'yyyy년 MM월')} – {format(addMonths(currentMonth, 1), 'MM월')}
+                      </span>
                       <button onClick={() => setCurrentMonth(addMonths(currentMonth, 1))} className="p-2 hover:bg-white rounded-xl transition-all shadow-sm">
                         <ChevronRightIcon className="w-5 h-5" />
                       </button>
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-7 border-t border-l border-gray-100">
-                    {['일', '월', '화', '수', '목', '금', '토'].map(day => (
-                      <div key={day} className="px-1 md:px-4 py-3 bg-gray-50/50 border-r border-b border-gray-100 text-center text-[10px] md:text-xs font-bold text-gray-400 uppercase tracking-widest">
-                        {day}
-                      </div>
-                    ))}
-                    {(() => {
-                      const monthStart = startOfMonth(currentMonth)
+                  {/* 2 calendars side by side */}
+                  <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+                    {[currentMonth, addMonths(currentMonth, 1)].map((monthRef, monthIdx) => {
+                      const monthStart = startOfMonth(monthRef)
                       const monthEnd = endOfMonth(monthStart)
                       const startDate = startOfWeek(monthStart)
                       const endDate = endOfWeek(monthEnd)
                       const calendarDays = eachDayOfInterval({ start: startDate, end: endDate })
 
-                      return calendarDays.map((day, i) => {
-                        const dayCustomers = customers.filter(c => {
-                          if (!c.appointment_at) return false
-                          const d = new Date(c.appointment_at)
-                          return !isNaN(d.getTime()) && isSameDay(d, day)
-                        })
+                      const MONTH_PASTELS = [
+                        // 인접 달(N, N+1)이 보색이 되도록 따뜻↔차가운 교차 배열
+                        'bg-rose-100',     // 1월 (빨강)
+                        'bg-sky-100',      // 2월 (파랑 — 빨강 보색)
+                        'bg-amber-100',    // 3월 (주황/노랑)
+                        'bg-violet-100',   // 4월 (보라 — 노랑 보색)
+                        'bg-lime-100',     // 5월 (연두)
+                        'bg-pink-100',     // 6월 (핑크 — 녹색 보색)
+                        'bg-cyan-100',     // 7월 (청록)
+                        'bg-orange-100',   // 8월 (주황 — 청록 보색)
+                        'bg-emerald-100',  // 9월 (초록)
+                        'bg-purple-100',   // 10월 (자주 — 초록 보색)
+                        'bg-yellow-100',   // 11월 (노랑)
+                        'bg-blue-100',     // 12월 (파랑 — 노랑 보색)
+                      ]
 
-                        const dayTodos = todos.filter(t => {
-                          const d = new Date(t.target_date)
-                          return !isNaN(d.getTime()) && isSameDay(d, day)
-                        })
+                      const getStripeMonth = (day: Date): number => {
+                        for (let offset = -1; offset <= 1; offset++) {
+                          const m = addMonths(monthStart, offset)
+                          const mStart = startOfMonth(m)
+                          const week2Start = startOfWeek(addDays(mStart, 7))
+                          const nextWeek2Start = startOfWeek(addDays(startOfMonth(addMonths(m, 1)), 7))
+                          if (day >= week2Start && day < nextWeek2Start) return m.getMonth()
+                        }
+                        return day.getMonth()
+                      }
 
-                        return (
-                          <div
-                            key={i}
-                            className={`min-h-[100px] md:min-h-[140px] p-1 md:p-2 border-r border-b border-gray-50 transition-all cursor-pointer ${
-                              !isSameMonth(day, monthStart) ? 'bg-gray-50/30 opacity-30 shadow-inner' : 
-                              isSameDay(day, new Date(todoDate)) ? 'bg-primary-50/50 ring-1 ring-inset ring-primary-200 z-10' :
-                              'bg-white hover:bg-gray-50/50'
-                            }`}
-                            onClick={() => {
-                              setTodoDate(format(day, 'yyyy-MM-dd'))
-                              if (window.innerWidth < 768) {
-                                todoSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-                              }
-                            }}
-                          >
-                            <span className={`text-[10px] md:text-xs font-bold ml-1 flex items-center justify-center w-5 h-5 md:w-6 md:h-6 rounded-full ${
-                              isSameDay(day, new Date()) ? 'bg-primary-600 text-white' : 
-                              isSameDay(day, new Date(todoDate)) ? 'bg-primary-100 text-primary-700' :
-                              'text-gray-400'
-                            }`}>
-                              {format(day, 'd')}
-                            </span>
-                            {/* Desktop View: Show detailed text */}
-                            <div className="mt-2 space-y-1 hidden md:block">
-                              {dayCustomers.map(cust => (
-                                <div key={cust.id} className="bg-primary-50 text-primary-700 px-2 py-1 rounded text-[10px] font-bold truncate border border-primary-100">
-                                  👤 {cust.name}
-                                </div>
-                              ))}
-                              {dayTodos.map(todo => (
-                                <div key={todo.id} className={`${todo.is_completed ? 'bg-gray-50 text-gray-400 line-through' : 'bg-amber-50 text-amber-700'} px-2 py-1 rounded text-[10px] font-black truncate border ${todo.is_completed ? 'border-gray-100' : 'border-amber-100'}`}>
-                                  📝 {todo.content}
-                                </div>
-                              ))}
-                            </div>
+                      return (
+                        <div key={monthIdx}>
+                          <p className="text-sm font-black text-gray-500 mb-2 text-center">{format(monthStart, 'yyyy년 MM월')}</p>
+                          <div className="grid grid-cols-7 border-t border-l border-gray-100 rounded-xl overflow-hidden">
+                            {['일', '월', '화', '수', '목', '금', '토'].map((day, idx) => (
+                              <div key={day} className={`px-1 py-2 bg-gray-50/50 border-r border-b border-gray-100 text-center text-[10px] font-bold uppercase tracking-widest ${idx === 0 ? 'text-rose-400' : 'text-gray-400'}`}>
+                                {day}
+                              </div>
+                            ))}
+                            {calendarDays.map((day, i) => {
+                              const dayCustomers = customers.filter(c => {
+                                if (!c.appointment_at) return false
+                                const d = new Date(c.appointment_at)
+                                return !isNaN(d.getTime()) && isSameDay(d, day)
+                              })
+                              const dayTodos = todos.filter(t => {
+                                const d = new Date(t.target_date)
+                                return !isNaN(d.getTime()) && isSameDay(d, day)
+                              })
+                              const isOutside = !isSameMonth(day, monthStart)
+                              const isSelected = isSameDay(day, new Date(todoDate))
+                              const isToday = isSameDay(day, new Date())
+                              const stripeColor = MONTH_PASTELS[getStripeMonth(day)]
+                              const holidayName = HOLIDAYS[format(day, 'yyyy-MM-dd')]
+                              const isSunday = getDay(day) === 0
+                              const isRedDay = !!holidayName || isSunday
 
-                            {/* Mobile View: Show simple checkmark indicator */}
-                            <div className="mt-1 flex flex-wrap gap-0.5 justify-center md:hidden">
-                              {(dayCustomers.length > 0 || dayTodos.length > 0) && (
-                                <div className="w-5 h-5 bg-primary-100 text-primary-700 rounded-lg flex items-center justify-center border border-primary-200">
-                                  <span className="text-[10px] font-black">✓</span>
+                              return (
+                                <div
+                                  key={i}
+                                  className={`min-h-[72px] md:min-h-[90px] p-1 border-r border-b border-gray-100 transition-all cursor-pointer relative ${
+                                    isOutside ? 'opacity-30' :
+                                    isSelected ? 'ring-1 ring-inset ring-primary-300 z-10' : ''
+                                  } ${isOutside ? 'bg-gray-50/30' : stripeColor}`}
+                                  onClick={() => {
+                                    setTodoDate(format(day, 'yyyy-MM-dd'))
+                                    todoSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+                                  }}
+                                >
+                                  <div className="flex flex-col items-center">
+                                    <span className={`text-[10px] font-bold flex items-center justify-center w-5 h-5 rounded-full ${
+                                      isToday ? 'bg-primary-600 text-white' :
+                                      isSelected ? 'bg-primary-100 text-primary-700' :
+                                      isRedDay ? 'text-rose-500' : 'text-gray-500'
+                                    }`}>
+                                      {format(day, 'd')}
+                                    </span>
+                                    {holidayName && (
+                                      <span className="text-[8px] font-black text-rose-400 mt-0.5 whitespace-nowrap">
+                                        {holidayName}
+                                      </span>
+                                    )}
+                                  </div>
+                                  <div className="mt-1 border-t border-gray-100/50" />
+                                  <div className="mt-1 space-y-0.5">
+                                    {dayCustomers.map(cust => (
+                                      <div key={cust.id} className="bg-primary-50 text-primary-700 px-1 py-0.5 rounded text-[9px] font-bold truncate border border-primary-100" title={cust.name}>
+                                        👤 <span className="hidden md:inline">{cust.name}</span>
+                                      </div>
+                                    ))}
+                                    {dayTodos.map(todo => (
+                                      <div key={todo.id} className={`${todo.is_completed ? 'bg-white/80 text-gray-400 line-through' : 'bg-white/90 text-amber-700'} px-1 py-0.5 rounded text-[9px] font-black truncate border ${todo.is_completed ? 'border-gray-100' : 'border-amber-100'}`} title={todo.content}>
+                                        📝 <span className="hidden md:inline">{todo.content}</span>
+                                      </div>
+                                    ))}
+                                  </div>
                                 </div>
-                              )}
-                            </div>
+                              )
+                            })}
                           </div>
-                        )
-                      })
-                    })()}
+                        </div>
+                      )
+                    })}
                   </div>
                 </div>
 
@@ -1376,11 +1819,462 @@ export default function DashboardPage() {
               </div>
             )}
 
+            {/* Tab: 상담 알림 / 현황 (통합) */}
+            {activeTab === 'notification' && (
+              <div className="space-y-6">
+                {/* Push Notification Toggle */}
+                <div className="bg-white rounded-[2rem] shadow-xl p-8 border border-gray-100">
+                  <div className="flex items-center gap-3 mb-2">
+                    <div className="w-10 h-10 bg-blue-100 rounded-2xl flex items-center justify-center text-blue-600">
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0" /></svg>
+                    </div>
+                    <h3 className="text-2xl font-black text-gray-900">브라우저 푸시 알림</h3>
+                  </div>
+                  <p className="text-sm text-gray-500 font-medium mb-6 ml-[52px]">
+                    상담 신청이 들어오면 브라우저 알림으로 실시간 알려드립니다.
+                  </p>
+
+                  <div className="flex items-center justify-between p-5 bg-gray-50 rounded-2xl border border-gray-100">
+                    <div>
+                      <p className="font-bold text-gray-900 text-sm">푸시 알림 {pushEnabled ? '활성화됨 ✅' : '비활성화됨'}</p>
+                      <p className="text-xs text-gray-500 mt-1">{pushEnabled ? '이 브라우저에서 알림을 받고 있습니다.' : '알림을 켜면 상담 접수 시 바로 알림을 받을 수 있습니다.'}</p>
+                    </div>
+                    <button
+                      onClick={async () => {
+                        if (!planner) return
+                        setPushLoading(true)
+                        try {
+                          if (pushEnabled) {
+                            const registration = await navigator.serviceWorker.ready
+                            const subscription = await registration.pushManager.getSubscription()
+                            if (subscription) {
+                              await fetch('/api/push-subscribe', {
+                                method: 'DELETE',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ endpoint: subscription.endpoint })
+                              })
+                              await subscription.unsubscribe()
+                            }
+                            setPushEnabled(false)
+                          } else {
+                            const permission = await Notification.requestPermission()
+                            if (permission !== 'granted') {
+                              alert('알림 권한을 허용해주세요. 브라우저 설정에서 이 사이트의 알림을 허용해주세요.')
+                              setPushLoading(false)
+                              return
+                            }
+                            const registration = await navigator.serviceWorker.ready
+                            const subscription = await registration.pushManager.subscribe({
+                              userVisibleOnly: true,
+                              applicationServerKey: process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY
+                            })
+                            await fetch('/api/push-subscribe', {
+                              method: 'POST',
+                              headers: { 'Content-Type': 'application/json' },
+                              body: JSON.stringify({
+                                planner_id: planner.id,
+                                subscription: subscription.toJSON()
+                              })
+                            })
+                            setPushEnabled(true)
+                          }
+                        } catch (err) {
+                          console.error('Push toggle error:', err)
+                          alert('푸시 알림 설정 중 오류가 발생했습니다.')
+                        }
+                        setPushLoading(false)
+                      }}
+                      disabled={pushLoading}
+                      className={`px-6 py-3 rounded-2xl font-bold text-sm transition-all whitespace-nowrap disabled:opacity-50 ${
+                        pushEnabled
+                          ? 'bg-red-50 text-red-600 border border-red-100 hover:bg-red-100'
+                          : 'bg-primary-600 text-white shadow-lg shadow-primary-200 hover:bg-primary-700'
+                      }`}
+                    >
+                      {pushLoading ? '처리 중...' : pushEnabled ? '알림 끄기' : '🔔 알림 켜기'}
+                    </button>
+                  </div>
+                </div>
+
+                {/* Full Consultation List */}
+                <div className="bg-white rounded-[2rem] shadow-xl overflow-hidden border border-gray-100">
+                  <div className="px-8 py-6 border-b border-gray-50 flex items-center justify-between">
+                    <h3 className="font-bold text-gray-900 text-xl">실시간 상담 신청 현황</h3>
+                    <span className="text-xs font-bold text-primary-600 bg-primary-50 px-3 py-1 rounded-full">{leads.length}건 접수</span>
+                  </div>
+                  <div className="overflow-x-auto">
+                    <table className="w-full">
+                      <thead>
+                        <tr className="bg-gray-50/50 text-left">
+                          <th className="px-8 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest">이름</th>
+                          <th className="px-8 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest">연락처</th>
+                          <th className="px-8 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest">신청 시각</th>
+                          <th className="px-8 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest text-right">명함 전송</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-gray-50">
+                        {leads.length === 0 ? (
+                          <tr>
+                            <td colSpan={4} className="px-8 py-12 text-center text-gray-400 font-medium">
+                              아직 접수된 상담 신청이 없습니다.
+                            </td>
+                          </tr>
+                        ) : (
+                          leads.map(l => {
+                            const isNew = lastSeenAt ? new Date(l.created_at) > new Date(lastSeenAt) : false
+                            return (
+                              <tr key={l.id} className={`transition-colors ${isNew ? 'bg-primary-50/50' : 'hover:bg-gray-50/50'}`}>
+                                <td className="px-8 py-5 font-bold text-gray-900">
+                                  <div className="flex items-center gap-2">
+                                    {isNew && <span className="w-2 h-2 bg-primary-500 rounded-full animate-pulse shrink-0" />}
+                                    {l.name}
+                                  </div>
+                                </td>
+                                <td className="px-8 py-5 text-gray-600 font-mono tracking-tight">{l.phone.replace(/(\d{3})(\d{4})(\d{4})/, '$1-$2-$3')}</td>
+                                <td className="px-8 py-5 text-gray-400 text-sm">{new Date(l.created_at).toLocaleString()}</td>
+                                <td className="px-8 py-5 text-right">
+                                  <button 
+                                    onClick={() => shareCard(l.name, l.phone)}
+                                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-primary-50 text-primary-600 rounded-lg font-bold text-xs hover:bg-primary-100 transition-colors"
+                                    title="명함 메시지 복사"
+                                  >
+                                    <ShareIcon className="w-4 h-4" />
+                                    전송
+                                  </button>
+                                </td>
+                              </tr>
+                            )
+                          })
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            )}
+
+
+            {/* Tab: 사용 가이드 */}
+            {activeTab === 'guide' && (
+              <div className="space-y-6">
+                <div className="bg-white rounded-[2rem] shadow-xl p-8 border border-gray-100">
+                  <div className="flex items-center gap-3 mb-2">
+                    <div className="w-10 h-10 bg-indigo-100 rounded-2xl flex items-center justify-center text-indigo-600 text-xl">📖</div>
+                    <h3 className="text-2xl font-black text-gray-900">보험다이어트 사용 가이드</h3>
+                  </div>
+                  <p className="text-sm text-gray-500 font-medium mb-8 ml-[52px]">
+                    디지털 명함부터 상담 관리까지, 보험다이어트 플랫폼 활용법을 안내합니다.
+                  </p>
+
+                  <div className="space-y-8">
+                    {/* Step 1 */}
+                    <div className="flex gap-5">
+                      <div className="w-10 h-10 bg-primary-600 text-white rounded-2xl flex items-center justify-center font-black text-lg shrink-0">1</div>
+                      <div>
+                        <h4 className="font-black text-gray-900 text-lg mb-2">내 프로필 관리</h4>
+                        <p className="text-sm text-gray-600 leading-relaxed mb-3">
+                          <strong>내 프로필 관리</strong> 메뉴에서 이름, 소속, 지역, 연락처, 카카오톡 오픈채팅 주소를 입력해주세요.
+                          여기에 입력한 정보가 디지털 명함에 표시됩니다.
+                        </p>
+                        <div className="bg-amber-50 border border-amber-100 rounded-xl p-3 text-xs text-amber-800 font-medium">
+                          💡 카카오톡 오픈채팅방을 만든 후 주소를 넣으면, 고객이 명함에서 바로 카톡 상담을 요청할 수 있습니다.
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Step 2 */}
+                    <div className="flex gap-5">
+                      <div className="w-10 h-10 bg-primary-600 text-white rounded-2xl flex items-center justify-center font-black text-lg shrink-0">2</div>
+                      <div>
+                        <h4 className="font-black text-gray-900 text-lg mb-2">디지털 명함 만들기</h4>
+                        <p className="text-sm text-gray-600 leading-relaxed mb-3">
+                          <strong>명함 만들기</strong> 메뉴에서 프로필 사진과 명함 이미지를 업로드하세요.
+                          업로드 후 나만의 디지털 명함 URL이 생성됩니다.
+                        </p>
+                        <div className="bg-blue-50 border border-blue-100 rounded-xl p-3 text-xs text-blue-800 font-medium">
+                          📱 명함 URL을 카카오톡, 문자, SNS 등에 공유하면 고객이 내 명함을 확인할 수 있습니다.
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Step 3 */}
+                    <div className="flex gap-5">
+                      <div className="w-10 h-10 bg-primary-600 text-white rounded-2xl flex items-center justify-center font-black text-lg shrink-0">3</div>
+                      <div>
+                        <h4 className="font-black text-gray-900 text-lg mb-2">명함 공유 & 상담 접수</h4>
+                        <p className="text-sm text-gray-600 leading-relaxed">
+                          고객이 명함에서 <strong>무료 상담 신청</strong>을 하면, 자동으로 <strong>상담 알림 / 현황</strong>에 접수됩니다.
+                          접수된 고객의 이름과 전화번호를 확인하고 바로 연락하세요.
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Step 4 */}
+                    <div className="flex gap-5">
+                      <div className="w-10 h-10 bg-primary-600 text-white rounded-2xl flex items-center justify-center font-black text-lg shrink-0">4</div>
+                      <div>
+                        <h4 className="font-black text-gray-900 text-lg mb-2">🔔 브라우저 푸시 알림 설정</h4>
+                        <p className="text-sm text-gray-600 leading-relaxed mb-3">
+                          <strong>상담 알림 / 현황</strong> 메뉴에서 <strong>알림 켜기</strong> 버튼을 클릭하면,
+                          상담 신청이 들어올 때 브라우저에서 실시간 알림을 받을 수 있습니다.
+                        </p>
+                        <div className="bg-green-50 border border-green-100 rounded-xl p-3 text-xs text-green-800 font-medium">
+                          ✅ 알림을 켜면 브라우저를 닫아도 새 상담이 접수될 때 바로 알림이 뜹니다!
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Step 5 */}
+                    <div className="flex gap-5">
+                      <div className="w-10 h-10 bg-primary-600 text-white rounded-2xl flex items-center justify-center font-black text-lg shrink-0">5</div>
+                      <div>
+                        <h4 className="font-black text-gray-900 text-lg mb-2">고객 관리</h4>
+                        <p className="text-sm text-gray-600 leading-relaxed">
+                          <strong>내 고객 직접 등록</strong> 메뉴에서 기존 고객 정보를 직접 입력하고 관리할 수 있습니다.
+                          고객명, 전화번호, 메모를 입력하면 고객 목록이 만들어집니다.
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Step 6 */}
+                    <div className="flex gap-5">
+                      <div className="w-10 h-10 bg-primary-600 text-white rounded-2xl flex items-center justify-center font-black text-lg shrink-0">6</div>
+                      <div>
+                        <h4 className="font-black text-gray-900 text-lg mb-2">일정 관리 (달력)</h4>
+                        <p className="text-sm text-gray-600 leading-relaxed">
+                          달력에서 날짜를 선택하고 할 일을 추가해보세요.
+                          상담 일정, 미팅, 계약 예정 등을 효율적으로 관리할 수 있습니다.
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Step 7 */}
+                    <div className="flex gap-5">
+                      <div className="w-10 h-10 bg-primary-600 text-white rounded-2xl flex items-center justify-center font-black text-lg shrink-0">7</div>
+                      <div>
+                        <h4 className="font-black text-gray-900 text-lg mb-2">보험 도구 활용</h4>
+                        <p className="text-sm text-gray-600 leading-relaxed mb-3">
+                          디지털 명함에는 고객이 직접 사용할 수 있는 보험 도구가 포함되어 있습니다:
+                        </p>
+                        <ul className="space-y-2 text-sm text-gray-600">
+                          <li className="flex items-start gap-2"><span className="text-primary-600 font-bold mt-0.5">•</span>보험료 계산기 — 암/뇌/심장 예상 보험료 산출</li>
+                          <li className="flex items-start gap-2"><span className="text-primary-600 font-bold mt-0.5">•</span>실비 계산기 — 실손보험 환급 금액 시뮬레이션</li>
+                          <li className="flex items-start gap-2"><span className="text-primary-600 font-bold mt-0.5">•</span>5세대 실손 가이드 — 5세대 실손보험 전환 안내</li>
+                          <li className="flex items-start gap-2"><span className="text-primary-600 font-bold mt-0.5">•</span>질병코드 검색 — 산정특례/중증질환 질병코드 조회</li>
+                          <li className="flex items-start gap-2"><span className="text-primary-600 font-bold mt-0.5">•</span>암 치료비 가이드 — 암 종류별 실제 치료비 정보</li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Quick Tips */}
+                <div className="bg-gradient-to-br from-primary-600 to-primary-700 rounded-[2rem] shadow-xl p-8 text-white">
+                  <h4 className="font-black text-lg mb-4">💡 활용 팁</h4>
+                  <div className="space-y-3 text-sm font-medium text-white/90">
+                    <p>• 명함 URL을 카카오톡 프로필에 링크로 걸어두세요.</p>
+                    <p>• 고객 상담 후 <strong>내 고객 직접 등록</strong>에서 고객 정보를 기록해두세요.</p>
+                    <p>• 달력에 팔로업 일정을 등록하면 고객 관리가 쉬워집니다.</p>
+                    <p>• 상담 신청이 들어오면 30분 이내에 연락하세요 — 계약 확률이 높아집니다!</p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Tab: Referrals */}
+            {activeTab === 'referrals' && (
+              <div className="space-y-6">
+                {/* Referral Link & Code Card */}
+                <div className="bg-white rounded-[2rem] shadow-xl p-8 border border-gray-100 flex flex-col md:flex-row items-center gap-8">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-3 mb-4">
+                      <div className="w-10 h-10 bg-rose-100 rounded-2xl flex items-center justify-center text-rose-600">
+                        <GiftIcon className="w-6 h-6" />
+                      </div>
+                      <h3 className="text-2xl font-black text-gray-900">내 친구추천 링크 공유하기</h3>
+                    </div>
+                    <p className="text-sm text-gray-500 font-medium mb-6">
+                      내 추천 링크로 신규 설계사가 가입하거나, 일반 고객이 무료 상담을 신청하면 포인트가 적립됩니다!
+                    </p>
+                    
+                    <div className="p-4 bg-gray-50 border border-gray-100 rounded-2xl flex items-center gap-4">
+                      <div className="flex-1 font-mono text-sm tracking-tight text-gray-700 font-bold truncate">
+                        https://stroy.kr/?ref={planner?.referral_code || 'CODE'}
+                      </div>
+                      <button
+                        onClick={() => {
+                          navigator.clipboard.writeText(`https://stroy.kr/?ref=${planner?.referral_code || ''}`);
+                          alert('추천 링크가 복사되었습니다!');
+                        }}
+                        className="px-6 py-2.5 bg-primary-600 hover:bg-primary-700 text-white font-black text-sm rounded-xl shadow-md transition-all whitespace-nowrap"
+                      >
+                        링크 복사
+                      </button>
+                    </div>
+                  </div>
+                  
+                  {/* Summary Box */}
+                  <div className="w-full md:w-64 bg-rose-50 border border-rose-100 rounded-[2rem] p-6 text-center shadow-inner shrink-0">
+                    <p className="text-[10px] font-black tracking-widest uppercase text-rose-400 mb-2">총 누적/적립 포인트</p>
+                    <p className="text-3xl font-black text-rose-600">
+                      {referrals.filter(r => r.status === 'APPROVED' || r.status === 'PAID').reduce((acc, curr) => acc + curr.reward_amount, 0).toLocaleString()} <span className="text-lg">P</span>
+                    </p>
+                    <p className="text-xs font-semibold text-rose-400 mt-2 bg-white/50 py-1 px-3 rounded-full inline-block">
+                      총 {referrals.length}건 추천완료
+                    </p>
+                  </div>
+                </div>
+
+                {/* Referral History List */}
+                <div className="bg-white rounded-[2rem] shadow-xl overflow-hidden border border-gray-100">
+                  <div className="px-8 py-6 border-b border-gray-50 flex items-center justify-between">
+                    <h3 className="font-bold text-gray-900 text-xl">나의 추천 이력</h3>
+                    <span className="text-xs font-bold text-gray-500 bg-gray-100 px-3 py-1 rounded-full">최근 순</span>
+                  </div>
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left">
+                      <thead>
+                        <tr className="bg-gray-50/50">
+                          <th className="px-8 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest whitespace-nowrap">신청일</th>
+                          <th className="px-8 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest whitespace-nowrap">추천 대상 (이름/연락처)</th>
+                          <th className="px-8 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest whitespace-nowrap">유형</th>
+                          <th className="px-8 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest whitespace-nowrap">적립 P</th>
+                          <th className="px-8 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest whitespace-nowrap text-right">상태</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-gray-50 text-sm">
+                        {referrals.length === 0 ? (
+                          <tr>
+                            <td colSpan={5} className="px-8 py-12 text-center text-gray-400 font-medium">
+                              아직 추천 이력이 없습니다.
+                            </td>
+                          </tr>
+                        ) : (
+                          referrals.map((ref) => (
+                            <tr key={ref.id} className="hover:bg-gray-50 transition-colors">
+                              <td className="px-8 py-5 text-gray-400 font-medium font-mono text-xs">
+                                {new Date(ref.created_at).toLocaleDateString()}
+                              </td>
+                              <td className="px-8 py-5">
+                                <span className="font-bold text-gray-900 mr-2">{ref.referee_name}</span>
+                                <span className="text-xs text-gray-400">{ref.referee_phone.replace(/(\d{3})(\d{4})(\d{4})/, '$1-$2-$3')}</span>
+                              </td>
+                              <td className="px-8 py-5">
+                                <span className={`px-2 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest ${
+                                  ref.referee_type === 'SIGNUP' ? 'bg-indigo-50 text-indigo-600' : 'bg-emerald-50 text-emerald-600'
+                                }`}>
+                                  {ref.referee_type === 'SIGNUP' ? '플래너 가입' : '무료 상담'}
+                                </span>
+                              </td>
+                              <td className="px-8 py-5 font-black text-rose-500">
+                                {ref.reward_amount > 0 ? `+${ref.reward_amount.toLocaleString()}` : '-'}
+                              </td>
+                              <td className="px-8 py-5 text-right">
+                                {ref.status === 'PENDING' && <span className="text-amber-500 font-bold text-xs bg-amber-50 px-3 py-1 rounded-full">심사중</span>}
+                                {ref.status === 'APPROVED' && <span className="text-emerald-500 font-bold text-xs bg-emerald-50 px-3 py-1 rounded-full">적립대기</span>}
+                                {ref.status === 'PAID' && <span className="text-primary-600 font-black text-xs bg-primary-50 px-3 py-1 rounded-full">지급완료</span>}
+                                {ref.status === 'REJECTED' && <span className="text-gray-400 font-bold text-xs bg-gray-100 px-3 py-1 rounded-full">반려됨</span>}
+                              </td>
+                            </tr>
+                          ))
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* ─── Chat Inbox ─── */}
+            {activeTab === 'chat' && (
+              <ChatInboxPanel plannerId={planner?.id || null} plannerName={planner?.name || '상담사'} />
+            )}
+
+            {/* ─── Free Board ─── */}
+            {activeTab === 'freeboard' && (
+              <BoardPage 
+                boardType="free" 
+                boardTitle="자유 게시판" 
+                boardDesc="보험, 재테크, 일상 이야기 등 자유롭게 공유하세요." 
+                accentColor="bg-primary-600" 
+                accentBubble="bg-primary-500"
+                isDashboard={true}
+              />
+            )}
+
           </div>
         </div>
       </div>
 
       <Footer />
+
+      {/* Mobile Bottom Navigation */}
+      <nav className="lg:hidden fixed bottom-0 left-0 right-0 bg-white/80 backdrop-blur-md border-t border-gray-100 px-3 py-3 flex items-center justify-between z-50 transition-all">
+        <button
+          onClick={() => handleTabChange('calendar')}
+          className={`flex flex-col items-center gap-1 transition-all ${
+            activeTab === 'calendar' ? 'text-primary-600 scale-110' : 'text-gray-400'
+          }`}
+        >
+          <CalendarIcon className="w-6 h-6" />
+          <span className="text-[10px] font-black">일정</span>
+        </button>
+
+        <button
+          onClick={() => handleTabChange('customers')}
+          className={`flex flex-col items-center gap-1 transition-all ${
+            activeTab === 'customers' ? 'text-primary-600 scale-110' : 'text-gray-400'
+          }`}
+        >
+          <UsersIcon className="w-6 h-6" />
+          <span className="text-[10px] font-black">고객</span>
+        </button>
+
+        <button
+          onClick={() => handleTabChange('freeboard')}
+          className={`flex flex-col items-center gap-1 transition-all ${
+            activeTab === 'freeboard' ? 'text-primary-600 scale-110' : 'text-gray-400'
+          }`}
+        >
+          <div className="relative">
+            <ChatBubbleLeftRightIcon className="w-6 h-6" />
+            {hasNewBoardPost && (
+              <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-rose-500 rounded-full border-2 border-white" />
+            )}
+          </div>
+          <span className="text-[10px] font-black">게시판</span>
+        </button>
+
+        <button
+          onClick={() => handleTabChange('card')}
+          className={`flex flex-col items-center gap-1 transition-all ${
+            activeTab === 'card' ? 'text-primary-600 scale-110' : 'text-gray-400'
+          }`}
+        >
+          <IdentificationIcon className="w-6 h-6" />
+          <span className="text-[10px] font-black">명함</span>
+        </button>
+
+        <button
+          onClick={() => handleTabChange('referrals')}
+          className={`flex flex-col items-center gap-1 transition-all ${
+            activeTab === 'referrals' ? 'text-primary-600 scale-110' : 'text-gray-400'
+          }`}
+        >
+          <GiftIcon className="w-6 h-6" />
+          <span className="text-[10px] font-black">리워드</span>
+        </button>
+
+        <button
+          onClick={() => handleTabChange('profile')}
+          className={`flex flex-col items-center gap-1 transition-all ${
+            activeTab === 'profile' ? 'text-primary-600 scale-110' : 'text-gray-400'
+          }`}
+        >
+          <UserCircleIcon className="w-6 h-6" />
+          <span className="text-[10px] font-black">설정</span>
+        </button>
+      </nav>
     </main>
   )
 }

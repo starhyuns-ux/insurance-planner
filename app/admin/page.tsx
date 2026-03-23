@@ -10,7 +10,8 @@ import {
   ChevronRightIcon,
   ArrowTopRightOnSquareIcon,
   ChartBarIcon,
-  CurrencyDollarIcon
+  CurrencyDollarIcon,
+  GiftIcon
 } from '@heroicons/react/24/outline'
 
 interface Planner {
@@ -20,18 +21,59 @@ interface Planner {
   affiliation: string
   region: string
   subscription_status: string
+  visit_count: number
   created_at: string
 }
 
+interface Referral {
+  id: string
+  referrer_id: string
+  referee_name: string
+  referee_phone: string
+  referee_type: 'CONSULTATION' | 'SIGNUP'
+  status: 'PENDING' | 'APPROVED' | 'PAID' | 'REJECTED'
+  reward_amount: number
+  created_at: string
+  planners?: {
+    id: string
+    name: string
+    phone: string
+    affiliation: string
+  }
+  guest_referrers?: {
+    id: string
+    name: string
+    phone: string
+    bank_name: string
+    bank_account: string
+  }
+}
+
 export default function AdminPage() {
+  const [activeTab, setActiveTab] = useState<'planners' | 'referrals'>('planners')
   const [planners, setPlanners] = useState<Planner[]>([])
+  const [referrals, setReferrals] = useState<Referral[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const router = useRouter()
 
   useEffect(() => {
     fetchPlanners()
+    fetchReferrals()
   }, [])
+
+  const fetchReferrals = async () => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession()
+      const res = await fetch('/api/admin/referrals', {
+        headers: { 'Authorization': session ? `Bearer ${session.access_token}` : '' }
+      })
+      const result = await res.json()
+      if (res.ok) setReferrals(result.data || [])
+    } catch (err) {
+      console.error('Failed to fetch referrals:', err)
+    }
+  }
 
   const fetchPlanners = async () => {
     try {
@@ -67,6 +109,30 @@ export default function AdminPage() {
   }
 
   const activeSubscribers = planners.filter(p => p.subscription_status === 'active').length
+
+  const updateReferralStatus = async (id: string, newStatus: string, amount: number) => {
+    if (!confirm(`이 추천 내역의 상태를 '${newStatus}'(으)로 변경하시겠습니까? (적립 예정금액: ${amount.toLocaleString()}원)`)) return
+    
+    try {
+      const { data: { session } } = await supabase.auth.getSession()
+      const res = await fetch(`/api/admin/referrals/${id}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': session ? `Bearer ${session.access_token}` : ''
+        },
+        body: JSON.stringify({ status: newStatus, reward_amount: amount })
+      })
+      const result = await res.json()
+      
+      if (!res.ok) throw new Error(result.error || '상태 변경 중 오류가 발생했습니다.')
+      
+      alert('상태가 성공적으로 변경되었습니다.')
+      fetchReferrals() // Refresh list
+    } catch (err: any) {
+      alert(err.message)
+    }
+  }
 
   if (loading) {
     return (
@@ -154,13 +220,55 @@ export default function AdminPage() {
             </div>
             <div>
               <p className="text-xs font-black text-gray-400 uppercase tracking-widest mb-1">예상 월 매출</p>
-              <h3 className="text-3xl font-black text-gray-900">{(activeSubscribers * 29900).toLocaleString()}원</h3>
+              <h3 className="text-3xl font-black text-gray-900">{(activeSubscribers * 5900).toLocaleString()}원</h3>
+            </div>
+          </div>
+
+          <div className="bg-indigo-600 p-8 rounded-[2rem] shadow-lg shadow-indigo-100 flex items-center gap-6 group hover:scale-[1.02] transition-all text-white">
+            <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center">
+              <ChartBarIcon className="w-8 h-8 text-white" />
+            </div>
+            <div>
+              <p className="text-xs font-black text-indigo-200 uppercase tracking-widest mb-1">총 명함 방문수</p>
+              <h3 className="text-3xl font-black">{planners.reduce((acc, p) => acc + (p.visit_count || 0), 0).toLocaleString()}회</h3>
             </div>
           </div>
         </div>
 
+        {/* Tab Switcher */}
+        <div className="flex items-center gap-4 mb-8">
+          <button
+            onClick={() => setActiveTab('planners')}
+            className={`px-6 py-3 rounded-2xl font-black text-sm flex items-center gap-2 transition-all ${
+              activeTab === 'planners' 
+                ? 'bg-primary-600 text-white shadow-lg shadow-primary-200' 
+                : 'bg-white text-gray-500 hover:bg-gray-50 border border-gray-100'
+            }`}
+          >
+            <UsersIcon className="w-5 h-5" />
+            설계사 가입자 현황
+          </button>
+          <button
+            onClick={() => setActiveTab('referrals')}
+            className={`px-6 py-3 rounded-2xl font-black text-sm flex items-center gap-2 transition-all ${
+              activeTab === 'referrals' 
+                ? 'bg-rose-500 text-white shadow-lg shadow-rose-200' 
+                : 'bg-white text-gray-500 hover:bg-gray-50 border border-gray-100'
+            }`}
+          >
+            <GiftIcon className="w-5 h-5" />
+            친구추천 리워드 관리
+            {referrals.filter(r => r.status === 'PENDING').length > 0 && (
+              <span className="bg-rose-100 text-rose-600 px-2 py-0.5 rounded-full text-[10px] ml-1">
+                {referrals.filter(r => r.status === 'PENDING').length}건 대기
+              </span>
+            )}
+          </button>
+        </div>
+
         {/* User List Table */}
-        <div className="bg-white rounded-[2rem] shadow-sm border border-gray-100 overflow-hidden">
+        {activeTab === 'planners' && (
+          <div className="bg-white rounded-[2rem] shadow-sm border border-gray-100 overflow-hidden">
           <div className="p-8 border-b border-gray-50 flex items-center justify-between">
             <h3 className="text-xl font-black text-gray-900">설계사 가입자 현황</h3>
             <span className="px-4 py-1.5 bg-gray-50 text-gray-500 text-[10px] font-black rounded-full border border-gray-100">
@@ -176,6 +284,7 @@ export default function AdminPage() {
                   <th className="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-50">소속 / 지역</th>
                   <th className="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-50 text-center">구독 상태</th>
                   <th className="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-50 text-center">가입일</th>
+                  <th className="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-50 text-center">조회수</th>
                   <th className="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-50 text-right">관리</th>
                 </tr>
               </thead>
@@ -204,6 +313,11 @@ export default function AdminPage() {
                         {new Date(p.created_at).toLocaleDateString('ko-KR')}
                       </div>
                     </td>
+                    <td className="px-8 py-6 text-center">
+                      <div className="text-[14px] font-black text-primary-600">
+                        {(p.visit_count || 0).toLocaleString()}
+                      </div>
+                    </td>
                     <td className="px-8 py-6 text-right">
                       <Link 
                         href={`/p/${p.id}`}
@@ -226,6 +340,104 @@ export default function AdminPage() {
             </div>
           )}
         </div>
+        )}
+
+        {/* Referrals List Table */}
+        {activeTab === 'referrals' && (
+          <div className="bg-white rounded-[2rem] shadow-sm border border-gray-100 overflow-hidden">
+            <div className="p-8 border-b border-gray-50 flex items-center justify-between">
+              <h3 className="text-xl font-black text-gray-900">친구추천 리워드 내역</h3>
+              <div className="flex gap-3 text-xs font-bold">
+                <span className="px-3 py-1.5 bg-amber-50 text-amber-600 rounded-lg">심사대기: {referrals.filter(r => r.status === 'PENDING').length}건</span>
+                <span className="px-3 py-1.5 bg-primary-50 text-primary-600 rounded-lg">지급완료: {referrals.filter(r => r.status === 'PAID').length}건</span>
+              </div>
+            </div>
+            
+            <div className="overflow-x-auto">
+              <table className="w-full text-left">
+                <thead>
+                  <tr className="bg-gray-50/50">
+                    <th className="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-50">신청일 / 추천인(설계사)</th>
+                    <th className="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-50">추천 대상 (이름/연락처)</th>
+                    <th className="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-50">유형</th>
+                    <th className="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-50 text-center">상태</th>
+                    <th className="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-50 text-right">상태 변경 (적립/지급)</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-50">
+                  {referrals.map((r) => (
+                    <tr key={r.id} className="hover:bg-gray-50/30 transition-colors">
+                      <td className="px-8 py-5">
+                        <div className="text-xs font-bold text-gray-400 mb-1">{new Date(r.created_at).toLocaleDateString()}</div>
+                        <div className="font-black text-gray-900">
+                          {r.planners ? (
+                            <>{r.planners.name} <span className="text-xs font-medium text-gray-400 ml-1">설계사</span></>
+                          ) : r.guest_referrers ? (
+                            <>{r.guest_referrers.name} <span className="text-xs font-medium text-amber-500 ml-1">비회원</span></>
+                          ) : (
+                            '알 수 없음'
+                          )}
+                        </div>
+                      </td>
+                      <td className="px-8 py-5">
+                        <div className="font-bold text-gray-900">{r.referee_name}</div>
+                        <div className="text-xs font-mono text-gray-500 mt-0.5">{r.referee_phone.replace(/(\d{3})(\d{4})(\d{4})/, '$1-$2-$3')}</div>
+                      </td>
+                      <td className="px-8 py-5">
+                        <span className={`inline-flex px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest ${
+                          r.referee_type === 'SIGNUP' ? 'bg-indigo-50 text-indigo-600' : 'bg-emerald-50 text-emerald-600'
+                        }`}>
+                          {r.referee_type === 'SIGNUP' ? '플래너 가입' : '무료 상담'}
+                        </span>
+                      </td>
+                      <td className="px-8 py-5 text-center">
+                        {r.status === 'PENDING' && <span className="text-amber-500 font-black text-[11px] bg-amber-50 px-3 py-1.5 rounded-full">심사중 (대기)</span>}
+                        {r.status === 'APPROVED' && <span className="text-emerald-500 font-black text-[11px] bg-emerald-50 px-3 py-1.5 rounded-full">적립완료 (지급대기)</span>}
+                        {r.status === 'PAID' && <span className="text-primary-600 font-black text-[11px] bg-primary-50 px-3 py-1.5 rounded-full">지급/발송완료</span>}
+                        {r.status === 'REJECTED' && <span className="text-gray-400 font-black text-[11px] bg-gray-100 px-3 py-1.5 rounded-full">반려됨</span>}
+                        
+                        {r.reward_amount > 0 && <div className="text-[10px] font-bold text-rose-500 mt-1">+{r.reward_amount.toLocaleString()}원</div>}
+                      </td>
+                      <td className="px-8 py-5 text-right space-x-2">
+                        {r.status === 'PENDING' && (
+                          <>
+                            <button onClick={() => updateReferralStatus(r.id, 'APPROVED', r.referee_type === 'SIGNUP' ? 50000 : 5000)} className="px-3 py-1.5 bg-emerald-500 text-white rounded-lg text-xs font-black hover:bg-emerald-600 transition-colors">
+                              승인 (적립)
+                            </button>
+                            <button onClick={() => updateReferralStatus(r.id, 'REJECTED', 0)} className="px-3 py-1.5 bg-gray-200 text-gray-600 rounded-lg text-xs font-black hover:bg-gray-300 transition-colors">
+                              반려
+                            </button>
+                          </>
+                        )}
+                        {r.status === 'APPROVED' && (
+                          <>
+                            <button onClick={() => updateReferralStatus(r.id, 'PAID', r.reward_amount)} className="px-3 py-1.5 bg-primary-600 text-white rounded-lg text-xs font-black hover:bg-primary-700 transition-colors">
+                              지급 완료
+                            </button>
+                            <button onClick={() => updateReferralStatus(r.id, 'PENDING', 0)} className="px-3 py-1.5 bg-gray-100 text-gray-500 rounded-lg text-[10px] font-bold hover:bg-gray-200 transition-colors">
+                              대기 취소
+                            </button>
+                          </>
+                        )}
+                        {(r.status === 'PAID' || r.status === 'REJECTED') && (
+                          <button onClick={() => updateReferralStatus(r.id, 'PENDING', 0)} className="px-3 py-1.5 bg-gray-100 text-gray-400 rounded-lg text-[10px] font-bold hover:bg-gray-200 transition-colors">
+                            상태 초기화
+                          </button>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            
+            {referrals.length === 0 && (
+              <div className="p-20 text-center">
+                <p className="text-gray-300 font-bold italic">추천 이력이 없습니다.</p>
+              </div>
+            )}
+          </div>
+        )}
       </main>
     </div>
   )
