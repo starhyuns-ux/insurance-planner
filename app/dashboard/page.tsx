@@ -28,7 +28,8 @@ import {
   GiftIcon,
   DocumentCheckIcon,
   PhotoIcon,
-  PaperAirplaneIcon
+  PaperAirplaneIcon,
+  ChatBubbleBottomCenterTextIcon
 } from '@heroicons/react/24/outline'
 import BoardPage from '@/components/BoardPage'
 import { 
@@ -363,10 +364,163 @@ function ChatInboxPanel({ plannerId, plannerName }: { plannerId: string | null; 
     </div>
   )
 }
+// ── KakaoTalk Messaging Panel ───────────────────────────────────
+function KakaoTalkPanel() {
+  const [isLoggedIn, setIsLoggedIn] = useState(false)
+  const [friends, setFriends] = useState<any[]>([])
+  const [selectedFriends, setSelectedFriends] = useState<string[]>([])
+  const [message, setMessage] = useState('')
+  const [sending, setSending] = useState(false)
+  const [loadingFriends, setLoadingFriends] = useState(false)
+
+  const { initKakao, loginWithKakao, fetchKakaoFriends, sendKakaoDefault } = require('@/lib/kakao-client')
+
+  useEffect(() => {
+    initKakao()
+  }, [])
+
+  const handleLogin = async () => {
+    try {
+      await loginWithKakao()
+      setIsLoggedIn(true)
+      fetchFriends()
+    } catch (err) {
+      alert('카카오 로그인에 실패했습니다.')
+    }
+  }
+
+  const fetchFriends = async () => {
+    setLoadingFriends(true)
+    try {
+      const friendList = await fetchKakaoFriends()
+      setFriends(friendList)
+    } catch (err) {
+      console.error(err)
+    } finally {
+      setLoadingFriends(false)
+    }
+  }
+
+  const toggleFriend = (uuid: string) => {
+    setSelectedFriends(prev => 
+      prev.includes(uuid) ? prev.filter(id => id !== uuid) : [...prev, uuid]
+    )
+  }
+
+  const handleSendMessage = async () => {
+    if (selectedFriends.length === 0 || !message.trim()) return
+    setSending(true)
+    try {
+      await sendKakaoDefault(selectedFriends, message, 'https://stroy.kr')
+      alert(`${selectedFriends.length}명의 친구에게 메시지를 보냈습니다.`)
+      setMessage('')
+      setSelectedFriends([])
+    } catch (err) {
+      alert('메시지 전송에 실패했습니다.')
+    } finally {
+      setSending(false)
+    }
+  }
+
+  if (!isLoggedIn) {
+    return (
+      <div className="bg-white rounded-[2rem] shadow-xl p-12 border border-gray-100 flex flex-col items-center justify-center text-center">
+        <div className="w-20 h-20 bg-[#FEE500] rounded-3xl flex items-center justify-center mb-6 shadow-lg">
+          <ChatBubbleBottomCenterTextIcon className="w-10 h-10 text-[#3C1E1E]" />
+        </div>
+        <h3 className="text-2xl font-black text-gray-900 mb-2">카카오톡 연동하기</h3>
+        <p className="text-gray-500 mb-8 max-w-sm">
+          내 카카오톡 계정을 연동하여 고객(친구)들에게<br/>다양한 보험 안내 메시지를 직접 보낼 수 있습니다.
+        </p>
+        <button
+          onClick={handleLogin}
+          className="bg-[#FEE500] text-[#3C1E1E] px-8 py-4 rounded-2xl font-black text-lg hover:bg-[#FADA0A] transition-all flex items-center gap-3 shadow-xl shadow-yellow-100"
+        >
+          <img src="https://developers.kakao.com/assets/img/about/logos/kakaolink/kakaolink_btn_medium.png" alt="Kakao" className="w-6 h-6" />
+          카카오 로그인으로 시작하기
+        </button>
+        <p className="mt-6 text-[10px] text-gray-300 font-medium">※ 친구 목록 조회 및 메시지 전송 권한 동의가 필요합니다.</p>
+      </div>
+    )
+  }
+
+  return (
+    <div className="bg-white rounded-[2rem] shadow-xl border border-gray-100 overflow-hidden flex flex-col md:flex-row" style={{ height: '72vh', minHeight: '600px' }}>
+      {/* Friend List Side */}
+      <div className="w-full md:w-80 border-r border-gray-100 flex flex-col bg-gray-50/30">
+        <div className="p-5 border-b border-gray-100 flex items-center justify-between">
+          <h4 className="font-black text-gray-900 text-sm">카카오톡 친구 목록</h4>
+          <span className="text-[10px] font-black bg-primary-100 text-primary-600 px-2 py-0.5 rounded-full">{friends.length}명</span>
+        </div>
+        <div className="flex-1 overflow-y-auto p-2 space-y-1">
+          {loadingFriends ? (
+            <div className="flex items-center justify-center h-full text-gray-400 text-xs animate-pulse italic">목록 불러오는 중...</div>
+          ) : friends.length === 0 ? (
+            <div className="p-8 text-center text-gray-300 text-xs">친구 목록을 불러올 수 없거나 친구가 없습니다.</div>
+          ) : friends.map(f => (
+            <button
+              key={f.uuid}
+              onClick={() => toggleFriend(f.uuid)}
+              className={`w-full flex items-center gap-3 p-3 rounded-xl transition-all ${
+                selectedFriends.includes(f.uuid) ? 'bg-primary-50 border border-primary-100 shadow-sm' : 'hover:bg-white border border-transparent'
+              }`}
+            >
+              <div className="relative">
+                <img src={f.profile_thumbnail_image || 'https://via.placeholder.com/40'} alt={f.profile_nickname} className="w-10 h-10 rounded-xl object-cover" />
+                {selectedFriends.includes(f.uuid) && (
+                  <div className="absolute -top-1 -right-1 w-4 h-4 bg-primary-600 rounded-full flex items-center justify-center text-white border-2 border-white">
+                    <CheckIcon className="w-2.5 h-2.5" />
+                  </div>
+                )}
+              </div>
+              <div className="text-left">
+                <p className="text-sm font-bold text-gray-800">{f.profile_nickname}</p>
+                <p className="text-[10px] text-gray-400">카카오톡 친구</p>
+              </div>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Message Compose Area */}
+      <div className="flex-1 flex flex-col p-6 md:p-8 space-y-6">
+        <div>
+          <h4 className="text-xs font-black text-gray-400 uppercase tracking-widest mb-4">메시지 작성</h4>
+          <textarea
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+            rows={6}
+            placeholder="친구에게 보낼 메시지 내용을 입력하세요..."
+            className="w-full p-5 bg-gray-50 border border-gray-100 rounded-[2rem] text-sm font-medium focus:bg-white focus:border-primary-500 transition-all outline-none resize-none shadow-inner"
+          />
+        </div>
+
+        <div className="flex-1 flex flex-col justify-end gap-4">
+          <div className="bg-gray-50 rounded-2xl p-4 border border-dashed border-gray-200">
+            <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 italic">발송 요약</p>
+            <div className="flex items-center justify-between">
+              <span className="text-sm font-bold text-gray-600">선택된 친구</span>
+              <span className="text-sm font-black text-primary-600">{selectedFriends.length}명</span>
+            </div>
+          </div>
+
+          <button
+            onClick={handleSendMessage}
+            disabled={sending || selectedFriends.length === 0 || !message.trim()}
+            className="w-full bg-primary-600 text-white py-5 rounded-2xl font-black text-lg hover:bg-primary-700 disabled:opacity-40 shadow-xl shadow-primary-100 transition-all active:scale-[0.98] flex items-center justify-center gap-3"
+          >
+            {sending ? '메시지 전송 중...' : '메시지 전송하기'}
+            <PaperAirplaneIcon className="w-5 h-5 -rotate-45" />
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
 // ─────────────────────────────────────────────────────────────────
 
 export default function DashboardPage() {
-  const [activeTab, setActiveTab] = useState<'profile' | 'leads' | 'customers' | 'calendar' | 'subscription' | 'card' | 'notification' | 'guide' | 'chat' | 'freeboard' | 'referrals' | 'claims'>('calendar')
+  const [activeTab, setActiveTab] = useState<'profile' | 'leads' | 'customers' | 'calendar' | 'subscription' | 'card' | 'notification' | 'guide' | 'chat' | 'freeboard' | 'referrals' | 'claims' | 'kakaotalk'>('calendar')
   const [planner, setPlanner] = useState<Planner | null>(null)
   const [customers, setCustomers] = useState<Customer[]>([])
   const [leads, setLeads] = useState<Lead[]>([])
@@ -1051,6 +1205,15 @@ export default function DashboardPage() {
                   <DocumentCheckIcon className="w-4 h-4 shrink-0" />
                   보상청구 관리
                 </button>
+                <button
+                  onClick={() => setActiveTab('kakaotalk')}
+                  className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-semibold transition-all text-sm ${
+                    activeTab === 'kakaotalk' ? 'bg-primary-600 text-white shadow-md' : 'text-gray-600 hover:bg-gray-50'
+                  }`}
+                >
+                  <ChatBubbleBottomCenterTextIcon className="w-4 h-4 shrink-0" />
+                  카카오톡 보내기
+                </button>
               </div>
             </div>
 
@@ -1377,6 +1540,8 @@ export default function DashboardPage() {
               </div>
             )}
 
+
+            {activeTab === 'kakaotalk' && <KakaoTalkPanel />}
 
             {activeTab === 'customers' && (
               <div className="space-y-6">

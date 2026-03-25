@@ -105,10 +105,8 @@ export async function generateClaimPDF(claim: any, planner: any) {
 
   currentY -= 15
 
-  // 4. Planner & Consent Info
-  drawRow('4. 접수 및 동의 정보', null, true)
-  drawRow('담당 설계사', `${planner?.name} (${planner?.affiliation || '개인'})`)
-  drawRow('설계사 연락처', planner?.phone)
+  // 4. Consent Info
+  drawRow('4. 동의 정보', null, true)
   drawRow('개인정보 동의', claim.consent_third_party ? '동의 완료' : '미동의')
   drawRow('동의 일시', claim.consent_at ? new Date(claim.consent_at).toLocaleString('ko-KR') : '-')
   drawRow('서명 방식', claim.signature_type === 'FACE' ? '대면 서명' : '온라인/비대면 서명')

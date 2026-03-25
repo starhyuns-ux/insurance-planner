@@ -218,8 +218,6 @@ function InsurancePopup({ company, info, onClose }: {
 // ─── Main Page Component ─────────────────────────────────────────────────────
 export default function ClaimPage() {
   const { planner } = useAttribution()
-  const [planners, setPlanners] = useState<{ id: string; name: string; affiliation: string }[]>([])
-  const [selectedPlannerId, setSelectedPlannerId] = useState<string>('')
   const [currentStep, setCurrentStep] = useState(1)
   const [submitting, setSubmitting] = useState(false)
 
@@ -265,15 +263,6 @@ export default function ClaimPage() {
   const [signatureDataUrl, setSignatureDataUrl] = useState<string>('')
   const [signatureSaved, setSignatureSaved] = useState(false)
 
-  useEffect(() => {
-    if (planner) {
-      setSelectedPlannerId(planner.id)
-    } else {
-      supabase.from('planners').select('id, name, affiliation').order('name')
-        .then(({ data }) => { if (data) setPlanners(data) })
-    }
-  }, [planner])
-
   const canProceed = () => {
     switch (currentStep) {
       case 1: return name && residentFront.length === 6 && residentBack.length >= 1 && phone
@@ -287,7 +276,7 @@ export default function ClaimPage() {
         return true
       }
       case 4: return bankName && bankAccount && bankHolder
-      case 5: return insuranceCompany && selectedPlannerId
+      case 5: return insuranceCompany
       case 6: return consentThirdParty && (signatureType === 'NON_FACE' || signatureSaved)
       default: return false
     }
@@ -332,7 +321,7 @@ export default function ClaimPage() {
       const maskedResident = residentBack ? `${residentFront}-${residentBack[0]}******` : residentFront
 
       const { error } = await supabase.from('claims').insert({
-        planner_id: selectedPlannerId,
+        planner_id: planner?.id || null,
         customer_name: name,
         customer_phone: phone,
         address,
@@ -441,24 +430,12 @@ export default function ClaimPage() {
             {/* STEP 1 */}
             {currentStep === 1 && (
               <>
-                {!planner && (
-                  <div>
-                    <label className="block text-xs font-black text-gray-500 uppercase tracking-widest mb-2">담당 설계사 선택 *</label>
-                    <select value={selectedPlannerId} onChange={e => setSelectedPlannerId(e.target.value)} className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary-300 bg-white">
-                      <option value="">설계사를 선택하세요</option>
-                      {planners.map(p => <option key={p.id} value={p.id}>{p.name}{p.affiliation ? ` (${p.affiliation})` : ''}</option>)}
-                    </select>
-                  </div>
-                )}
-                {planner && (
-                  <div className="flex items-center gap-3 px-4 py-3 bg-primary-50 border border-primary-100 rounded-xl">
-                    <CheckCircleIcon className="w-5 h-5 text-primary-600 shrink-0" />
-                    <div>
-                      <p className="text-xs text-primary-500 font-bold">담당 설계사 확인됨</p>
-                      <p className="text-sm font-black text-primary-900">{planner.name} 설계사</p>
-                    </div>
-                  </div>
-                )}
+                <div className="bg-primary-50 rounded-2xl p-4 border border-primary-100 flex items-center gap-3">
+                  <DocumentCheckIcon className="w-6 h-6 text-primary-600 shrink-0" />
+                  <p className="text-xs text-primary-800 font-bold leading-relaxed">
+                    본 신청서는 담당 설계사에게 안전하게 전달되어 보험사로 즉시 접수됩니다.
+                  </p>
+                </div>
                 <div>
                   <label className="block text-xs font-black text-gray-500 uppercase tracking-widest mb-2">이름 *</label>
                   <input type="text" value={name} onChange={e => setName(e.target.value)} placeholder="홍길동" className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary-300" />

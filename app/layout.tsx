@@ -79,6 +79,7 @@ export default function RootLayout({
   return (
     <html lang="ko">
       <body className={`${notoSansKr.variable} ${dancingScript.variable} font-sans antialiased bg-gray-50 text-gray-900`}>
+        <script src="https://t2.kakaocdn.net/kakao_js_sdk/2.7.0/kakao.min.js" integrity="sha384-lElementById('kakao-js-sdk')" crossOrigin="anonymous" async></script>
         <LanguageProvider>
           <Suspense fallback={null}>
             <ReferralTracker />
