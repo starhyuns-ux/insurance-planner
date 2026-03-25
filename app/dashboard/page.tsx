@@ -25,7 +25,9 @@ import {
   ShareIcon,
   ChatBubbleLeftEllipsisIcon,
   ChatBubbleLeftRightIcon,
-  GiftIcon
+  GiftIcon,
+  DocumentCheckIcon,
+  PhotoIcon
 } from '@heroicons/react/24/outline'
 import BoardPage from '@/components/BoardPage'
 import { 
@@ -237,6 +239,16 @@ interface Referral {
   created_at: string;
 }
 
+interface Claim {
+  id: string;
+  planner_id: string;
+  customer_name: string;
+  description: string;
+  image_urls: string[];
+  status: 'PENDING' | 'IN_PROGRESS' | 'COMPLETED';
+  created_at: string;
+}
+
 // ── 1:1 Chat Inbox Panel ──────────────────────────────────
 function ChatInboxPanel({ plannerId, plannerName }: { plannerId: string | null; plannerName: string }) {
   const [sessions, setSessions] = useState<any[]>([])
@@ -350,11 +362,16 @@ function ChatInboxPanel({ plannerId, plannerName }: { plannerId: string | null; 
 // ─────────────────────────────────────────────────────────────────
 
 export default function DashboardPage() {
-  const [activeTab, setActiveTab] = useState<'profile' | 'leads' | 'customers' | 'calendar' | 'subscription' | 'card' | 'notification' | 'guide' | 'chat' | 'freeboard' | 'referrals'>('calendar')
+  const [activeTab, setActiveTab] = useState<'profile' | 'leads' | 'customers' | 'calendar' | 'subscription' | 'card' | 'notification' | 'guide' | 'chat' | 'freeboard' | 'referrals' | 'claims'>('calendar')
   const [planner, setPlanner] = useState<Planner | null>(null)
   const [customers, setCustomers] = useState<Customer[]>([])
   const [leads, setLeads] = useState<Lead[]>([])
   const [todos, setTodos] = useState<Todo[]>([])
+  const [claims, setClaims] = useState<Claim[]>([])
+  const [newClaimName, setNewClaimName] = useState('')
+  const [newClaimDesc, setNewClaimDesc] = useState('')
+  const [newClaimImages, setNewClaimImages] = useState<File[]>([])
+  const [uploadingClaim, setUploadingClaim] = useState(false)
   const [newTodoContent, setNewTodoContent] = useState('')
   const [todoDate, setTodoDate] = useState(format(new Date(), 'yyyy-MM-dd'))
   const [referrals, setReferrals] = useState<Referral[]>([])
@@ -514,15 +531,22 @@ export default function DashboardPage() {
     const { data: { session } } = await supabase.auth.getSession()
     if (session) {
       const refRes = await fetch('/api/referrals/me', {
-        headers: {
-          'Authorization': `Bearer ${session.access_token}`
-        }
+        headers: { 'Authorization': `Bearer ${session.access_token}` }
       })
       if (refRes.ok) {
         const refData = await refRes.json()
         setReferrals(refData.data || [])
       }
     }
+
+    // Fetch Claims
+    const { data: claimsData } = await supabase
+      .from('claims')
+      .select('*')
+      .eq('planner_id', user.id)
+      .order('created_at', { ascending: false })
+
+    if (claimsData) setClaims(claimsData)
 
     // Check push subscription status
     if ('serviceWorker' in navigator && 'PushManager' in window) {
@@ -605,6 +629,75 @@ export default function DashboardPage() {
   const cancelEditingTodo = () => {
     setEditingTodoId(null)
     setEditTodoContent('')
+  }
+
+  const handleClaimImagesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      setNewClaimImages(Array.from(e.target.files))
+    }
+  }
+
+  const submitClaim = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!planner || !newClaimName.trim()) return
+    setUploadingClaim(true)
+    try {
+      const uploadedUrls: string[] = []
+      
+      for (const file of newClaimImages) {
+        const fileExt = file.name.split('.').pop()
+        const fileName = `claims/${planner.id}/${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`
+        
+        const { error: uploadError } = await supabase.storage
+          .from('planner-assets')
+          .upload(fileName, file)
+          
+        if (uploadError) throw uploadError
+        
+        const { data: { publicUrl } } = supabase.storage
+          .from('planner-assets')
+          .getPublicUrl(fileName)
+          
+        uploadedUrls.push(publicUrl)
+      }
+
+      const { data, error } = await supabase
+        .from('claims')
+        .insert({
+          planner_id: planner.id,
+          customer_name: newClaimName,
+          description: newClaimDesc,
+          image_urls: uploadedUrls,
+          status: 'PENDING'
+        })
+        .select()
+
+      if (error) throw error
+      if (data) {
+        setClaims([data[0], ...claims])
+        setNewClaimName('')
+        setNewClaimDesc('')
+        setNewClaimImages([])
+        alert('보상청구가 접수되었습니다.')
+      }
+    } catch (err: any) {
+      alert('보상청구 접수 중 오류가 발생했습니다: ' + err.message)
+    } finally {
+      setUploadingClaim(false)
+    }
+  }
+
+  const updateClaimStatus = async (id: string, newStatus: string) => {
+    const { error } = await supabase.from('claims').update({ status: newStatus }).eq('id', id)
+    if (!error) {
+      setClaims(claims.map(c => c.id === id ? { ...c, status: newStatus as any } : c))
+    }
+  }
+
+  const deleteClaim = async (id: string) => {
+    if(!confirm('정말 이 청구건을 삭제하시겠습니까?')) return
+    const { error } = await supabase.from('claims').delete().eq('id', id)
+    if (!error) setClaims(claims.filter(c => c.id !== id))
   }
 
   const handleCopyUrl = (id: string) => {
@@ -924,6 +1017,15 @@ export default function DashboardPage() {
                 >
                   <UsersIcon className="w-4 h-4 shrink-0" />
                   고객 관리
+                </button>
+                <button
+                  onClick={() => setActiveTab('claims')}
+                  className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-semibold transition-all text-sm ${
+                    activeTab === 'claims' ? 'bg-primary-600 text-white shadow-md' : 'text-gray-600 hover:bg-gray-50'
+                  }`}
+                >
+                  <DocumentCheckIcon className="w-4 h-4 shrink-0" />
+                  보상청구 관리
                 </button>
               </div>
             </div>
@@ -2191,6 +2293,130 @@ export default function DashboardPage() {
             )}
 
             {/* ─── Free Board ─── */}
+            {/* Tab: 보상청구 관리 */}
+            {activeTab === 'claims' && (
+              <div className="space-y-6">
+                {/* Submit New Claim */}
+                <div className="bg-white rounded-[2rem] shadow-xl p-8 border border-gray-100">
+                  <h3 className="text-xl font-black text-gray-900 mb-6 flex items-center gap-2">
+                    <DocumentCheckIcon className="w-6 h-6 text-primary-600" />
+                    새 보상청구 접수
+                  </h3>
+                  <form onSubmit={submitClaim} className="space-y-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div>
+                        <label className="block text-xs font-black text-gray-500 uppercase tracking-widest mb-2">고객명</label>
+                        <input
+                          type="text"
+                          required
+                          value={newClaimName}
+                          onChange={(e) => setNewClaimName(e.target.value)}
+                          className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary-300"
+                          placeholder="청구 고객 이름 입력"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-black text-gray-500 uppercase tracking-widest mb-2">청구 관련 서류 (복수 선택 가능)</label>
+                        <label className="flex items-center justify-center w-full h-[46px] px-4 border border-dashed border-gray-300 rounded-xl cursor-pointer hover:bg-gray-50 transition-colors">
+                          <div className="flex items-center gap-2 text-sm text-gray-500 font-bold">
+                            <PhotoIcon className="w-5 h-5 text-gray-400" />
+                            {newClaimImages.length > 0 ? `${newClaimImages.length}개의 파일 선택됨` : '사진 파일 첨부하기'}
+                          </div>
+                          <input type="file" multiple accept="image/*" className="hidden" onChange={handleClaimImagesChange} />
+                        </label>
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-xs font-black text-gray-500 uppercase tracking-widest mb-2">청구 내용 / 병명</label>
+                      <textarea
+                        required
+                        value={newClaimDesc}
+                        onChange={(e) => setNewClaimDesc(e.target.value)}
+                        rows={3}
+                        className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary-300 resize-none"
+                        placeholder="청구 상세 내용 및 전달사항 입력"
+                      />
+                    </div>
+                    <div className="flex justify-end">
+                      <button
+                        type="submit"
+                        disabled={uploadingClaim}
+                        className="px-6 py-3 bg-primary-600 text-white rounded-xl text-sm font-black hover:bg-primary-700 disabled:opacity-50 transition-colors flex items-center gap-2"
+                      >
+                        {uploadingClaim ? '접수 중...' : '보상청구 접수하기'}
+                      </button>
+                    </div>
+                  </form>
+                </div>
+
+                {/* Claims List */}
+                <div className="bg-white rounded-[2rem] shadow-sm border border-gray-100 overflow-hidden">
+                  <div className="px-8 py-6 border-b border-gray-50">
+                    <h3 className="text-lg font-black text-gray-900">보상청구 접수 내역 <span className="text-primary-600">{claims.length}</span></h3>
+                  </div>
+                  <div className="divide-y divide-gray-50">
+                    {claims.map((claim) => (
+                      <div key={claim.id} className="p-8 hover:bg-gray-50/50 transition-colors">
+                        <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
+                          <div className="flex-1 space-y-2">
+                            <div className="flex items-center gap-3">
+                              <span className="font-black text-gray-900 text-lg">{claim.customer_name}</span>
+                              <span className="text-xs font-bold text-gray-400">{new Date(claim.created_at).toLocaleDateString()}</span>
+                              <span className={`px-3 py-1 text-[10px] font-black uppercase tracking-widest rounded-full ${
+                                claim.status === 'PENDING' ? 'bg-amber-50 text-amber-600' :
+                                claim.status === 'IN_PROGRESS' ? 'bg-blue-50 text-blue-600' :
+                                'bg-emerald-50 text-emerald-600'
+                              }`}>
+                                {claim.status === 'PENDING' ? '접수 대기' : claim.status === 'IN_PROGRESS' ? '처리 중' : '지급 완료'}
+                              </span>
+                            </div>
+                            <p className="text-sm text-gray-600 break-words whitespace-pre-wrap">{claim.description}</p>
+                            
+                            {/* Images Viewer */}
+                            {claim.image_urls && claim.image_urls.length > 0 && (
+                              <div className="flex gap-2 mt-4 pt-4 border-t border-gray-100 border-dashed overflow-x-auto pb-2">
+                                {claim.image_urls.map((url, idx) => (
+                                  <a key={idx} href={url} target="_blank" rel="noopener noreferrer" className="shrink-0 group relative rounded-lg overflow-hidden border border-gray-200 h-20 w-20">
+                                    <img src={url} alt="첨부 사진" className="object-cover w-full h-full group-hover:scale-110 transition-transform" />
+                                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                      <span className="text-white text-xs font-bold">확대</span>
+                                    </div>
+                                  </a>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                          
+                          {/* Actions */}
+                          <div className="flex items-center gap-2 md:flex-col md:items-end md:gap-2 pt-2 md:pt-0 shrink-0">
+                            {claim.status === 'PENDING' && (
+                              <button onClick={() => updateClaimStatus(claim.id, 'IN_PROGRESS')} className="px-4 py-2 bg-blue-50 text-blue-600 hover:bg-blue-100 rounded-lg text-xs font-black transition-colors w-full md:w-auto text-center">
+                                처리 중으로
+                              </button>
+                            )}
+                            {claim.status === 'IN_PROGRESS' && (
+                              <button onClick={() => updateClaimStatus(claim.id, 'COMPLETED')} className="px-4 py-2 bg-emerald-50 text-emerald-600 hover:bg-emerald-100 rounded-lg text-xs font-black transition-colors w-full md:w-auto text-center">
+                                지급 완료로
+                              </button>
+                            )}
+                            <button onClick={() => deleteClaim(claim.id)} className="px-4 py-2 text-rose-500 hover:bg-rose-50 rounded-lg text-xs font-bold transition-colors w-full md:w-auto text-center border border-rose-100 md:border-transparent">
+                              삭제
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                    {claims.length === 0 && (
+                      <div className="p-16 text-center">
+                        <DocumentCheckIcon className="w-12 h-12 text-gray-200 mx-auto mb-4" />
+                        <p className="text-gray-400 font-bold">등록된 보상청구 내역이 없습니다.</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+
             {activeTab === 'freeboard' && (
               <BoardPage 
                 boardType="free" 
@@ -2228,6 +2454,16 @@ export default function DashboardPage() {
         >
           <UsersIcon className="w-6 h-6" />
           <span className="text-[10px] font-black">고객</span>
+        </button>
+
+        <button
+          onClick={() => handleTabChange('claims')}
+          className={`flex flex-col items-center gap-1 transition-all ${
+            activeTab === 'claims' ? 'text-primary-600 scale-110' : 'text-gray-400'
+          }`}
+        >
+          <DocumentCheckIcon className="w-6 h-6" />
+          <span className="text-[10px] font-black">보상청구</span>
         </button>
 
         <button
