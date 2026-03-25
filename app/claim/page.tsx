@@ -242,6 +242,12 @@ export default function ClaimPage() {
   // Step 3
   const [accidentType, setAccidentType] = useState<'질병' | '상해' | '교통사고' | ''>('')
   const [accidentDetail, setAccidentDetail] = useState('')
+  // Car accident extra fields
+  const [carAccidentDetail, setCarAccidentDetail] = useState('')
+  const [carInsuranceClaim, setCarInsuranceClaim] = useState<boolean | null>(null)
+  const [carInsuranceCompany, setCarInsuranceCompany] = useState('')
+  const [carAgentPhone, setCarAgentPhone] = useState('')
+  const [carPlateNumber, setCarPlateNumber] = useState('')
 
   // Step 4
   const [bankName, setBankName] = useState('')
@@ -272,7 +278,14 @@ export default function ClaimPage() {
     switch (currentStep) {
       case 1: return name && residentFront.length === 6 && residentBack.length >= 1 && phone
       case 2: return (!sameAsPolicyholder ? policyholderName : true) && notificationPerson
-      case 3: return accidentType && accidentDetail
+      case 3: {
+        if (!accidentType || !accidentDetail) return false
+        if (accidentType === '교통사고') {
+          if (carInsuranceClaim === null) return false
+          if (!carPlateNumber) return false
+        }
+        return true
+      }
       case 4: return bankName && bankAccount && bankHolder
       case 5: return insuranceCompany && selectedPlannerId
       case 6: return consentThirdParty && (signatureType === 'NON_FACE' || signatureSaved)
@@ -330,6 +343,11 @@ export default function ClaimPage() {
         accident_type: accidentType,
         accident_detail: accidentDetail,
         description: `[${accidentType}] ${accidentDetail}`,
+        car_accident_detail: accidentType === '교통사고' ? carAccidentDetail : null,
+        car_insurance_claim: accidentType === '교통사고' ? carInsuranceClaim : null,
+        car_insurance_company: accidentType === '교통사고' ? carInsuranceCompany || null : null,
+        car_agent_phone: accidentType === '교통사고' ? carAgentPhone || null : null,
+        car_plate_number: accidentType === '교통사고' ? carPlateNumber || null : null,
         bank_name: bankName,
         bank_account: bankAccount,
         bank_holder: bankHolder,
@@ -506,19 +524,102 @@ export default function ClaimPage() {
                   <label className="block text-xs font-black text-gray-500 uppercase tracking-widest mb-3">사고 유형 *</label>
                   <div className="grid grid-cols-3 gap-3">
                     {(['질병', '상해', '교통사고'] as const).map(type => (
-                      <button key={type} type="button" onClick={() => setAccidentType(type)}
-                        className={`py-5 rounded-2xl text-sm font-black border-2 transition-all ${accidentType === type ? 'border-primary-600 bg-primary-50 text-primary-700' : 'border-gray-200 bg-white text-gray-500'}`}>
+                      <button key={type} type="button"
+                        onClick={() => {
+                          setAccidentType(type)
+                          setCarInsuranceClaim(null)
+                          setCarInsuranceCompany('')
+                          setCarAgentPhone('')
+                          setCarPlateNumber('')
+                          setCarAccidentDetail('')
+                        }}
+                        className={`py-5 rounded-2xl text-sm font-black border-2 transition-all whitespace-pre-line leading-tight ${
+                          accidentType === type ? 'border-primary-600 bg-primary-50 text-primary-700' : 'border-gray-200 bg-white text-gray-500'
+                        }`}>
                         {type === '질병' ? '🏥\n질병' : type === '상해' ? '🩹\n상해' : '🚗\n교통사고'}
                       </button>
                     ))}
                   </div>
                 </div>
+
+                {/* 공통: 사고 내용 */}
                 <div>
-                  <label className="block text-xs font-black text-gray-500 uppercase tracking-widest mb-2">사고 내용 *</label>
-                  <textarea rows={5} value={accidentDetail} onChange={e => setAccidentDetail(e.target.value)}
-                    placeholder={'예시:\n- 병명: 고혈압성 심장질환\n- 입원 기간: 2024년 1월 5일 ~ 1월 12일 (7박 8일)\n- 병원명: OO대학교병원\n- 청구 내용: 입원비, 수술비, 약제비'}
+                  <label className="block text-xs font-black text-gray-500 uppercase tracking-widest mb-2">
+                    {accidentType === '교통사고' ? '진단명 / 치료 내용 *' : '사고 내용 *'}
+                  </label>
+                  <textarea rows={4} value={accidentDetail} onChange={e => setAccidentDetail(e.target.value)}
+                    placeholder={accidentType === '교통사고'
+                      ? '예시:\n- 병명: 경추 염좌, 요추 염좌\n- 치료 기간: 2024년 3월 1일 ~ 3월 20일 (20일)\n- 병원명: OO한방병원'
+                      : '예시:\n- 병명: 고혈압성 심장질환\n- 입원 기간: 2024년 1월 5일 ~ 1월 12일 (7박 8일)\n- 병원명: OO대학교병원\n- 청구 내용: 입원비, 수술비, 약제비'}
                     className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary-300 resize-none leading-relaxed" />
                 </div>
+
+                {/* 교통사고 전용 추가 필드 */}
+                {accidentType === '교통사고' && (
+                  <>
+                    <div className="h-px bg-gray-100" />
+                    <div className="bg-amber-50 border border-amber-100 rounded-2xl px-4 py-3">
+                      <p className="text-xs font-black text-amber-700">🚗 교통사고 추가 정보</p>
+                      <p className="text-xs text-amber-600 mt-0.5">아래 항목을 추가로 입력해 주세요.</p>
+                    </div>
+
+                    {/* 사고경위 */}
+                    <div>
+                      <label className="block text-xs font-black text-gray-500 uppercase tracking-widest mb-2">
+                        사고 경위 *
+                        <span className={`ml-2 normal-case font-medium ${ carAccidentDetail.length > 180 ? 'text-rose-400' : 'text-gray-300'}`}>
+                          {carAccidentDetail.length}/200
+                        </span>
+                      </label>
+                      <textarea rows={3} maxLength={200} value={carAccidentDetail} onChange={e => setCarAccidentDetail(e.target.value)}
+                        placeholder="예시: 2024년 3월 1일 오전 10시경 서울 강남구 삼성동 교차로에서 신호 대기 중 후방 차량이 추돌하여 경추 및 요추 부위에 충격을 받아 인근 병원에서 치료를 받게 됨."
+                        className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary-300 resize-none leading-relaxed" />
+                    </div>
+
+                    {/* 자동차보험 처리여부 */}
+                    <div>
+                      <label className="block text-xs font-black text-gray-500 uppercase tracking-widest mb-3">자동차보험 처리 여부 *</label>
+                      <div className="grid grid-cols-2 gap-3">
+                        {[{ val: true, label: '✅ 예 (처리함)' }, { val: false, label: '❌ 아니오 (미처리)' }].map(opt => (
+                          <button key={String(opt.val)} type="button" onClick={() => setCarInsuranceClaim(opt.val)}
+                            className={`py-4 rounded-2xl text-sm font-bold border-2 transition-all ${
+                              carInsuranceClaim === opt.val ? 'border-primary-600 bg-primary-50 text-primary-700' : 'border-gray-200 bg-white text-gray-500'
+                            }`}>
+                            {opt.label}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* 자동차보험 처리 시 추가 필드 */}
+                    {carInsuranceClaim === true && (
+                      <>
+                        <div>
+                          <label className="block text-xs font-black text-gray-500 uppercase tracking-widest mb-2">담당 보험사</label>
+                          <select value={carInsuranceCompany} onChange={e => setCarInsuranceCompany(e.target.value)}
+                            className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary-300 bg-white">
+                            <option value="">보험사를 선택하세요</option>
+                            {COMPANY_NAMES.map(c => <option key={c} value={c}>{c}</option>)}
+                          </select>
+                        </div>
+                        <div>
+                          <label className="block text-xs font-black text-gray-500 uppercase tracking-widest mb-2">담당자 연락처</label>
+                          <input type="tel" value={carAgentPhone} onChange={e => setCarAgentPhone(e.target.value)}
+                            placeholder="담당 보상 직원 연락처 (예: 010-0000-0000)"
+                            className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary-300" />
+                        </div>
+                      </>
+                    )}
+
+                    {/* 본인 차량번호 */}
+                    <div>
+                      <label className="block text-xs font-black text-gray-500 uppercase tracking-widest mb-2">본인 차량번호 *</label>
+                      <input type="text" value={carPlateNumber} onChange={e => setCarPlateNumber(e.target.value.toUpperCase())}
+                        placeholder="예: 123가 4567"
+                        className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary-300 tracking-widest font-bold" />
+                    </div>
+                  </>
+                )}
               </>
             )}
 
