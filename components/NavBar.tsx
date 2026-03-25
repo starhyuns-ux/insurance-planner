@@ -147,6 +147,7 @@ export default function NavBar() {
             <Link href="/calculator" className="text-primary-600 font-bold hover:text-primary-700 transition-colors whitespace-nowrap">{t('navSilbiCalc')}</Link>
             <Link href="/disease-codes" className="text-primary-600 font-bold hover:text-primary-700 transition-colors whitespace-nowrap">{t('navDiseaseSearch')}</Link>
             <Link href="/contacts" className="text-primary-600 font-bold hover:text-primary-700 transition-colors whitespace-nowrap">{t('navCustomerCenter')}</Link>
+            <Link href="/claim" className="text-rose-600 font-bold hover:text-rose-700 transition-colors whitespace-nowrap">{t('navClaim')}</Link>
           </div>
         </div>
       </div>
@@ -173,6 +174,7 @@ export default function NavBar() {
             <Link href="/calculator" onClick={() => setIsOpen(false)} className="text-gray-800 font-bold text-lg hover:text-primary-600">{t('navSilbiCalc')}</Link>
             <Link href="/disease-codes" onClick={() => setIsOpen(false)} className="text-gray-800 font-bold text-lg hover:text-primary-600">{t('navDiseaseSearch')}</Link>
             <Link href="/contacts" onClick={() => setIsOpen(false)} className="text-gray-800 font-bold text-lg hover:text-primary-600">{t('navCustomerCenter')}</Link>
+            <Link href="/claim" onClick={() => setIsOpen(false)} className="text-rose-600 font-black text-lg hover:text-rose-700">{t('navClaim')}</Link>
             
             <div className="pt-4 mt-4 border-t border-gray-100 flex flex-col gap-4">
               {/* Language switcher in mobile menu */}

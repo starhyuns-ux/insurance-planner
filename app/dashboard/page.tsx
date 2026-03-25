@@ -27,7 +27,8 @@ import {
   ChatBubbleLeftRightIcon,
   GiftIcon,
   DocumentCheckIcon,
-  PhotoIcon
+  PhotoIcon,
+  PaperAirplaneIcon
 } from '@heroicons/react/24/outline'
 import BoardPage from '@/components/BoardPage'
 import { 
@@ -243,9 +244,12 @@ interface Claim {
   id: string;
   planner_id: string;
   customer_name: string;
+  customer_phone?: string;
   description: string;
   image_urls: string[];
+  insurance_company?: string;
   status: 'PENDING' | 'IN_PROGRESS' | 'COMPLETED';
+  transmission_status: 'NOT_SENT' | 'SENT';
   created_at: string;
 }
 
@@ -372,6 +376,7 @@ export default function DashboardPage() {
   const [newClaimDesc, setNewClaimDesc] = useState('')
   const [newClaimImages, setNewClaimImages] = useState<File[]>([])
   const [uploadingClaim, setUploadingClaim] = useState(false)
+  const [transmittingClaimId, setTransmittingClaimId] = useState<string | null>(null)
   const [newTodoContent, setNewTodoContent] = useState('')
   const [todoDate, setTodoDate] = useState(format(new Date(), 'yyyy-MM-dd'))
   const [referrals, setReferrals] = useState<Referral[]>([])
@@ -698,6 +703,25 @@ export default function DashboardPage() {
     if(!confirm('정말 이 청구건을 삭제하시겠습니까?')) return
     const { error } = await supabase.from('claims').delete().eq('id', id)
     if (!error) setClaims(claims.filter(c => c.id !== id))
+  }
+
+  const transmitClaim = async (id: string) => {
+    setTransmittingClaimId(id)
+    try {
+      const res = await fetch('/api/claims/transmit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ claimId: id }),
+      })
+      const json = await res.json()
+      if (!res.ok) throw new Error(json.error)
+      setClaims(claims.map(c => c.id === id ? { ...c, transmission_status: 'SENT', status: 'IN_PROGRESS' } : c))
+      alert(json.message || '송신이 완료되었습니다.')
+    } catch (err: any) {
+      alert('송신 중 오류가 발생했습니다: ' + err.message)
+    } finally {
+      setTransmittingClaimId(null)
+    }
   }
 
   const handleCopyUrl = (id: string) => {
@@ -2351,16 +2375,26 @@ export default function DashboardPage() {
 
                 {/* Claims List */}
                 <div className="bg-white rounded-[2rem] shadow-sm border border-gray-100 overflow-hidden">
-                  <div className="px-8 py-6 border-b border-gray-50">
+                  <div className="px-8 py-6 border-b border-gray-50 flex items-center justify-between">
                     <h3 className="text-lg font-black text-gray-900">보상청구 접수 내역 <span className="text-primary-600">{claims.length}</span></h3>
+                    <div className="flex items-center gap-4 text-xs font-bold text-gray-400">
+                      <span><span className="inline-block w-2.5 h-2.5 rounded-full bg-amber-400 mr-1" />접수 대기</span>
+                      <span><span className="inline-block w-2.5 h-2.5 rounded-full bg-blue-400 mr-1" />송신 완료</span>
+                      <span><span className="inline-block w-2.5 h-2.5 rounded-full bg-emerald-400 mr-1" />지급 완료</span>
+                    </div>
                   </div>
                   <div className="divide-y divide-gray-50">
                     {claims.map((claim) => (
                       <div key={claim.id} className="p-8 hover:bg-gray-50/50 transition-colors">
                         <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
                           <div className="flex-1 space-y-2">
-                            <div className="flex items-center gap-3">
+                            <div className="flex flex-wrap items-center gap-2">
                               <span className="font-black text-gray-900 text-lg">{claim.customer_name}</span>
+                              {claim.customer_phone && (
+                                <a href={`tel:${claim.customer_phone}`} className="text-xs text-primary-600 font-bold bg-primary-50 px-2 py-0.5 rounded-lg hover:bg-primary-100 transition-colors">
+                                  {claim.customer_phone}
+                                </a>
+                              )}
                               <span className="text-xs font-bold text-gray-400">{new Date(claim.created_at).toLocaleDateString()}</span>
                               <span className={`px-3 py-1 text-[10px] font-black uppercase tracking-widest rounded-full ${
                                 claim.status === 'PENDING' ? 'bg-amber-50 text-amber-600' :
@@ -2369,7 +2403,18 @@ export default function DashboardPage() {
                               }`}>
                                 {claim.status === 'PENDING' ? '접수 대기' : claim.status === 'IN_PROGRESS' ? '처리 중' : '지급 완료'}
                               </span>
+                              {claim.transmission_status === 'SENT' ? (
+                                <span className="px-3 py-1 text-[10px] font-black rounded-full bg-teal-50 text-teal-600">📤 보험사 송신완료</span>
+                              ) : (
+                                <span className="px-3 py-1 text-[10px] font-black rounded-full bg-gray-50 text-gray-400">송신 전</span>
+                              )}
                             </div>
+                            {claim.insurance_company && (
+                              <div className="flex items-center gap-1.5">
+                                <span className="w-1.5 h-1.5 rounded-full bg-primary-400 inline-block" />
+                                <span className="text-sm font-black text-primary-700">{claim.insurance_company}</span>
+                              </div>
+                            )}
                             <p className="text-sm text-gray-600 break-words whitespace-pre-wrap">{claim.description}</p>
                             
                             {/* Images Viewer */}
@@ -2389,9 +2434,15 @@ export default function DashboardPage() {
                           
                           {/* Actions */}
                           <div className="flex items-center gap-2 md:flex-col md:items-end md:gap-2 pt-2 md:pt-0 shrink-0">
-                            {claim.status === 'PENDING' && (
-                              <button onClick={() => updateClaimStatus(claim.id, 'IN_PROGRESS')} className="px-4 py-2 bg-blue-50 text-blue-600 hover:bg-blue-100 rounded-lg text-xs font-black transition-colors w-full md:w-auto text-center">
-                                처리 중으로
+                            {/* Send to insurance button */}
+                            {claim.insurance_company && claim.transmission_status !== 'SENT' && (
+                              <button
+                                onClick={() => transmitClaim(claim.id)}
+                                disabled={transmittingClaimId === claim.id}
+                                className="px-4 py-2 bg-primary-600 text-white hover:bg-primary-700 rounded-lg text-xs font-black transition-colors w-full md:w-auto text-center flex items-center gap-1.5 justify-center shadow-sm disabled:opacity-50"
+                              >
+                                <PaperAirplaneIcon className="w-3.5 h-3.5" />
+                                {transmittingClaimId === claim.id ? '송신 중...' : `${claim.insurance_company}으로 송신`}
                               </button>
                             )}
                             {claim.status === 'IN_PROGRESS' && (
@@ -2410,6 +2461,7 @@ export default function DashboardPage() {
                       <div className="p-16 text-center">
                         <DocumentCheckIcon className="w-12 h-12 text-gray-200 mx-auto mb-4" />
                         <p className="text-gray-400 font-bold">등록된 보상청구 내역이 없습니다.</p>
+                        <p className="text-xs text-gray-300 mt-1">고객이 보상청구 페이지에서 등록하거나, 위의 양식으로 직접 접수해주세요.</p>
                       </div>
                     )}
                   </div>
