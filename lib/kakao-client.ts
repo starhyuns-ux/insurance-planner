@@ -38,6 +38,13 @@ export const loginWithKakao = (): Promise<any> => {
   })
 }
 
+export const getKakaoToken = () => {
+  if (typeof window !== 'undefined' && window.Kakao) {
+    return window.Kakao.Auth.getAccessToken()
+  }
+  return null
+}
+
 export const fetchKakaoFriends = (): Promise<any[]> => {
   return new Promise((resolve, reject) => {
     if (!window.Kakao) return reject('Kakao SDK not loaded')

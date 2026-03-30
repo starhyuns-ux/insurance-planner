@@ -32,30 +32,49 @@ export default function LoginPage() {
 
     try {
       if (isPhone) {
-        // Find email by phone number from planners table
         const cleanPhone = email.replace(/-/g, '')
-        const { data: planner, error: lookupError } = await supabase
+        const { data: planners, error: lookupError } = await supabase
           .from('planners')
-          .select('email')
+          .select('email, id')
           .eq('phone', cleanPhone)
-          .single()
         
-        if (lookupError || !planner?.email) {
-          throw new Error('등록된 휴대폰 번호를 찾을 수 없습니다.')
+        if (lookupError) {
+          console.error('Phone lookup error:', lookupError)
+          throw new Error('휴대폰 번호 조회 중 오류가 발생했습니다.')
         }
-        loginEmail = planner.email
+        
+        if (!planners || planners.length === 0) {
+          throw new Error('등록된 휴대폰 번호를 찾을 수 없습니다. 다시 확인해 주세요.')
+        }
+        
+        const firstPlanner = planners.find(p => p.email)
+        if (!firstPlanner?.email) {
+          throw new Error('해당 번호에 연결된 가입 이메일 정보를 찾을 수 없습니다. (데이터 동기화 필요)')
+        }
+        loginEmail = firstPlanner.email
       }
 
-      const { error: loginError } = await supabase.auth.signInWithPassword({
+      const { data: authData, error: loginError } = await supabase.auth.signInWithPassword({
         email: loginEmail,
         password,
       })
-      if (loginError) throw loginError
+      
+      if (loginError) {
+        console.error('Login error details:', loginError)
+        if (loginError.message.includes('Invalid login credentials')) {
+          throw new Error('이메일(번호) 또는 비밀번호가 올바르지 않습니다.')
+        } else if (loginError.message.includes('Email not confirmed')) {
+          throw new Error('이메일 인증이 완료되지 않은 계정입니다. 메일함을 확인해 주세요.')
+        } else if (loginError.message.includes('User not found')) {
+          throw new Error('가입되지 않은 계정입니다. 신규 가입을 진행해 주세요.')
+        }
+        throw loginError
+      }
+      
       router.push('/dashboard')
     } catch (err: any) {
-      setError(err.message === '등록된 휴대폰 번호를 찾을 수 없습니다.' 
-        ? err.message 
-        : '이메일(번호) 또는 비밀번호가 올바르지 않습니다.')
+      console.error('Final login error:', err)
+      setError(err.message || '로그인 중 예기치 않은 오류가 발생했습니다.')
     } finally {
       setLoading(false)
     }

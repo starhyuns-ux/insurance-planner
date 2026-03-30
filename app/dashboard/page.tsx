@@ -372,30 +372,68 @@ function KakaoTalkPanel() {
   const [message, setMessage] = useState('')
   const [sending, setSending] = useState(false)
   const [loadingFriends, setLoadingFriends] = useState(false)
+  const [isSdkReady, setIsSdkReady] = useState(false)
 
-  const { initKakao, loginWithKakao, fetchKakaoFriends, sendKakaoDefault } = require('@/lib/kakao-client')
+  const { initKakao, loginWithKakao, fetchKakaoFriends, sendKakaoDefault, getKakaoToken } = require('@/lib/kakao-client')
 
   useEffect(() => {
-    initKakao()
+    let checkInterval: any;
+    
+    const initialize = async () => {
+      try {
+        initKakao()
+        
+        // Wait for window.Kakao to be ready (it's loaded async in layout.tsx)
+        checkInterval = setInterval(() => {
+          if (typeof window !== 'undefined' && window.Kakao && window.Kakao.isInitialized()) {
+            setIsSdkReady(true)
+            clearInterval(checkInterval)
+            
+            // Now check for existing session
+            const token = getKakaoToken()
+            if (token) {
+              console.log('Kakao existing session detected')
+              setIsLoggedIn(true)
+              fetchFriends()
+            }
+          }
+        }, 300)
+      } catch (e) {
+        console.error('Kakao init error:', e)
+      }
+    }
+
+    initialize()
+    return () => { if (checkInterval) clearInterval(checkInterval) }
   }, [])
 
   const handleLogin = async () => {
+    if (!isSdkReady) {
+      alert('카카오 SDK 로딩 중입니다. 잠시 후 다시 시도해 주세요.')
+      return
+    }
     try {
       await loginWithKakao()
       setIsLoggedIn(true)
       fetchFriends()
     } catch (err) {
-      alert('카카오 로그인에 실패했습니다.')
+      console.error('Kakao login detailed error:', err)
+      alert('카카오 로그인에 실패했습니다. 권한 동의를 확인하거나 개발자 콘솔의 설정을 확인해 주세요.')
     }
   }
 
   const fetchFriends = async () => {
+    if (!isSdkReady) return
     setLoadingFriends(true)
     try {
       const friendList = await fetchKakaoFriends()
       setFriends(friendList)
     } catch (err) {
-      console.error(err)
+      console.error('Failed to fetch Kakao friends:', err)
+      // If unauthorized, reset login state
+      if (err && (err as any).code === -401) {
+        setIsLoggedIn(false)
+      }
     } finally {
       setLoadingFriends(false)
     }
