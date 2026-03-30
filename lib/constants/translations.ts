@@ -107,7 +107,6 @@ export const translations = {
     brainLabel: '뇌혈관질환 진단비',
     heartLabel: '허혈성심장질환 진단비',
     cancerTreatmentLabel: '비급여 암주요치료비',
-    cancerTreatmentDiscountLabel: '비급여 암주요치료비 (17% 할인)',
 
     // New tools for Card expansion
     fifthGenSilbi: '5세대 실손보험 가이드',
@@ -451,7 +450,6 @@ export const translations = {
     brainLabel: 'Cerebrovascular Diagnosis',
     heartLabel: 'Ischemic Heart Diagnosis',
     cancerTreatmentLabel: 'Non-covered Cancer Treatment',
-    cancerTreatmentDiscountLabel: 'Non-covered Cancer Treatment (17% Off)',
 
     // New tools for Card expansion
     fifthGenSilbi: '5th Gen Silbi Guide',
@@ -795,7 +793,6 @@ export const translations = {
     brainLabel: '脑血管疾病确诊金',
     heartLabel: '缺血性心脏病确诊金',
     cancerTreatmentLabel: '非医保癌症主要治疗费',
-    cancerTreatmentDiscountLabel: '非医保癌症主要治疗费 (17% 折扣)',
 
     // New tools for Card expansion
     fifthGenSilbi: '第5代实费保险指南',

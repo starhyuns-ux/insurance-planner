@@ -165,7 +165,6 @@ export default function InsurancePremiumCalculator() {
   const [injurySurgeryAmount, setInjurySurgeryAmount] = useState<number>(1500);
   const [diseaseSurgeryAmount, setDiseaseSurgeryAmount] = useState<number>(2000);
   const [cancerTreatmentAmount, setCancerTreatmentAmount] = useState<number>(5000);
-  const [cancerTreatmentDiscountAmount, setCancerTreatmentDiscountAmount] = useState<number>(5000);
   
   const [isCalculated, setIsCalculated] = useState(false);
   const [showResults, setShowResults] = useState(false);
@@ -188,7 +187,6 @@ export default function InsurancePremiumCalculator() {
       injurySurgery: calcPremium(injurySurgeryAmount, injurySurgeryRateTable[insuranceAge][gender]),
       diseaseSurgery: calcPremium(diseaseSurgeryAmount, diseaseSurgeryRateTable[insuranceAge][gender]),
       cancerTreatment: calcPremium(cancerTreatmentAmount, cancerRateTable[insuranceAge][gender]),
-      cancerTreatmentDiscount: calcPremium(cancerTreatmentDiscountAmount, cancerRateTable[insuranceAge][gender]) * 0.83,
     };
 
     const total = Object.values(premiums).reduce((acc, curr) => acc + curr, 0);
@@ -199,7 +197,7 @@ export default function InsurancePremiumCalculator() {
       age: insuranceAge,
       genderLabel: gender === 'male' ? t('male') : t('female')
     };
-  }, [gender, insuranceAge, cancerAmount, brainAmount, heartAmount, injurySurgeryAmount, diseaseSurgeryAmount, cancerTreatmentAmount, cancerTreatmentDiscountAmount, t]);
+  }, [gender, insuranceAge, cancerAmount, brainAmount, heartAmount, injurySurgeryAmount, diseaseSurgeryAmount, cancerTreatmentAmount, t]);
 
   const formatMoney = (amount: number) => {
     if (amount <= 0) return `0 ${t('currencyUnit')}`
@@ -363,7 +361,6 @@ export default function InsurancePremiumCalculator() {
                     { id: 'injury', label: t('injurySurgery'), value: injurySurgeryAmount, setter: setInjurySurgeryAmount, icon: BoltIcon, color: 'text-green-500' },
                     { id: 'disease', label: t('diseaseSurgery'), value: diseaseSurgeryAmount, setter: setDiseaseSurgeryAmount, icon: ShieldCheckIcon, color: 'text-indigo-500' },
                     { id: 'cancerTreatment', label: t('cancerTreatmentLabel') || '비급여 암주요치료비', value: cancerTreatmentAmount, setter: setCancerTreatmentAmount, icon: ShieldCheckIcon, color: 'text-purple-500' },
-                    { id: 'cancerTreatmentDiscount', label: t('cancerTreatmentDiscountLabel') || '비급여 암주요치료비 (17% 할인)', value: cancerTreatmentDiscountAmount, setter: setCancerTreatmentDiscountAmount, icon: ShieldCheckIcon, color: 'text-fuchsia-500' },
                   ].map((item) => (
                     <div key={item.id}>
                       <div className="flex justify-between items-center mb-1.5 ml-1">
@@ -441,7 +438,6 @@ export default function InsurancePremiumCalculator() {
                   { label: t('injurySurgery'), amount: injurySurgeryAmount, premium: results.premiums.injurySurgery, icon: BoltIcon, bg: 'bg-green-50', text: 'text-green-700', iconColor: 'text-green-500' },
                   { label: t('diseaseSurgery'), amount: diseaseSurgeryAmount, premium: results.premiums.diseaseSurgery, icon: ShieldCheckIcon, bg: 'bg-indigo-50', text: 'text-indigo-700', iconColor: 'text-indigo-500' },
                   { label: t('cancerTreatmentLabel') || '비급여 암주요치료비', amount: cancerTreatmentAmount, premium: results.premiums.cancerTreatment, icon: ShieldCheckIcon, bg: 'bg-purple-50', text: 'text-purple-700', iconColor: 'text-purple-500' },
-                  { label: t('cancerTreatmentDiscountLabel') || '비급여 암주요치료비 (17% 할인)', amount: cancerTreatmentDiscountAmount, premium: results.premiums.cancerTreatmentDiscount, icon: ShieldCheckIcon, bg: 'bg-fuchsia-50', text: 'text-fuchsia-700', iconColor: 'text-fuchsia-500' },
                 ].map((item, idx) => (
                   <div key={idx} className="group p-5 rounded-2xl bg-gray-50 border border-transparent hover:border-gray-200 transition-all">
                     <div className="flex items-center justify-between mb-3">
