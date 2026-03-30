@@ -37,6 +37,27 @@ const cancerRateTable: Record<number, { male: number; female: number }> = {
   68:{male:18660,female:17750},69:{male:19020,female:18070},70:{male:19380,female:18390}
 };
 
+const cancerTreatmentRateTable: Record<number, { male: number; female: number }> = {
+  0:{male:8350,female:8350},1:{male:8445,female:8445},2:{male:8540,female:8540},3:{male:8635,female:8635},
+  4:{male:8730,female:8730},5:{male:8825,female:8825},6:{male:8920,female:8920},7:{male:9015,female:9015},
+  8:{male:9110,female:9110},9:{male:9205,female:9205},10:{male:9300,female:9300},11:{male:9395,female:9395},
+  12:{male:9490,female:9490},13:{male:9585,female:9585},14:{male:9680,female:9680},15:{male:9775,female:9775},
+  16:{male:9870,female:9870},17:{male:9965,female:9965},18:{male:10060,female:10060},19:{male:10155,female:10155},
+  20:{male:10250,female:10250},21:{male:10345,female:10345},22:{male:10440,female:10440},23:{male:10535,female:10535},
+  24:{male:10630,female:10630},25:{male:10725,female:10725},26:{male:10820,female:10820},27:{male:10915,female:10915},
+  28:{male:11010,female:11010},29:{male:11105,female:11105},30:{male:11200,female:11200},31:{male:11295,female:11295},
+  32:{male:11390,female:11390},33:{male:11485,female:11485},34:{male:11580,female:11580},35:{male:11675,female:11675},
+  36:{male:11770,female:11770},37:{male:11865,female:11865},38:{male:11960,female:11960},39:{male:12055,female:12055},
+  40:{male:12150,female:12150},41:{male:12245,female:12245},42:{male:12340,female:12340},43:{male:12435,female:12435},
+  44:{male:12530,female:12530},45:{male:12625,female:12625},46:{male:12720,female:12720},47:{male:12815,female:12815},
+  48:{male:12910,female:12910},49:{male:13005,female:13005},50:{male:13100,female:13100},51:{male:13195,female:13195},
+  52:{male:13290,female:13290},53:{male:13385,female:13385},54:{male:13480,female:13480},55:{male:13575,female:13575},
+  56:{male:13670,female:13670},57:{male:13765,female:13765},58:{male:13860,female:13860},59:{male:13955,female:13955},
+  60:{male:14050,female:14050},61:{male:14145,female:14145},62:{male:14240,female:14240},63:{male:14335,female:14335},
+  64:{male:14430,female:14430},65:{male:14525,female:14525},66:{male:14620,female:14620},67:{male:14715,female:14715},
+  68:{male:14810,female:14810},69:{male:14905,female:14905},70:{male:15000,female:15000}
+};
+
 const brainRateTable: Record<number, { male: number; female: number }> = {
   0:{male:3000,female:3200},1:{male:3000,female:3200},2:{male:3000,female:3200},3:{male:3000,female:3200},
   4:{male:3000,female:3200},5:{male:3000,female:3200},6:{male:3000,female:3200},7:{male:3000,female:3200},
@@ -186,7 +207,7 @@ export default function InsurancePremiumCalculator() {
       heart: calcPremium(heartAmount, heartRateTable[insuranceAge][gender]),
       injurySurgery: calcPremium(injurySurgeryAmount, injurySurgeryRateTable[insuranceAge][gender]),
       diseaseSurgery: calcPremium(diseaseSurgeryAmount, diseaseSurgeryRateTable[insuranceAge][gender]),
-      cancerTreatment: calcPremium(cancerTreatmentAmount, cancerRateTable[insuranceAge][gender]),
+      cancerTreatment: calcPremium(cancerTreatmentAmount, cancerTreatmentRateTable[insuranceAge][gender]),
     };
 
     const total = Object.values(premiums).reduce((acc, curr) => acc + curr, 0);
