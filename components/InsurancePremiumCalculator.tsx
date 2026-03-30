@@ -180,7 +180,7 @@ export default function InsurancePremiumCalculator() {
   const [gender, setGender] = useState<'male' | 'female'>('male');
   const [birthDate, setBirthDate] = useState<string>('');
   
-  const [cancerAmount, setCancerAmount] = useState<number>(5000);
+  const [cancerAmount, setCancerAmount] = useState<number>(10000);
   const [brainAmount, setBrainAmount] = useState<number>(2000);
   const [heartAmount, setHeartAmount] = useState<number>(2000);
   const [injurySurgeryAmount, setInjurySurgeryAmount] = useState<number>(1500);
