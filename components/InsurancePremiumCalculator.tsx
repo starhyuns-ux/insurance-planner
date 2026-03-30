@@ -38,24 +38,24 @@ const cancerRateTable: Record<number, { male: number; female: number }> = {
 };
 
 const cancerTreatmentRateTable: Record<number, { male: number; female: number }> = {
-  0:{male:8350,female:8350},1:{male:8445,female:8445},2:{male:8540,female:8540},3:{male:8635,female:8635},
-  4:{male:8730,female:8730},5:{male:8825,female:8825},6:{male:8920,female:8920},7:{male:9015,female:9015},
-  8:{male:9110,female:9110},9:{male:9205,female:9205},10:{male:9300,female:9300},11:{male:9395,female:9395},
-  12:{male:9490,female:9490},13:{male:9585,female:9585},14:{male:9680,female:9680},15:{male:9775,female:9775},
-  16:{male:9870,female:9870},17:{male:9965,female:9965},18:{male:10060,female:10060},19:{male:10155,female:10155},
-  20:{male:10250,female:10250},21:{male:10345,female:10345},22:{male:10440,female:10440},23:{male:10535,female:10535},
-  24:{male:10630,female:10630},25:{male:10725,female:10725},26:{male:10820,female:10820},27:{male:10915,female:10915},
-  28:{male:11010,female:11010},29:{male:11105,female:11105},30:{male:11200,female:11200},31:{male:11295,female:11295},
-  32:{male:11390,female:11390},33:{male:11485,female:11485},34:{male:11580,female:11580},35:{male:11675,female:11675},
-  36:{male:11770,female:11770},37:{male:11865,female:11865},38:{male:11960,female:11960},39:{male:12055,female:12055},
-  40:{male:12150,female:12150},41:{male:12245,female:12245},42:{male:12340,female:12340},43:{male:12435,female:12435},
-  44:{male:12530,female:12530},45:{male:12625,female:12625},46:{male:12720,female:12720},47:{male:12815,female:12815},
-  48:{male:12910,female:12910},49:{male:13005,female:13005},50:{male:13100,female:13100},51:{male:13195,female:13195},
-  52:{male:13290,female:13290},53:{male:13385,female:13385},54:{male:13480,female:13480},55:{male:13575,female:13575},
-  56:{male:13670,female:13670},57:{male:13765,female:13765},58:{male:13860,female:13860},59:{male:13955,female:13955},
-  60:{male:14050,female:14050},61:{male:14145,female:14145},62:{male:14240,female:14240},63:{male:14335,female:14335},
-  64:{male:14430,female:14430},65:{male:14525,female:14525},66:{male:14620,female:14620},67:{male:14715,female:14715},
-  68:{male:14810,female:14810},69:{male:14905,female:14905},70:{male:15000,female:15000}
+  0:{male:832,female:832},1:{male:844,female:844},2:{male:856,female:856},3:{male:869,female:869},
+  4:{male:881,female:881},5:{male:893,female:893},6:{male:905,female:905},7:{male:918,female:918},
+  8:{male:930,female:930},9:{male:942,female:942},10:{male:954,female:954},11:{male:967,female:967},
+  12:{male:979,female:979},13:{male:991,female:991},14:{male:1003,female:1003},15:{male:1016,female:1016},
+  16:{male:1028,female:1028},17:{male:1040,female:1040},18:{male:1052,female:1052},19:{male:1065,female:1065},
+  20:{male:1077,female:1077},21:{male:1089,female:1089},22:{male:1101,female:1101},23:{male:1114,female:1114},
+  24:{male:1126,female:1126},25:{male:1138,female:1138},26:{male:1150,female:1150},27:{male:1163,female:1163},
+  28:{male:1175,female:1175},29:{male:1187,female:1187},30:{male:1199,female:1199},31:{male:1212,female:1212},
+  32:{male:1224,female:1224},33:{male:1236,female:1236},34:{male:1248,female:1248},35:{male:1261,female:1261},
+  36:{male:1273,female:1273},37:{male:1285,female:1285},38:{male:1297,female:1297},39:{male:1309,female:1309},
+  40:{male:1322,female:1322},41:{male:1334,female:1334},42:{male:1346,female:1346},43:{male:1358,female:1358},
+  44:{male:1371,female:1371},45:{male:1383,female:1383},46:{male:1395,female:1395},47:{male:1407,female:1407},
+  48:{male:1420,female:1420},49:{male:1432,female:1432},50:{male:1444,female:1444},51:{male:1456,female:1456},
+  52:{male:1469,female:1469},53:{male:1481,female:1481},54:{male:1493,female:1493},55:{male:1505,female:1505},
+  56:{male:1518,female:1518},57:{male:1530,female:1530},58:{male:1542,female:1542},59:{male:1554,female:1554},
+  60:{male:1567,female:1567},61:{male:1579,female:1579},62:{male:1591,female:1591},63:{male:1603,female:1603},
+  64:{male:1616,female:1616},65:{male:1628,female:1628},66:{male:1640,female:1640},67:{male:1652,female:1652},
+  68:{male:1665,female:1665},69:{male:1677,female:1677},70:{male:1689,female:1689}
 };
 
 const brainRateTable: Record<number, { male: number; female: number }> = {
