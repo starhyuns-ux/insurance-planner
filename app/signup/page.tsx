@@ -39,12 +39,10 @@ export default function SignupPage() {
 
     // Clean phone number: remove dashes
     const cleanPhone = phone.replace(/-/g, '')
-    // Internally use phone@planner.stroy.kr as the email for Supabase Auth
-    const internalEmail = `${cleanPhone}@planner.stroy.kr`
 
     try {
       const { data: { user }, error: signUpError } = await supabase.auth.signUp({
-        email: internalEmail,
+        email: email, // 실제 이메일 사용
         password,
         options: {
           data: {
@@ -60,7 +58,7 @@ export default function SignupPage() {
       if (signUpError) throw signUpError
 
       if (user) {
-        alert('회원가입이 완료되었습니다! 휴대폰 번호로 로그인해 주세요.')
+        alert('회원가입이 완료되었습니다! 이메일 또는 휴대폰 번호로 로그인해 주세요.')
         router.push('/login')
       }
     } catch (err: any) {
@@ -89,6 +87,18 @@ export default function SignupPage() {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="홍길동"
+                className="w-full px-5 py-3.5 bg-gray-50 border border-transparent rounded-2xl focus:bg-white focus:border-primary-500 transition-all outline-none"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-bold text-gray-700 mb-2 ml-1">이메일 주소 (비밀번호 찾기용)</label>
+              <input
+                type="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="example@email.com"
                 className="w-full px-5 py-3.5 bg-gray-50 border border-transparent rounded-2xl focus:bg-white focus:border-primary-500 transition-all outline-none"
               />
             </div>

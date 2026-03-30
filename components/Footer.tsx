@@ -66,7 +66,7 @@ export default function Footer() {
           <div className="flex gap-4 md:self-end">
             <a href="#" className="hover:text-gray-600 transition-colors">{t('footerTerms')}</a>
             <div className="w-px h-3 bg-gray-300 rounded self-center"></div>
-            <a href="#" className="font-bold text-gray-600 hover:text-gray-800 transition-colors">{t('footerPrivacy')}</a>
+            <Link href="/privacy" className="font-bold text-gray-600 hover:text-gray-800 transition-colors">{t('footerPrivacy')}</Link>
           </div>
         </div>
       </div>

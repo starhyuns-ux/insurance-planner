@@ -21,8 +21,7 @@ export class FaxClient {
   }
 
   /**
-   * Send a fax with multiple files
-   * @param params 
+   * Send a fax with multiple files using Popbill SDK
    */
   async sendFax(params: {
     receiverNum: string
@@ -30,43 +29,59 @@ export class FaxClient {
     senderNum: string
     senderName: string
     title: string
-    files: Buffer[] // Array of PDF/Image buffers
-  }) {
+    files: Buffer[]
+  }): Promise<{ success: boolean; receiptId: string; status: string }> {
     if (this.isMock) {
       console.log('--- [FAX MOCK MODE] ---')
       console.log(`To: ${params.receiverName} (${params.receiverNum})`)
       console.log(`From: ${params.senderName} (${params.senderNum})`)
-      console.log(`Title: ${params.title}`)
-      console.log(`Files: ${params.files.length} documents generated/attached`)
-      console.log('-----------------------')
-      
-      // Simulate API response
-      return {
-        success: true,
-        receiptId: `MOCK_FAX_${Date.now()}_${Math.random().toString(36).slice(7)}`,
-        status: 'SUCCESS_MOCK',
-      }
+      const mockId = `MOCK_FAX_${Date.now()}_${Math.random().toString(36).slice(7)}`
+      return { success: true, receiptId: mockId, status: 'SUCCESS_MOCK' }
     }
 
-    /**
-     * REAL POPBILL INTEGRATION
-     * Note: Popbill usually requires their SDK or a specific HMAC-SHA1 auth header.
-     * Implementation below shows the architectural structure for the REST API.
-     */
-    try {
-      // In a real implementation with the Popbill SDK:
-      // const popbill = require('popbill');
-      // popbill.config({ LinkID: this.apiKey, SecretKey: this.apiSecret });
-      // const receiptId = await popbill.Fax.sendFax(this.corpNum, { ... });
-      
-      // For now, if keys are provided but SDK is not installed, we'd use fetch() to their endpoint
-      // with the required headers. 
-      
-      throw new Error('Real Popbill SDK/API integration requires specific library setup. Falling back to Log.')
-    } catch (err: any) {
-      console.error('[FAX CLIENT ERROR]', err.message)
-      throw err
-    }
+    const popbill = require('popbill')
+    popbill.config({
+      LinkID: this.apiKey,
+      SecretKey: this.apiSecret,
+      IsTest: false, // Set to false for production
+    })
+
+    const faxService = popbill.FaxService()
+    const corpNum = this.corpNum!
+    const userId = this.userId!
+
+    const receivers = [
+      {
+        receiveNum: params.receiverNum,
+        receiveName: params.receiverName,
+      },
+    ]
+
+    const binaryFiles = params.files.map((data, index) => ({
+      fileName: `claim_doc_${index + 1}.pdf`,
+      fileData: data,
+    }))
+
+    return new Promise((resolve, reject) => {
+      // Popbill sendFaxBinary params: (CorpNum, senderNumber, receivers, binaryFiles, sendDT, success, error)
+      // Empty string for sendDT means immediate transmission
+      faxService.sendFaxBinary(
+        corpNum,
+        params.senderNum,
+        receivers,
+        binaryFiles,
+        '',
+        (receiptId: string) => {
+          console.log('[FAX SUCCESS] Receipt ID:', receiptId)
+          resolve({ success: true, receiptId, status: 'SENT' })
+        },
+        (error: any) => {
+          console.error('[FAX ERROR]', error)
+          reject(new Error(`Popbill Error [${error.code}]: ${error.message}`))
+        },
+        userId
+      )
+    })
   }
 }
 

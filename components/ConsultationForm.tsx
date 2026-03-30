@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from 'react'
+import Link from 'next/link'
 import { useAttribution } from '@/lib/attribution'
 import { useLanguage } from '@/lib/contexts/LanguageContext'
 
@@ -181,7 +182,9 @@ export default function ConsultationForm({ id = "consultation", plannerId, plann
                     />
                   </div>
                   <div className="text-sm text-gray-600">
-                    <span className="font-semibold text-gray-800">{t('formAgree')}</span>
+                    <Link href="/privacy" className="font-semibold text-gray-800 hover:text-primary-600 underline underline-offset-4 decoration-gray-300 hover:decoration-primary-300 transition-all cursor-pointer">
+                      {t('formAgree')}
+                    </Link>
                     <div className="mt-2 p-3 bg-gray-50 rounded-lg text-xs text-gray-500 border border-gray-100">
                       {t('formPrivacyPurpose')}<br />
                       {t('formPrivacyItems')}<br />

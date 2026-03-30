@@ -519,6 +519,316 @@ function KakaoTalkPanel() {
 }
 // ─────────────────────────────────────────────────────────────────
 
+// ── Subscription Tab Component ────────────────────────────────────
+function SubscriptionTab({ planner }: { planner: { id: string; name: string; subscription_status: string } | null }) {
+  const [payments, setPayments] = useState<any[]>([])
+  const [loadingPayments, setLoadingPayments] = useState(true)
+  const [checkingOut, setCheckingOut] = useState(false)
+
+  useEffect(() => {
+    fetchPaymentHistory()
+  }, [])
+
+  // 카카오페이는 별도 SDK 불필요 (서버 side API 호출 후 리다이렉트)
+
+  const fetchPaymentHistory = async () => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session) return
+      const res = await fetch('/api/payment/history', {
+        headers: { 'Authorization': `Bearer ${session.access_token}` }
+      })
+      if (res.ok) {
+        const data = await res.json()
+        setPayments(data.data || [])
+      }
+    } catch (e) {
+      console.error('Failed to fetch payment history:', e)
+    } finally {
+      setLoadingPayments(false)
+    }
+  }
+
+  const handlePayment = async () => {
+    if (!planner || checkingOut) return
+    setCheckingOut(true)
+    try {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session) { alert('로그인이 필요합니다.'); return }
+
+      // 카카오페이 Ready API 호출 → 리다이렉트 URL 수신
+      const prepRes = await fetch('/api/payment/prepare', {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${session.access_token}` }
+      })
+      const prepData = await prepRes.json()
+      if (!prepRes.ok) throw new Error(prepData.error || '결제 준비 실패')
+
+      // 모바일/PC 분기하여 카카오페이 결제창으로 리다이렉트
+      const isMobile = /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent)
+      const redirectUrl = isMobile ? prepData.mobileRedirectUrl : prepData.redirectUrl
+      if (!redirectUrl) throw new Error('결제 URL을 받지 못했습니다.')
+
+      window.location.href = redirectUrl
+    } catch (err: any) {
+      alert(err.message || '결제 중 오류가 발생했습니다.')
+      setCheckingOut(false)
+    }
+    // 리다이렉트 후에는 setCheckingOut(false) 호출이 의미 없으므로 생략
+  }
+
+  const isActive = planner?.subscription_status === 'active'
+  const latestPayment = payments.find(p => p.status === 'DONE')
+  const periodEnd = latestPayment?.period_end
+    ? new Date(latestPayment.period_end).toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' })
+    : null
+  const daysLeft = latestPayment?.period_end
+    ? Math.max(0, Math.ceil((new Date(latestPayment.period_end).getTime() - Date.now()) / (1000 * 60 * 60 * 24)))
+    : 0
+
+  const FEATURES = [
+    { icon: '🏢', label: '디지털 명함 & 랜딩페이지' },
+    { icon: '👥', label: '고객 관리 (무제한)' },
+    { icon: '📅', label: '일정 캘린더 & 할일 관리' },
+    { icon: '📋', label: '보험청구 자동화 서비스' },
+    { icon: '📊', label: '상담 신청 실시간 알림' },
+    { icon: '🎁', label: '친구 추천 리워드 시스템' },
+    { icon: '💬', label: '1:1 채팅 & 카카오톡 연동' },
+    { icon: '📌', label: '자유게시판 & 공지사항' },
+  ]
+
+  return (
+    <div className="space-y-6">
+      {/* 현재 구독 상태 카드 */}
+      <div className={`rounded-[2rem] p-8 relative overflow-hidden ${
+        isActive
+          ? 'bg-gradient-to-br from-[#1A1A1A] to-[#2D2D2D] text-white'
+          : 'bg-gradient-to-br from-gray-800 to-gray-900 text-white'
+      }`}>
+        {/* 배경 장식 */}
+        <div className="absolute top-0 right-0 -mr-20 -mt-20 w-80 h-80 bg-white/10 rounded-full blur-3xl" />
+        <div className="absolute bottom-0 left-0 -ml-10 -mb-10 w-48 h-48 bg-white/5 rounded-full blur-2xl" />
+        
+        <div className="relative z-10">
+          <div className="flex flex-col md:flex-row md:items-start justify-between gap-6">
+            <div className="flex-1">
+              <div className="flex items-center gap-3 mb-5">
+                {isActive ? (
+                  <span className="px-4 py-1.5 bg-emerald-400 text-white text-xs font-black uppercase tracking-widest rounded-full shadow-lg shadow-emerald-500/20 flex items-center gap-1.5">
+                    <span className="w-1.5 h-1.5 bg-white rounded-full animate-pulse" />
+                    구독 활성
+                  </span>
+                ) : (
+                  <span className="px-4 py-1.5 bg-gray-600 text-white text-xs font-black uppercase tracking-widest rounded-full">
+                    미구독
+                  </span>
+                )}
+                <span className="px-4 py-1.5 bg-white/10 text-white/80 text-xs font-black uppercase tracking-widest rounded-full backdrop-blur-sm">
+                  PREMIUM PLAN
+                </span>
+              </div>
+
+              <h3 className="text-3xl font-black mb-1">프리미엄 설계사 플랜</h3>
+              <p className="text-white/60 font-medium mb-6">
+                {isActive
+                  ? '모든 기능을 제한 없이 이용하고 있습니다.'
+                  : '구독을 시작하면 모든 프리미엄 기능을 이용할 수 있습니다.'}
+              </p>
+
+              {/* 구독 정보 (활성일 때) */}
+              {isActive && (
+                <div className="flex flex-wrap gap-4">
+                  <div className="px-5 py-3.5 bg-white/10 rounded-2xl backdrop-blur-md border border-white/10">
+                    <p className="text-[10px] font-black text-white/50 uppercase tracking-widest mb-1">다음 갱신일</p>
+                    <p className="text-lg font-black text-white">{periodEnd || '—'}</p>
+                  </div>
+                  <div className="px-5 py-3.5 bg-white/10 rounded-2xl backdrop-blur-md border border-white/10">
+                    <p className="text-[10px] font-black text-white/50 uppercase tracking-widest mb-1">남은 기간</p>
+                    <p className="text-lg font-black text-emerald-300">{daysLeft}일</p>
+                  </div>
+                  <div className="px-5 py-3.5 bg-white/10 rounded-2xl backdrop-blur-md border border-white/10">
+                    <p className="text-[10px] font-black text-white/50 uppercase tracking-widest mb-1">월 이용료</p>
+                    <p className="text-lg font-black text-white">5,900원</p>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* 가격 + 결제 버튼 */}
+            <div className="flex flex-col items-center gap-4 md:items-end">
+              <div className="text-right">
+                <p className="text-white/40 text-sm font-bold line-through mb-1">월 29,900원</p>
+                <div className="flex items-baseline gap-2">
+                  <span className="text-5xl font-black text-white">5,900</span>
+                  <span className="text-white/60 font-bold">원/월</span>
+                </div>
+                <p className="text-amber-300 text-xs font-black mt-1">🔥 베타 출시 특별가</p>
+              </div>
+              <button
+                onClick={handlePayment}
+                disabled={checkingOut}
+                className={`w-full md:w-auto px-8 py-4 rounded-2xl font-black text-base transition-all shadow-2xl flex items-center gap-2 whitespace-nowrap ${
+                  checkingOut
+                    ? 'bg-white/20 text-white/50 cursor-not-allowed'
+                    : 'bg-[#FEE500] text-[#3C1E1E] hover:bg-[#FADA0A] hover:scale-105 active:scale-95 shadow-yellow-500/20'
+                }`}
+              >
+                {checkingOut ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-[#3C1E1E]/40 border-t-[#3C1E1E] rounded-full animate-spin" />
+                    카카오페이 연동 중...
+                  </>
+                ) : isActive ? (
+                  <>
+                    {/* 카카오페이 로고 아이콘 */}
+                    <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M12 2C6.48 2 2 5.92 2 10.8c0 3.12 1.68 5.88 4.24 7.52L5.2 22l4.56-2.36c.72.16 1.48.24 2.24.24 5.52 0 10-3.92 10-8.8S17.52 2 12 2z"/>
+                    </svg>
+                    구독 연장하기
+                  </>
+                ) : (
+                  <>
+                    <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M12 2C6.48 2 2 5.92 2 10.8c0 3.12 1.68 5.88 4.24 7.52L5.2 22l4.56-2.36c.72.16 1.48.24 2.24.24 5.52 0 10-3.92 10-8.8S17.52 2 12 2z"/>
+                    </svg>
+                    카카오페이로 시작하기
+                  </>
+                )}
+              </button>
+              {!isActive && (
+                <p className="text-white/40 text-xs font-medium text-center">화살표 카카오페이 · 안전한 간편결제</p>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* 플랜 포함 기능 */}
+      <div className="bg-white rounded-[2rem] shadow-xl p-8 border border-gray-100">
+        <h4 className="text-lg font-black text-gray-900 mb-6">플랜에 포함된 기능</h4>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {FEATURES.map((feat, i) => (
+            <div key={i} className="flex items-center gap-3 p-4 bg-gray-50 rounded-2xl border border-gray-100 hover:bg-primary-50 hover:border-primary-100 transition-all group">
+              <span className="text-2xl">{feat.icon}</span>
+              <span className="text-xs font-bold text-gray-700 group-hover:text-primary-700 leading-snug">{feat.label}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* 결제 내역 */}
+      <div className="bg-white rounded-[2rem] shadow-xl overflow-hidden border border-gray-100">
+        <div className="px-8 py-6 border-b border-gray-50 flex items-center justify-between">
+          <h4 className="text-lg font-black text-gray-900">결제 내역</h4>
+          <span className="text-xs font-bold text-gray-400 bg-gray-50 px-3 py-1 rounded-full border border-gray-100">최근 12건</span>
+        </div>
+
+        {loadingPayments ? (
+          <div className="p-16 text-center">
+            <div className="w-8 h-8 border-2 border-primary-200 border-t-primary-600 rounded-full animate-spin mx-auto mb-3" />
+            <p className="text-gray-400 text-sm font-medium">결제 내역을 불러오는 중...</p>
+          </div>
+        ) : payments.length === 0 ? (
+          <div className="p-16 text-center">
+            <div className="w-16 h-16 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+              <CreditCardIcon className="w-8 h-8 text-gray-300" />
+            </div>
+            <p className="text-gray-400 font-bold">결제 내역이 없습니다.</p>
+            <p className="text-gray-300 text-sm mt-1">구독을 시작하면 이곳에 내역이 표시됩니다.</p>
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-left">
+              <thead>
+                <tr className="bg-gray-50/50">
+                  <th className="px-8 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">결제일</th>
+                  <th className="px-8 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">내용</th>
+                  <th className="px-8 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest text-right">금액</th>
+                  <th className="px-8 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest text-center">상태</th>
+                  <th className="px-8 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">구독 기간</th>
+                  <th className="px-8 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest text-right">영수증</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-50">
+                {payments.map(p => (
+                  <tr key={p.id} className="hover:bg-gray-50/30 transition-colors">
+                    <td className="px-8 py-5 text-sm font-bold text-gray-700">
+                      {p.paid_at
+                        ? new Date(p.paid_at).toLocaleDateString('ko-KR')
+                        : new Date(p.created_at).toLocaleDateString('ko-KR')}
+                    </td>
+                    <td className="px-8 py-5">
+                      <p className="font-bold text-gray-900 text-sm">보험 플래너 구독</p>
+                      {p.card_company && (
+                        <p className="text-xs text-gray-400 mt-0.5">{p.card_company} {p.card_number ? `••••${p.card_number.slice(-4)}` : ''}</p>
+                      )}
+                    </td>
+                    <td className="px-8 py-5 text-right font-black text-gray-900">
+                      {(p.amount || 5900).toLocaleString()}원
+                    </td>
+                    <td className="px-8 py-5 text-center">
+                      {p.status === 'DONE' && (
+                        <span className="inline-flex px-3 py-1 bg-emerald-50 text-emerald-600 text-[10px] font-black rounded-full uppercase tracking-widest">결제완료</span>
+                      )}
+                      {p.status === 'PENDING' && (
+                        <span className="inline-flex px-3 py-1 bg-amber-50 text-amber-600 text-[10px] font-black rounded-full uppercase tracking-widest">처리중</span>
+                      )}
+                      {p.status === 'CANCELED' && (
+                        <span className="inline-flex px-3 py-1 bg-gray-100 text-gray-400 text-[10px] font-black rounded-full uppercase tracking-widest">취소됨</span>
+                      )}
+                      {p.status === 'FAILED' && (
+                        <span className="inline-flex px-3 py-1 bg-rose-50 text-rose-500 text-[10px] font-black rounded-full uppercase tracking-widest">실패</span>
+                      )}
+                    </td>
+                    <td className="px-8 py-5 text-xs font-medium text-gray-500">
+                      {p.period_start && p.period_end
+                        ? `${new Date(p.period_start).toLocaleDateString('ko-KR')} ~ ${new Date(p.period_end).toLocaleDateString('ko-KR')}`
+                        : '—'}
+                    </td>
+                    <td className="px-8 py-5 text-right">
+                      {p.receipt_url ? (
+                        <a
+                          href={p.receipt_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1 px-3 py-1.5 bg-gray-50 text-gray-600 rounded-xl text-xs font-bold hover:bg-gray-100 transition-colors border border-gray-100"
+                        >
+                          영수증
+                        </a>
+                      ) : (
+                        <span className="text-gray-300 text-xs">—</span>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+
+      {/* FAQ */}
+      <div className="bg-white rounded-[2rem] shadow-xl p-8 border border-gray-100">
+        <h4 className="text-lg font-black text-gray-900 mb-6">자주 묻는 질문</h4>
+        <div className="space-y-4">
+          {[
+            { q: '구독은 언제 시작되나요?', a: '결제 완료 즉시 구독이 활성화됩니다. 매월 같은 날짜에 자동 갱신됩니다.' },
+            { q: '어떤 결제 수단을 지원하나요?', a: '신용카드, 체크카드를 지원합니다. 토스 페이먼츠를 통해 안전하게 처리됩니다.' },
+            { q: '구독을 중간에 해지할 수 있나요?', a: '언제든지 해지할 수 있습니다. 해지 시 이미 결제된 기간은 정상적으로 이용 가능합니다.' },
+            { q: '영수증은 어떻게 받나요?', a: '결제 내역에서 \'영수증\' 버튼을 클릭하면 토스 페이먼츠 영수증 페이지로 이동합니다.' },
+          ].map((faq, i) => (
+            <div key={i} className="p-5 bg-gray-50 rounded-2xl border border-gray-100">
+              <p className="font-bold text-gray-900 text-sm mb-1.5">Q. {faq.q}</p>
+              <p className="text-gray-500 text-sm font-medium">A. {faq.a}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  )
+}
+// ─────────────────────────────────────────────────────────────────
+
 export default function DashboardPage() {
   const [activeTab, setActiveTab] = useState<'profile' | 'leads' | 'customers' | 'calendar' | 'subscription' | 'card' | 'notification' | 'guide' | 'chat' | 'freeboard' | 'referrals' | 'claims' | 'kakaotalk'>('calendar')
   const [planner, setPlanner] = useState<Planner | null>(null)
@@ -530,15 +840,59 @@ export default function DashboardPage() {
   const [newClaimDesc, setNewClaimDesc] = useState('')
   const [newClaimImages, setNewClaimImages] = useState<File[]>([])
   const [uploadingClaim, setUploadingClaim] = useState(false)
-  const [transmittingClaimId, setTransmittingClaimId] = useState<string | null>(null)
   const [newTodoContent, setNewTodoContent] = useState('')
   const [todoDate, setTodoDate] = useState(format(new Date(), 'yyyy-MM-dd'))
   const [referrals, setReferrals] = useState<Referral[]>([])
   const [editingTodoId, setEditingTodoId] = useState<string | null>(null)
   const [editTodoContent, setEditTodoContent] = useState('')
   const [loading, setLoading] = useState(true)
+  const [showProfileModal, setShowProfileModal] = useState(false)
+  const [transmittingClaimId, setTransmittingClaimId] = useState<string | null>(null)
   const router = useRouter()
   const todoSectionRef = useRef<HTMLDivElement>(null)
+
+  // ... (existing state)
+
+  const handleCompleteProfile = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!planner) return
+    if (!compPhone || !compAffiliation) {
+      alert('휴대폰 번호와 소속은 필수 입력 사항입니다.')
+      return
+    }
+
+    setCompSaving(true)
+    try {
+      const cleanPhone = compPhone.replace(/-/g, '')
+      const { error } = await supabase
+        .from('planners')
+        .update({
+          phone: cleanPhone,
+          affiliation: compAffiliation,
+          region: compRegion
+        })
+        .eq('id', planner.id)
+
+      if (error) throw error
+
+      // Update local state
+      setPlanner({
+        ...planner,
+        phone: cleanPhone,
+        affiliation: compAffiliation,
+        region: compRegion
+      })
+      setEditPhone(cleanPhone)
+      setEditAffiliation(compAffiliation)
+      setEditRegion(compRegion)
+      setShowProfileModal(false)
+      alert('프로필 정보가 업데이트되었습니다.')
+    } catch (err: any) {
+      alert('저장 중 오류가 발생했습니다: ' + err.message)
+    } finally {
+      setCompSaving(false)
+    }
+  }
 
   // Profile Edit State
   const [editName, setEditName] = useState('')
@@ -549,6 +903,12 @@ export default function DashboardPage() {
   const [editMessage, setEditMessage] = useState('')
   const [isSaving, setIsSaving] = useState(false)
   const [urlCopied, setUrlCopied] = useState(false)
+
+  // Profile Completion Modal State
+  const [compPhone, setCompPhone] = useState('')
+  const [compAffiliation, setCompAffiliation] = useState('')
+  const [compRegion, setCompRegion] = useState('')
+  const [compSaving, setCompSaving] = useState(false)
 
   // Notification Settings State
   const [editNotificationEmail, setEditNotificationEmail] = useState('')
@@ -644,6 +1004,12 @@ export default function DashboardPage() {
       setEditMessage(profile.advisor_message || '')
       setEditNotificationEmail(profile.notification_email || '')
       setEditGmailAppPassword(profile.gmail_app_password || '')
+
+      // Social Login Check: If phone or affiliation is missing, show completion modal
+      if (!profile.phone || !profile.affiliation) {
+        setShowProfileModal(true)
+        setCompRegion(profile.region || '')
+      }
     }
 
     // Fetch Manual Customers
@@ -2075,39 +2441,7 @@ export default function DashboardPage() {
 
             {/* Tab: Subscription */}
             {activeTab === 'subscription' && (
-              <div className="space-y-6">
-                <div className="bg-white rounded-[2rem] shadow-xl p-8 border border-gray-100">
-                  <h3 className="text-2xl font-black text-gray-900 mb-8">구독 정보</h3>
-                  
-                  <div className="bg-gradient-to-br from-primary-900 to-primary-800 rounded-3xl p-8 text-white relative overflow-hidden group">
-                    <div className="absolute top-0 right-0 -mr-16 -mt-16 w-64 h-64 bg-white/10 rounded-full blur-3xl group-hover:bg-white/20 transition-all duration-700" />
-                    
-                    <div className="relative z-10">
-                      <div className="flex items-center gap-3 mb-4">
-                        <span className="px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-widest bg-amber-500 text-white shadow-xl shadow-amber-500/20 animate-pulse">
-                          BETA TEST PERIOD
-                        </span>
-                        <span className="px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-widest bg-white/20 text-white backdrop-blur-md">
-                          무료 체험 중
-                        </span>
-                      </div>
-                      <h4 className="text-3xl font-black mb-2">프리미엄 설계사 플랜</h4>
-                      <p className="text-white/70 mb-8 font-medium">현재 베타 테스트 기간으로 **모든 기능을 제한 없이 무료**로 이용하실 수 있습니다.</p>
-                      
-                      <div className="flex flex-wrap gap-4">
-                        <div className="px-6 py-4 bg-white/10 rounded-2xl backdrop-blur-md border border-white/10">
-                          <p className="text-[10px] font-black text-white/50 uppercase tracking-widest mb-1">현재 상태</p>
-                          <p className="text-lg font-black text-white">무제한 이용 가능</p>
-                        </div>
-                        <div className="px-6 py-4 bg-white/10 rounded-2xl backdrop-blur-md border border-white/10">
-                          <p className="text-[10px] font-black text-white/50 uppercase tracking-widest mb-1">결제 예정일</p>
-                          <p className="text-lg font-black text-white">베타 종료 후 공지</p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
+              <SubscriptionTab planner={planner} />
             )}
 
             {/* Tab: 상담 알림 / 현황 (통합) */}
@@ -2728,6 +3062,76 @@ export default function DashboardPage() {
           <span className="text-[10px] font-black">설정</span>
         </button>
       </nav>
+
+      {/* ── Profile Completion Modal (Social Login Users) ── */}
+      {showProfileModal && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-gray-900/60 backdrop-blur-sm animate-in fade-in duration-300">
+          <div className="bg-white w-full max-w-lg rounded-[2.5rem] shadow-2xl p-8 md:p-12 border border-gray-100 animate-in zoom-in-95 slide-in-from-bottom-4 duration-500">
+            <div className="text-center mb-10">
+              <div className="w-20 h-20 bg-primary-100 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-xl shadow-primary-50">
+                <IdentificationIcon className="w-10 h-10 text-primary-600" />
+              </div>
+              <h2 className="text-3xl font-black text-gray-900 mb-3 tracking-tight">프로필 정보를 완성해 주세요!</h2>
+              <p className="text-gray-500 font-medium">
+                디지털 명함 생성과 서비스 이용을 위해<br/>
+                추가 정보 입력이 필요합니다.
+              </p>
+            </div>
+
+            <form onSubmit={handleCompleteProfile} className="space-y-6">
+              <div>
+                <label className="block text-sm font-bold text-gray-700 mb-2 ml-1">휴대폰 번호 <span className="text-rose-500">*</span></label>
+                <input
+                  type="tel"
+                  required
+                  value={compPhone}
+                  onChange={(e) => setCompPhone(e.target.value)}
+                  placeholder="010-1234-5678"
+                  className="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:bg-white focus:border-primary-500 focus:ring-4 focus:ring-primary-500/10 transition-all outline-none font-bold placeholder:font-normal"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-bold text-gray-700 mb-2 ml-1">소속 <span className="text-rose-500">*</span></label>
+                  <input
+                    type="text"
+                    required
+                    value={compAffiliation}
+                    onChange={(e) => setCompAffiliation(e.target.value)}
+                    placeholder="삼성생명 등"
+                    className="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:bg-white focus:border-primary-500 focus:ring-4 focus:ring-primary-500/10 transition-all outline-none font-bold placeholder:font-normal"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-bold text-gray-700 mb-2 ml-1">지역</label>
+                  <input
+                    type="text"
+                    value={compRegion}
+                    onChange={(e) => setCompRegion(e.target.value)}
+                    placeholder="서울 강남구 등"
+                    className="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:bg-white focus:border-primary-500 focus:ring-4 focus:ring-primary-500/10 transition-all outline-none font-bold placeholder:font-normal"
+                  />
+                </div>
+              </div>
+
+              <div className="pt-4">
+                <button
+                  type="submit"
+                  disabled={compSaving}
+                  className="w-full bg-gray-900 text-white py-5 rounded-[1.5rem] font-black text-lg shadow-xl hover:bg-gray-800 transition-all active:scale-[0.98] disabled:opacity-50"
+                >
+                  {compSaving ? '저장 중...' : '프로필 완성하고 대시보드 가기'}
+                </button>
+              </div>
+            </form>
+
+            <p className="mt-8 text-center text-xs text-gray-400 font-medium">
+              ※ 입력하신 정보는 디지털 명함과 상담 신청 알림 등에 사용됩니다.
+            </p>
+          </div>
+        </div>
+      )}
     </main>
   )
 }

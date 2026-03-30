@@ -23,7 +23,7 @@ export const initKakao = () => {
 export const loginWithKakao = (): Promise<any> => {
   return new Promise((resolve, reject) => {
     if (!window.Kakao) return reject('Kakao SDK not loaded')
-    
+
     window.Kakao.Auth.login({
       scope: 'friends,talk_message',
       success: (authObj: any) => {
@@ -41,7 +41,7 @@ export const loginWithKakao = (): Promise<any> => {
 export const fetchKakaoFriends = (): Promise<any[]> => {
   return new Promise((resolve, reject) => {
     if (!window.Kakao) return reject('Kakao SDK not loaded')
-    
+
     window.Kakao.API.request({
       url: '/v1/api/talk/friends',
       success: (res: any) => {
@@ -59,7 +59,7 @@ export const fetchKakaoFriends = (): Promise<any[]> => {
 export const sendKakaoTemplate = (receiverUuids: string[], templateId: number, templateArgs: any) => {
   return new Promise((resolve, reject) => {
     if (!window.Kakao) return reject('Kakao SDK not loaded')
-    
+
     window.Kakao.API.request({
       url: '/v1/api/talk/friends/message/send',
       data: {
@@ -85,7 +85,7 @@ export const sendKakaoTemplate = (receiverUuids: string[], templateId: number, t
 export const sendKakaoDefault = (receiverUuids: string[], text: string, link: string) => {
   return new Promise((resolve, reject) => {
     if (!window.Kakao) return reject('Kakao SDK not loaded')
-    
+
     window.Kakao.API.request({
       url: '/v1/api/talk/friends/message/default/send',
       data: {

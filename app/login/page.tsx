@@ -16,7 +16,7 @@ export default function LoginPage() {
 
   // Forgot password
   const [mode, setMode] = useState<'login' | 'forgot'>('login')
-  const [resetPhone, setResetPhone] = useState('')
+  const [resetEmail, setResetEmail] = useState('')
   const [resetSent, setResetSent] = useState(false)
   const [resetLoading, setResetLoading] = useState(false)
   const [resetError, setResetError] = useState<string | null>(null)
@@ -26,18 +26,36 @@ export default function LoginPage() {
     setLoading(true)
     setError(null)
 
-    const cleanPhone = email.replace(/-/g, '')
-    const internalEmail = `${cleanPhone}@planner.stroy.kr`
+    // Check if input is a phone number (contains digits only or dashes)
+    const isPhone = /^[0-9-]+$/.test(email)
+    let loginEmail = email
 
     try {
+      if (isPhone) {
+        // Find email by phone number from planners table
+        const cleanPhone = email.replace(/-/g, '')
+        const { data: planner, error: lookupError } = await supabase
+          .from('planners')
+          .select('email')
+          .eq('phone', cleanPhone)
+          .single()
+        
+        if (lookupError || !planner?.email) {
+          throw new Error('등록된 휴대폰 번호를 찾을 수 없습니다.')
+        }
+        loginEmail = planner.email
+      }
+
       const { error: loginError } = await supabase.auth.signInWithPassword({
-        email: internalEmail,
+        email: loginEmail,
         password,
       })
       if (loginError) throw loginError
       router.push('/dashboard')
     } catch (err: any) {
-      setError('휴대폰 번호 또는 비밀번호가 올바르지 않습니다.')
+      setError(err.message === '등록된 휴대폰 번호를 찾을 수 없습니다.' 
+        ? err.message 
+        : '이메일(번호) 또는 비밀번호가 올바르지 않습니다.')
     } finally {
       setLoading(false)
     }
@@ -48,17 +66,15 @@ export default function LoginPage() {
     setResetLoading(true)
     setResetError(null)
 
-    const cleanPhone = resetPhone.replace(/-/g, '')
-    if (!cleanPhone) { setResetError('휴대폰 번호를 입력해주세요.'); setResetLoading(false); return }
-    const internalEmail = `${cleanPhone}@planner.stroy.kr`
+    if (!resetEmail) { setResetError('이메일 주소를 입력해주세요.'); setResetLoading(false); return }
 
-    const { error } = await supabase.auth.resetPasswordForEmail(internalEmail, {
+    const { error } = await supabase.auth.resetPasswordForEmail(resetEmail, {
       redirectTo: `${window.location.origin}/reset-password`,
     })
 
     setResetLoading(false)
     if (error) {
-      setResetError('비밀번호 재설정 이메일 발송에 실패했습니다. 등록된 번호인지 확인해주세요.')
+      setResetError('비밀번호 재설정 이메일 발송에 실패했습니다. 올바른 이메일인지 확인해주세요.')
     } else {
       setResetSent(true)
     }
@@ -80,13 +96,13 @@ export default function LoginPage() {
 
               <form onSubmit={handleLogin} className="space-y-5">
                 <div>
-                  <label className="block text-sm font-bold text-gray-700 mb-2 ml-1">휴대폰 번호</label>
+                  <label className="block text-sm font-bold text-gray-700 mb-2 ml-1">휴대폰 번호 또는 이메일</label>
                   <input
-                    type="tel"
+                    type="text"
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    placeholder="010-1234-5678"
+                    placeholder="번호(010-...) 또는 이메일 입력"
                     className="w-full px-5 py-3.5 bg-gray-50 border border-transparent rounded-2xl focus:bg-white focus:border-primary-500 transition-all outline-none"
                   />
                 </div>
@@ -142,14 +158,14 @@ export default function LoginPage() {
                   </svg>
                 </div>
                 <h1 className="text-2xl font-black text-gray-900 mb-1">비밀번호 재설정</h1>
-                <p className="text-gray-500 text-sm">가입 시 사용한 휴대폰 번호를 입력하세요.</p>
+                <p className="text-gray-500 text-sm">가입 시 사용한 이메일 주소를 입력하세요.</p>
               </div>
 
               {resetSent ? (
                 <div className="text-center space-y-4">
                   <div className="bg-green-50 border border-green-100 rounded-2xl p-6">
                     <p className="text-green-700 font-bold mb-1">이메일을 확인해주세요</p>
-                    <p className="text-green-600 text-sm">비밀번호 재설정 링크가 관리자를 통해 전달됩니다.<br />관리자에게 문의해주세요.</p>
+                    <p className="text-green-600 text-sm">비밀번호 재설정 링크가 이메일로 발송되었습니다.<br />받은 편지함(또는 스팸함)을 확인해 주세요.</p>
                   </div>
                   <button
                     onClick={() => setMode('login')}
@@ -161,13 +177,13 @@ export default function LoginPage() {
               ) : (
                 <form onSubmit={handleResetPassword} className="space-y-5">
                   <div>
-                    <label className="block text-sm font-bold text-gray-700 mb-2 ml-1">가입 시 휴대폰 번호</label>
+                    <label className="block text-sm font-bold text-gray-700 mb-2 ml-1">가입 시 이메일 주소</label>
                     <input
-                      type="tel"
+                      type="email"
                       required
-                      value={resetPhone}
-                      onChange={(e) => setResetPhone(e.target.value)}
-                      placeholder="010-1234-5678"
+                      value={resetEmail}
+                      onChange={(e) => setResetEmail(e.target.value)}
+                      placeholder="example@email.com"
                       className="w-full px-5 py-3.5 bg-gray-50 border border-transparent rounded-2xl focus:bg-white focus:border-primary-500 transition-all outline-none"
                     />
                   </div>
