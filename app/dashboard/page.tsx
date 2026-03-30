@@ -381,20 +381,24 @@ function KakaoTalkPanel() {
     
     const initialize = async () => {
       try {
-        initKakao()
-        
         // Wait for window.Kakao to be ready (it's loaded async in layout.tsx)
         checkInterval = setInterval(() => {
-          if (typeof window !== 'undefined' && window.Kakao && window.Kakao.isInitialized()) {
-            setIsSdkReady(true)
-            clearInterval(checkInterval)
+          if (typeof window !== 'undefined' && window.Kakao) {
+            if (!window.Kakao.isInitialized()) {
+              initKakao()
+            }
             
-            // Now check for existing session
-            const token = getKakaoToken()
-            if (token) {
-              console.log('Kakao existing session detected')
-              setIsLoggedIn(true)
-              fetchFriends()
+            if (window.Kakao.isInitialized()) {
+              console.log('Kakao SDK is ready and initialized')
+              setIsSdkReady(true)
+              clearInterval(checkInterval)
+              
+              // Now check for existing session
+              const token = getKakaoToken()
+              if (token) {
+                setIsLoggedIn(true)
+                fetchFriends()
+              }
             }
           }
         }, 300)
