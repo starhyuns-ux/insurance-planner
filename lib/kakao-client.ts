@@ -10,12 +10,13 @@ declare global {
 
 export const initKakao = () => {
   if (typeof window !== 'undefined' && window.Kakao && !window.Kakao.isInitialized()) {
-    const key = process.env.NEXT_PUBLIC_KAKAO_JS_KEY
+    // 제공해주신 키를 우선 사용하거나 환경 변수에서 가져옴
+    const key = process.env.NEXT_PUBLIC_KAKAO_JS_KEY || '074e249b7b54cce3d65bb23f4c02c177'
     if (key) {
       window.Kakao.init(key)
-      console.log('Kakao SDK Initialized')
+      console.log('Kakao SDK Initialized with key:', key.slice(0, 5) + '...')
     } else {
-      console.warn('Kakao JavaScript Key is missing in environment variables')
+      console.warn('Kakao JavaScript Key is missing')
     }
   }
 }
