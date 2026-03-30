@@ -185,7 +185,7 @@ export default function InsurancePremiumCalculator() {
   const [heartAmount, setHeartAmount] = useState<number>(2000);
   const [injurySurgeryAmount, setInjurySurgeryAmount] = useState<number>(1500);
   const [diseaseSurgeryAmount, setDiseaseSurgeryAmount] = useState<number>(2000);
-  const [cancerTreatmentAmount, setCancerTreatmentAmount] = useState<number>(5000);
+  const [cancerTreatmentAmount, setCancerTreatmentAmount] = useState<number>(10000);
   
   const [isCalculated, setIsCalculated] = useState(false);
   const [showResults, setShowResults] = useState(false);
