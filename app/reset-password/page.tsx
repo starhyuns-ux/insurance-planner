@@ -9,6 +9,9 @@ import Footer from '@/components/Footer'
 export default function ResetPasswordPage() {
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
+  const [inputPhone, setInputPhone] = useState('')
+  const [registeredPhone, setRegisteredPhone] = useState<string | null>(null)
+  const [isPhoneVerified, setIsPhoneVerified] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState(false)
@@ -20,10 +23,42 @@ export default function ResetPasswordPage() {
       const { data: { session } } = await supabase.auth.getSession()
       if (!session) {
         setError('유효하지 않거나 만료된 비밀번호 재설정 링크입니다. 다시 시도해 주세요.')
+        return
+      }
+      
+      // 가입된 전화번호 가져오기
+      const { data: planner, error: plannerError } = await supabase
+        .from('planners')
+        .select('phone')
+        .eq('id', session.user.id)
+        .single()
+      
+      if (planner) {
+        setRegisteredPhone(planner.phone)
+      } else if (plannerError) {
+        console.error('Failed to fetch planner info:', plannerError)
       }
     }
     checkSession()
   }, [])
+
+  const handleVerifyPhone = (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!registeredPhone) {
+      setError('가입 정보를 불러올 수 없습니다. 고객센터에 문의해 주세요.')
+      return
+    }
+
+    const cleanInput = inputPhone.replace(/-/g, '')
+    const cleanRegistered = registeredPhone.replace(/-/g, '')
+
+    if (cleanInput === cleanRegistered) {
+      setIsPhoneVerified(true)
+      setError(null)
+    } else {
+      setError('입력하신 휴대폰 번호가 가입 시 등록한 정보와 일치하지 않습니다.')
+    }
+  }
 
   const handleUpdatePassword = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -65,8 +100,8 @@ export default function ResetPasswordPage() {
       <div className="flex-1 flex items-center justify-center p-4 py-20">
         <div className="max-w-md w-full bg-white rounded-3xl shadow-xl p-8 border border-gray-100">
           <div className="text-center mb-10">
-            <h1 className="text-3xl font-black text-gray-900 mb-2">새 비밀번호 설정</h1>
-            <p className="text-gray-500 text-sm">새로운 비밀번호를 입력해 주세요.</p>
+            <h1 className="text-3xl font-black text-gray-900 mb-2">비밀번호 재설정</h1>
+            <p className="text-gray-500 text-sm">본인 확인을 위해 정보를 입력해 주세요.</p>
           </div>
 
           {success ? (
@@ -75,15 +110,40 @@ export default function ResetPasswordPage() {
                 <p className="text-green-700 font-bold mb-1">비밀번호가 변경되었습니다</p>
                 <p className="text-green-600 text-sm">3초 후 로그인 페이지로 이동합니다.</p>
               </div>
-              <button
-                onClick={() => router.push('/login')}
-                className="w-full bg-gray-900 text-white py-4 rounded-2xl font-black text-lg"
-              >
-                로그인하러 가기
-              </button>
             </div>
+          ) : !isPhoneVerified ? (
+            <form onSubmit={handleVerifyPhone} className="space-y-5">
+              <div>
+                <label className="block text-sm font-bold text-gray-700 mb-2 ml-1">가입 시 등록한 휴대폰 번호</label>
+                <input
+                  type="tel"
+                  required
+                  value={inputPhone}
+                  onChange={(e) => setInputPhone(e.target.value)}
+                  placeholder="010-0000-0000"
+                  className="w-full px-5 py-3.5 bg-gray-50 border border-transparent rounded-2xl focus:bg-white focus:border-primary-500 transition-all outline-none"
+                />
+              </div>
+
+              {error && (
+                <div className="bg-rose-50 border border-rose-100 text-rose-600 px-4 py-3 rounded-2xl text-sm font-medium">
+                  {error}
+                </div>
+              )}
+
+              <button
+                type="submit"
+                className="w-full bg-gray-900 text-white py-4 rounded-2xl font-black text-lg shadow-lg hover:bg-gray-800 transition-all"
+              >
+                본인 확인하기
+              </button>
+            </form>
           ) : (
             <form onSubmit={handleUpdatePassword} className="space-y-5">
+              <div className="bg-primary-50 text-primary-700 px-4 py-3 rounded-2xl text-sm font-bold mb-4 text-center">
+                본인 확인이 완료되었습니다. 새 비밀번호를 입력해 주세요.
+              </div>
+              
               <div>
                 <label className="block text-sm font-bold text-gray-700 mb-2 ml-1">새 비밀번호</label>
                 <input
