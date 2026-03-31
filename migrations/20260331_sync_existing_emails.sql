@@ -7,11 +7,11 @@ FROM auth.users u
 WHERE p.id = u.id
 AND (p.email IS NULL OR p.email = '');
 
--- 휴대폰 번호 형식에 관계없이(하이픈 유무) 이메일이 정확히 반영되도록 합니다.
--- 향후 가입되는 사용자를 위해 트리거 재확인
+-- 향후 가입자가 발생할 때 데이터를 안정적으로 쌓기 위한 트리거 함수 (안전한 버전)
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS trigger AS $$
 BEGIN
+  -- 이미 존재하는 아이디인 경우 작업을 무시하며(ON CONFLICT DO NOTHING), 기존 정보를 절대 건드리지 않습니다.
   INSERT INTO public.planners (id, name, phone, email, affiliation, region)
   VALUES (
     new.id,
@@ -21,9 +21,7 @@ BEGIN
     coalesce(new.raw_user_meta_data->>'affiliation', ''),
     coalesce(new.raw_user_meta_data->>'region', '')
   )
-  ON CONFLICT (id) DO UPDATE
-  SET email = EXCLUDED.email,
-      phone = coalesce(EXCLUDED.phone, planners.phone);
+  ON CONFLICT (id) DO NOTHING;
   RETURN new;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
