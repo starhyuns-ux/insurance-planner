@@ -35,53 +35,49 @@ export default function LoginPage() {
         const cleanPhone = email.replace(/-/g, '')
         const withDashes = cleanPhone.replace(/(\d{3})(\d{3,4})(\d{4})/, '$1-$2-$3')
         
-        console.log(`Searching for planner with phone: ${cleanPhone} or ${withDashes}`)
+        console.log(`Attempting phone lookup for: ${cleanPhone}`)
         
-        // Try to fetch id and phone first (guaranteed to exist)
+        // 휴대폰 번호로 이메일 조회 시도 (실패하더라도 전체 로직이 멈추지 않도록 함)
         const { data: planners, error: lookupError } = await supabase
           .from('planners')
-          .select('email, id, phone')
+          .select('email')
           .or(`phone.eq.${cleanPhone},phone.eq.${withDashes}`)
         
-        if (lookupError) {
-          console.error('Phone lookup error:', lookupError)
-          // If the email column is missing, it's a migration issue
-          if (lookupError.message?.includes('column "email" does not exist')) {
-            throw new Error('데이터베이스 설정(이메일 컬럼)이 완료되지 않았습니다. 관리자에게 문의해 주세요.')
+        if (!lookupError && planners && planners.length > 0) {
+          const foundEmail = planners.find(p => p.email)?.email
+          if (foundEmail) {
+            loginEmail = foundEmail
+            console.log('Found email for phone:', loginEmail)
           }
-          throw new Error(`조회 오류 (${lookupError.code}): ${lookupError.message}`)
+        } else if (lookupError) {
+          console.warn('Phone lookup skipped due to DB error or missing column:', lookupError.message)
+          // DB 오류(컬럼 누락 등)가 있어도 입력값을 이메일로 간주하여 다음 단계 진행
         }
-        
-        if (!planners || planners.length === 0) {
-          throw new Error('등록된 휴대폰 번호를 찾을 수 없습니다. 다시 확인해 주세요.')
-        }
-        
-        const firstPlanner = planners.find(p => p.email)
-        if (!firstPlanner?.email) {
-          throw new Error('해당 번호에 연결된 가입 이메일 정보를 찾을 수 없습니다. (이메일 연동 전 가입자)')
-        }
-        loginEmail = firstPlanner.email
       }
 
-      const { data: authData, error: loginError } = await supabase.auth.signInWithPassword({
+      // 최종 로그인 시도
+      const { error: loginError } = await supabase.auth.signInWithPassword({
         email: loginEmail,
         password,
       })
       
       if (loginError) {
-        console.error('Login error details:', loginError)
-        if (loginError.message.includes('Invalid login credentials')) {
-          throw new Error('이메일(번호) 또는 비밀번호가 올바르지 않습니다. (소셜 가입자인 경우 소셜 로그인을 사용해 주세요)')
-        } else if (loginError.message.includes('Email not confirmed')) {
-          throw new Error('이메일 인증이 완료되지 않은 계정입니다. 메일함을 확인해 주세요.')
+        console.error('Final login error:', loginError)
+        const msg = loginError.message
+        if (msg.includes('Invalid login credentials')) {
+          throw new Error('이메일(또는 번호)이나 비밀번호가 맞지 않습니다.')
+        } else if (msg.includes('Email not confirmed')) {
+          throw new Error('이메일 인증이 아직 완료되지 않았습니다.')
+        } else if (msg.includes('User not found')) {
+          throw new Error('가입되지 않은 계정입니다. 회원가입을 먼저 진행해 주세요.')
         }
         throw loginError
       }
       
       router.push('/dashboard')
     } catch (err: any) {
-      console.error('Final login error:', err)
-      setError(err.message || '로그인 중 예기치 않은 오류가 발생했습니다.')
+      console.error('LoginPage Catch Error:', err)
+      setError(err.message || '로그인 중 문제가 발생했습니다.')
     } finally {
       setLoading(false)
     }
