@@ -37,6 +37,7 @@ export default function LoginPage() {
         
         console.log(`Searching for planner with phone: ${cleanPhone} or ${withDashes}`)
         
+        // Try to fetch id and phone first (guaranteed to exist)
         const { data: planners, error: lookupError } = await supabase
           .from('planners')
           .select('email, id, phone')
@@ -44,7 +45,11 @@ export default function LoginPage() {
         
         if (lookupError) {
           console.error('Phone lookup error:', lookupError)
-          throw new Error('휴대폰 번호 조회 중 오류가 발생했습니다.')
+          // If the email column is missing, it's a migration issue
+          if (lookupError.message?.includes('column "email" does not exist')) {
+            throw new Error('데이터베이스 설정(이메일 컬럼)이 완료되지 않았습니다. 관리자에게 문의해 주세요.')
+          }
+          throw new Error(`조회 오류 (${lookupError.code}): ${lookupError.message}`)
         }
         
         if (!planners || planners.length === 0) {
@@ -53,7 +58,7 @@ export default function LoginPage() {
         
         const firstPlanner = planners.find(p => p.email)
         if (!firstPlanner?.email) {
-          throw new Error('해당 번호에 연결된 가입 이메일 정보를 찾을 수 없습니다. (데이터 동기화 필요)')
+          throw new Error('해당 번호에 연결된 가입 이메일 정보를 찾을 수 없습니다. (이메일 연동 전 가입자)')
         }
         loginEmail = firstPlanner.email
       }
