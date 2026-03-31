@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import NavBar from '@/components/NavBar'
 import Footer from '@/components/Footer'
+import { lookupEmailByPhone } from './actions'
 
 export default function LoginPage() {
   const [email, setEmail] = useState('')
@@ -32,26 +33,17 @@ export default function LoginPage() {
 
     try {
       if (isPhone) {
-        const cleanPhone = email.replace(/-/g, '')
-        const withDashes = cleanPhone.replace(/(\d{3})(\d{3,4})(\d{4})/, '$1-$2-$3')
+        console.log(`Attempting secure phone lookup for: ${email}`)
         
-        console.log(`Attempting phone lookup for: ${cleanPhone}`)
-        
-        // 휴대폰 번호로 이메일 조회 시도 (실패하더라도 전체 로직이 멈추지 않도록 함)
-        const { data: planners, error: lookupError } = await supabase
-          .from('planners')
-          .select('email')
-          .or(`phone.eq.${cleanPhone},phone.eq.${withDashes}`)
-        
-        if (!lookupError && planners && planners.length > 0) {
-          const foundEmail = planners.find(p => p.email)?.email
-          if (foundEmail) {
-            loginEmail = foundEmail
-            console.log('Found email for phone:', loginEmail)
-          }
-        } else if (lookupError) {
-          console.warn('Phone lookup skipped due to DB error or missing column:', lookupError.message)
-          // DB 오류(컬럼 누락 등)가 있어도 입력값을 이메일로 간주하여 다음 단계 진행
+        // 서버 액션을 통해 email 컬럼 유무와 상관없이 auth.users에서 직접 이메일을 가져옵니다.
+        const foundEmail = await lookupEmailByPhone(email)
+
+        if (foundEmail) {
+          loginEmail = foundEmail
+          console.log('Secure mapping resolved email:', loginEmail)
+        } else {
+          // 조회 실패 시 기존 이메일 방식 실패 메시지 표시를 위해 그대로 진행하지 않고 에러 던짐
+          throw new Error('등록된 휴대폰 번호 또는 이메일 정보를 찾을 수 없습니다.')
         }
       }
 
