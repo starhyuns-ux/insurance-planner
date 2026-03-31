@@ -129,7 +129,18 @@ export default function NavBar() {
             <Link href="/calculator/insurance-premium" className="text-amber-600 font-black hover:text-amber-700 transition-colors whitespace-nowrap">{t('navPremiumCalc')}</Link>
             <Link href="/guide/pension" className="text-indigo-600 font-bold hover:text-indigo-700 transition-colors whitespace-nowrap">{t('navPension')}</Link>
             <Link href="/guide/critical-illness-relief" className="text-indigo-600 font-bold hover:text-indigo-700 transition-colors whitespace-nowrap">{t('navCriticalIllness')}</Link>
-            <Link href="/guide/vascular-disease" className="text-rose-600 font-bold hover:text-rose-700 transition-colors whitespace-nowrap">{t('navVascularStudy')}</Link>
+            
+            {/* Disease Study Dropdown */}
+            <div className="relative group py-1">
+              <button className="flex items-center gap-1 text-rose-600 font-bold hover:text-rose-700 transition-colors whitespace-nowrap outline-none">
+                {t('navDiseaseStudy')}
+                <ChevronDownIcon className="w-3.5 h-3.5 transition-transform group-hover:rotate-180" />
+              </button>
+              <div className="absolute top-full left-1/2 -translate-x-1/2 w-48 bg-white border border-gray-100 rounded-2xl shadow-xl py-2 opacity-0 invisible translate-y-2 group-hover:opacity-100 group-hover:visible group-hover:translate-y-0 transition-all z-50">
+                <Link href="/guide/vascular-disease" className="block px-4 py-2.5 text-sm hover:bg-gray-50 text-gray-700 hover:text-rose-600 transition-colors">{t('navHeartStudy')}</Link>
+                <Link href="/guide/cerebrovascular-disease" className="block px-4 py-2.5 text-sm hover:bg-gray-50 text-gray-700 hover:text-rose-600 transition-colors">{t('navBrainStudy')}</Link>
+              </div>
+            </div>
             <Link href="/guide/5th-gen" className="text-primary-600 font-bold hover:text-primary-700 transition-colors whitespace-nowrap">{t('navSilbiGen5')}</Link>
             
             {/* Cancer Treatment Dropdown */}
@@ -160,8 +171,15 @@ export default function NavBar() {
             <Link href="/calculator/insurance-premium" onClick={() => setIsOpen(false)} className="text-amber-600 font-black text-xl hover:text-amber-700">{t('navPremiumCalc')}</Link>
             <Link href="/guide/pension" onClick={() => setIsOpen(false)} className="text-indigo-700 font-bold text-lg hover:text-indigo-600">{t('navPension')}</Link>
             <Link href="/guide/critical-illness-relief" onClick={() => setIsOpen(false)} className="text-indigo-700 font-bold text-lg hover:text-indigo-600">{t('navCriticalIllness')}</Link>
-            <Link href="/guide/vascular-disease" onClick={() => setIsOpen(false)} className="text-rose-600 font-bold text-lg hover:text-rose-700">{t('navVascularStudy')}</Link>
             <Link href="/guide/5th-gen" onClick={() => setIsOpen(false)} className="text-gray-800 font-bold text-lg hover:text-primary-600">{t('navSilbiGen5')} {t('noticeTitle')}</Link>
+            
+            <div className="space-y-3 pt-2">
+              <span className="text-xs font-black text-rose-400 uppercase tracking-widest pl-1">{t('navDiseaseStudy')}</span>
+              <div className="flex flex-col gap-3 pl-4 border-l-2 border-rose-100 italic">
+                <Link href="/guide/vascular-disease" onClick={() => setIsOpen(false)} className="text-gray-600 font-bold text-base hover:text-rose-600">{t('navHeartStudy')}</Link>
+                <Link href="/guide/cerebrovascular-disease" onClick={() => setIsOpen(false)} className="text-gray-600 font-bold text-base hover:text-rose-600">{t('navBrainStudy')}</Link>
+              </div>
+            </div>
             
             <div className="space-y-3 pt-2">
               <span className="text-xs font-black text-gray-400 uppercase tracking-widest pl-1">{t('navCancerTreat')}</span>
