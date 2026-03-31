@@ -90,8 +90,13 @@ export default function LoginPage() {
 
     if (!resetEmail) { setResetError('이메일 주소를 입력해주세요.'); setResetLoading(false); return }
 
+    // 로컬 환경 외에서는 무조건 stroy.kr 실서버 주소로 보내도록 강제합니다.
+    const redirectUrl = typeof window !== 'undefined' && window.location.href.includes('localhost')
+      ? 'http://localhost:3000/reset-password'
+      : 'https://stroy.kr/reset-password'
+
     const { error } = await supabase.auth.resetPasswordForEmail(resetEmail, {
-      redirectTo: `${window.location.origin}/reset-password`,
+      redirectTo: redirectUrl,
     })
 
     setResetLoading(false)
