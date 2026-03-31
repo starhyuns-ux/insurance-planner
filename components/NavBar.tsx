@@ -129,6 +129,7 @@ export default function NavBar() {
             <Link href="/calculator/insurance-premium" className="text-amber-600 font-black hover:text-amber-700 transition-colors whitespace-nowrap">{t('navPremiumCalc')}</Link>
             <Link href="/guide/pension" className="text-indigo-600 font-bold hover:text-indigo-700 transition-colors whitespace-nowrap">{t('navPension')}</Link>
             <Link href="/guide/critical-illness-relief" className="text-indigo-600 font-bold hover:text-indigo-700 transition-colors whitespace-nowrap">{t('navCriticalIllness')}</Link>
+            <Link href="/guide/vascular-disease" className="text-rose-600 font-bold hover:text-rose-700 transition-colors whitespace-nowrap">{t('navVascularStudy')}</Link>
             <Link href="/guide/5th-gen" className="text-primary-600 font-bold hover:text-primary-700 transition-colors whitespace-nowrap">{t('navSilbiGen5')}</Link>
             
             {/* Cancer Treatment Dropdown */}
@@ -159,6 +160,7 @@ export default function NavBar() {
             <Link href="/calculator/insurance-premium" onClick={() => setIsOpen(false)} className="text-amber-600 font-black text-xl hover:text-amber-700">{t('navPremiumCalc')}</Link>
             <Link href="/guide/pension" onClick={() => setIsOpen(false)} className="text-indigo-700 font-bold text-lg hover:text-indigo-600">{t('navPension')}</Link>
             <Link href="/guide/critical-illness-relief" onClick={() => setIsOpen(false)} className="text-indigo-700 font-bold text-lg hover:text-indigo-600">{t('navCriticalIllness')}</Link>
+            <Link href="/guide/vascular-disease" onClick={() => setIsOpen(false)} className="text-rose-600 font-bold text-lg hover:text-rose-700">{t('navVascularStudy')}</Link>
             <Link href="/guide/5th-gen" onClick={() => setIsOpen(false)} className="text-gray-800 font-bold text-lg hover:text-primary-600">{t('navSilbiGen5')} {t('noticeTitle')}</Link>
             
             <div className="space-y-3 pt-2">
