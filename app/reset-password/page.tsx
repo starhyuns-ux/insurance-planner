@@ -26,17 +26,25 @@ export default function ResetPasswordPage() {
         return
       }
       
-      // 가입된 전화번호 가져오기
+      // 1. planners 테이블에서 먼저 조회 시도
       const { data: planner, error: plannerError } = await supabase
         .from('planners')
         .select('phone')
         .eq('id', session.user.id)
         .single()
       
-      if (planner) {
-        setRegisteredPhone(planner.phone)
-      } else if (plannerError) {
+      let foundPhone = planner?.phone
+
+      // 2. 만약 planners에 없거나 조회 실패 시 가입 시 생성된 user_metadata에서 조회
+      if (!foundPhone && session.user.user_metadata?.phone) {
+        foundPhone = session.user.user_metadata.phone
+      }
+      
+      if (foundPhone) {
+        setRegisteredPhone(foundPhone)
+      } else {
         console.error('Failed to fetch planner info:', plannerError)
+        setError('설계사 정보를 불러올 수 없어 본인 확인이 불가합니다. 이메일 링크를 다시 발급해 주세요.')
       }
     }
     checkSession()
