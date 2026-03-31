@@ -32,6 +32,7 @@ import {
   ChatBubbleBottomCenterTextIcon
 } from '@heroicons/react/24/outline'
 import BoardPage from '@/components/BoardPage'
+import DetailedClaimForm from '@/components/DetailedClaimForm'
 import { 
   format, 
   startOfMonth, 
@@ -2861,58 +2862,8 @@ export default function DashboardPage() {
             {/* Tab: 보상청구 관리 */}
             {activeTab === 'claims' && (
               <div className="space-y-6">
-                {/* Submit New Claim */}
-                <div className="bg-white rounded-[2rem] shadow-xl p-8 border border-gray-100">
-                  <h3 className="text-xl font-black text-gray-900 mb-6 flex items-center gap-2">
-                    <DocumentCheckIcon className="w-6 h-6 text-primary-600" />
-                    새 보상청구 접수
-                  </h3>
-                  <form onSubmit={submitClaim} className="space-y-6">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <div>
-                        <label className="block text-xs font-black text-gray-500 uppercase tracking-widest mb-2">고객명</label>
-                        <input
-                          type="text"
-                          required
-                          value={newClaimName}
-                          onChange={(e) => setNewClaimName(e.target.value)}
-                          className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary-300"
-                          placeholder="청구 고객 이름 입력"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-xs font-black text-gray-500 uppercase tracking-widest mb-2">청구 관련 서류 (복수 선택 가능)</label>
-                        <label className="flex items-center justify-center w-full h-[46px] px-4 border border-dashed border-gray-300 rounded-xl cursor-pointer hover:bg-gray-50 transition-colors">
-                          <div className="flex items-center gap-2 text-sm text-gray-500 font-bold">
-                            <PhotoIcon className="w-5 h-5 text-gray-400" />
-                            {newClaimImages.length > 0 ? `${newClaimImages.length}개의 파일 선택됨` : '사진 파일 첨부하기'}
-                          </div>
-                          <input type="file" multiple accept="image/*" className="hidden" onChange={handleClaimImagesChange} />
-                        </label>
-                      </div>
-                    </div>
-                    <div>
-                      <label className="block text-xs font-black text-gray-500 uppercase tracking-widest mb-2">청구 내용 / 병명</label>
-                      <textarea
-                        required
-                        value={newClaimDesc}
-                        onChange={(e) => setNewClaimDesc(e.target.value)}
-                        rows={3}
-                        className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary-300 resize-none"
-                        placeholder="청구 상세 내용 및 전달사항 입력"
-                      />
-                    </div>
-                    <div className="flex justify-end">
-                      <button
-                        type="submit"
-                        disabled={uploadingClaim}
-                        className="px-6 py-3 bg-primary-600 text-white rounded-xl text-sm font-black hover:bg-primary-700 disabled:opacity-50 transition-colors flex items-center gap-2"
-                      >
-                        {uploadingClaim ? '접수 중...' : '보상청구 접수하기'}
-                      </button>
-                    </div>
-                  </form>
-                </div>
+                {/* Submit New Claim (Detailed) */}
+                <DetailedClaimForm onSuccess={() => window.location.reload()} />
 
                 {/* Claims List */}
                 <div className="bg-white rounded-[2rem] shadow-sm border border-gray-100 overflow-hidden">
