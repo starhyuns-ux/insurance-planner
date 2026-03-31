@@ -33,10 +33,14 @@ export default function LoginPage() {
     try {
       if (isPhone) {
         const cleanPhone = email.replace(/-/g, '')
+        const withDashes = cleanPhone.replace(/(\d{3})(\d{3,4})(\d{4})/, '$1-$2-$3')
+        
+        console.log(`Searching for planner with phone: ${cleanPhone} or ${withDashes}`)
+        
         const { data: planners, error: lookupError } = await supabase
           .from('planners')
-          .select('email, id')
-          .eq('phone', cleanPhone)
+          .select('email, id, phone')
+          .or(`phone.eq.${cleanPhone},phone.eq.${withDashes}`)
         
         if (lookupError) {
           console.error('Phone lookup error:', lookupError)
@@ -62,11 +66,9 @@ export default function LoginPage() {
       if (loginError) {
         console.error('Login error details:', loginError)
         if (loginError.message.includes('Invalid login credentials')) {
-          throw new Error('이메일(번호) 또는 비밀번호가 올바르지 않습니다.')
+          throw new Error('이메일(번호) 또는 비밀번호가 올바르지 않습니다. (소셜 가입자인 경우 소셜 로그인을 사용해 주세요)')
         } else if (loginError.message.includes('Email not confirmed')) {
           throw new Error('이메일 인증이 완료되지 않은 계정입니다. 메일함을 확인해 주세요.')
-        } else if (loginError.message.includes('User not found')) {
-          throw new Error('가입되지 않은 계정입니다. 신규 가입을 진행해 주세요.')
         }
         throw loginError
       }
