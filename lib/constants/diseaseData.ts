@@ -210,30 +210,94 @@ export const getGroupedDiseaseData = (t: any, locale: string): TopCategory[] => 
             id: 'M',
             title: locale === 'ko' ? '[M코드] 뼈·관절·근골격계 질환' : (locale === 'en' ? '[M-Code] Bone, Joint & Musculoskeletal' : '[M代码] 骨·关节·肌肉骨骼系统疾病'),
             shortTitle: locale === 'ko' ? 'M코드 (근골격계)' : (locale === 'en' ? 'M-Code (Musculoskeletal)' : 'M代码 (肌肉骨骼)'),
-            desc: locale === 'ko' ? '디스크, 관절염, 인대 파열 등 근골격계 질환 코드입니다.' : (locale === 'en' ? 'Musculoskeletal codes for discs, arthritis, etc.' : '椎间盘、关节炎、韧带撕裂等肌肉骨骼系统疾病代码。'),
+            desc: locale === 'ko' ? '디스크, 관절염, 인대 파열, 회전근개 등 근골격계 질환 코드입니다.' : (locale === 'en' ? 'Musculoskeletal codes for discs, arthritis, rotator cuff, etc.' : '椎间盘、关节炎、韧带撕裂、旋转肌腱等肌肉骨骼系统疾病代码。'),
             subCategories: [
                 {
-                    name: locale === 'ko' ? '관절 및 척추 질환' : (locale === 'en' ? 'Joint & Spinal Diseases' : '关节及脊柱疾病'),
+                    name: locale === 'ko' ? '관절염 및 류마티스 질환' : (locale === 'en' ? 'Arthritis & Rheumatic Diseases' : '关节炎及风湿性疾病'),
                     items: [
-                        { name: locale === 'ko' ? '화농성 관절염' : (locale === 'en' ? 'Pyogenic Arthritis' : '化脓性关节炎'), code: 'M00', riders: riders.DISEASE },
-                        { name: locale === 'ko' ? '류마티스 관절염(혈청양성)' : (locale === 'en' ? 'Rheumatoid Arthritis' : '类风湿性关节炎'), code: 'M05', riders: riders.DISEASE },
-                        { name: locale === 'ko' ? '고관절 관절증' : (locale === 'en' ? 'Coxarthrosis' : '髋关节病'), code: 'M16', riders: riders.DISEASE },
-                        { name: locale === 'ko' ? '무릎 관절증' : (locale === 'en' ? 'Gonarthrosis' : '膝关节病'), code: 'M17', desc: locale === 'ko' ? '퇴행성 관절염 (인공관절수술 다빈도)' : (locale === 'en' ? 'Degenerative arthritis (Frequent total joint replacement)' : '退行性关节炎 (人工关节手术高频)'), riders: [t('jointReplacementSurgery'), ...riders.DISEASE], isImportant: true },
-                        { name: locale === 'ko' ? '무릎 내부 장애' : (locale === 'en' ? 'Internal Derangement of Knee' : '膝内部障碍'), code: 'M23', desc: locale === 'ko' ? '반월상연골파열 등' : (locale === 'en' ? 'Meniscus tear, etc.' : '半月板损伤等'), riders: riders.DISEASE, isImportant: true },
-                        { name: locale === 'ko' ? '척추측만증' : (locale === 'en' ? 'Scoliosis' : '脊柱侧弯'), code: 'M41', riders: riders.DISEASE },
-                        { name: locale === 'ko' ? '강직성 척추염' : (locale === 'en' ? 'Ankylosing Spondylitis' : '强直性脊柱炎'), code: 'M45', riders: riders.DISEASE },
-                        { name: locale === 'ko' ? '기타 척추병증' : (locale === 'en' ? 'Other Spondylopathies' : '其他脊柱病变'), code: 'M48', desc: locale === 'ko' ? '척추관 협착증 등' : (locale === 'en' ? 'Spinal stenosis, etc.' : '脊柱管狭窄等'), riders: [t('discSurgery'), t('nDiseaseSurgery'), t('diseaseSurgery')], isImportant: true },
-                        { name: locale === 'ko' ? '경추 추간판 장애' : (locale === 'en' ? 'Cervical Disc Disorder' : '颈椎间盘障碍'), code: 'M50', desc: locale === 'ko' ? '목 디스크 (구형 수술비 면책 주의)' : (locale === 'en' ? 'Cervical disc (Caution for old policy exclusions)' : '颈椎间盘 (注意旧版手术费免责)'), riders: [t('discSurgery'), t('nDiseaseSurgery'), t('diseaseSurgery')], isImportant: true },
-                        { name: locale === 'ko' ? '기타 추간판 장애' : (locale === 'en' ? 'Other Disc Disorders' : '其他椎间盘障碍'), code: 'M51', desc: locale === 'ko' ? '허리 디스크 (구형 수술비 면책 주의)' : (locale === 'en' ? 'Lumbar disc (Caution for old policy exclusions)' : '腰椎间盘 (注意旧版手术费免责)'), riders: [t('discSurgery'), t('nDiseaseSurgery'), t('diseaseSurgery')], isImportant: true },
+                        { name: locale === 'ko' ? '화농성 관절염' : (locale === 'en' ? 'Pyogenic Arthritis' : '化脓性关节炎'), code: 'M00', desc: locale === 'ko' ? '세균성 감염으로 인한 관절염' : (locale === 'en' ? 'Bacterial joint infection' : '细菌性感染引起的关节炎'), riders: riders.DISEASE },
+                        { name: locale === 'ko' ? '반응성 관절염' : (locale === 'en' ? 'Reactive Arthritis' : '反应性关节炎'), code: 'M02', riders: riders.DISEASE },
+                        { name: locale === 'ko' ? '류마티스 관절염(혈청양성)' : (locale === 'en' ? 'Seropositive Rheumatoid Arthritis' : '血清阳性类风湿性关节炎'), code: 'M05', desc: locale === 'ko' ? '자가면역 관절 질환. 희귀난치성질환 적용 가능' : (locale === 'en' ? 'Autoimmune joint disease. May qualify for rare disease coverage' : '自身免疫性关节疾病。可能适用罕见疾病覆盖'), riders: [t('rareDiseaseDiag'), ...riders.DISEASE] },
+                        { name: locale === 'ko' ? '기타 류마티스 관절염' : (locale === 'en' ? 'Other Rheumatoid Arthritis' : '其他类风湿性关节炎'), code: 'M06', riders: riders.DISEASE },
+                        { name: locale === 'ko' ? '통풍' : (locale === 'en' ? 'Gout' : '痛风'), code: 'M10', desc: locale === 'ko' ? '요산 축적으로 인한 관절 통증. 엄지발가락 발작 빈번' : (locale === 'en' ? 'Uric acid accumulation causing joint pain. Big toe attacks common' : '尿酸积累引起的关节疼痛。大脚趾发作频繁'), isImportant: true },
+                        { name: locale === 'ko' ? '건선성 관절병증' : (locale === 'en' ? 'Psoriatic Arthropathy' : '银屑病性关节病'), code: 'M07', riders: riders.DISEASE },
+                        { name: locale === 'ko' ? '전신성 결합조직 장애(루푸스 등)' : (locale === 'en' ? 'Systemic Connective Tissue Disorders (Lupus, etc.)' : '全身性结缔组织障碍（红斑狼疮等）'), code: 'M32', desc: locale === 'ko' ? '루푸스(전신홍반루푸스) 포함. 희귀난치성질환 해당' : (locale === 'en' ? 'Includes SLE (Lupus). Qualifies as rare disease' : '包括系统性红斑狼疮。属于罕见疾病'), riders: [t('rareDiseaseDiag'), ...riders.DISEASE] },
+                        { name: locale === 'ko' ? '섬유근통' : (locale === 'en' ? 'Fibromyalgia' : '纤维肌痛'), code: 'M79.1', desc: locale === 'ko' ? '전신 근육통 및 만성 피로' : (locale === 'en' ? 'Widespread muscle pain and chronic fatigue' : '全身肌肉疼痛及慢性疲劳') },
                     ]
                 },
                 {
-                    name: locale === 'ko' ? '근육, 힘줄 및 뼈 질환' : (locale === 'en' ? 'Muscle, Tendon & Bone Diseases' : '肌肉、肌腱及骨骼疾病'),
+                    name: locale === 'ko' ? '관절 내부 장애 (무릎·고관절)' : (locale === 'en' ? 'Internal Joint Derangement (Knee/Hip)' : '关节内部障碍（膝·髋关节）'),
                     items: [
-                        { name: locale === 'ko' ? '활막염 및 건초염' : (locale === 'en' ? 'Synovitis & Tenosynovitis' : '滑膜炎及腱鞘炎'), code: 'M65', desc: locale === 'ko' ? '방아쇠수지, 손목건초염 등' : (locale === 'en' ? 'Trigger finger, De Quervain syndrome, etc.' : '弹响指、腕腱鞘炎等'), riders: riders.DISEASE },
-                        { name: locale === 'ko' ? '어깨 병변' : (locale === 'en' ? 'Shoulder Lesions' : '肩部病变'), code: 'M75', desc: locale === 'ko' ? '회전근개파열, 오십견 등' : (locale === 'en' ? 'Rotator cuff tear, frozen shoulder, etc.' : '旋转肌腱损伤、五十肩等'), riders: riders.DISEASE, isImportant: true },
-                        { name: locale === 'ko' ? '골수염' : (locale === 'en' ? 'Osteomyelitis' : '骨髓炎'), code: 'M86', riders: riders.DISEASE },
-                        { name: locale === 'ko' ? '무혈성 골괴사' : (locale === 'en' ? 'Avascular Necrosis' : '无血性骨坏死'), code: 'M87', desc: locale === 'ko' ? '대퇴골두무혈성괴사 (인공관절 수술 등)' : (locale === 'en' ? 'AVN of femoral head (Joint replacement, etc.)' : '股骨头无血性坏死 (人工关节手术等)'), riders: [t('jointReplacementSurgery'), ...riders.DISEASE] },
+                        { name: locale === 'ko' ? '무릎 반월상연골 파열' : (locale === 'en' ? 'Meniscus Tear of Knee' : '膝关节半月板损伤'), code: 'M23.2', desc: locale === 'ko' ? '반월상연골 손상. 관절경 수술 빈도 높음' : (locale === 'en' ? 'Meniscal damage. High frequency arthroscopic surgery' : '半月板损伤。关节镜手术频率高'), riders: riders.DISEASE, isImportant: true },
+                        { name: locale === 'ko' ? '무릎 내부 장애(기타)' : (locale === 'en' ? 'Internal Derangement of Knee (Other)' : '膝内部障碍（其他）'), code: 'M23', desc: locale === 'ko' ? '십자인대파열, 연골연화증 등 무릎 내부 문제 전반' : (locale === 'en' ? 'ACL tear, chondromalacia, and other knee internal issues' : '前交叉韧带撕裂、软骨软化症等膝内部问题'), riders: riders.DISEASE, isImportant: true },
+                        { name: locale === 'ko' ? '무릎 관절증(퇴행성)' : (locale === 'en' ? 'Gonarthrosis (Degenerative Knee)' : '膝关节病（退行性）'), code: 'M17', desc: locale === 'ko' ? '퇴행성 관절염. 인공관절 수술 다빈도' : (locale === 'en' ? 'Degenerative arthritis. Frequent total knee replacement' : '退行性关节炎。人工关节手术高频'), riders: [t('jointReplacementSurgery'), ...riders.DISEASE], isImportant: true },
+                        { name: locale === 'ko' ? '고관절 관절증' : (locale === 'en' ? 'Coxarthrosis (Hip)' : '髋关节病'), code: 'M16', desc: locale === 'ko' ? '고관절 퇴행성 관절염. 인공관절치환술 적용' : (locale === 'en' ? 'Hip joint degeneration. Total hip replacement applicable' : '髋关节退行性变。适用髋关节置换术'), riders: [t('jointReplacementSurgery'), ...riders.DISEASE] },
+                        { name: locale === 'ko' ? '기타 관절증' : (locale === 'en' ? 'Other Arthrosis' : '其他关节病'), code: 'M19', desc: locale === 'ko' ? '손가락·발가락 등 기타 관절 퇴행성 변화' : (locale === 'en' ? 'Degenerative changes in finger, toe joints, etc.' : '手指、脚趾等其他关节退行性变化'), riders: riders.DISEASE },
+                    ]
+                },
+                {
+                    name: locale === 'ko' ? '척추 추간판·협착증·측만증' : (locale === 'en' ? 'Disc, Stenosis & Scoliosis' : '椎间盘·狭窄症·侧弯症'),
+                    items: [
+                        { name: locale === 'ko' ? '경추 추간판 장애 (목디스크)' : (locale === 'en' ? 'Cervical Disc Disorder (Neck Disc)' : '颈椎间盘障碍（颈椎病）'), code: 'M50', desc: locale === 'ko' ? '목 디스크. 경추 신경 압박 증상. 수술비 청구 시 가입 시기 약관 확인 필요' : (locale === 'en' ? 'Cervical disc. Nerve compression. Check policy date for surgery coverage' : '颈椎间盘。颈椎神经压迫症状。手术费申请时需确认承保时期条款'), riders: [t('discSurgery'), t('nDiseaseSurgery'), t('diseaseSurgery')], isImportant: true },
+                        { name: locale === 'ko' ? '흉추 추간판 장애' : (locale === 'en' ? 'Thoracic Disc Disorder' : '胸椎间盘障碍'), code: 'M51.0', desc: locale === 'ko' ? '등 디스크. 비교적 드물지만 증상 심할 수 있음' : (locale === 'en' ? 'Thoracic disc. Uncommon but can be severe' : '胸椎间盘。相对罕见但症状可能严重'), riders: [t('discSurgery'), ...riders.DISEASE] },
+                        { name: locale === 'ko' ? '요추 추간판 탈출증 (허리디스크)' : (locale === 'en' ? 'Lumbar Disc Herniation (Lumbar Disc)' : '腰椎间盘突出症（腰椎病）'), code: 'M51.1', desc: locale === 'ko' ? '허리 디스크. 가장 흔한 수술 원인. 수술비 청구 다빈도' : (locale === 'en' ? 'Most common surgery cause. High frequency surgery claims' : '最常见手术原因。手术费申请高频'), riders: [t('discSurgery'), t('nDiseaseSurgery'), t('diseaseSurgery')], isImportant: true },
+                        { name: locale === 'ko' ? '기타 추간판 장애' : (locale === 'en' ? 'Other Intervertebral Disc Disorders' : '其他椎间盘障碍'), code: 'M51', desc: locale === 'ko' ? '추간판 퇴행, 일반 디스크 질환' : (locale === 'en' ? 'Disc degeneration and general disc disorders' : '椎间盘退变及一般性椎间盘疾病'), riders: [t('discSurgery'), ...riders.DISEASE] },
+                        { name: locale === 'ko' ? '척추관 협착증' : (locale === 'en' ? 'Spinal Stenosis' : '脊柱管狭窄症'), code: 'M48.0', desc: locale === 'ko' ? '척추관이 좁아져 신경 압박. 수술 시 수술비 청구 가능' : (locale === 'en' ? 'Narrowing of spinal canal compresses nerves. Surgery claim applicable' : '脊柱管变窄压迫神经。手术时可申请手术费'), riders: [t('discSurgery'), t('nDiseaseSurgery'), t('diseaseSurgery')], isImportant: true },
+                        { name: locale === 'ko' ? '척추병증(기타)' : (locale === 'en' ? 'Other Spondylopathies' : '其他脊柱病变'), code: 'M48', desc: locale === 'ko' ? '척추관 협착증 포함 기타 척추 구조 이상' : (locale === 'en' ? 'Spinal stenosis and other structural spinal abnormalities' : '脊柱管狭窄症及其他脊柱结构异常'), riders: [t('discSurgery'), t('nDiseaseSurgery')], isImportant: true },
+                        { name: locale === 'ko' ? '척추전방전위증' : (locale === 'en' ? 'Spondylolisthesis' : '脊柱滑脱症'), code: 'M43.1', desc: locale === 'ko' ? '척추뼈가 앞으로 밀려남. 수술 고려 시 다빈도' : (locale === 'en' ? 'Vertebra slips forward. Frequently requires surgery' : '椎骨向前滑脱。手术频率高'), riders: [t('discSurgery'), t('nDiseaseSurgery')] },
+                        { name: locale === 'ko' ? '척추측만증' : (locale === 'en' ? 'Scoliosis' : '脊柱侧弯'), code: 'M41', desc: locale === 'ko' ? '척추의 측방 만곡. 심한 경우 수술 시행' : (locale === 'en' ? 'Lateral spinal curvature. Surgery for severe cases' : '脊柱侧向弯曲。严重时进行手术'), riders: riders.DISEASE },
+                        { name: locale === 'ko' ? '강직성 척추염' : (locale === 'en' ? 'Ankylosing Spondylitis' : '强直性脊柱炎'), code: 'M45', desc: locale === 'ko' ? '척추 자가면역 염증. 희귀난치성질환 해당' : (locale === 'en' ? 'Autoimmune spinal inflammation. Qualifies as rare disease' : '脊柱自身免疫性炎症。属于罕见疾病'), riders: [t('rareDiseaseDiag'), ...riders.DISEASE] },
+                    ]
+                },
+                {
+                    name: locale === 'ko' ? '어깨 질환 (회전근개·오십견)' : (locale === 'en' ? 'Shoulder Diseases (Rotator Cuff / Frozen Shoulder)' : '肩部疾病（旋转肌腱·五十肩）'),
+                    items: [
+                        { name: locale === 'ko' ? '어깨의 병변 (전체)' : (locale === 'en' ? 'Shoulder Lesions (General)' : '肩部病变（总体）'), code: 'M75', desc: locale === 'ko' ? '회전근개파열, 오십견 포함 어깨 관련 질환 전반' : (locale === 'en' ? 'All shoulder conditions including rotator cuff tear, frozen shoulder' : '包括旋转肌腱损伤、五十肩的肩部相关疾病全体'), riders: riders.DISEASE, isImportant: true },
+                        { name: locale === 'ko' ? '회전근개 증후군' : (locale === 'en' ? 'Rotator Cuff Syndrome' : '旋转肌腱综合征'), code: 'M75.1', desc: locale === 'ko' ? '어깨 회전근개파열. 수술 시 수술비·실비 청구 빈도 높음' : (locale === 'en' ? 'Rotator cuff tear. High frequency surgery and insurance claims' : '肩旋转肌腱损伤。手术费·医疗费申请频率高'), riders: riders.DISEASE, isImportant: true },
+                        { name: locale === 'ko' ? '오십견(동결견)' : (locale === 'en' ? 'Adhesive Capsulitis (Frozen Shoulder)' : '五十肩（冻结肩）'), code: 'M75.0', desc: locale === 'ko' ? '어깨 관절 굳음증. 물리치료·주사·수술 다양한 치료' : (locale === 'en' ? 'Shoulder joint stiffness. Various treatments including PT, injection, surgery' : '肩关节僵硬症。物理治疗·注射·手术多种治疗方法'), riders: riders.DISEASE, isImportant: true },
+                        { name: locale === 'ko' ? '상완이두근 건염' : (locale === 'en' ? 'Bicipital Tendinitis' : '肱二头肌腱炎'), code: 'M75.2', riders: riders.DISEASE },
+                        { name: locale === 'ko' ? '충돌 증후군' : (locale === 'en' ? 'Shoulder Impingement Syndrome' : '肩撞击综合征'), code: 'M75.5', desc: locale === 'ko' ? '어깨뼈 충돌로 인한 통증' : (locale === 'en' ? 'Pain from shoulder bone impingement' : '肩骨撞击引起的疼痛'), riders: riders.DISEASE },
+                    ]
+                },
+                {
+                    name: locale === 'ko' ? '힘줄·건·인대 질환' : (locale === 'en' ? 'Tendon & Ligament Diseases' : '肌腱·肌腱·韧带疾病'),
+                    items: [
+                        { name: locale === 'ko' ? '활막염 및 건초염' : (locale === 'en' ? 'Synovitis & Tenosynovitis' : '滑膜炎及腱鞘炎'), code: 'M65', desc: locale === 'ko' ? '방아쇠수지(M65.3), 손목 드퀘르벵 건초염 포함' : (locale === 'en' ? 'Trigger finger (M65.3), De Quervain wrist tenosynovitis included' : '弹响指（M65.3）、腕部де克维恩腱鞘炎等'), riders: riders.DISEASE },
+                        { name: locale === 'ko' ? '방아쇠수지' : (locale === 'en' ? 'Trigger Finger' : '弹响指'), code: 'M65.3', desc: locale === 'ko' ? '손가락 건초염. 수술 가능 여부 약관 확인 필요' : (locale === 'en' ? 'Finger tendon sheath inflammation. Verify surgery coverage in policy' : '手指腱鞘炎。需确认手术承保条款'), riders: riders.DISEASE, isImportant: true },
+                        { name: locale === 'ko' ? '건염 및 건부착부염' : (locale === 'en' ? 'Tendinitis & Enthesopathy' : '腱炎及附着点病'), code: 'M77', desc: locale === 'ko' ? '테니스엘보(M77.1), 골프엘보(M77.0), 발꿈치 가시 등 포함' : (locale === 'en' ? 'Tennis elbow (M77.1), Golfers elbow (M77.0), Heel spur included' : '网球肘（M77.1）、高尔夫肘（M77.0）、跟骨刺等'), riders: riders.DISEASE },
+                        { name: locale === 'ko' ? '외측 상과염 (테니스엘보)' : (locale === 'en' ? 'Lateral Epicondylitis (Tennis Elbow)' : '外侧上髁炎（网球肘）'), code: 'M77.1', desc: locale === 'ko' ? '팔꿈치 바깥쪽 통증. 체외충격파·주사 치료 다빈도' : (locale === 'en' ? 'Outer elbow pain. Shock wave and injection therapy common' : '肘部外侧疼痛。体外冲击波·注射治疗频率高'), riders: riders.DISEASE, isImportant: true },
+                        { name: locale === 'ko' ? '내측 상과염 (골프엘보)' : (locale === 'en' ? 'Medial Epicondylitis (Golfers Elbow)' : '内侧上髁炎（高尔夫肘）'), code: 'M77.0', riders: riders.DISEASE },
+                        { name: locale === 'ko' ? '족저근막염' : (locale === 'en' ? 'Plantar Fasciitis' : '跖筋膜炎'), code: 'M72.2', desc: locale === 'ko' ? '발바닥 통증. 체외충격파 등 비급여 치료 다빈도' : (locale === 'en' ? 'Heel/foot pain. Frequent non-covered shockwave therapy' : '足底疼痛。体外冲击波等非医保治疗频率高'), isImportant: true },
+                        { name: locale === 'ko' ? '아킬레스건 파열(자발성)' : (locale === 'en' ? 'Spontaneous Rupture of Achilles Tendon' : '自发性跟腱断裂'), code: 'M66.3', desc: locale === 'ko' ? '아킬레스건 끊어짐. 수술비 청구 가능' : (locale === 'en' ? 'Achilles tendon rupture. Surgery claim applicable' : '跟腱断裂。可申请手术费'), riders: riders.DISEASE },
+                        { name: locale === 'ko' ? '어깨 힘줄 파열(자발성)' : (locale === 'en' ? 'Spontaneous Rupture of Shoulder Tendon' : '自发性肩部肌腱断裂'), code: 'M66.2', riders: riders.DISEASE },
+                    ]
+                },
+                {
+                    name: locale === 'ko' ? '손목·수근관·기타 상지' : (locale === 'en' ? 'Wrist, Carpal Tunnel & Upper Limb' : '腕部·腕管·其他上肢'),
+                    items: [
+                        { name: locale === 'ko' ? '손목 수근관 증후군' : (locale === 'en' ? 'Carpal Tunnel Syndrome' : '腕管综合征'), code: 'G54.2', desc: locale === 'ko' ? '손 저림, 야간통. 수술 시 5종 수술비 청구 가능. (G코드로도 분류)' : (locale === 'en' ? 'Hand numbness, night pain. Type 5 surgery claim applicable. (Also G-code)' : '手麻、夜间痛。手术时可申请5种手术费。（也属G代码）'), riders: riders.DISEASE, isImportant: true },
+                        { name: locale === 'ko' ? '드퀘르벵 건초염' : (locale === 'en' ? 'De Quervain Tenosynovitis' : '狄奎尔万腱鞘炎'), code: 'M65.4', desc: locale === 'ko' ? '엄지 손목 건초염. 산모, 주방 종사자 다빈도' : (locale === 'en' ? 'Thumb/wrist tenosynovitis. Common in new mothers, kitchen workers' : '拇指腕部腱鞘炎。产妇、厨房工作者高发'), riders: riders.DISEASE },
+                        { name: locale === 'ko' ? '손목 관절증' : (locale === 'en' ? 'Wrist Arthrosis' : '腕关节病'), code: 'M19.0', riders: riders.DISEASE },
+                    ]
+                },
+                {
+                    name: locale === 'ko' ? '뼈·골밀도 질환 (골다공증·골절)' : (locale === 'en' ? 'Bone Density Diseases (Osteoporosis/Fracture)' : '骨·骨密度疾病（骨质疏松·骨折）'),
+                    items: [
+                        { name: locale === 'ko' ? '골다공증 (병적골절 없음)' : (locale === 'en' ? 'Osteoporosis without Fracture' : '骨质疏松（无病理性骨折）'), code: 'M81', desc: locale === 'ko' ? '폐경후·노령성 골다공증. 골절 발생 시 골절진단비 청구' : (locale === 'en' ? 'Postmenopausal/senile osteoporosis. Fracture diagnosis benefit when fracture occurs' : '绝经后·老龄性骨质疏松。发生骨折时可申请骨折诊断金'), riders: [t('fractureDiag')] },
+                        { name: locale === 'ko' ? '병적 골절을 동반한 골다공증' : (locale === 'en' ? 'Osteoporosis with Pathological Fracture' : '伴病理性骨折的骨质疏松'), code: 'M80', desc: locale === 'ko' ? '골다공증으로 인한 골절. 척추·고관절 압박골절 포함' : (locale === 'en' ? 'Fractures due to osteoporosis. Includes spinal/hip compression fractures' : '骨质疏松引起的骨折。包括脊柱·髋关节压缩性骨折'), riders: [t('fractureDiag'), ...riders.DISEASE], isImportant: true },
+                        { name: locale === 'ko' ? '골수염' : (locale === 'en' ? 'Osteomyelitis' : '骨髓炎'), code: 'M86', desc: locale === 'ko' ? '뼈 감염. 수술 치료 필요한 경우 수술비 청구 가능' : (locale === 'en' ? 'Bone infection. Surgery claim possible when surgical treatment needed' : '骨感染。需要手术治疗时可申请手术费'), riders: riders.DISEASE },
+                        { name: locale === 'ko' ? '무혈성 골괴사 (대퇴골두)' : (locale === 'en' ? 'Avascular Necrosis (Femoral Head)' : '无血性骨坏死（股骨头）'), code: 'M87', desc: locale === 'ko' ? '혈액공급 차단으로 뼈 괴사. 인공관절수술 다빈도' : (locale === 'en' ? 'Bone death from blocked blood supply. Frequent joint replacement surgery' : '血液供应中断导致骨坏死。人工关节手术高频'), riders: [t('jointReplacementSurgery'), ...riders.DISEASE], isImportant: true },
+                    ]
+                },
+                {
+                    name: locale === 'ko' ? '연조직·기타 근골격계 질환' : (locale === 'en' ? 'Soft Tissue & Other Musculoskeletal' : '软组织及其他肌肉骨骼疾病'),
+                    items: [
+                        { name: locale === 'ko' ? '등통증 (기타)' : (locale === 'en' ? 'Back Pain (Other)' : '背部疼痛（其他）'), code: 'M54', desc: locale === 'ko' ? '좌골신경통(M54.3), 목·등·허리 통증 포함' : (locale === 'en' ? 'Includes sciatica (M54.3), neck/back/lumbar pain' : '包括坐骨神经痛（M54.3）、颈·背·腰痛'), isImportant: true },
+                        { name: locale === 'ko' ? '좌골신경통' : (locale === 'en' ? 'Sciatica' : '坐骨神经痛'), code: 'M54.3', desc: locale === 'ko' ? '디스크·협착증으로 인한 좌골신경 압박. 실비 보상 빈도 높음' : (locale === 'en' ? 'Sciatic nerve compression from disc/stenosis. High frequency insurance claims' : '椎间盘·狭窄症引起的坐骨神经压迫。实费保险赔付频率高'), isImportant: true },
+                        { name: locale === 'ko' ? '목 통증' : (locale === 'en' ? 'Neck Pain' : '颈部疼痛'), code: 'M54.2', riders: riders.DISEASE },
+                        { name: locale === 'ko' ? '근육염' : (locale === 'en' ? 'Myositis' : '肌肉炎'), code: 'M60', riders: riders.DISEASE },
+                        { name: locale === 'ko' ? '연조직 장애 (기타)' : (locale === 'en' ? 'Other Soft Tissue Disorders' : '其他软组织障碍'), code: 'M79', desc: locale === 'ko' ? '류마티즘(기타), 신경통, 근육통 등 포함' : (locale === 'en' ? 'Includes other rheumatism, neuralgia, myalgia, etc.' : '包括其他风湿病、神经痛、肌肉痛等') },
+                        { name: locale === 'ko' ? '석회성 건염' : (locale === 'en' ? 'Calcific Tendinitis' : '钙化性腱炎'), code: 'M65.2', desc: locale === 'ko' ? '어깨 힘줄 석회 침착. 체외충격파·수술 치료' : (locale === 'en' ? 'Calcium deposits in shoulder tendon. Shock wave or surgery treatment' : '肩部肌腱钙质沉积。体外冲击波·手术治疗'), riders: riders.DISEASE },
                     ]
                 }
             ]
