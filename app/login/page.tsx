@@ -110,7 +110,7 @@ export default function LoginPage() {
             <>
               <div className="text-center mb-10">
                 <h1 className="text-3xl font-black text-gray-900 mb-2">설계사 로그인</h1>
-                <p className="text-gray-500 text-sm">보험다이어트 대시보드에 접속합니다.</p>
+                <p className="text-gray-500 text-sm">인슈닷 대시보드에 접속합니다.</p>
               </div>
 
               <form onSubmit={handleLogin} className="space-y-5">

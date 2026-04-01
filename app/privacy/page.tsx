@@ -91,7 +91,7 @@ export default function PrivacyPage() {
                   
                   <section className="mb-16">
                     <p className="text-lg font-bold text-gray-800 leading-relaxed bg-gray-50/50 p-8 rounded-[2rem] border border-gray-100 italic">
-                      "보험다이어트((주)인터커스텀)(이하 “회사”라 합니다)는 「개인정보 보호법」 등 관련 법령을 준수하며, 이용자의 개인정보를 보호하기 위하여 최선을 다하고 있습니다. 회사는 본 개인정보처리방침을 통하여 이용자의 개인정보가 어떠한 용도와 방식으로 처리되고 있는지 안내드립니다."
+                      "인슈닷((주)인터커스텀)(이하 “회사”라 합니다)는 「개인정보 보호법」 등 관련 법령을 준수하며, 이용자의 개인정보를 보호하기 위하여 최선을 다하고 있습니다. 회사는 본 개인정보처리방침을 통하여 이용자의 개인정보가 어떠한 용도와 방식으로 처리되고 있는지 안내드립니다."
                     </p>
                   </section>
 
@@ -279,7 +279,7 @@ export default function PrivacyPage() {
                           <div>
                             <p className="text-primary-400 font-black uppercase tracking-widest text-[10px] mb-2">Personal Information Manager</p>
                             <h3 className="text-3xl font-black mb-1">이광현 대표</h3>
-                            <p className="text-gray-400 font-bold">보험다이어트 대표이사</p>
+                            <p className="text-gray-400 font-bold">인슈닷 대표이사</p>
                           </div>
                           <div className="space-y-3 font-bold text-sm">
                             <div className="flex items-center gap-3 text-gray-300 hover:text-white transition-colors">

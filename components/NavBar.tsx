@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import { Bars3Icon, XMarkIcon, UserCircleIcon, ChevronDownIcon } from '@heroicons/react/24/outline'
 import { supabase } from '@/lib/supabaseClient'
@@ -38,19 +39,31 @@ export default function NavBar() {
       <div className="container">
         {/* Top Row: Brand & Actions */}
         <div className="flex items-center justify-between h-14 relative">
-          <Link href="/" className="flex flex-col items-start z-50 group -my-0.5" onClick={() => setIsOpen(false)}>
+          <Link href="/" className="flex items-center gap-2.5 z-50 group" onClick={() => setIsOpen(false)}>
+            {/* Logo Image (Optional) - User can place logo.png in public folder */}
             <div className="flex items-center gap-1.5">
-              <div className="bg-primary-50 p-1 rounded-lg text-primary-600 transition-colors group-hover:bg-primary-100">
-                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+              <div className="relative w-8 h-8 bg-primary-600 rounded-xl flex items-center justify-center shadow-lg shadow-primary-200 group-hover:scale-110 transition-transform duration-300">
+                <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                 </svg>
+                {/* 
+                  To use an actual image logo:
+                  1. Place your logo image in /public/logo.png
+                  2. Uncomment the Image component below
+                */}
+                {/* <Image src="/logo.png" alt="Logo" width={32} height={32} className="absolute inset-0 object-contain" /> */}
               </div>
-              <span className="font-bold text-lg tracking-tight text-gray-900 leading-none">
+              <span className="font-black text-2xl tracking-tighter text-gray-900 flex items-baseline">
                 {(() => {
                   const name = t('brandName') as string
-                  const idx = name.indexOf('다이어트')
-                  if (idx !== -1) {
-                    return <>{name.slice(0, idx)}<span className="text-primary-600">다이어트</span>{name.slice(idx + 4)}</>
+                  if (name.includes('인슈')) {
+                    const parts = name.split('닷')
+                    return (
+                      <>
+                        <span className="tracking-tight">인슈</span>
+                        {name.includes('닷') && <span className="text-primary-600 ml-px">닷</span>}
+                      </>
+                    )
                   }
                   return <span>{name}</span>
                 })()}

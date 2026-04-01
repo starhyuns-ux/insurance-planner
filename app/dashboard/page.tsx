@@ -2793,10 +2793,10 @@ export default function DashboardPage() {
                 <div className="bg-white rounded-[2rem] shadow-xl p-8 border border-gray-100">
                   <div className="flex items-center gap-3 mb-2">
                     <div className="w-10 h-10 bg-indigo-100 rounded-2xl flex items-center justify-center text-indigo-600 text-xl">📖</div>
-                    <h3 className="text-2xl font-black text-gray-900">보험다이어트 사용 가이드</h3>
+                    <h3 className="text-2xl font-black text-gray-900">인슈닷 사용 가이드</h3>
                   </div>
                   <p className="text-sm text-gray-500 font-medium mb-8 ml-[52px]">
-                    디지털 명함부터 상담 관리까지, 보험다이어트 플랫폼 활용법을 안내합니다.
+                    디지털 명함부터 상담 관리까지, 인슈닷 플랫폼 활용법을 안내합니다.
                   </p>
 
                   <div className="space-y-8">

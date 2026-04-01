@@ -75,7 +75,7 @@ export default function SignupPage() {
         <div className="max-w-md w-full bg-white rounded-3xl shadow-xl p-8 border border-gray-100">
           <div className="text-center mb-10">
             <h1 className="text-3xl font-black text-gray-900 mb-2">설계사 전용 가입</h1>
-            <p className="text-gray-500 text-sm">보험다이어트 플래너로 등록하고 나만의 페이지를 만드세요.</p>
+            <p className="text-gray-500 text-sm">인슈닷 플래너로 등록하고 나만의 페이지를 만드세요.</p>
           </div>
 
           <form onSubmit={handleSignup} className="space-y-5">

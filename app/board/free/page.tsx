@@ -1,7 +1,7 @@
 import BoardPage from '@/components/BoardPage'
 
 export const metadata = {
-  title: '자유 게시판 | 보험다이어트',
+  title: '자유 게시판 | 인슈닷',
   description: '자유롭게 이야기를 나눠보세요.'
 }
 

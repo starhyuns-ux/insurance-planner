@@ -12,8 +12,9 @@ export default function Footer() {
       <div className="container max-w-6xl">
         <div className="grid md:grid-cols-4 gap-8 mb-12">
           <div className="md:col-span-2 pr-4">
-            <Link href="/" className="inline-block font-bold text-[1.5rem] tracking-tight text-gray-900 mb-4">
-              {t('brandName').split('다이어트')[0]}<span className="text-primary-600">{t('brandName').includes('다이어트') ? '다이어트' : t('brandName')}</span>
+            <Link href="/" className="inline-block font-black text-3xl tracking-tighter text-gray-900 mb-4 flex items-baseline">
+              <span>인슈</span>
+              <span className="text-primary-600 ml-px">닷</span>
             </Link>
             <p className="text-gray-500 mb-6 leading-relaxed max-w-sm text-[15px]">
               {t('footerDesc')}

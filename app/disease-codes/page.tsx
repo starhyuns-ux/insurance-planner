@@ -5,10 +5,10 @@ import PlannerBranding from '@/components/PlannerBranding'
 import DiseaseCodeSearch from '@/components/DiseaseCodeSearch'
 
 export const metadata: Metadata = {
-    title: '암·질병코드 검색 | 보험다이어트',
+    title: '암·질병코드 검색 | 인슈닷',
     description: '어려운 암 질병코드 및 진단코드를 쉽고 빠르게 검색해보세요. 내 진단서의 코드가 어떤 암을 의미하는지 한눈에 확인할 수 있습니다.',
     openGraph: {
-        title: '암·질병코드 검색 | 보험다이어트',
+        title: '암·질병코드 검색 | 인슈닷',
         description: '어려운 암 질병코드 및 진단코드를 쉽게 검색하고 의미를 확인해보세요.',
         url: 'https://insurance-planner-eosin.vercel.app/disease-codes',
     }

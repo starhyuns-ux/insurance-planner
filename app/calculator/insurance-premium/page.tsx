@@ -4,7 +4,7 @@ import InsurancePremiumCalculator from '@/components/InsurancePremiumCalculator'
 import PlannerBranding from '@/components/PlannerBranding'
 
 export const metadata = {
-    title: '보험료 계산기 | 보험다이어트',
+    title: '보험료 계산기 | 인슈닷',
     description: '성별, 생년월일만 입력하면 암, 뇌, 심장 진단비부터 수술비까지 예상 보험료를 확인해 보세요.',
 }
 

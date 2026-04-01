@@ -1,7 +1,7 @@
 import BoardPage from '@/components/BoardPage'
 
 export const metadata = {
-  title: 'Q&A 게시판 | 보험다이어트',
+  title: 'Q&A 게시판 | 인슈닷',
   description: '보험에 관한 궁금한 점을 자유롭게 질문하고 답변을 받아보세요.'
 }
 

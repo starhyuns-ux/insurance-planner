@@ -5,10 +5,10 @@ import PlannerBranding from '@/components/PlannerBranding'
 import { PhoneIcon, BuildingOffice2Icon, BuildingLibraryIcon, BriefcaseIcon } from '@heroicons/react/24/outline'
 
 export const metadata: Metadata = {
-    title: '주요 보험사 및 기관 고객센터 연락처 | 보험다이어트',
+    title: '주요 보험사 및 기관 고객센터 연락처 | 인슈닷',
     description: '국내 주요 손해보험사, 생명보험사 고객센터 번호와 국민건강보험공단 등 유용한 기관 연락처 모음입니다.',
     openGraph: {
-        title: '보험사 고객센터 연락처 모음 | 보험다이어트',
+        title: '보험사 고객센터 연락처 모음 | 인슈닷',
         description: '급할 때 바로 찾아 전화할 수 있는 보험사 콜센터 연락처 모음',
         url: 'https://insurance-planner-eosin.vercel.app/contacts',
     }

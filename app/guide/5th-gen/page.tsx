@@ -6,7 +6,7 @@ import FifthGenGuide from '@/components/FifthGenGuide'
 import { LanguageProvider } from '@/lib/contexts/LanguageContext'
 
 export const metadata = {
-    title: '5세대 실손보험 가이드 | 보험다이어트',
+    title: '5세대 실손보험 가이드 | 인슈닷',
     description: '새롭게 개편된 5세대 실손의료보험의 중증, 비중증, 급여 의료비 보장 내용을 알기 쉽게 정리한 가이드입니다.',
 }
 

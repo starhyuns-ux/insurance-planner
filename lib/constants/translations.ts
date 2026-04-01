@@ -174,7 +174,7 @@ export const translations = {
     gen5: '5세대',
 
     // Brand
-    brandName: '보험다이어트',
+    brandName: '인슈닷',
 
     // NavBar
     navHome: '홈',
@@ -206,7 +206,7 @@ export const translations = {
     heroBadge: '3월 한정 리모델링 상담 접수 중',
     heroTitlePrefix: '보험료는 절약하고',
     heroTitleHighlight: '보장은 제대로',
-    heroDesc: '전문가의 1:1 맞춤 분석으로 부담스러운 보험료는 다이어트하고,\n가장 어려운 순간에 든든한 혜택을 채워드립니다.',
+    heroDesc: '전문가의 1:1 맞춤 분석으로 부담스러운 보험료는 낮추고,\n가장 어려운 순간에 든든한 혜택을 채워드립니다.',
     heroBtnApply: '리모델링 상담 신청하기',
     heroBtnCases: '절감 사례 보기',
     heroNotice: '* 상담 신청 시 전문 컨설턴트가 카카오톡으로 배정됩니다.',
@@ -294,7 +294,7 @@ export const translations = {
 
     // Services section
     servicesTag: 'Process',
-    servicesTitle: '보험 다이어트, 이렇게 진행됩니다',
+    servicesTitle: '인슈닷 서비스, 이렇게 진행됩니다',
     servicesDesc: '복잡하고 어려운 보험, 검증된 전문가가 A부터 Z까지 투명하게 분석해드립니다.',
     servicesSteps: [
       { title: '현재 상태 정밀 진단', desc: '현재 가입된 모든 보험을 모아 불필요한 지출과 보장 공백을 찾아냅니다.' },
@@ -304,7 +304,7 @@ export const translations = {
 
     // Reviews section
     reviewsTag: '실제 리모델링 사례',
-    reviewsTitle: '이미 많은 분들이 보험료 다이어트에 성공했습니다',
+    reviewsTitle: '이미 많은 분들이 실질적인 보험료 절감에 성공했습니다',
     reviewsDesc: '새는 돈은 막고, 필요한 보장은 채우는 놀라운 변화를 확인하세요.',
     reviewsBefore: '리모델링 전',
     reviewsAfter: '리모델링 후',
@@ -521,7 +521,7 @@ export const translations = {
     gen5: 'Gen 5',
 
     // Brand
-    brandName: 'InsuranceDiet',
+    brandName: 'InsuDot',
 
     // NavBar
     navHome: 'Home',
@@ -553,7 +553,7 @@ export const translations = {
     heroBadge: 'March limited remodeling consultation',
     heroTitlePrefix: 'Save on Premiums',
     heroTitleHighlight: 'Ensure Coverage',
-    heroDesc: 'Through expert 1:1 analysis, your burdensome premiums go on a diet,\nbringing you strong benefits when you need them most.',
+    heroDesc: 'Through expert 1:1 analysis, your burdensome premiums are reduced,\nbringing you strong benefits when you need them most.',
     heroBtnApply: 'Request Remodeling Consultation',
     heroBtnCases: 'View Savings Cases',
     heroNotice: '* Upon application, a consultant will be assigned via KakaoTalk.',
@@ -641,7 +641,7 @@ export const translations = {
 
     // Services section
     servicesTag: 'Process',
-    servicesTitle: 'How Insurance Diet Works',
+    servicesTitle: 'How InsuDot Works',
     servicesDesc: "Complex insurance, analyzed transparently from A to Z by verified experts.",
     servicesSteps: [
       { title: 'Precise Diagnosis', desc: 'We gather all your current policies to find unnecessary spending and coverage gaps.' },
@@ -651,7 +651,7 @@ export const translations = {
 
     // Reviews section
     reviewsTag: 'Real Remodeling Cases',
-    reviewsTitle: 'Many people have already succeeded at their Insurance Diet',
+    reviewsTitle: 'Many people have already succeeded in saving premiums',
     reviewsDesc: 'See the amazing changes. Stop the leaks and fill the coverage you need.',
     reviewsBefore: 'Before',
     reviewsAfter: 'After',
@@ -875,7 +875,7 @@ export const translations = {
     gen5: '第5代',
 
     // Brand
-    brandName: '保险减肥',
+    brandName: 'InsuDot',
 
     // NavBar
     navHome: '首页',
@@ -988,7 +988,7 @@ export const translations = {
 
     // Services section
     servicesTag: '流程',
-    servicesTitle: '保险瘦身，这样进行',
+    servicesTitle: 'InsuDot 服务，这样进行',
     servicesDesc: '复杂难懂的保险，由经验丰富的专家从头到尾为您透明分析。',
     servicesSteps: [
       { title: '精准现状诊断', desc: '整合您目前加入的所有保险，找出不必要的支出和保障空白。' },
@@ -998,7 +998,7 @@ export const translations = {
 
     // Reviews section
     reviewsTag: '真实重组案例',
-    reviewsTitle: '已有众多客户成功实现保险瘦身',
+    reviewsTitle: '已有众多客户成功实现保费节省',
     reviewsDesc: '堵住漏洞，填补必要保障，见证惊人的变化。',
     reviewsBefore: '重组前',
     reviewsAfter: '重组后',

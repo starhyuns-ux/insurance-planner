@@ -8,10 +8,10 @@ import Link from 'next/link'
 import { LanguageProvider } from '@/lib/contexts/LanguageContext'
 
 export const metadata: Metadata = {
-    title: '암 치료 통합 가이드 | 보험다이어트',
+    title: '암 치료 통합 가이드 | 인슈닷',
     description: '수술, 방사선, 약물 치료까지 - 현대 암 치료의 모든 단계를 알기 쉽게 정리한 통합 가이드입니다.',
     openGraph: {
-        title: '암 치료 통합 가이드 | 보험다이어트',
+        title: '암 치료 통합 가이드 | 인슈닷',
         description: '최신 로봇 수술부터 중입자 치료, 면역 항암제까지. 내 보험은 이 고액 치료들을 감당할 수 있을까요?',
         url: 'https://stroy.kr/guide/cancer-treatment',
     }

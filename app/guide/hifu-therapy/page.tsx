@@ -6,10 +6,10 @@ import Link from 'next/link'
 import Image from 'next/image'
 
 export const metadata: Metadata = {
-    title: '하이푸(HIFU) 시술 안내 | 보험다이어트',
+    title: '하이푸(HIFU) 시술 안내 | 인슈닷',
     description: '수술의 부담은 낮추고 치료 효과는 높이는 하이푸(HIFU) 시술. 나의 수술 전 종양 크기 감소 시술 대비책을 점검하세요.',
     openGraph: {
-        title: '하이푸(HIFU) 시술 안내 | 보험다이어트',
+        title: '하이푸(HIFU) 시술 안내 | 인슈닷',
         description: '칼을 대지 않고 종양을 태우는 차세대 암 치료, 하이푸. 암 수술 전 필수가 된 이 시술에 내 보험은 준비되어 있을까요?',
         url: 'https://insurance-planner-eosin.vercel.app/guide/hifu-therapy',
     }

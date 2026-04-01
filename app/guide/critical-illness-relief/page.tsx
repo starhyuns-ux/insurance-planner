@@ -6,7 +6,7 @@ import CriticalIllnessRelief from '@/components/CriticalIllnessRelief'
 import { LanguageProvider } from '@/lib/contexts/LanguageContext'
 
 export const metadata = {
-    title: '산정특례 제도 가이드 | 보험다이어트',
+    title: '산정특례 제도 가이드 | 인슈닷',
     description: '중증질환 환자의 치료비 본인부담을 낮춰주는 산정특례 제도의 질환별 기준(암, 심장, 뇌혈관 등)과 기간을 정리한 안내서입니다.',
 }
 

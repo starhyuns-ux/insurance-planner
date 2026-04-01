@@ -4,7 +4,7 @@ import PlannerBranding from '@/components/PlannerBranding'
 import SilbiCalculator from '@/components/SilbiCalculator'
 
 export const metadata = {
-    title: '실손보험 세대별 계산기 | 보험다이어트',
+    title: '실손보험 세대별 계산기 | 인슈닷',
     description: '1세대부터 4세대까지 내 보험금을 즉시 계산하고 비교해보세요.'
 }
 

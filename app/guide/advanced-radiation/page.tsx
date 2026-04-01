@@ -6,10 +6,10 @@ import Image from 'next/image'
 import Link from 'next/link'
 
 export const metadata: Metadata = {
-    title: '첨단 방사선 치료 가이드 | 보험다이어트',
+    title: '첨단 방사선 치료 가이드 | 인슈닷',
     description: '수천만 원에 달하는 양성자, 중입자 등 첨단 방사선 치료비용. 든든하게 대비하는 방법을 알려드립니다.',
     openGraph: {
-        title: '첨단 방사선 치료 가이드 | 보험다이어트',
+        title: '첨단 방사선 치료 가이드 | 인슈닷',
         description: '수천만 원대의 첨단 방사선 치료비, 내 보험으로 감당 가능할까? 전문가와 함께 미리 점검하세요.',
         url: 'https://insurance-planner-eosin.vercel.app/guide/advanced-radiation',
     }

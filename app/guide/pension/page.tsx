@@ -7,7 +7,7 @@ import Link from 'next/link'
 import { LanguageProvider } from '@/lib/contexts/LanguageContext'
 
 export const metadata: Metadata = {
-  title: '연금 준비 전략 | 40대·50대 노후 준비 가이드 | 보험다이어트',
+  title: '연금 준비 전략 | 40대·50대 노후 준비 가이드 | 인슈닷',
   description: '40대와 50대의 연금 전략이 왜 다른지 알아보세요. 시간을 활용한 자산 성장부터 안정적인 연금 소득 구조 설계까지 전문가가 정리했습니다.',
   openGraph: {
     title: '연금 준비 전략 | 40대·50대 노후 준비 가이드',
