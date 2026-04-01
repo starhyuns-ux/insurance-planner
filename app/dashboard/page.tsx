@@ -27,9 +27,9 @@ import {
   ChatBubbleLeftRightIcon,
   GiftIcon,
   DocumentCheckIcon,
-  PhotoIcon,
   PaperAirplaneIcon,
-  ChatBubbleBottomCenterTextIcon
+  ChatBubbleBottomCenterTextIcon,
+  DocumentTextIcon
 } from '@heroicons/react/24/outline'
 import BoardPage from '@/components/BoardPage'
 import DetailedClaimForm from '@/components/DetailedClaimForm'
@@ -873,7 +873,7 @@ function SubscriptionTab({ planner }: { planner: { id: string; name: string; sub
 // ─────────────────────────────────────────────────────────────────
 
 export default function DashboardPage() {
-  const [activeTab, setActiveTab] = useState<'profile' | 'leads' | 'customers' | 'calendar' | 'subscription' | 'card' | 'notification' | 'guide' | 'chat' | 'freeboard' | 'referrals' | 'claims' | 'kakaotalk'>('calendar')
+  const [activeTab, setActiveTab] = useState<'profile' | 'leads' | 'customers' | 'calendar' | 'subscription' | 'card' | 'notification' | 'guide' | 'chat' | 'freeboard' | 'referrals' | 'claims' | 'kakaotalk' | 'disclosure'>('calendar')
   const [planner, setPlanner] = useState<Planner | null>(null)
   const [customers, setCustomers] = useState<Customer[]>([])
   const [leads, setLeads] = useState<Lead[]>([])
@@ -1626,6 +1626,25 @@ export default function DashboardPage() {
               </div>
             </div>
 
+            {/* ── 업무 지원 ── */}
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+              <div className="flex items-center gap-2 px-4 py-2.5 bg-gray-50 border-b border-gray-100">
+                <span className="w-1 h-4 rounded-full bg-rose-500 inline-block" />
+                <span className="text-[10px] font-black text-gray-500 uppercase tracking-[0.18em]">업무 지원</span>
+              </div>
+              <div className="p-2 space-y-0.5">
+                <button
+                  onClick={() => setActiveTab('disclosure')}
+                  className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-semibold transition-all text-sm ${
+                    activeTab === 'disclosure' ? 'bg-primary-600 text-white shadow-md' : 'text-gray-600 hover:bg-gray-50'
+                  }`}
+                >
+                  <DocumentTextIcon className="w-4 h-4 shrink-0" />
+                  상품공시실 (약관)
+                </button>
+              </div>
+            </div>
+
             {/* ── 내 설정 ── */}
             <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
               <div className="flex items-center gap-2 px-4 py-2.5 bg-gray-50 border-b border-gray-100">
@@ -2220,6 +2239,99 @@ export default function DashboardPage() {
                         )}
                       </tbody>
                     </table>
+                  </div>
+                </div>
+              </div>
+            )}
+            {/* Tab: Disclosure (상품공시실) */}
+            {activeTab === 'disclosure' && (
+              <div className="space-y-8">
+                <div className="bg-white rounded-[2rem] shadow-xl p-6 md:p-8 border border-gray-100">
+                  <div className="flex flex-col md:flex-row items-center justify-between gap-4 mb-8 border-b border-gray-100 pb-6">
+                    <div>
+                      <h3 className="text-xl md:text-2xl font-black text-gray-900 mb-2">상품공시실 (약관 보기)</h3>
+                      <p className="text-sm font-bold text-gray-500">각 보험사의 상품공시실로 이동하여 쉽게 전체 상품의 상세 약관을 확인하실 수 있습니다.</p>
+                    </div>
+                  </div>
+
+                  <div className="space-y-12">
+                    {/* 생명보험 */}
+                    <div>
+                      <h4 className="text-lg font-black text-rose-600 mb-6 flex items-center gap-2">
+                        <span className="w-1.5 h-6 bg-rose-500 rounded-full inline-block"></span>
+                        생명보험
+                      </h4>
+                      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                        {[
+                          { name: '교보생명', url: 'https://www.kyobo.com/dgt/web/product-official/all-product/search' },
+                          { name: '동양생명', url: 'https://pbano.myangel.co.kr/paging/WE_AC_WEPAAP020100L' },
+                          { name: '라이나생명', url: 'https://www.lina.co.kr/disclosure/product-public-announcement/product-on-sales?key=0' },
+                          { name: '메트라이프생명', url: 'https://brand.metlife.co.kr/pn/paReal/insuProductDisclMain.do' },
+                          { name: '미래에셋생명', url: 'https://life.miraeasset.com/micro/disclosure/product/PC-HO-080301-000000.do' },
+                          { name: '삼성생명', url: 'https://www.samsunglife.com/individual/products/disclosure/main/PDO-PRPRC010100M' },
+                          { name: '신한라이프', url: 'https://www.shinhanlife.co.kr/hp/cdhi0030.do' },
+                          { name: '하나생명', url: 'https://hanalife.co.kr/anm/product/allProduct.do?status=on' },
+                          { name: '한화생명', url: 'https://www.hanwhalife.com/main/disclosure/goods/disclosurenotice/DF_GDDN000_P10000.do?MENU_ID1=DF_GDGL000' },
+                          { name: '흥국생명', url: 'https://www.heungkuklife.co.kr/front/public/saleProduct.do?searchFlgSale=Y' },
+                          { name: '푸본현대생명', url: 'https://www.fubonhyundai.com/#CUSI150102010101' },
+                          { name: '처브생명', url: 'https://www.chubblife.co.kr/front/official/sale/list.do' },
+                          { name: 'ABL생명', url: 'https://www.abllife.co.kr/st/pban/prdtPban/whlPrdt/whlPrdt1/whlPrdt11?page=index' },
+                          { name: 'BNP파리바카디프생명', url: 'https://www.cardif.co.kr/disclosure/papag101.do' },
+                          { name: 'DB생명', url: 'https://www.idblife.com/notice/product/sale' },
+                          { name: 'IBK연금보험', url: 'https://www.ibki.co.kr/process/HP_PBANO_PDT_SP_INDV' },
+                          { name: 'iM생명', url: 'https://www.imlifeins.co.kr/BA/BA_A020.do' },
+                          { name: 'KB라이프', url: 'https://www.kblife.co.kr/customer-common/productList.do' },
+                          { name: '농협생명', url: 'https://www.nhlife.co.kr/ho/on/HOON0004M00.nhl' },
+                          { name: 'KDB생명', url: 'https://www.kdblife.co.kr/ajax.do?scrId=HDLMA002M02P' }
+                        ].map((item, idx) => (
+                          <a 
+                            key={idx} 
+                            href={item.url} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="flex items-center justify-between p-4 bg-gray-50 border border-gray-100 hover:border-rose-200 hover:bg-rose-50 hover:shadow-sm rounded-2xl transition-all group"
+                          >
+                            <span className="font-bold text-gray-700 group-hover:text-rose-700 text-sm whitespace-nowrap">{item.name}</span>
+                            <ArrowRightOnRectangleIcon className="w-4 h-4 text-gray-400 group-hover:text-rose-500 opacity-0 group-hover:opacity-100 -translate-x-2 group-hover:translate-x-0 transition-all" />
+                          </a>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* 손해보험 */}
+                    <div>
+                      <h4 className="text-lg font-black text-blue-600 mb-6 flex items-center gap-2">
+                        <span className="w-1.5 h-6 bg-blue-500 rounded-full inline-block"></span>
+                        손해보험
+                      </h4>
+                      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                        {[
+                          { name: '라이나손보', url: 'https://www.chubb.com/kr-kr/disclosure/product.html' },
+                          { name: '롯데손보', url: 'https://www.lotteins.co.kr/web/C/D/H/cdh190.jsp' },
+                          { name: '메리츠화재', url: 'https://www.meritzfire.com/disclosure/product-announcement/product-list.do#!/' },
+                          { name: '삼성화재', url: 'https://www.samsungfire.com/vh/page/VH.HPIF0103.do' },
+                          { name: '한화손보', url: 'https://www.hwgeneralins.com/notice/ir/product-ing01.do' },
+                          { name: '하나손보', url: 'https://www.hanainsure.co.kr/w/disclosure/product/saleProduct' },
+                          { name: '현대해상', url: 'https://www.hi.co.kr/serviceAction.do?view=bin/PA/03/HHPA03010M' },
+                          { name: '흥국화재', url: 'https://www.heungkukfire.co.kr/FRW/announce/insGoodsGongsiSale.do' },
+                          { name: 'AIG손보', url: 'https://www.aig.co.kr/wo/dpwot001.html?menuId=MS702' },
+                          { name: 'DB손보', url: 'https://www.idbins.com/FWMAIV1534.do' },
+                          { name: 'KB손보', url: 'https://www.kbinsure.co.kr/CG802030001.ec' },
+                          { name: 'NH손보', url: 'https://www.nhfire.co.kr/announce/productAnnounce/retrieveInsuranceProductsAnnounce.nhfire' }
+                        ].map((item, idx) => (
+                          <a 
+                            key={idx} 
+                            href={item.url} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="flex items-center justify-between p-4 bg-gray-50 border border-gray-100 hover:border-blue-200 hover:bg-blue-50 hover:shadow-sm rounded-2xl transition-all group"
+                          >
+                            <span className="font-bold text-gray-700 group-hover:text-blue-700 text-sm whitespace-nowrap">{item.name}</span>
+                            <ArrowRightOnRectangleIcon className="w-4 h-4 text-gray-400 group-hover:text-blue-500 opacity-0 group-hover:opacity-100 -translate-x-2 group-hover:translate-x-0 transition-all" />
+                          </a>
+                        ))}
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
