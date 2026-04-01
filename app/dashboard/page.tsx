@@ -2481,7 +2481,7 @@ export default function DashboardPage() {
                     </h3>
 
                     {/* Add Todo Input */}
-                    <form onSubmit={(e) => { e.preventDefault(); addTodo(); }} className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
                       <div className="md:col-span-1">
                         <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1 mb-1 block">날짜 선택</label>
                         <input 
@@ -2499,17 +2499,29 @@ export default function DashboardPage() {
                             placeholder="할 일을 입력하세요..."
                             value={newTodoContent}
                             onChange={(e) => setNewTodoContent(e.target.value)}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter') {
+                                e.preventDefault()
+                                addTodo()
+                              }
+                            }}
                             className="flex-1 px-4 py-3 bg-gray-50 border-none rounded-2xl text-sm font-bold focus:ring-2 focus:ring-primary-500 transition-all outline-none"
                           />
                           <button 
-                            type="submit"
-                            className="w-full md:w-auto px-6 py-4 md:py-3 bg-primary-600 text-white rounded-2xl shadow-lg shadow-primary-200 hover:bg-primary-500 transition-all font-black text-sm whitespace-nowrap"
+                            type="button"
+                            onClick={(e) => { e.preventDefault(); addTodo(); }}
+                            onTouchEnd={(e) => { 
+                              // Use onTouchEnd to bypass cases where onClick is ignored due to keyboard dismissal
+                              e.preventDefault(); 
+                              addTodo(); 
+                            }}
+                            className="w-full md:w-auto px-6 py-4 md:py-3 bg-primary-600 text-white rounded-2xl shadow-lg shadow-primary-200 hover:bg-primary-500 transition-all font-black text-sm whitespace-nowrap active:scale-95 touch-manipulation"
                           >
                             추가하기
                           </button>
                         </div>
                       </div>
-                    </form>
+                    </div>
 
                     {/* Todo Items */}
                     <div className="space-y-4">
