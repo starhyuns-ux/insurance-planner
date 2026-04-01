@@ -2369,7 +2369,7 @@ export default function DashboardPage() {
                     </h3>
 
                     {/* Add Todo Input */}
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+                    <form onSubmit={(e) => { e.preventDefault(); addTodo(); }} className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
                       <div className="md:col-span-1">
                         <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1 mb-1 block">날짜 선택</label>
                         <input 
@@ -2387,18 +2387,17 @@ export default function DashboardPage() {
                             placeholder="할 일을 입력하세요..."
                             value={newTodoContent}
                             onChange={(e) => setNewTodoContent(e.target.value)}
-                            onKeyDown={(e) => e.key === 'Enter' && addTodo()}
                             className="flex-1 px-4 py-3 bg-gray-50 border-none rounded-2xl text-sm font-bold focus:ring-2 focus:ring-primary-500 transition-all outline-none"
                           />
                           <button 
-                            onClick={addTodo}
-                            className="w-full md:w-auto px-6 py-4 md:py-0 bg-primary-600 text-white rounded-2xl shadow-lg shadow-primary-200 hover:bg-primary-500 transition-all group font-black text-sm whitespace-nowrap"
+                            type="submit"
+                            className="w-full md:w-auto px-6 py-4 md:py-3 bg-primary-600 text-white rounded-2xl shadow-lg shadow-primary-200 hover:bg-primary-500 transition-all font-black text-sm whitespace-nowrap"
                           >
                             추가하기
                           </button>
                         </div>
                       </div>
-                    </div>
+                    </form>
 
                     {/* Todo Items */}
                     <div className="space-y-4">
@@ -2456,18 +2455,18 @@ export default function DashboardPage() {
                                     }`}>
                                       {todo.content}
                                     </span>
-                                    <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-all">
+                                    <div className="flex items-center gap-1 opacity-100 md:opacity-0 group-hover:opacity-100 transition-all">
                                       <button 
                                         onClick={() => startEditingTodo(todo)}
-                                        className="p-1 text-gray-300 hover:text-primary-500 transition-all"
+                                        className="p-2 md:p-1 text-gray-400 hover:text-primary-500 transition-all"
                                       >
-                                        <PencilIcon className="w-4 h-4" />
+                                        <PencilIcon className="w-5 h-5 md:w-4 md:h-4" />
                                       </button>
                                       <button 
                                         onClick={() => deleteTodo(todo.id)}
-                                        className="p-1 text-gray-300 hover:text-rose-500 transition-all"
+                                        className="p-2 md:p-1 text-gray-400 hover:text-rose-500 transition-all"
                                       >
-                                        <TrashIcon className="w-4 h-4" />
+                                        <TrashIcon className="w-5 h-5 md:w-4 md:h-4" />
                                       </button>
                                     </div>
                                   </>
