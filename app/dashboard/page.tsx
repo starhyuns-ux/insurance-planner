@@ -991,6 +991,21 @@ export default function DashboardPage() {
   useEffect(() => {
     checkUser()
     checkFreeBoardNewPost()
+
+    // Auto-refresh data when bringing the app to the foreground (switching from PC to mobile)
+    const handleFocusOrVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        checkUser()
+      }
+    }
+
+    document.addEventListener('visibilitychange', handleFocusOrVisibilityChange)
+    window.addEventListener('focus', handleFocusOrVisibilityChange)
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleFocusOrVisibilityChange)
+      window.removeEventListener('focus', handleFocusOrVisibilityChange)
+    }
   }, [])
 
   const checkFreeBoardNewPost = async () => {
