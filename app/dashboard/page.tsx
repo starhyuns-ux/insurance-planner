@@ -29,7 +29,9 @@ import {
   DocumentCheckIcon,
   PaperAirplaneIcon,
   ChatBubbleBottomCenterTextIcon,
-  DocumentTextIcon
+  DocumentTextIcon,
+  Bars3Icon,
+  XMarkIcon
 } from '@heroicons/react/24/outline'
 import BoardPage from '@/components/BoardPage'
 import DetailedClaimForm from '@/components/DetailedClaimForm'
@@ -984,6 +986,7 @@ export default function DashboardPage() {
   const [editCustRiders, setEditCustRiders] = useState('')
   const [editCustAppt, setEditCustAppt] = useState('')
   const [hasNewBoardPost, setHasNewBoardPost] = useState(false)
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
   // Calendar State
   const [currentMonth, setCurrentMonth] = useState(new Date())
@@ -1031,6 +1034,7 @@ export default function DashboardPage() {
 
   const handleTabChange = (tab: any) => {
     setActiveTab(tab)
+    setIsMobileMenuOpen(false)
     if (tab === 'freeboard') {
       setHasNewBoardPost(false)
       localStorage.setItem('last_seen_free_board', new Date().toISOString())
@@ -1562,8 +1566,31 @@ export default function DashboardPage() {
       <div className="flex-1 container py-12">
         <div className="flex flex-col lg:flex-row gap-8">
           
-          {/* Sidebar */}
-          <aside className="hidden lg:block w-full lg:w-72 shrink-0 space-y-3">
+          {/* Mobile Overlay Background */}
+          {isMobileMenuOpen && (
+            <div 
+              className="fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-[60] lg:hidden transition-opacity" 
+              onClick={() => setIsMobileMenuOpen(false)}
+            />
+          )}
+
+          {/* Sidebar (Slide-over on Mobile / Static on Desktop) */}
+          <aside className={`
+            fixed inset-y-0 left-0 z-[70] w-72 bg-gray-50 overflow-y-auto shadow-2xl pb-24 transition-transform duration-300 transform 
+            lg:translate-x-0 lg:static lg:block lg:pb-0 lg:w-72 lg:shrink-0 lg:p-0 lg:bg-transparent lg:shadow-none lg:h-auto lg:z-auto space-y-3
+            ${isMobileMenuOpen ? 'translate-x-0 pt-6 px-6' : '-translate-x-full lg:px-0 lg:pt-0'}
+          `}>
+            
+            {/* Mobile Sidebar Header */}
+            <div className="flex items-center justify-between lg:hidden mb-6 px-1">
+              <h2 className="text-2xl font-black text-gray-900">플래너 메뉴</h2>
+              <button 
+                onClick={() => setIsMobileMenuOpen(false)} 
+                className="p-2 -mr-2 text-gray-400 hover:text-gray-900 bg-white rounded-full shadow-sm"
+              >
+                <XMarkIcon className="w-6 h-6" />
+              </button>
+            </div>
 
 
             {/* ── 홈 ── */}
@@ -3184,13 +3211,13 @@ export default function DashboardPage() {
         </button>
 
         <button
-          onClick={() => handleTabChange('profile')}
+          onClick={() => setIsMobileMenuOpen(true)}
           className={`flex flex-col items-center gap-1 transition-all ${
-            activeTab === 'profile' ? 'text-primary-600 scale-110' : 'text-gray-400'
+            isMobileMenuOpen ? 'text-primary-600 scale-110' : 'text-gray-400'
           }`}
         >
-          <UserCircleIcon className="w-6 h-6" />
-          <span className="text-[10px] font-black">설정</span>
+          <Bars3Icon className="w-6 h-6" />
+          <span className="text-[10px] font-black">전체 메뉴</span>
         </button>
       </nav>
 
