@@ -153,6 +153,33 @@ export default function AdminPage() {
     }
   }
 
+  const updatePlannerStatus = async (plannerId: string, currentStatus: string) => {
+    const newStatus = currentStatus === 'active' ? 'Inactive' : 'active'
+    if (!confirm(`이 설계사의 상태를 '${newStatus}'(으)로 변경하시겠습니까?`)) return
+
+    try {
+      const { data: { session } } = await supabase.auth.getSession()
+      const res = await fetch('/api/admin/planners', {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': session ? `Bearer ${session.access_token}` : ''
+        },
+        body: JSON.stringify({ planner_id: plannerId, status: newStatus })
+      })
+
+      if (!res.ok) {
+        const result = await res.json()
+        throw new Error(result.error || '상태 변경 중 오류가 발생했습니다.')
+      }
+
+      alert('상태가 성공적으로 변경되었습니다.')
+      fetchPlanners() // Refresh list
+    } catch (err: any) {
+      alert(err.message)
+    }
+  }
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -339,13 +366,15 @@ export default function AdminPage() {
                       <div className="text-xs font-medium text-gray-400 mt-0.5">{p.region || '-'}</div>
                     </td>
                     <td className="px-8 py-6 text-center">
-                      <span className={`inline-flex px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${
+                      <button 
+                        onClick={() => updatePlannerStatus(p.id, p.subscription_status)}
+                        className={`inline-flex px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest transition-all hover:scale-105 active:scale-95 ${
                         p.subscription_status === 'active' 
-                          ? 'bg-emerald-50 text-emerald-600' 
-                          : 'bg-gray-100 text-gray-400'
+                          ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' 
+                          : 'bg-gray-100 text-gray-400 border border-transparent'
                       }`}>
                         {p.subscription_status === 'active' ? 'Active' : 'Inactive'}
-                      </span>
+                      </button>
                     </td>
                     <td className="px-8 py-6 text-center">
                       <div className="text-xs font-bold text-gray-400 italic">

@@ -64,3 +64,39 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 })
   }
 }
+
+export async function PATCH(request: Request) {
+  try {
+    // 1. Auth check (Same as GET)
+    const authHeader = request.headers.get('Authorization')
+    const token = authHeader?.replace('Bearer ', '')
+    if (!token) return NextResponse.json({ error: 'Auth failed' }, { status: 401 })
+    
+    const { data: { user } } = await supabase.auth.getUser(token)
+    if (!user) return NextResponse.json({ error: 'Auth failed' }, { status: 401 })
+
+    // Admin verify
+    const { data: profile } = await supabase.from('planners').select('phone').eq('id', user.id).single()
+    const cleanPhone = (profile?.phone || '').replace(/-/g, '')
+    const isAdmin = ADMIN_PHONES.some(p => p.replace(/-/g, '') === cleanPhone)
+    if (!isAdmin) return NextResponse.json({ error: 'Access Denied' }, { status: 403 })
+
+    // 2. Process Update
+    const { planner_id, status } = await request.json()
+    if (!planner_id || !status) {
+      return NextResponse.json({ error: 'Missing parameters' }, { status: 400 })
+    }
+
+    const { error: updateError } = await supabaseAdmin
+      .from('planners')
+      .update({ subscription_status: status })
+      .eq('id', planner_id)
+
+    if (updateError) throw updateError
+
+    return NextResponse.json({ success: true })
+  } catch (err: any) {
+    console.error('Admin PATCH error:', err)
+    return NextResponse.json({ error: err.message }, { status: 500 })
+  }
+}

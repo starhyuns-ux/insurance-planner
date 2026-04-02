@@ -49,6 +49,9 @@ export default function ConsultationForm({ id = "consultation", plannerId, plann
 
     setIsSubmitting(true)
 
+    const searchParams = new URLSearchParams(typeof window !== 'undefined' ? window.location.search : '')
+    const urlSource = searchParams.get('source')
+
     try {
       const res = await fetch('/api/consultations', {
         method: 'POST',
@@ -58,7 +61,7 @@ export default function ConsultationForm({ id = "consultation", plannerId, plann
           phone: phone.replace(/-/g, ''), // Save without dashes
           planner_id: finalPlannerId || null,
           meta: { 
-            source: finalPlannerId ? `planner_page_${finalPlannerId}` : 'landing_page_bottom_form',
+            source: urlSource || (finalPlannerId ? `planner_page_${finalPlannerId}` : 'landing_page_bottom_form'),
             planner_name: finalPlannerName,
             referrer_code: typeof window !== 'undefined' ? localStorage.getItem('referral_code') : null
           }

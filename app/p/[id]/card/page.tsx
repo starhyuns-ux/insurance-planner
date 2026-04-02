@@ -45,8 +45,15 @@ export async function generateMetadata({ params }: { params: { id: string } }): 
   }
 }
 
-export default async function DigitalBusinessCardPage({ params }: { params: { id: string } }) {
+export default async function DigitalBusinessCardPage({ 
+  params,
+  searchParams
+}: { 
+  params: { id: string },
+  searchParams: { source?: string }
+}) {
   const { id } = await params
+  const { source } = await searchParams
 
   // Fetch planner info
   const { data: planner, error } = await supabaseAdmin
@@ -59,9 +66,13 @@ export default async function DigitalBusinessCardPage({ params }: { params: { id
     notFound()
   }
 
-  // Increment visit_count
+  // Increment visit_count and track acquisition source
   try {
+    // 1. Increment planner specific count
     await supabaseAdmin.rpc('increment_visit_count', { planner_id: id })
+    
+    // 2. Increment global site visit with source tracking
+    await supabaseAdmin.rpc('increment_site_visit', { p_source: source || 'direct' })
   } catch (err) {
     console.error('Increment error:', err)
   }

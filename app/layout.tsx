@@ -69,6 +69,7 @@ export const metadata: Metadata = {
 import { LanguageProvider } from '@/lib/contexts/LanguageContext'
 import ChatWidget from '@/components/ChatWidget'
 import ReferralTracker from '@/components/ReferralTracker'
+import VisitTracker from '@/components/VisitTracker'
 import { Suspense } from 'react'
 
 export default function RootLayout({
@@ -81,6 +82,7 @@ export default function RootLayout({
       <body className={`${notoSansKr.variable} ${dancingScript.variable} font-sans antialiased bg-gray-50 text-gray-900 break-keep break-words w-full overflow-x-hidden`}>
         <script src="https://t2.kakaocdn.net/kakao_js_sdk/2.7.0/kakao.min.js" crossOrigin="anonymous" async></script>
         <LanguageProvider>
+          <VisitTracker />
           <Suspense fallback={null}>
             <ReferralTracker />
           </Suspense>

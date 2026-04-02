@@ -31,10 +31,23 @@ import {
   ChatBubbleBottomCenterTextIcon,
   DocumentTextIcon,
   Bars3Icon,
-  XMarkIcon
+  XMarkIcon,
+  ChartBarIcon
 } from '@heroicons/react/24/outline'
+import { motion, AnimatePresence } from 'framer-motion'
 import BoardPage from '@/components/BoardPage'
 import DetailedClaimForm from '@/components/DetailedClaimForm'
+
+// New Modular Components
+import Overview from './components/Overview'
+import LeadPipeline from './components/LeadPipeline'
+import CustomerCRM from './components/CustomerCRM'
+import ClaimCenter from './components/ClaimCenter'
+import CardSettings from './components/CardSettings'
+import CalendarManager from './components/CalendarManager'
+import KakaoTalkPanel from './components/KakaoTalkPanel'
+import SubscriptionTab from './components/SubscriptionTab'
+import ChatInboxPanel from './components/ChatInboxPanel'
 import { 
   format, 
   startOfMonth, 
@@ -201,6 +214,7 @@ type Planner = {
   notification_email: string | null
   gmail_app_password: string | null
   referral_code?: string
+  visit_count?: number
 }
 
 type Lead = {
@@ -257,622 +271,8 @@ interface Claim {
   created_at: string;
 }
 
-// ── 1:1 Chat Inbox Panel ──────────────────────────────────
-function ChatInboxPanel({ plannerId, plannerName }: { plannerId: string | null; plannerName: string }) {
-  const [sessions, setSessions] = useState<any[]>([])
-  const [selectedSession, setSelectedSession] = useState<any | null>(null)
-  const [messages, setMessages] = useState<any[]>([])
-  const [replyInput, setReplyInput] = useState('')
-  const [sending, setSending] = useState(false)
-  const bottomRef = useRef<HTMLDivElement>(null)
+// Modular components are imported at the top.
 
-  useEffect(() => { fetchSessions() }, [plannerId])
-  useEffect(() => {
-    if (!selectedSession) return
-    fetchMessages(selectedSession.id)
-    const ch = supabase.channel(`inbox_${selectedSession.id}`)
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'chat_messages', filter: `session_id=eq.${selectedSession.id}` }, p => {
-        setMessages(prev => [...prev, p.new])
-      })
-      .subscribe()
-    return () => { supabase.removeChannel(ch) }
-  }, [selectedSession?.id])
-  useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: 'smooth' }) }, [messages])
-
-  const fetchSessions = async () => {
-    const { data } = await supabase.from('chat_sessions').select('*').order('last_message_at', { ascending: false, nullsFirst: false })
-    if (data) setSessions(data)
-  }
-  const fetchMessages = async (sid: string) => {
-    const { data } = await supabase.from('chat_messages').select('*').eq('session_id', sid).order('created_at')
-    if (data) setMessages(data)
-  }
-  const sendReply = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!replyInput.trim() || !selectedSession) return
-    setSending(true)
-    await supabase.from('chat_messages').insert({ session_id: selectedSession.id, sender_type: 'planner', content: replyInput.trim() })
-    await supabase.from('chat_sessions').update({ last_message_at: new Date().toISOString() }).eq('id', selectedSession.id)
-    setReplyInput('')
-    setSending(false)
-    fetchSessions()
-  }
-  const safeDate = (str: string) => { try { return format(new Date(str), 'M/d HH:mm') } catch { return '' } }
-
-  return (
-    <div className="bg-white rounded-[2rem] shadow-xl border border-gray-100 overflow-hidden flex" style={{ height: '72vh', minHeight: '500px' }}>
-      {/* Session List */}
-      <div className="w-64 shrink-0 border-r border-gray-100 flex flex-col">
-        <div className="px-5 py-4 border-b border-gray-100 flex items-center gap-2">
-          <span className="text-sm font-black text-gray-800">1:1 채팅 인박스</span>
-          <span className="ml-auto text-xs text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">{sessions.length}</span>
-        </div>
-        <div className="flex-1 overflow-y-auto">
-          {sessions.length === 0 ? (
-            <div className="flex items-center justify-center h-full text-gray-300 text-sm px-4 text-center">아직 채팅 문의가 없습니다.</div>
-          ) : sessions.map(s => (
-            <button key={s.id} onClick={() => setSelectedSession(s)}
-              className={`w-full text-left px-4 py-3 border-b border-gray-50 hover:bg-gray-50 transition-colors ${selectedSession?.id === s.id ? 'bg-primary-50' : ''}`}>
-              <p className="font-bold text-sm text-gray-900 truncate">{s.visitor_name}</p>
-              {s.visitor_phone && <p className="text-xs text-gray-400">{s.visitor_phone}</p>}
-              <p className="text-[10px] text-gray-300 mt-0.5">{safeDate(s.last_message_at || s.created_at)}</p>
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Chat Area */}
-      <div className="flex-1 flex flex-col">
-        {!selectedSession ? (
-          <div className="flex-1 flex items-center justify-center text-gray-300 flex-col gap-2">
-            <span className="text-4xl">💬</span>
-            <span className="text-sm">세션을 선택하면 채팅이 표시됩니다.</span>
-          </div>
-        ) : (
-          <>
-            <div className="px-6 py-3 border-b border-gray-100 bg-gray-50/50 flex items-center gap-3">
-              <div className="w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center text-primary-600 font-black text-sm">{selectedSession.visitor_name.charAt(0)}</div>
-              <div>
-                <p className="font-bold text-sm text-gray-900">{selectedSession.visitor_name}</p>
-                {selectedSession.visitor_phone && <p className="text-xs text-gray-400">{selectedSession.visitor_phone}</p>}
-              </div>
-            </div>
-            <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-gray-50/20">
-              {messages.map(msg => (
-                <div key={msg.id} className={`flex ${msg.sender_type === 'planner' ? 'justify-end' : 'justify-start'}`}>
-                  {msg.sender_type === 'visitor' && (
-                    <div className="w-7 h-7 bg-gray-100 rounded-full flex items-center justify-center text-xs font-bold text-gray-500 mr-2 shrink-0 mt-1">{selectedSession.visitor_name.charAt(0)}</div>
-                  )}
-                  <div className="max-w-[75%]">
-                    <div className={`rounded-2xl px-3.5 py-2.5 text-sm whitespace-pre-wrap break-words ${
-                      msg.sender_type === 'planner' ? 'bg-primary-600 text-white rounded-tr-sm' : 'bg-white text-gray-800 rounded-tl-sm shadow-sm border border-gray-100'
-                    }`}>{msg.content}</div>
-                    <p className={`text-[10px] text-gray-300 mt-0.5 ${msg.sender_type === 'planner' ? 'text-right' : ''}`}>{safeDate(msg.created_at)}</p>
-                  </div>
-                </div>
-              ))}
-              <div ref={bottomRef} />
-            </div>
-            <form onSubmit={sendReply} className="p-3 border-t border-gray-100 flex gap-2 items-end bg-gray-50/50">
-              <textarea value={replyInput} onChange={e => setReplyInput(e.target.value)}
-                onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendReply(e as any) } }}
-                rows={2} placeholder={`${plannerName}으로 답변... (Enter 전송)`}
-                className="flex-1 border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-300 resize-none bg-white" />
-              <button type="submit" disabled={sending || !replyInput.trim()}
-                className="px-4 py-2.5 bg-primary-600 text-white rounded-xl text-sm font-bold hover:bg-primary-700 disabled:opacity-40 shrink-0">전송</button>
-            </form>
-          </>
-        )}
-      </div>
-    </div>
-  )
-}
-// ── KakaoTalk Messaging Panel ───────────────────────────────────
-function KakaoTalkPanel() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false)
-  const [friends, setFriends] = useState<any[]>([])
-  const [selectedFriends, setSelectedFriends] = useState<string[]>([])
-  const [message, setMessage] = useState('')
-  const [sending, setSending] = useState(false)
-  const [loadingFriends, setLoadingFriends] = useState(false)
-  const [isSdkReady, setIsSdkReady] = useState(false)
-
-  const { initKakao, loginWithKakao, fetchKakaoFriends, sendKakaoDefault, getKakaoToken } = require('@/lib/kakao-client')
-
-  useEffect(() => {
-    let checkInterval: any;
-    
-    const initialize = async () => {
-      try {
-        // Wait for window.Kakao to be ready (it's loaded async in layout.tsx)
-        checkInterval = setInterval(() => {
-          if (typeof window !== 'undefined' && window.Kakao) {
-            if (!window.Kakao.isInitialized()) {
-              initKakao()
-            }
-            
-            if (window.Kakao.isInitialized()) {
-              console.log('Kakao SDK is ready and initialized')
-              setIsSdkReady(true)
-              clearInterval(checkInterval)
-              
-              // Now check for existing session
-              const token = getKakaoToken()
-              if (token) {
-                setIsLoggedIn(true)
-                fetchFriends()
-              }
-            }
-          }
-        }, 300)
-      } catch (e) {
-        console.error('Kakao init error:', e)
-      }
-    }
-
-    initialize()
-    return () => { if (checkInterval) clearInterval(checkInterval) }
-  }, [])
-
-  const handleLogin = async () => {
-    if (!isSdkReady) {
-      alert('카카오 SDK 로딩 중입니다. 잠시 후 다시 시도해 주세요.')
-      return
-    }
-    try {
-      await loginWithKakao()
-      setIsLoggedIn(true)
-      fetchFriends()
-    } catch (err) {
-      console.error('Kakao login detailed error:', err)
-      alert('카카오 로그인에 실패했습니다. 권한 동의를 확인하거나 개발자 콘솔의 설정을 확인해 주세요.')
-    }
-  }
-
-  const fetchFriends = async () => {
-    if (!isSdkReady) return
-    setLoadingFriends(true)
-    try {
-      const friendList = await fetchKakaoFriends()
-      setFriends(friendList)
-    } catch (err) {
-      console.error('Failed to fetch Kakao friends:', err)
-      // If unauthorized, reset login state
-      if (err && (err as any).code === -401) {
-        setIsLoggedIn(false)
-      }
-    } finally {
-      setLoadingFriends(false)
-    }
-  }
-
-  const toggleFriend = (uuid: string) => {
-    setSelectedFriends(prev => 
-      prev.includes(uuid) ? prev.filter(id => id !== uuid) : [...prev, uuid]
-    )
-  }
-
-  const handleSendMessage = async () => {
-    if (selectedFriends.length === 0 || !message.trim()) return
-    setSending(true)
-    try {
-      await sendKakaoDefault(selectedFriends, message, 'https://stroy.kr')
-      alert(`${selectedFriends.length}명의 친구에게 메시지를 보냈습니다.`)
-      setMessage('')
-      setSelectedFriends([])
-    } catch (err) {
-      alert('메시지 전송에 실패했습니다.')
-    } finally {
-      setSending(false)
-    }
-  }
-
-  if (!isLoggedIn) {
-    return (
-      <div className="bg-white rounded-[2rem] shadow-xl p-12 border border-gray-100 flex flex-col items-center justify-center text-center">
-        <div className="w-20 h-20 bg-[#FEE500] rounded-3xl flex items-center justify-center mb-6 shadow-lg">
-          <ChatBubbleBottomCenterTextIcon className="w-10 h-10 text-[#3C1E1E]" />
-        </div>
-        <h3 className="text-2xl font-black text-gray-900 mb-2">카카오톡 연동하기</h3>
-        <p className="text-gray-500 mb-8 max-w-sm">
-          내 카카오톡 계정을 연동하여 고객(친구)들에게<br/>다양한 보험 안내 메시지를 직접 보낼 수 있습니다.
-        </p>
-        <button
-          onClick={handleLogin}
-          className="bg-[#FEE500] text-[#3C1E1E] px-8 py-4 rounded-2xl font-black text-lg hover:bg-[#FADA0A] transition-all flex items-center gap-3 shadow-xl shadow-yellow-100"
-        >
-          <img src="https://developers.kakao.com/assets/img/about/logos/kakaolink/kakaolink_btn_medium.png" alt="Kakao" className="w-6 h-6" />
-          카카오 로그인으로 시작하기
-        </button>
-        <p className="mt-6 text-[10px] text-gray-300 font-medium">※ 친구 목록 조회 및 메시지 전송 권한 동의가 필요합니다.</p>
-      </div>
-    )
-  }
-
-  return (
-    <div className="bg-white rounded-[2rem] shadow-xl border border-gray-100 overflow-hidden flex flex-col md:flex-row" style={{ height: '72vh', minHeight: '600px' }}>
-      {/* Friend List Side */}
-      <div className="w-full md:w-80 border-r border-gray-100 flex flex-col bg-gray-50/30">
-        <div className="p-5 border-b border-gray-100 flex items-center justify-between">
-          <h4 className="font-black text-gray-900 text-sm">카카오톡 친구 목록</h4>
-          <span className="text-[10px] font-black bg-primary-100 text-primary-600 px-2 py-0.5 rounded-full">{friends.length}명</span>
-        </div>
-        <div className="flex-1 overflow-y-auto p-2 space-y-1">
-          {loadingFriends ? (
-            <div className="flex items-center justify-center h-full text-gray-400 text-xs animate-pulse italic">목록 불러오는 중...</div>
-          ) : friends.length === 0 ? (
-            <div className="p-8 text-center text-gray-300 text-xs">친구 목록을 불러올 수 없거나 친구가 없습니다.</div>
-          ) : friends.map(f => (
-            <button
-              key={f.uuid}
-              onClick={() => toggleFriend(f.uuid)}
-              className={`w-full flex items-center gap-3 p-3 rounded-xl transition-all ${
-                selectedFriends.includes(f.uuid) ? 'bg-primary-50 border border-primary-100 shadow-sm' : 'hover:bg-white border border-transparent'
-              }`}
-            >
-              <div className="relative">
-                <img src={f.profile_thumbnail_image || 'https://via.placeholder.com/40'} alt={f.profile_nickname} className="w-10 h-10 rounded-xl object-cover" />
-                {selectedFriends.includes(f.uuid) && (
-                  <div className="absolute -top-1 -right-1 w-4 h-4 bg-primary-600 rounded-full flex items-center justify-center text-white border-2 border-white">
-                    <CheckIcon className="w-2.5 h-2.5" />
-                  </div>
-                )}
-              </div>
-              <div className="text-left">
-                <p className="text-sm font-bold text-gray-800">{f.profile_nickname}</p>
-                <p className="text-[10px] text-gray-400">카카오톡 친구</p>
-              </div>
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Message Compose Area */}
-      <div className="flex-1 flex flex-col p-6 md:p-8 space-y-6">
-        <div>
-          <h4 className="text-xs font-black text-gray-400 uppercase tracking-widest mb-4">메시지 작성</h4>
-          <textarea
-            value={message}
-            onChange={(e) => setMessage(e.target.value)}
-            rows={6}
-            placeholder="친구에게 보낼 메시지 내용을 입력하세요..."
-            className="w-full p-5 bg-gray-50 border border-gray-100 rounded-[2rem] text-sm font-medium focus:bg-white focus:border-primary-500 transition-all outline-none resize-none shadow-inner"
-          />
-        </div>
-
-        <div className="flex-1 flex flex-col justify-end gap-4">
-          <div className="bg-gray-50 rounded-2xl p-4 border border-dashed border-gray-200">
-            <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 italic">발송 요약</p>
-            <div className="flex items-center justify-between">
-              <span className="text-sm font-bold text-gray-600">선택된 친구</span>
-              <span className="text-sm font-black text-primary-600">{selectedFriends.length}명</span>
-            </div>
-          </div>
-
-          <button
-            onClick={handleSendMessage}
-            disabled={sending || selectedFriends.length === 0 || !message.trim()}
-            className="w-full bg-primary-600 text-white py-5 rounded-2xl font-black text-lg hover:bg-primary-700 disabled:opacity-40 shadow-xl shadow-primary-100 transition-all active:scale-[0.98] flex items-center justify-center gap-3"
-          >
-            {sending ? '메시지 전송 중...' : '메시지 전송하기'}
-            <PaperAirplaneIcon className="w-5 h-5 -rotate-45" />
-          </button>
-        </div>
-      </div>
-    </div>
-  )
-}
-// ─────────────────────────────────────────────────────────────────
-
-// ── Subscription Tab Component ────────────────────────────────────
-function SubscriptionTab({ planner }: { planner: { id: string; name: string; subscription_status: string } | null }) {
-  const [payments, setPayments] = useState<any[]>([])
-  const [loadingPayments, setLoadingPayments] = useState(true)
-  const [checkingOut, setCheckingOut] = useState(false)
-
-  useEffect(() => {
-    fetchPaymentHistory()
-  }, [])
-
-  // 카카오페이는 별도 SDK 불필요 (서버 side API 호출 후 리다이렉트)
-
-  const fetchPaymentHistory = async () => {
-    try {
-      const { data: { session } } = await supabase.auth.getSession()
-      if (!session) return
-      const res = await fetch('/api/payment/history', {
-        headers: { 'Authorization': `Bearer ${session.access_token}` }
-      })
-      if (res.ok) {
-        const data = await res.json()
-        setPayments(data.data || [])
-      }
-    } catch (e) {
-      console.error('Failed to fetch payment history:', e)
-    } finally {
-      setLoadingPayments(false)
-    }
-  }
-
-  const handlePayment = async () => {
-    if (!planner || checkingOut) return
-    setCheckingOut(true)
-    try {
-      const { data: { session } } = await supabase.auth.getSession()
-      if (!session) { alert('로그인이 필요합니다.'); return }
-
-      // 카카오페이 Ready API 호출 → 리다이렉트 URL 수신
-      const prepRes = await fetch('/api/payment/prepare', {
-        method: 'POST',
-        headers: { 'Authorization': `Bearer ${session.access_token}` }
-      })
-      const prepData = await prepRes.json()
-      if (!prepRes.ok) throw new Error(prepData.error || '결제 준비 실패')
-
-      // 모바일/PC 분기하여 카카오페이 결제창으로 리다이렉트
-      const isMobile = /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent)
-      const redirectUrl = isMobile ? prepData.mobileRedirectUrl : prepData.redirectUrl
-      if (!redirectUrl) throw new Error('결제 URL을 받지 못했습니다.')
-
-      window.location.href = redirectUrl
-    } catch (err: any) {
-      alert(err.message || '결제 중 오류가 발생했습니다.')
-      setCheckingOut(false)
-    }
-    // 리다이렉트 후에는 setCheckingOut(false) 호출이 의미 없으므로 생략
-  }
-
-  const isActive = planner?.subscription_status === 'active'
-  const latestPayment = payments.find(p => p.status === 'DONE')
-  const periodEnd = latestPayment?.period_end
-    ? new Date(latestPayment.period_end).toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' })
-    : null
-  const daysLeft = latestPayment?.period_end
-    ? Math.max(0, Math.ceil((new Date(latestPayment.period_end).getTime() - Date.now()) / (1000 * 60 * 60 * 24)))
-    : 0
-
-  const FEATURES = [
-    { icon: '🏢', label: '디지털 명함 & 랜딩페이지' },
-    { icon: '👥', label: '고객 관리 (무제한)' },
-    { icon: '📅', label: '일정 캘린더 & 할일 관리' },
-    { icon: '📋', label: '보험청구 자동화 서비스' },
-    { icon: '📊', label: '상담 신청 실시간 알림' },
-    { icon: '🎁', label: '친구 추천 리워드 시스템' },
-    { icon: '💬', label: '1:1 채팅 & 카카오톡 연동' },
-    { icon: '📌', label: '자유게시판 & 공지사항' },
-  ]
-
-  return (
-    <div className="space-y-6">
-      {/* 현재 구독 상태 카드 */}
-      <div className={`rounded-[2rem] p-8 relative overflow-hidden ${
-        isActive
-          ? 'bg-gradient-to-br from-[#1A1A1A] to-[#2D2D2D] text-white'
-          : 'bg-gradient-to-br from-gray-800 to-gray-900 text-white'
-      }`}>
-        {/* 배경 장식 */}
-        <div className="absolute top-0 right-0 -mr-20 -mt-20 w-80 h-80 bg-white/10 rounded-full blur-3xl" />
-        <div className="absolute bottom-0 left-0 -ml-10 -mb-10 w-48 h-48 bg-white/5 rounded-full blur-2xl" />
-        
-        <div className="relative z-10">
-          <div className="flex flex-col md:flex-row md:items-start justify-between gap-6">
-            <div className="flex-1">
-              <div className="flex items-center gap-3 mb-5">
-                {isActive ? (
-                  <span className="px-4 py-1.5 bg-emerald-400 text-white text-xs font-black uppercase tracking-widest rounded-full shadow-lg shadow-emerald-500/20 flex items-center gap-1.5">
-                    <span className="w-1.5 h-1.5 bg-white rounded-full animate-pulse" />
-                    구독 활성
-                  </span>
-                ) : (
-                  <span className="px-4 py-1.5 bg-gray-600 text-white text-xs font-black uppercase tracking-widest rounded-full">
-                    미구독
-                  </span>
-                )}
-                <span className="px-4 py-1.5 bg-white/10 text-white/80 text-xs font-black uppercase tracking-widest rounded-full backdrop-blur-sm">
-                  PREMIUM PLAN
-                </span>
-              </div>
-
-              <h3 className="text-3xl font-black mb-1">프리미엄 설계사 플랜</h3>
-              <p className="text-white/60 font-medium mb-6">
-                {isActive
-                  ? '모든 기능을 제한 없이 이용하고 있습니다.'
-                  : '구독을 시작하면 모든 프리미엄 기능을 이용할 수 있습니다.'}
-              </p>
-
-              {/* 구독 정보 (활성일 때) */}
-              {isActive && (
-                <div className="flex flex-wrap gap-4">
-                  <div className="px-5 py-3.5 bg-white/10 rounded-2xl backdrop-blur-md border border-white/10">
-                    <p className="text-[10px] font-black text-white/50 uppercase tracking-widest mb-1">다음 갱신일</p>
-                    <p className="text-lg font-black text-white">{periodEnd || '—'}</p>
-                  </div>
-                  <div className="px-5 py-3.5 bg-white/10 rounded-2xl backdrop-blur-md border border-white/10">
-                    <p className="text-[10px] font-black text-white/50 uppercase tracking-widest mb-1">남은 기간</p>
-                    <p className="text-lg font-black text-emerald-300">{daysLeft}일</p>
-                  </div>
-                  <div className="px-5 py-3.5 bg-white/10 rounded-2xl backdrop-blur-md border border-white/10">
-                    <p className="text-[10px] font-black text-white/50 uppercase tracking-widest mb-1">월 이용료</p>
-                    <p className="text-lg font-black text-white">5,900원</p>
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* 가격 + 결제 버튼 */}
-            <div className="flex flex-col items-center gap-4 md:items-end">
-              <div className="text-right">
-                <p className="text-white/40 text-sm font-bold line-through mb-1">월 29,900원</p>
-                <div className="flex items-baseline gap-2">
-                  <span className="text-5xl font-black text-white">5,900</span>
-                  <span className="text-white/60 font-bold">원/월</span>
-                </div>
-                <p className="text-amber-300 text-xs font-black mt-1">🔥 베타 출시 특별가</p>
-              </div>
-              <button
-                onClick={handlePayment}
-                disabled={checkingOut}
-                className={`w-full md:w-auto px-8 py-4 rounded-2xl font-black text-base transition-all shadow-2xl flex items-center gap-2 whitespace-nowrap ${
-                  checkingOut
-                    ? 'bg-white/20 text-white/50 cursor-not-allowed'
-                    : 'bg-[#FEE500] text-[#3C1E1E] hover:bg-[#FADA0A] hover:scale-105 active:scale-95 shadow-yellow-500/20'
-                }`}
-              >
-                {checkingOut ? (
-                  <>
-                    <div className="w-4 h-4 border-2 border-[#3C1E1E]/40 border-t-[#3C1E1E] rounded-full animate-spin" />
-                    카카오페이 연동 중...
-                  </>
-                ) : isActive ? (
-                  <>
-                    {/* 카카오페이 로고 아이콘 */}
-                    <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M12 2C6.48 2 2 5.92 2 10.8c0 3.12 1.68 5.88 4.24 7.52L5.2 22l4.56-2.36c.72.16 1.48.24 2.24.24 5.52 0 10-3.92 10-8.8S17.52 2 12 2z"/>
-                    </svg>
-                    구독 연장하기
-                  </>
-                ) : (
-                  <>
-                    <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M12 2C6.48 2 2 5.92 2 10.8c0 3.12 1.68 5.88 4.24 7.52L5.2 22l4.56-2.36c.72.16 1.48.24 2.24.24 5.52 0 10-3.92 10-8.8S17.52 2 12 2z"/>
-                    </svg>
-                    카카오페이로 시작하기
-                  </>
-                )}
-              </button>
-              {!isActive && (
-                <p className="text-white/40 text-xs font-medium text-center">화살표 카카오페이 · 안전한 간편결제</p>
-              )}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* 플랜 포함 기능 */}
-      <div className="bg-white rounded-[2rem] shadow-xl p-8 border border-gray-100">
-        <h4 className="text-lg font-black text-gray-900 mb-6">플랜에 포함된 기능</h4>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {FEATURES.map((feat, i) => (
-            <div key={i} className="flex items-center gap-3 p-4 bg-gray-50 rounded-2xl border border-gray-100 hover:bg-primary-50 hover:border-primary-100 transition-all group">
-              <span className="text-2xl">{feat.icon}</span>
-              <span className="text-xs font-bold text-gray-700 group-hover:text-primary-700 leading-snug">{feat.label}</span>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* 결제 내역 */}
-      <div className="bg-white rounded-[2rem] shadow-xl overflow-hidden border border-gray-100">
-        <div className="px-8 py-6 border-b border-gray-50 flex items-center justify-between">
-          <h4 className="text-lg font-black text-gray-900">결제 내역</h4>
-          <span className="text-xs font-bold text-gray-400 bg-gray-50 px-3 py-1 rounded-full border border-gray-100">최근 12건</span>
-        </div>
-
-        {loadingPayments ? (
-          <div className="p-16 text-center">
-            <div className="w-8 h-8 border-2 border-primary-200 border-t-primary-600 rounded-full animate-spin mx-auto mb-3" />
-            <p className="text-gray-400 text-sm font-medium">결제 내역을 불러오는 중...</p>
-          </div>
-        ) : payments.length === 0 ? (
-          <div className="p-16 text-center">
-            <div className="w-16 h-16 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
-              <CreditCardIcon className="w-8 h-8 text-gray-300" />
-            </div>
-            <p className="text-gray-400 font-bold">결제 내역이 없습니다.</p>
-            <p className="text-gray-300 text-sm mt-1">구독을 시작하면 이곳에 내역이 표시됩니다.</p>
-          </div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left">
-              <thead>
-                <tr className="bg-gray-50/50">
-                  <th className="px-8 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">결제일</th>
-                  <th className="px-8 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">내용</th>
-                  <th className="px-8 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest text-right">금액</th>
-                  <th className="px-8 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest text-center">상태</th>
-                  <th className="px-8 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">구독 기간</th>
-                  <th className="px-8 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest text-right">영수증</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-50">
-                {payments.map(p => (
-                  <tr key={p.id} className="hover:bg-gray-50/30 transition-colors">
-                    <td className="px-8 py-5 text-sm font-bold text-gray-700">
-                      {p.paid_at
-                        ? new Date(p.paid_at).toLocaleDateString('ko-KR')
-                        : new Date(p.created_at).toLocaleDateString('ko-KR')}
-                    </td>
-                    <td className="px-8 py-5">
-                      <p className="font-bold text-gray-900 text-sm">보험 플래너 구독</p>
-                      {p.card_company && (
-                        <p className="text-xs text-gray-400 mt-0.5">{p.card_company} {p.card_number ? `••••${p.card_number.slice(-4)}` : ''}</p>
-                      )}
-                    </td>
-                    <td className="px-8 py-5 text-right font-black text-gray-900">
-                      {(p.amount || 5900).toLocaleString()}원
-                    </td>
-                    <td className="px-8 py-5 text-center">
-                      {p.status === 'DONE' && (
-                        <span className="inline-flex px-3 py-1 bg-emerald-50 text-emerald-600 text-[10px] font-black rounded-full uppercase tracking-widest">결제완료</span>
-                      )}
-                      {p.status === 'PENDING' && (
-                        <span className="inline-flex px-3 py-1 bg-amber-50 text-amber-600 text-[10px] font-black rounded-full uppercase tracking-widest">처리중</span>
-                      )}
-                      {p.status === 'CANCELED' && (
-                        <span className="inline-flex px-3 py-1 bg-gray-100 text-gray-400 text-[10px] font-black rounded-full uppercase tracking-widest">취소됨</span>
-                      )}
-                      {p.status === 'FAILED' && (
-                        <span className="inline-flex px-3 py-1 bg-rose-50 text-rose-500 text-[10px] font-black rounded-full uppercase tracking-widest">실패</span>
-                      )}
-                    </td>
-                    <td className="px-8 py-5 text-xs font-medium text-gray-500">
-                      {p.period_start && p.period_end
-                        ? `${new Date(p.period_start).toLocaleDateString('ko-KR')} ~ ${new Date(p.period_end).toLocaleDateString('ko-KR')}`
-                        : '—'}
-                    </td>
-                    <td className="px-8 py-5 text-right">
-                      {p.receipt_url ? (
-                        <a
-                          href={p.receipt_url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1 px-3 py-1.5 bg-gray-50 text-gray-600 rounded-xl text-xs font-bold hover:bg-gray-100 transition-colors border border-gray-100"
-                        >
-                          영수증
-                        </a>
-                      ) : (
-                        <span className="text-gray-300 text-xs">—</span>
-                      )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </div>
-
-      {/* FAQ */}
-      <div className="bg-white rounded-[2rem] shadow-xl p-8 border border-gray-100">
-        <h4 className="text-lg font-black text-gray-900 mb-6">자주 묻는 질문</h4>
-        <div className="space-y-4">
-          {[
-            { q: '구독은 언제 시작되나요?', a: '결제 완료 즉시 구독이 활성화됩니다. 매월 같은 날짜에 자동 갱신됩니다.' },
-            { q: '어떤 결제 수단을 지원하나요?', a: '신용카드, 체크카드를 지원합니다. 토스 페이먼츠를 통해 안전하게 처리됩니다.' },
-            { q: '구독을 중간에 해지할 수 있나요?', a: '언제든지 해지할 수 있습니다. 해지 시 이미 결제된 기간은 정상적으로 이용 가능합니다.' },
-            { q: '영수증은 어떻게 받나요?', a: '결제 내역에서 \'영수증\' 버튼을 클릭하면 토스 페이먼츠 영수증 페이지로 이동합니다.' },
-          ].map((faq, i) => (
-            <div key={i} className="p-5 bg-gray-50 rounded-2xl border border-gray-100">
-              <p className="font-bold text-gray-900 text-sm mb-1.5">Q. {faq.q}</p>
-              <p className="text-gray-500 text-sm font-medium">A. {faq.a}</p>
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  )
-}
-// ─────────────────────────────────────────────────────────────────
 
 export default function DashboardPage() {
   const [activeTab, setActiveTab] = useState<'profile' | 'leads' | 'customers' | 'calendar' | 'subscription' | 'card' | 'notification' | 'guide' | 'chat' | 'freeboard' | 'referrals' | 'claims' | 'kakaotalk' | 'disclosure'>('calendar')
@@ -893,6 +293,8 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true)
   const [showProfileModal, setShowProfileModal] = useState(false)
   const [transmittingClaimId, setTransmittingClaimId] = useState<string | null>(null)
+  const [visitStats, setVisitStats] = useState<any[]>([])
+  const [totalVisits, setTotalVisits] = useState(0)
   const router = useRouter()
   const todoSectionRef = useRef<HTMLDivElement>(null)
 
@@ -991,9 +393,24 @@ export default function DashboardPage() {
   // Calendar State
   const [currentMonth, setCurrentMonth] = useState(new Date())
 
+  const fetchVisitStats = async () => {
+    try {
+      const res = await fetch('/api/site-visit/stats')
+      if (res.ok) {
+        const { data } = await res.json()
+        setVisitStats(data || [])
+        const total = (data || []).reduce((acc: number, cur: any) => acc + cur.visit_count, 0)
+        setTotalVisits(total)
+      }
+    } catch (err) {
+      console.error('Error fetching visit stats:', err)
+    }
+  }
+
   useEffect(() => {
     checkUser()
     checkFreeBoardNewPost()
+    fetchVisitStats()
 
     // Auto-refresh data when bringing the app to the foreground (switching from PC to mobile)
     const handleFocusOrVisibilityChange = () => {
@@ -1010,6 +427,35 @@ export default function DashboardPage() {
       window.removeEventListener('focus', handleFocusOrVisibilityChange)
     }
   }, [])
+
+  // Real-time Subscriptions
+  useEffect(() => {
+    if (!planner?.id) return
+
+    const todoChannel = supabase.channel(`todos_${planner.id}`)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'todos', filter: `planner_id=eq.${planner.id}` }, () => {
+        fetchTodos(planner.id)
+      })
+      .subscribe()
+
+    const claimChannel = supabase.channel(`claims_${planner.id}`)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'claims', filter: `planner_id=eq.${planner.id}` }, () => {
+        checkUser() // Also refreshes claims
+      })
+      .subscribe()
+
+    const consultationChannel = supabase.channel(`consultations_${planner.id}`)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'consultations', filter: `planner_id=eq.${planner.id}` }, () => {
+        checkUser() // Refreshes leads
+      })
+      .subscribe()
+
+    return () => {
+      supabase.removeChannel(todoChannel)
+      supabase.removeChannel(claimChannel)
+      supabase.removeChannel(consultationChannel)
+    }
+  }, [planner?.id])
 
   const checkFreeBoardNewPost = async () => {
     try {
@@ -1055,9 +501,7 @@ export default function DashboardPage() {
       .single()
 
     if (profile) {
-      // BETA TEST OVERRIDE: Always treat as active subscriber
-      const betaProfile = { ...profile, subscription_status: 'active' }
-      setPlanner(betaProfile)
+      setPlanner(profile)
       setEditName(profile.name)
       setEditPhone(profile.phone || '')
       setEditAffiliation(profile.affiliation || '')
@@ -1147,6 +591,51 @@ export default function DashboardPage() {
     }
     
     setLoading(false)
+  }
+
+  const togglePush = async () => {
+    if (!planner) return
+    setPushLoading(true)
+    try {
+      if (pushEnabled) {
+        const registration = await navigator.serviceWorker.ready
+        const subscription = await registration.pushManager.getSubscription()
+        if (subscription) {
+          await fetch('/api/push-subscribe', {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ endpoint: subscription.endpoint })
+          })
+          await subscription.unsubscribe()
+        }
+        setPushEnabled(false)
+      } else {
+        const permission = await Notification.requestPermission()
+        if (permission !== 'granted') {
+          alert('알림 권한을 허용해주세요. 브라우저 설정에서 이 사이트의 알림을 허용해주세요.')
+          setPushLoading(false)
+          return
+        }
+        const registration = await navigator.serviceWorker.ready
+        const subscription = await registration.pushManager.subscribe({
+          userVisibleOnly: true,
+          applicationServerKey: process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY
+        })
+        await fetch('/api/push-subscribe', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            planner_id: planner.id,
+            subscription: subscription.toJSON()
+          })
+        })
+        setPushEnabled(true)
+      }
+    } catch (err) {
+      console.error('Push toggle error:', err)
+      alert('푸시 알림 설정 중 오류가 발생했습니다.')
+    }
+    setPushLoading(false)
   }
 
   const fetchTodos = async (plannerId: string) => {
@@ -1307,7 +796,7 @@ export default function DashboardPage() {
   }
 
   const handleCopyUrl = (id: string) => {
-    const url = `https://stroy.kr/p/${id}/card`
+    const url = `https://stroy.kr/p/${id}/card?source=copy`
     navigator.clipboard.writeText(url)
     setUrlCopied(true)
     setTimeout(() => setUrlCopied(false), 2000)
@@ -1316,7 +805,7 @@ export default function DashboardPage() {
   const shareCard = async (targetName: string, targetPhone?: string) => {
     if (!planner) return
 
-    const cardUrl = `https://stroy.kr/p/${planner.id}/card`
+    const cardUrl = `https://stroy.kr/p/${planner.id}/card?source=share`
     const message = `[${planner.name} 설계사] 안녕하세요, ${targetName}님! 제 모바일 명함을 보내드립니다.\n\n🔗 명함 보기: ${cardUrl}`
 
     try {
@@ -1567,12 +1056,17 @@ export default function DashboardPage() {
         <div className="flex flex-col lg:flex-row gap-8">
           
           {/* Mobile Overlay Background */}
-          {isMobileMenuOpen && (
-            <div 
-              className="fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-[60] lg:hidden transition-opacity" 
-              onClick={() => setIsMobileMenuOpen(false)}
-            />
-          )}
+          <AnimatePresence>
+            {isMobileMenuOpen && (
+              <motion.div 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-[60] lg:hidden" 
+                onClick={() => setIsMobileMenuOpen(false)}
+              />
+            )}
+          </AnimatePresence>
 
           {/* Sidebar (Slide-over on Mobile / Static on Desktop) */}
           <aside className={`
@@ -1832,164 +1326,79 @@ export default function DashboardPage() {
           </aside>
 
           {/* Main Content Area */}
-          <div className="flex-1 space-y-8">
-            
-            {/* Tab: Profile */}
-            {activeTab === 'card' && (
-              <div className="space-y-6">
-                <div className="bg-white rounded-[2rem] shadow-xl p-8 border border-gray-100">
-                  <div className="flex items-center gap-3 mb-8">
-                    <div className="w-10 h-10 bg-primary-100 rounded-2xl flex items-center justify-center text-primary-600">
-                      <IdentificationIcon className="w-6 h-6" />
-                    </div>
-                    <h3 className="text-2xl font-black text-gray-900">명함 정보 만들기</h3>
-                  </div>
+          <div className="flex-1 min-w-0">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={activeTab}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.2, ease: "easeOut" }}
+                className="space-y-8"
+              >
+                {/* ── Dashboard Views ── */}
+                {activeTab === 'calendar' && (
+                  <>
+                    <Overview 
+                      leads={leads}
+                      customers={customers}
+                      planner={planner}
+                      totalVisits={totalVisits}
+                      visitStats={visitStats}
+                      getInsuranceAge={getInsuranceAge}
+                    />
+                    <CalendarManager 
+                      currentMonth={currentMonth}
+                      todoDate={todoDate}
+                      todos={todos}
+                      customers={customers}
+                      newTodoContent={newTodoContent}
+                      editingTodoId={editingTodoId}
+                      editTodoContent={editTodoContent}
+                      holidays={HOLIDAYS}
+                      onUpdateState={(key, value) => {
+                        if (key === 'currentMonth') setCurrentMonth(value)
+                        if (key === 'todoDate') setTodoDate(value)
+                        if (key === 'newTodoContent') setNewTodoContent(value)
+                        if (key === 'editTodoContent') setEditTodoContent(value)
+                        if (key === 'editingTodoId') setEditingTodoId(value)
+                      }}
+                      onAddTodo={addTodo}
+                      onToggleTodo={toggleTodo}
+                      onDeleteTodo={deleteTodo}
+                      onStartEditingTodo={startEditingTodo}
+                      onSaveTodoEdit={saveTodoEdit}
+                      onCancelEditingTodo={cancelEditingTodo}
+                      todoSectionRef={todoSectionRef}
+                    />
+                  </>
+                )}
 
-                  {/* 1. Profile Photo - resume style, bigger */}
-                  <div className="mb-8">
-                    <h4 className="text-xs font-black text-gray-400 uppercase tracking-widest mb-4 flex items-center gap-2">
-                      <UserCircleIcon className="w-4 h-4 text-primary-500" />
-                      프로필 사진
-                    </h4>
-                    <div className="flex items-center gap-6">
-                      <div className="relative group">
-                        <input type="file" accept="image/*" onChange={(e) => handleFileUpload(e, 'profile')} className="hidden" id="card-profile-upload" />
-                        <label htmlFor="card-profile-upload" className="w-36 h-44 bg-gray-50 rounded-2xl border-2 border-dashed border-gray-200 flex flex-col items-center justify-center text-gray-400 hover:border-primary-300 transition-all cursor-pointer overflow-hidden relative shadow-sm">
-                          {planner?.profile_image_url ? (
-                            <img src={planner.profile_image_url} alt="Profile" className="w-full h-full object-cover" />
-                          ) : (
-                            <div className="text-center p-3">
-                              <UserCircleIcon className="w-14 h-14 mx-auto opacity-20 mb-2" />
-                              <p className="text-xs font-bold">사진 업로드</p>
-                            </div>
-                          )}
-                          <div className="absolute inset-0 bg-primary-600/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white text-sm font-bold backdrop-blur-sm rounded-2xl">
-                            변경
-                          </div>
-                        </label>
-                      </div>
-                      <div className="text-sm text-gray-500">
-                        <p className="font-bold text-gray-700 mb-1">프로필 사진을 업로드하세요</p>
-                        <p className="text-xs text-gray-400 leading-relaxed">이력서용 증명사진이나 신뢰감을 주는 사진을 추천합니다.<br/>명함 URL 공유 시 이 사진이 미리보기에 표시됩니다.</p>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* 2. 성함 / 소속 */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                    <div>
-                      <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1 mb-2">성함</label>
-                      <input type="text" value={editName} onChange={(e) => setEditName(e.target.value)} placeholder="성함을 입력하세요" className="w-full px-5 py-4 bg-gray-50 border border-transparent rounded-2xl focus:bg-white focus:border-primary-500 transition-all outline-none text-sm font-bold shadow-inner" />
-                    </div>
-                    <div>
-                      <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1 mb-2">소속 (회사명)</label>
-                      <input type="text" value={editAffiliation} onChange={(e) => setEditAffiliation(e.target.value)} placeholder="예: 삼성생명 / 메리츠화재" className="w-full px-5 py-4 bg-gray-50 border border-transparent rounded-2xl focus:bg-white focus:border-primary-500 transition-all outline-none text-sm font-bold shadow-inner" />
-                    </div>
-                  </div>
-
-                  {/* 3. 활동지역 / 연락처 */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                    <div>
-                      <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1 mb-2">활동 지역 / 주소</label>
-                      <input type="text" value={editRegion} onChange={(e) => setEditRegion(e.target.value)} placeholder="예: 서울 강남구 / 전국 상담 가능" className="w-full px-5 py-4 bg-gray-50 border border-transparent rounded-2xl focus:bg-white focus:border-primary-500 transition-all outline-none text-sm font-bold shadow-inner" />
-                    </div>
-                    <div>
-                      <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1 mb-2">연락처</label>
-                      <input type="text" value={editPhone} onChange={(e) => setEditPhone(e.target.value)} className="w-full px-5 py-4 bg-gray-50 border border-transparent rounded-2xl focus:bg-white focus:border-primary-500 transition-all outline-none text-sm font-bold shadow-inner" />
-                    </div>
-                  </div>
-
-                  {/* 4. 설계사 한마디 */}
-                  <div className="mb-6">
-                    <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1 mb-2">설계사 한마디 (인사말)</label>
-                    <input type="text" value={editMessage} onChange={(e) => setEditMessage(e.target.value)} placeholder="정직하게 분석하고 고객님의 소중한 보험료를 아껴드립니다." className="w-full px-5 py-4 bg-gray-50 border border-transparent rounded-2xl focus:bg-white focus:border-primary-500 transition-all outline-none text-sm font-bold shadow-inner" />
-                  </div>
-
-                  {/* 5. 카카오톡 오픈채팅 주소 */}
-                  <div className="mb-8">
-                    <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1 mb-2">카카오톡 오픈채팅 주소</label>
-                    <input type="text" value={editKakaoUrl} onChange={(e) => setEditKakaoUrl(e.target.value)} placeholder="https://open.kakao.com/o/..." className="w-full px-5 py-4 bg-gray-50 border border-transparent rounded-2xl focus:bg-white focus:border-primary-500 transition-all outline-none text-sm font-bold shadow-inner" />
-                  </div>
-
-                  {/* Save Button */}
-                  <button
-                    onClick={updateProfile}
-                    disabled={isSaving}
-                    className="w-full bg-primary-600 text-white px-8 py-5 rounded-2xl font-black text-lg hover:bg-primary-700 transition-all shadow-xl shadow-primary-200 hover:shadow-primary-300 disabled:opacity-50 disabled:cursor-not-allowed group flex items-center justify-center gap-2"
-                  >
-                    {isSaving ? '정보 저장 중...' : '명함 정보 저장하기'}
-                    <ArrowRightOnRectangleIcon className="w-5 h-5 group-hover:translate-x-1 transition-transform rotate-180" />
-                  </button>
-                </div>
-
-                {/* 6. Business Card Upload - landscape, separate card */}
-                <div className="bg-white rounded-[2rem] shadow-xl p-8 border border-gray-100">
-                  <h4 className="text-xs font-black text-gray-400 uppercase tracking-widest mb-4 flex items-center gap-2">
-                    <IdentificationIcon className="w-4 h-4 text-primary-500" />
-                    실제 명함 업로드
-                  </h4>
-                  <div className="relative group max-w-lg">
-                    <input type="file" accept="image/*" onChange={(e) => handleFileUpload(e, 'card')} className="hidden" id="card-card-upload" />
-                    <label htmlFor="card-card-upload" className="block aspect-[9/5] bg-gray-50 rounded-2xl border-2 border-dashed border-gray-200 flex flex-col items-center justify-center text-gray-400 hover:border-primary-300 transition-all cursor-pointer overflow-hidden relative shadow-sm">
-                      {planner?.business_card_url ? (
-                        <img src={planner.business_card_url} alt="Card" className="w-full h-full object-cover" />
-                      ) : (
-                        <div className="text-center p-6">
-                          <IdentificationIcon className="w-12 h-12 mx-auto opacity-20 mb-3" />
-                          <p className="text-sm font-bold text-gray-400">실제 명함 이미지를 업로드하세요</p>
-                          <p className="text-xs text-gray-300 mt-1">가로 형태의 명함 이미지를 권장합니다</p>
-                        </div>
-                      )}
-                      <div className="absolute inset-0 bg-primary-600/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white text-sm font-bold backdrop-blur-sm rounded-2xl">
-                        이미지 변경
-                      </div>
-                    </label>
-                  </div>
-                </div>
-
-                {/* Card URL Section */}
-                <div className="bg-primary-900 rounded-[2rem] p-8 text-white shadow-2xl relative overflow-hidden">
-                  <div className="absolute top-0 right-0 -mr-8 -mt-8 w-32 h-32 bg-primary-600 rounded-full opacity-20 blur-2xl"></div>
-                  <h4 className="text-sm font-black mb-2 flex items-center gap-2">
-                    내 명함 주소 (랜딩 페이지)
-                  </h4>
-                  <p className="text-xs text-primary-200 mb-6 italic opacity-80">고객들에게 공유할 설계사님만의 고유 페이지입니다.</p>
-                  <div className="flex flex-col gap-3">
-                    <div className="flex items-center gap-2">
-                      <div className="flex-1 bg-white/10 backdrop-blur-md rounded-xl p-3 border border-white/10 font-mono text-xs truncate">
-                        stroy.kr/p/{planner?.id}/card
-                      </div>
-                      <button
-                        onClick={() => planner?.id && handleCopyUrl(planner.id)}
-                        className={`shrink-0 p-3 rounded-xl border border-white/20 transition-all flex items-center justify-center gap-2 font-bold text-xs ${
-                          urlCopied ? 'bg-green-500 text-white border-green-400' : 'bg-white/10 text-white hover:bg-white/20'
-                        }`}
-                      >
-                        {urlCopied ? (
-                          <>
-                            <CheckIcon className="w-4 h-4" />
-                            복사됨
-                          </>
-                         ) : (
-                          <>
-                            <ShareIcon className="w-4 h-4" />
-                            주소 복사
-                          </>
-                        )}
-                      </button>
-                    </div>
-                    <Link 
-                      href={`/p/${planner?.id}/card`} 
-                      target="_blank"
-                      className="w-full bg-white text-primary-900 py-3 rounded-xl font-black text-sm text-center hover:bg-primary-50 transition-all flex items-center justify-center gap-2"
-                    >
-                      <GlobeAltIcon className="w-4 h-4" />
-                      공개 페이지 확인하기
-                    </Link>
-                  </div>
-                </div>
-              </div>
-            )}
+                {activeTab === 'card' && (
+                  <CardSettings 
+                    planner={planner}
+                    editName={editName}
+                    editAffiliation={editAffiliation}
+                    editRegion={editRegion}
+                    editPhone={editPhone}
+                    editMessage={editMessage}
+                    editKakaoUrl={editKakaoUrl}
+                    isSaving={isSaving}
+                    urlCopied={urlCopied}
+                    onUpdateState={(key, value) => {
+                      if (key === 'editName') setEditName(value)
+                      if (key === 'editAffiliation') setEditAffiliation(value)
+                      if (key === 'editRegion') setEditRegion(value)
+                      if (key === 'editPhone') setEditPhone(value)
+                      if (key === 'editMessage') setEditMessage(value)
+                      if (key === 'editKakaoUrl') setEditKakaoUrl(value)
+                    }}
+                    onUpdateProfile={updateProfile}
+                    onFileUpload={handleFileUpload}
+                    onCopyUrl={handleCopyUrl}
+                    onUpdate={checkUser}
+                  />
+                )}
 
             {activeTab === 'profile' && (
               <div className="space-y-6">
@@ -2013,278 +1422,57 @@ export default function DashboardPage() {
 
             {activeTab === 'kakaotalk' && <KakaoTalkPanel />}
 
-            {activeTab === 'customers' && (
-              <div className="space-y-6">
-                <div className="bg-white rounded-[2rem] shadow-xl p-8 border border-gray-100">
-                  <div className="flex items-center justify-between mb-8">
-                    <h3 className="text-2xl font-black text-gray-900">고객 정보 등록</h3>
-                  </div>
-                  <form onSubmit={addCustomer} className="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
-                    <div className="md:col-span-1">
-                      <label className="block text-xs font-bold text-gray-400 uppercase mb-2 ml-1">고객명</label>
-                      <input
-                        type="text"
-                        required
-                        value={newCustName}
-                        onChange={(e) => setNewCustName(e.target.value)}
-                        placeholder="이름"
-                        className="w-full px-5 py-3.5 bg-gray-50 border border-transparent rounded-2xl focus:bg-white focus:border-primary-500 transition-all outline-none text-sm"
-                      />
-                    </div>
-                    <div className="md:col-span-1">
-                      <label className="block text-xs font-bold text-gray-400 uppercase mb-2 ml-1">전화번호</label>
-                      <input
-                        type="tel"
-                        value={newCustPhone}
-                        onChange={(e) => setNewCustPhone(e.target.value)}
-                        placeholder="010-0000-0000"
-                        className="w-full px-5 py-3.5 bg-gray-50 border border-transparent rounded-2xl focus:bg-white focus:border-primary-500 transition-all outline-none text-sm"
-                      />
-                    </div>
-                    <div className="md:col-span-1">
-                      <label className="block text-xs font-bold text-gray-400 uppercase mb-2 ml-1">주소</label>
-                      <input
-                        type="text"
-                        value={newCustAddr}
-                        onChange={(e) => setNewCustAddr(e.target.value)}
-                        placeholder="주소"
-                        className="w-full px-5 py-3.5 bg-gray-50 border border-transparent rounded-2xl focus:bg-white focus:border-primary-500 transition-all outline-none text-sm"
-                      />
-                    </div>
-                    <div className="md:col-span-1">
-                      <label className="block text-xs font-bold text-gray-400 uppercase mb-2 ml-1">생년월일</label>
-                      <input
-                        type="date"
-                        value={newCustBirth}
-                        onChange={(e) => setNewCustBirth(e.target.value)}
-                        className="w-full px-5 py-3.5 bg-gray-50 border border-transparent rounded-2xl focus:bg-white focus:border-primary-500 transition-all outline-none text-sm"
-                      />
-                    </div>
-                    <div className="md:col-span-1">
-                      <label className="block text-xs font-bold text-gray-400 uppercase mb-2 ml-1">가족 수</label>
-                      <input
-                        type="number"
-                        min="1"
-                        value={newCustFamily}
-                        onChange={(e) => setNewCustFamily(e.target.value)}
-                        className="w-full px-5 py-3.5 bg-gray-50 border border-transparent rounded-2xl focus:bg-white focus:border-primary-500 transition-all outline-none text-sm"
-                      />
-                    </div>
-                    <div className="md:col-span-1">
-                      <label className="block text-xs font-bold text-gray-400 uppercase mb-2 ml-1">특약 사항 (콤마로 구분)</label>
-                      <input
-                        type="text"
-                        value={newCustRiders}
-                        onChange={(e) => setNewCustRiders(e.target.value)}
-                        placeholder="암, 뇌혈관..."
-                        className="w-full px-5 py-3.5 bg-gray-50 border border-transparent rounded-2xl focus:bg-white focus:border-primary-500 transition-all outline-none text-sm"
-                      />
-                    </div>
-                    <button
-                      type="submit"
-                      className="bg-primary-600 text-white p-4 rounded-2xl font-bold hover:bg-primary-700 transition-all flex items-center justify-center gap-2"
-                    >
-                      <PlusIcon className="w-5 h-5" />
-                      등록
-                    </button>
-                  </form>
-                </div>
-
-                <div className="bg-white rounded-[2rem] shadow-xl overflow-hidden border border-gray-100">
-                  <div className="px-8 py-6 border-b border-gray-50 flex items-center justify-between">
-                    <h3 className="font-bold text-gray-900">내 고객 리스트</h3>
-                    <span className="text-xs font-bold text-primary-600 bg-primary-50 px-3 py-1 rounded-full">{customers.length}명</span>
-                  </div>
-                  <div className="overflow-x-auto">
-                    <table className="w-full">
-                      <thead>
-                        <tr className="bg-gray-50/50 text-left">
-                          <th className="px-8 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest whitespace-nowrap">고객 정보</th>
-                          <th className="px-8 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest whitespace-nowrap">연락처/주소</th>
-                          <th className="px-8 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest text-center whitespace-nowrap">상령일 (D-Day)</th>
-                          <th className="px-8 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest whitespace-nowrap">약속</th>
-                          <th className="px-8 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest whitespace-nowrap">주요 특약</th>
-                          <th className="px-8 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest text-right whitespace-nowrap">터치 / 관리</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-gray-50 text-sm">
-                        {customers.length === 0 ? (
-                          <tr>
-                            <td colSpan={6} className="px-8 py-12 text-center text-gray-400 font-medium">
-                              등록된 고객 정보가 없습니다.
-                            </td>
-                          </tr>
-                        ) : (
-                          customers.map(c => (
-                            <Fragment key={c.id}>
-                              <tr className="hover:bg-gray-50/50 transition-colors group">
-                              {editingId === c.id ? (
-                                <>
-                                  <td className="px-4 py-3">
-                                    <div className="space-y-2">
-                                      <input value={editCustName} onChange={e => setEditCustName(e.target.value)} placeholder="이름" className="w-full px-3 py-2 border rounded-xl" />
-                                      <input type="date" value={editCustBirth} onChange={e => setEditCustBirth(e.target.value)} className="w-full px-3 py-2 border rounded-xl" />
-                                    </div>
-                                  </td>
-                                  <td className="px-4 py-3">
-                                    <div className="space-y-2">
-                                      <input value={editCustPhone} onChange={e => setEditCustPhone(e.target.value)} placeholder="전화번호" className="w-full px-3 py-2 border rounded-xl" />
-                                      <input value={editCustAddr} onChange={e => setEditCustAddr(e.target.value)} placeholder="주소" className="w-full px-3 py-2 border rounded-xl" />
-                                    </div>
-                                  </td>
-                                  <td className="px-4 py-3 text-center">
-                                    <input type="number" min="1" value={editCustFamily} onChange={e => setEditCustFamily(e.target.value)} className="w-full px-2 py-2 border rounded-xl text-center" />
-                                    <span className="text-[10px] block mt-1 text-gray-400">가족 수</span>
-                                  </td>
-                                  <td className="px-4 py-3"><input type="date" value={editCustAppt} onChange={e => setEditCustAppt(e.target.value)} className="w-full px-3 py-2 border rounded-xl" /></td>
-                                  <td className="px-4 py-3"><input value={editCustRiders} onChange={e => setEditCustRiders(e.target.value)} placeholder="특약 사항" className="w-full px-3 py-2 border rounded-xl" /></td>
-                                  <td className="px-4 py-3 text-right">
-                                    <div className="flex justify-end gap-2">
-                                      <button onClick={saveEdit} className="text-primary-600 font-bold hover:underline">저장</button>
-                                      <button onClick={() => setEditingId(null)} className="text-gray-400 font-bold hover:underline">취소</button>
-                                    </div>
-                                  </td>
-                                </>
-                              ) : (
-                                <>
-                                  <td className="px-8 py-5 whitespace-nowrap">
-                                    <div className="flex flex-col gap-0.5">
-                                      <span className="font-bold text-gray-900">{c.name}</span>
-                                      <div className="flex items-center gap-2 text-[10px] text-gray-400 font-medium">
-                                        <span>생일: {safeFormat(c.birth_date, 'yy.MM.dd')}</span>
-                                        <span className="w-px h-2 bg-gray-200" />
-                                        <span className="font-bold">가족: {c.family_count}명</span>
-                                      </div>
-                                    </div>
-                                  </td>
-                                  <td className="px-8 py-5 whitespace-nowrap">
-                                    <div className="flex flex-col gap-0.5">
-                                      <span className="font-mono tracking-tighter text-gray-600">{c.phone || '-'}</span>
-                                      <span className="text-[11px] text-gray-400 truncate max-w-[180px]">{c.address || '-'}</span>
-                                    </div>
-                                  </td>
-                                  <td className="px-8 py-5 text-center whitespace-nowrap">
-                                    {(() => {
-                                      const dDay = getInsuranceAge(c.birth_date);
-                                      return (
-                                        <div className="flex flex-col items-center justify-center">
-                                          {dDay ? (
-                                            <span className={`text-[11px] font-black tracking-tight ${
-                                              dDay.includes('-') && parseInt(dDay.split('-')[1]) <= 30 
-                                                ? 'text-rose-500 animate-pulse' 
-                                                : dDay === 'D-Day' ? 'text-rose-600 font-bold' : 'text-primary-600'
-                                            }`}>
-                                              {dDay}
-                                            </span>
-                                          ) : (
-                                            <span className="text-gray-300">-</span>
-                                          )}
-                                        </div>
-                                      );
-                                    })()}
-                                  </td>
-                                  <td className="px-8 py-5 font-bold text-primary-600 whitespace-nowrap">
-                                    {safeFormat(c.appointment_at, 'MM-DD')}
-                                  </td>
-                                  <td className="px-8 py-5 text-gray-500 font-medium text-xs whitespace-nowrap">
-                                    <div className="max-w-[150px] truncate">
-                                      {(c.riders || []).join(', ') || '-'}
-                                    </div>
-                                  </td>
-                                  <td className="px-8 py-5 text-right whitespace-nowrap">
-                                    <div className="flex items-center justify-end gap-6">
-                                      <div className="flex flex-col items-end gap-1 group">
-                                        <div className="flex items-center bg-gray-50 rounded-lg p-0.5 border border-gray-100 group-hover:border-primary-200 transition-colors">
-                                          <button 
-                                            onClick={() => decrementTouch(c.id, c.touch_count)}
-                                            className="p-1 hover:text-primary-600 text-gray-400 transition-colors"
-                                          >
-                                            <MinusIcon className="w-3.5 h-3.5" />
-                                          </button>
-                                          <span className="px-2 text-xs font-black text-primary-600 min-w-[2rem] text-center">
-                                            {c.touch_count}회
-                                          </span>
-                                          <button 
-                                            onClick={() => incrementTouch(c.id, c.touch_count)}
-                                            className="p-1 hover:text-primary-600 text-gray-400 transition-colors"
-                                          >
-                                            <PlusIcon className="w-3.5 h-3.5" />
-                                          </button>
-                                        </div>
-                                        {c.last_touch_at && (
-                                          <span className="text-[9px] font-bold text-gray-300 group-hover:text-primary-400 transition-colors">
-                                            {safeFormat(c.last_touch_at, 'MM.dd')} 터치함
-                                          </span>
-                                        )}
-                                      </div>
-                                      
-                                      <div className="flex items-center gap-3 border-l border-gray-100 pl-6">
-                                        <button 
-                                          onClick={() => toggleMemo(c)}
-                                          className={`${expandedMemoId === c.id ? 'text-primary-600' : 'text-gray-400'} hover:text-primary-600 transition-colors`}
-                                          title="메모 작성"
-                                        >
-                                          <ChatBubbleLeftEllipsisIcon className="w-5 h-5" />
-                                        </button>
-                                        <button 
-                                          onClick={() => shareCard(c.name, c.phone)}
-                                          className="text-gray-400 hover:text-primary-600 transition-colors"
-                                          title="명함 메시지 복사"
-                                        >
-                                          <ShareIcon className="w-5 h-5" />
-                                        </button>
-                                        <button onClick={() => startEditing(c)} className="text-gray-400 hover:text-primary-600 transition-colors">
-                                          <PencilIcon className="w-4 h-4" />
-                                        </button>
-                                        <button onClick={() => deleteCustomer(c.id)} className="text-gray-400 hover:text-rose-500 transition-colors">
-                                          <TrashIcon className="w-4 h-4" />
-                                        </button>
-                                      </div>
-                                    </div>
-                                  </td>
-                                </>
-                              )}
-                            </tr>
-                            {expandedMemoId === c.id && (
-                              <tr className="bg-primary-50/30">
-                                <td colSpan={6} className="px-8 py-4">
-                                  <div className="flex flex-col gap-3">
-                                    <div className="flex items-center justify-between">
-                                      <span className="text-xs font-black text-primary-600 uppercase tracking-widest">고객 메모 ({c.name})</span>
-                                      <button 
-                                        onClick={() => setExpandedMemoId(null)}
-                                        className="text-[10px] font-bold text-gray-400 hover:text-gray-600"
-                                      >
-                                        닫기
-                                      </button>
-                                    </div>
-                                    <textarea
-                                      value={memoValue}
-                                      onChange={(e) => setMemoValue(e.target.value)}
-                                      placeholder="이 고객에 대한 메모를 입력하세요 (예: 가족관계, 관심 상품, 상담 특이사항 등)"
-                                      className="w-full h-24 p-4 text-sm border-0 focus:ring-2 focus:ring-primary-500 rounded-2xl bg-white shadow-sm resize-none"
-                                    />
-                                    <div className="flex justify-end">
-                                      <button 
-                                        onClick={() => saveMemo(c.id)}
-                                        className="px-6 py-2 bg-primary-600 text-white text-xs font-black rounded-xl shadow-lg shadow-primary-100 hover:bg-primary-700 transition-all"
-                                      >
-                                        메모 저장하기
-                                      </button>
-                                    </div>
-                                  </div>
-                                </td>
-                              </tr>
-                            )}
-                          </Fragment>
-                          ))
-                        )}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              </div>
-            )}
+                {activeTab === 'customers' && (
+                  <CustomerCRM 
+                    customers={customers}
+                    newCustName={newCustName}
+                    newCustPhone={newCustPhone}
+                    newCustAddr={newCustAddr}
+                    newCustBirth={newCustBirth}
+                    newCustFamily={newCustFamily}
+                    newCustRiders={newCustRiders}
+                    editingId={editingId}
+                    expandedMemoId={expandedMemoId}
+                    memoValue={memoValue}
+                    editCustName={editCustName}
+                    editCustPhone={editCustPhone}
+                    editCustAddr={editCustAddr}
+                    editCustBirth={editCustBirth}
+                    editCustFamily={editCustFamily}
+                    editCustRiders={editCustRiders}
+                    editCustAppt={editCustAppt}
+                    onUpdateState={(key, value) => {
+                      if (key === 'newCustName') setNewCustName(value)
+                      if (key === 'newCustPhone') setNewCustPhone(value)
+                      if (key === 'newCustAddr') setNewCustAddr(value)
+                      if (key === 'newCustBirth') setNewCustBirth(value)
+                      if (key === 'newCustFamily') setNewCustFamily(value)
+                      if (key === 'newCustRiders') setNewCustRiders(value)
+                      if (key === 'editingId') setEditingId(value)
+                      if (key === 'expandedMemoId') setExpandedMemoId(value)
+                      if (key === 'memoValue') setMemoValue(value)
+                      if (key === 'editCustName') setEditCustName(value)
+                      if (key === 'editCustPhone') setEditCustPhone(value)
+                      if (key === 'editCustAddr') setEditCustAddr(value)
+                      if (key === 'editCustBirth') setEditCustBirth(value)
+                      if (key === 'editCustFamily') setEditCustFamily(value)
+                      if (key === 'editCustRiders') setEditCustRiders(value)
+                      if (key === 'editCustAppt') setEditCustAppt(value)
+                    }}
+                    onAddCustomer={addCustomer}
+                    onIncrementTouch={incrementTouch}
+                    onDecrementTouch={decrementTouch}
+                    onToggleMemo={toggleMemo}
+                    onSaveMemo={saveMemo}
+                    onStartEditing={startEditing}
+                    onSaveEdit={saveEdit}
+                    onDeleteCustomer={deleteCustomer}
+                    onShareCard={shareCard}
+                    getInsuranceAge={getInsuranceAge}
+                    safeFormat={safeFormat}
+                    onUpdate={checkUser}
+                  />
+                )}
             {/* Tab: Disclosure (상품공시실) */}
             {activeTab === 'disclosure' && (
               <div className="space-y-8">
@@ -2379,411 +1567,35 @@ export default function DashboardPage() {
               </div>
             )}
 
-            {/* Tab: Calendar */}
-            {activeTab === 'calendar' && (
-              <div className="space-y-8">
-                {/* Calendar View — 2 months */}
-                <div className="bg-white rounded-[2rem] shadow-xl p-6 md:p-8 border border-gray-100">
-                  {/* Header */}
-                  <div className="flex flex-col md:flex-row items-center justify-between gap-4 mb-6">
-                    <h3 className="text-xl md:text-2xl font-black text-gray-900">일정 관리</h3>
-                    <div className="flex items-center gap-3 bg-gray-50 p-2 rounded-2xl">
-                      <button onClick={() => setCurrentMonth(subMonths(currentMonth, 1))} className="p-2 hover:bg-white rounded-xl transition-all shadow-sm">
-                        <ChevronLeftIcon className="w-5 h-5" />
-                      </button>
-                      <span className="font-bold text-sm md:text-base min-w-[180px] text-center">
-                        {format(currentMonth, 'yyyy년 MM월')} – {format(addMonths(currentMonth, 1), 'MM월')}
-                      </span>
-                      <button onClick={() => setCurrentMonth(addMonths(currentMonth, 1))} className="p-2 hover:bg-white rounded-xl transition-all shadow-sm">
-                        <ChevronRightIcon className="w-5 h-5" />
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* 2 calendars side by side */}
-                  <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-                    {[currentMonth, addMonths(currentMonth, 1)].map((monthRef, monthIdx) => {
-                      const monthStart = startOfMonth(monthRef)
-                      const monthEnd = endOfMonth(monthStart)
-                      const startDate = startOfWeek(monthStart)
-                      const endDate = endOfWeek(monthEnd)
-                      const calendarDays = eachDayOfInterval({ start: startDate, end: endDate })
-
-                      const MONTH_PASTELS = [
-                        // 인접 달(N, N+1)이 보색이 되도록 따뜻↔차가운 교차 배열
-                        'bg-rose-100',     // 1월 (빨강)
-                        'bg-sky-100',      // 2월 (파랑 — 빨강 보색)
-                        'bg-amber-100',    // 3월 (주황/노랑)
-                        'bg-violet-100',   // 4월 (보라 — 노랑 보색)
-                        'bg-lime-100',     // 5월 (연두)
-                        'bg-pink-100',     // 6월 (핑크 — 녹색 보색)
-                        'bg-cyan-100',     // 7월 (청록)
-                        'bg-orange-100',   // 8월 (주황 — 청록 보색)
-                        'bg-emerald-100',  // 9월 (초록)
-                        'bg-purple-100',   // 10월 (자주 — 초록 보색)
-                        'bg-yellow-100',   // 11월 (노랑)
-                        'bg-blue-100',     // 12월 (파랑 — 노랑 보색)
-                      ]
-
-                      const getStripeMonth = (day: Date): number => {
-                        for (let offset = -1; offset <= 1; offset++) {
-                          const m = addMonths(monthStart, offset)
-                          const mStart = startOfMonth(m)
-                          const week2Start = startOfWeek(addDays(mStart, 7))
-                          const nextWeek2Start = startOfWeek(addDays(startOfMonth(addMonths(m, 1)), 7))
-                          if (day >= week2Start && day < nextWeek2Start) return m.getMonth()
-                        }
-                        return day.getMonth()
-                      }
-
-                      return (
-                        <div key={monthIdx}>
-                          <p className="text-sm font-black text-gray-500 mb-2 text-center">{format(monthStart, 'yyyy년 MM월')}</p>
-                          <div className="grid grid-cols-7 border-t border-l border-gray-100 rounded-xl overflow-hidden">
-                            {['일', '월', '화', '수', '목', '금', '토'].map((day, idx) => (
-                              <div key={day} className={`px-1 py-2 bg-gray-50/50 border-r border-b border-gray-100 text-center text-[10px] font-bold uppercase tracking-widest ${idx === 0 ? 'text-rose-400' : 'text-gray-400'}`}>
-                                {day}
-                              </div>
-                            ))}
-                            {calendarDays.map((day, i) => {
-                              const dayCustomers = customers.filter(c => {
-                                if (!c.appointment_at) return false
-                                const d = new Date(c.appointment_at)
-                                return !isNaN(d.getTime()) && isSameDay(d, day)
-                              })
-                              const dayTodos = todos.filter(t => {
-                                const d = new Date(t.target_date)
-                                return !isNaN(d.getTime()) && isSameDay(d, day)
-                              })
-                              const isOutside = !isSameMonth(day, monthStart)
-                              const isSelected = isSameDay(day, new Date(todoDate))
-                              const isToday = isSameDay(day, new Date())
-                              const stripeColor = MONTH_PASTELS[getStripeMonth(day)]
-                              const holidayName = HOLIDAYS[format(day, 'yyyy-MM-dd')]
-                              const isSunday = getDay(day) === 0
-                              const isRedDay = !!holidayName || isSunday
-
-                              return (
-                                <div
-                                  key={i}
-                                  className={`min-h-[72px] md:min-h-[90px] p-1 border-r border-b border-gray-100 transition-all cursor-pointer relative ${
-                                    isOutside ? 'opacity-30' :
-                                    isSelected ? 'ring-1 ring-inset ring-primary-300 z-10' : ''
-                                  } ${isOutside ? 'bg-gray-50/30' : stripeColor}`}
-                                  onClick={() => {
-                                    setTodoDate(format(day, 'yyyy-MM-dd'))
-                                    todoSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-                                  }}
-                                >
-                                  <div className="flex flex-col items-center">
-                                    <span className={`text-[10px] font-bold flex items-center justify-center w-5 h-5 rounded-full ${
-                                      isToday ? 'bg-primary-600 text-white' :
-                                      isSelected ? 'bg-primary-100 text-primary-700' :
-                                      isRedDay ? 'text-rose-500' : 'text-gray-500'
-                                    }`}>
-                                      {format(day, 'd')}
-                                    </span>
-                                    {holidayName && (
-                                      <span className="text-[8px] font-black text-rose-400 mt-0.5 whitespace-nowrap">
-                                        {holidayName}
-                                      </span>
-                                    )}
-                                  </div>
-                                  <div className="mt-1 border-t border-gray-100/50" />
-                                  <div className="mt-1 space-y-0.5">
-                                    {dayCustomers.map(cust => (
-                                      <div key={cust.id} className="bg-primary-50 text-primary-700 px-1 py-0.5 rounded text-[9px] font-bold truncate border border-primary-100" title={cust.name}>
-                                        👤 <span className="hidden md:inline">{cust.name}</span>
-                                      </div>
-                                    ))}
-                                    {dayTodos.map(todo => (
-                                      <div key={todo.id} className={`${todo.is_completed ? 'bg-white/80 text-gray-400 line-through' : 'bg-white/90 text-amber-700'} px-1 py-0.5 rounded text-[9px] font-black truncate border ${todo.is_completed ? 'border-gray-100' : 'border-amber-100'}`} title={todo.content}>
-                                        📝 <span className="hidden md:inline">{todo.content}</span>
-                                      </div>
-                                    ))}
-                                  </div>
-                                </div>
-                              )
-                            })}
-                          </div>
-                        </div>
-                      )
-                    })}
-                  </div>
-                </div>
-
-                {/* Todo List Content */}
-                <div ref={todoSectionRef} className="bg-white rounded-[2rem] shadow-xl p-4 md:p-8 border border-gray-100">
-                  <div className="max-w-3xl mx-auto">
-                    <h3 className="text-xl font-black text-gray-900 mb-6 flex items-center gap-2">
-                       To-do List
-                      <span className="text-xs font-bold text-primary-500 bg-primary-50 px-2 py-1 rounded-lg">
-                        {format(new Date(todoDate), 'MM.dd')}
-                      </span>
-                    </h3>
-
-                    {/* Add Todo Input */}
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-                      <div className="md:col-span-1">
-                        <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1 mb-1 block">날짜 선택</label>
-                        <input 
-                          type="date" 
-                          value={todoDate}
-                          onChange={(e) => setTodoDate(e.target.value)}
-                          className="w-full px-4 py-3 bg-gray-50 border-none rounded-2xl text-sm font-bold focus:ring-2 focus:ring-primary-500 transition-all"
-                        />
-                      </div>
-                      <div className="md:col-span-3">
-                        <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1 mb-1 block">새로운 할 일</label>
-                        <div className="flex flex-col md:flex-row gap-2">
-                          <input 
-                            type="text" 
-                            placeholder="할 일을 입력하세요..."
-                            value={newTodoContent}
-                            onChange={(e) => setNewTodoContent(e.target.value)}
-                            onKeyDown={(e) => {
-                              if (e.key === 'Enter') {
-                                e.preventDefault()
-                                addTodo()
-                              }
-                            }}
-                            className="flex-1 px-4 py-3 bg-gray-50 border-none rounded-2xl text-sm font-bold focus:ring-2 focus:ring-primary-500 transition-all outline-none"
-                          />
-                          <button 
-                            type="button"
-                            onClick={(e) => { e.preventDefault(); addTodo(); }}
-                            onTouchEnd={(e) => { 
-                              // Use onTouchEnd to bypass cases where onClick is ignored due to keyboard dismissal
-                              e.preventDefault(); 
-                              addTodo(); 
-                            }}
-                            className="w-full md:w-auto px-6 py-4 md:py-3 bg-primary-600 text-white rounded-2xl shadow-lg shadow-primary-200 hover:bg-primary-500 transition-all font-black text-sm whitespace-nowrap active:scale-95 touch-manipulation"
-                          >
-                            추가하기
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Todo Items */}
-                    <div className="space-y-4">
-                      {todos.filter(t => isSameDay(new Date(t.target_date), new Date(todoDate))).length === 0 ? (
-                        <div className="py-12 text-center border-2 border-dashed border-gray-50 rounded-[2rem]">
-                          <p className="text-gray-300 font-bold text-sm italic">등록된 할 일이 없습니다.</p>
-                        </div>
-                      ) : (
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          {todos.filter(t => isSameDay(new Date(t.target_date), new Date(todoDate))).map(todo => (
-                              <div 
-                                key={todo.id} 
-                                className={`flex items-center gap-3 p-4 rounded-3xl border transition-all group ${
-                                  todo.is_completed ? 'bg-gray-50 border-gray-100' : 'bg-white border-gray-100 hover:shadow-md hover:border-primary-100'
-                                }`}
-                              >
-                                <button 
-                                  onClick={() => toggleTodo(todo.id, todo.is_completed)}
-                                  className={`w-6 h-6 rounded-lg flex items-center justify-center transition-all ${
-                                    todo.is_completed ? 'bg-green-500 text-white shadow-green-100' : 'bg-gray-100 text-transparent hover:bg-gray-200'
-                                  } shadow-lg`}
-                                >
-                                  <span className="text-[10px] font-black">✓</span>
-                                </button>
-                                
-                                {editingTodoId === todo.id ? (
-                                  <div className="flex-1 flex gap-2">
-                                    <input 
-                                      type="text"
-                                      value={editTodoContent}
-                                      onChange={(e) => setEditTodoContent(e.target.value)}
-                                      onKeyDown={(e) => e.key === 'Enter' && saveTodoEdit(todo.id)}
-                                      className="flex-1 px-3 py-1 bg-gray-50 border-none rounded-xl text-sm font-bold focus:ring-2 focus:ring-primary-500 transition-all outline-none"
-                                      autoFocus
-                                    />
-                                    <div className="flex gap-1">
-                                      <button 
-                                        onClick={() => saveTodoEdit(todo.id)}
-                                        className="p-1 text-primary-600 hover:text-primary-700 font-black text-xs"
-                                      >
-                                        저장
-                                      </button>
-                                      <button 
-                                        onClick={cancelEditingTodo}
-                                        className="p-1 text-gray-400 hover:text-gray-600 font-black text-xs"
-                                      >
-                                        취소
-                                      </button>
-                                    </div>
-                                  </div>
-                                ) : (
-                                  <>
-                                    <span className={`flex-1 text-sm font-bold transition-all ${
-                                      todo.is_completed ? 'text-gray-400 line-through' : 'text-gray-700'
-                                    }`}>
-                                      {todo.content}
-                                    </span>
-                                    <div className="flex items-center gap-1 opacity-100 md:opacity-0 group-hover:opacity-100 transition-all">
-                                      <button 
-                                        onClick={() => startEditingTodo(todo)}
-                                        className="p-2 md:p-1 text-gray-400 hover:text-primary-500 transition-all"
-                                      >
-                                        <PencilIcon className="w-5 h-5 md:w-4 md:h-4" />
-                                      </button>
-                                      <button 
-                                        onClick={() => deleteTodo(todo.id)}
-                                        className="p-2 md:p-1 text-gray-400 hover:text-rose-500 transition-all"
-                                      >
-                                        <TrashIcon className="w-5 h-5 md:w-4 md:h-4" />
-                                      </button>
-                                    </div>
-                                  </>
-                                )}
-                              </div>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </div>
+            {activeTab === 'notification' && (
+              <LeadPipeline 
+                leads={leads} 
+                planner={planner} 
+                pushEnabled={pushEnabled}
+                pushLoading={pushLoading}
+                lastSeenAt={lastSeenAt} 
+                onShareCard={shareCard}
+                onTogglePush={togglePush}
+                onUpdate={checkUser}
+              />
             )}
 
-            {/* Tab: Subscription */}
             {activeTab === 'subscription' && (
               <SubscriptionTab planner={planner} />
             )}
 
-            {/* Tab: 상담 알림 / 현황 (통합) */}
-            {activeTab === 'notification' && (
-              <div className="space-y-6">
-                {/* Push Notification Toggle */}
-                <div className="bg-white rounded-[2rem] shadow-xl p-8 border border-gray-100">
-                  <div className="flex items-center gap-3 mb-2">
-                    <div className="w-10 h-10 bg-blue-100 rounded-2xl flex items-center justify-center text-blue-600">
-                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0" /></svg>
-                    </div>
-                    <h3 className="text-2xl font-black text-gray-900">브라우저 푸시 알림</h3>
-                  </div>
-                  <p className="text-sm text-gray-500 font-medium mb-6 ml-[52px]">
-                    상담 신청이 들어오면 브라우저 알림으로 실시간 알려드립니다.
-                  </p>
+            {activeTab === 'chat' && (
+              <ChatInboxPanel plannerId={planner?.id || null} plannerName={planner?.name || '상담사'} />
+            )}
 
-                  <div className="flex items-center justify-between p-5 bg-gray-50 rounded-2xl border border-gray-100">
-                    <div>
-                      <p className="font-bold text-gray-900 text-sm">푸시 알림 {pushEnabled ? '활성화됨 ✅' : '비활성화됨'}</p>
-                      <p className="text-xs text-gray-500 mt-1">{pushEnabled ? '이 브라우저에서 알림을 받고 있습니다.' : '알림을 켜면 상담 접수 시 바로 알림을 받을 수 있습니다.'}</p>
-                    </div>
-                    <button
-                      onClick={async () => {
-                        if (!planner) return
-                        setPushLoading(true)
-                        try {
-                          if (pushEnabled) {
-                            const registration = await navigator.serviceWorker.ready
-                            const subscription = await registration.pushManager.getSubscription()
-                            if (subscription) {
-                              await fetch('/api/push-subscribe', {
-                                method: 'DELETE',
-                                headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify({ endpoint: subscription.endpoint })
-                              })
-                              await subscription.unsubscribe()
-                            }
-                            setPushEnabled(false)
-                          } else {
-                            const permission = await Notification.requestPermission()
-                            if (permission !== 'granted') {
-                              alert('알림 권한을 허용해주세요. 브라우저 설정에서 이 사이트의 알림을 허용해주세요.')
-                              setPushLoading(false)
-                              return
-                            }
-                            const registration = await navigator.serviceWorker.ready
-                            const subscription = await registration.pushManager.subscribe({
-                              userVisibleOnly: true,
-                              applicationServerKey: process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY
-                            })
-                            await fetch('/api/push-subscribe', {
-                              method: 'POST',
-                              headers: { 'Content-Type': 'application/json' },
-                              body: JSON.stringify({
-                                planner_id: planner.id,
-                                subscription: subscription.toJSON()
-                              })
-                            })
-                            setPushEnabled(true)
-                          }
-                        } catch (err) {
-                          console.error('Push toggle error:', err)
-                          alert('푸시 알림 설정 중 오류가 발생했습니다.')
-                        }
-                        setPushLoading(false)
-                      }}
-                      disabled={pushLoading}
-                      className={`px-6 py-3 rounded-2xl font-bold text-sm transition-all whitespace-nowrap disabled:opacity-50 ${
-                        pushEnabled
-                          ? 'bg-red-50 text-red-600 border border-red-100 hover:bg-red-100'
-                          : 'bg-primary-600 text-white shadow-lg shadow-primary-200 hover:bg-primary-700'
-                      }`}
-                    >
-                      {pushLoading ? '처리 중...' : pushEnabled ? '알림 끄기' : '🔔 알림 켜기'}
-                    </button>
-                  </div>
-                </div>
-
-                {/* Full Consultation List */}
-                <div className="bg-white rounded-[2rem] shadow-xl overflow-hidden border border-gray-100">
-                  <div className="px-8 py-6 border-b border-gray-50 flex items-center justify-between">
-                    <h3 className="font-bold text-gray-900 text-xl">실시간 상담 신청 현황</h3>
-                    <span className="text-xs font-bold text-primary-600 bg-primary-50 px-3 py-1 rounded-full">{leads.length}건 접수</span>
-                  </div>
-                  <div className="overflow-x-auto">
-                    <table className="w-full">
-                      <thead>
-                        <tr className="bg-gray-50/50 text-left">
-                          <th className="px-8 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest">이름</th>
-                          <th className="px-8 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest">연락처</th>
-                          <th className="px-8 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest">신청 시각</th>
-                          <th className="px-8 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest text-right">명함 전송</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-gray-50">
-                        {leads.length === 0 ? (
-                          <tr>
-                            <td colSpan={4} className="px-8 py-12 text-center text-gray-400 font-medium">
-                              아직 접수된 상담 신청이 없습니다.
-                            </td>
-                          </tr>
-                        ) : (
-                          leads.map(l => {
-                            const isNew = lastSeenAt ? new Date(l.created_at) > new Date(lastSeenAt) : false
-                            return (
-                              <tr key={l.id} className={`transition-colors ${isNew ? 'bg-primary-50/50' : 'hover:bg-gray-50/50'}`}>
-                                <td className="px-8 py-5 font-bold text-gray-900">
-                                  <div className="flex items-center gap-2">
-                                    {isNew && <span className="w-2 h-2 bg-primary-500 rounded-full animate-pulse shrink-0" />}
-                                    {l.name}
-                                  </div>
-                                </td>
-                                <td className="px-8 py-5 text-gray-600 font-mono tracking-tight">{l.phone.replace(/(\d{3})(\d{4})(\d{4})/, '$1-$2-$3')}</td>
-                                <td className="px-8 py-5 text-gray-400 text-sm">{new Date(l.created_at).toLocaleString()}</td>
-                                <td className="px-8 py-5 text-right">
-                                  <button 
-                                    onClick={() => shareCard(l.name, l.phone)}
-                                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-primary-50 text-primary-600 rounded-lg font-bold text-xs hover:bg-primary-100 transition-colors"
-                                    title="명함 메시지 복사"
-                                  >
-                                    <ShareIcon className="w-4 h-4" />
-                                    전송
-                                  </button>
-                                </td>
-                              </tr>
-                            )
-                          })
-                        )}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              </div>
+            {activeTab === 'claims' && (
+              <ClaimCenter 
+                claims={claims}
+                transmittingClaimId={transmittingClaimId}
+                onTransmitClaim={transmitClaim}
+                onUpdateClaimStatus={updateClaimStatus}
+                onDeleteClaim={deleteClaim}
+              />
             )}
 
 
@@ -3028,7 +1840,10 @@ export default function DashboardPage() {
             {activeTab === 'claims' && (
               <div className="space-y-6">
                 {/* Submit New Claim (Detailed) */}
-                <DetailedClaimForm onSuccess={() => window.location.reload()} />
+                <DetailedClaimForm onSuccess={() => {
+                  // Realtime sync will handle the list update
+                  // Just show a success state/toast inside the form
+                }} />
 
                 {/* Claims List */}
                 <div className="bg-white rounded-[2rem] shadow-sm border border-gray-100 overflow-hidden">
@@ -3137,7 +1952,9 @@ export default function DashboardPage() {
               />
             )}
 
-          </div>
+          </motion.div>
+        </AnimatePresence>
+      </div>
         </div>
       </div>
 
