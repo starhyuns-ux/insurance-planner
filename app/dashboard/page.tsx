@@ -1339,14 +1339,6 @@ export default function DashboardPage() {
                 {/* ── Dashboard Views ── */}
                 {activeTab === 'calendar' && (
                   <>
-                    <Overview 
-                      leads={leads}
-                      customers={customers}
-                      planner={planner}
-                      totalVisits={totalVisits}
-                      visitStats={visitStats}
-                      getInsuranceAge={getInsuranceAge}
-                    />
                     <CalendarManager 
                       currentMonth={currentMonth}
                       todoDate={todoDate}
@@ -1370,6 +1362,14 @@ export default function DashboardPage() {
                       onSaveTodoEdit={saveTodoEdit}
                       onCancelEditingTodo={cancelEditingTodo}
                       todoSectionRef={todoSectionRef}
+                    />
+                    <Overview 
+                      leads={leads}
+                      customers={customers}
+                      planner={planner}
+                      totalVisits={totalVisits}
+                      visitStats={visitStats}
+                      getInsuranceAge={getInsuranceAge}
                     />
                   </>
                 )}

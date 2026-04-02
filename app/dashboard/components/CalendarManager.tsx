@@ -142,7 +142,7 @@ export default function CalendarManager({
                     return (
                       <div
                         key={i}
-                        className={`min-h-[85px] md:min-h-[100px] p-1.5 border-r border-b border-gray-100 transition-all cursor-pointer relative group/day ${
+                        className={`min-h-[75px] md:min-h-[90px] p-1.5 border-r border-b border-gray-100 transition-all cursor-pointer relative group/day ${
                           isOutside ? 'opacity-30' :
                           isSelected ? 'ring-2 ring-inset ring-primary-500/20 z-10 bg-white' : ''
                         } ${isOutside ? 'bg-gray-50/30' : stripeColor} hover:bg-white/80`}
@@ -160,7 +160,7 @@ export default function CalendarManager({
                             {format(day, 'd')}
                           </span>
                           {holidayName && (
-                            <span className="text-[8px] font-black text-rose-500 mt-1 whitespace-nowrap bg-rose-50 px-1 rounded uppercase tracking-tighter">
+                            <span className="text-[8px] font-black text-rose-500 mt-1 break-all text-center leading-none bg-rose-50 px-1 rounded uppercase tracking-tighter">
                               {holidayName}
                             </span>
                           )}

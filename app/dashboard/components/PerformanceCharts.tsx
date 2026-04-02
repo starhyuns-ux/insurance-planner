@@ -64,12 +64,12 @@ export default function PerformanceCharts({ leads, visitStats }: PerformanceChar
 
   return (
     <div className="space-y-8">
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-4">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-4">
         {/* 1. Lead Status Pipeline Chart */}
-        <div className="bg-white rounded-[2.5rem] shadow-xl p-8 border border-gray-100 flex flex-col">
-          <div className="flex items-center justify-between mb-8">
-            <h4 className="text-xl font-black text-gray-900 tracking-tight flex items-center gap-2">
-              <ArrowPathIcon className="w-6 h-6 text-primary-600" />
+        <div className="bg-white rounded-[2rem] shadow-xl p-6 border border-gray-100 flex flex-col">
+          <div className="flex items-center justify-between mb-4">
+            <h4 className="text-lg font-black text-gray-900 tracking-tight flex items-center gap-2">
+              <ArrowPathIcon className="w-5 h-5 text-primary-600" />
               리드 파이프라인 현황
             </h4>
             <div className="px-4 py-1.5 bg-primary-50 rounded-full text-xs font-bold text-primary-600">
@@ -77,29 +77,31 @@ export default function PerformanceCharts({ leads, visitStats }: PerformanceChar
             </div>
           </div>
 
-          <div className="flex flex-col md:flex-row items-center gap-12 flex-1">
+          <div className="flex flex-col md:flex-row items-center gap-8 flex-1">
             {/* Custom SVG Donut */}
-            <div className="relative w-48 h-48 flex items-center justify-center">
+            <div className="relative w-36 h-36 flex items-center justify-center">
               <svg className="w-full h-full transform -rotate-90">
-                <circle cx="96" cy="96" r="80" stroke="currentColor" strokeWidth="20" fill="transparent" className="text-gray-50" />
+                <circle cx="72" cy="72" r="60" stroke="currentColor" strokeWidth="15" fill="transparent" className="text-gray-50" />
                 {/* Calculating strokes for status proportions */}
                 {(() => {
                   let currentOffset = 0
                   const colors = { New: '#3b82f6', Consulting: '#f59e0b', Completed: '#10b981', Hold: '#f43f5e' }
+                  const radius = 60
+                  const circumference = 2 * Math.PI * radius // ~377
                   return Object.entries(statusCounts).map(([key, val], i) => {
                     const percentage = (val / totalLeads) * 100
-                    const dashArr = (percentage * 5.02).toString() // 2 * PI * 80 / 100 = 5.02...
+                    const dashArr = (percentage * (circumference / 100)).toString()
                     const strokeOffset = currentOffset
-                    currentOffset += percentage * 5.02
+                    currentOffset += percentage * (circumference / 100)
                     return (
                       <motion.circle
                         key={key}
-                        initial={{ strokeDasharray: `0 502` }}
-                        animate={{ strokeDasharray: `${dashArr} 502` }}
+                        initial={{ strokeDasharray: `0 ${circumference}` }}
+                        animate={{ strokeDasharray: `${dashArr} ${circumference}` }}
                         transition={{ duration: 1, delay: i * 0.2 }}
-                        cx="96" cy="96" r="80"
+                        cx="72" cy="72" r={radius}
                         stroke={colors[key as keyof typeof colors]}
-                        strokeWidth="20"
+                        strokeWidth="15"
                         fill="transparent"
                         strokeDashoffset={-strokeOffset}
                       />
@@ -108,32 +110,31 @@ export default function PerformanceCharts({ leads, visitStats }: PerformanceChar
                 })()}
               </svg>
               <div className="absolute inset-0 flex flex-col items-center justify-center">
-                <span className="text-4xl font-black text-gray-900">{totalLeads}</span>
-                <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Total Leads</span>
+                <span className="text-2xl font-black text-gray-900">{totalLeads}</span>
+                <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest leading-none mt-1">Leads</span>
               </div>
             </div>
 
-            <div className="flex-1 grid grid-cols-2 gap-4 w-full">
+            <div className="flex-1 grid grid-cols-2 gap-3 w-full">
               {Object.entries(statusCounts).map(([key, val], i) => {
-                const labels = { New: '신규접수', Consulting: '상담중', Completed: '계약완료', Hold: '보류' }
+                const labels = { New: '신규', Consulting: '상담', Completed: '성사', Hold: '보류' }
                 const colors = { New: 'bg-blue-500', Consulting: 'bg-amber-500', Completed: 'bg-emerald-500', Hold: 'bg-rose-500' }
                 return (
-                  <div key={key} className="bg-gray-50/50 p-4 rounded-3xl border border-gray-100/50 transition-all hover:bg-white hover:shadow-md">
-                    <div className="flex items-center gap-2 mb-1">
-                      <div className={`w-2 h-2 rounded-full ${colors[key as keyof typeof colors]}`} />
-                      <span className="text-xs font-bold text-gray-400">{labels[key as keyof typeof labels]}</span>
+                  <div key={key} className="bg-gray-50/50 p-3 rounded-2xl border border-gray-100/50 transition-all hover:bg-white hover:shadow-md">
+                    <div className="flex items-center gap-1.5 mb-0.5">
+                      <div className={`w-1.5 h-1.5 rounded-full ${colors[key as keyof typeof colors]}`} />
+                      <span className="text-[10px] font-bold text-gray-400">{labels[key as keyof typeof labels]}</span>
                     </div>
-                    <div className="text-xl font-black text-gray-900">{val}건</div>
+                    <div className="text-base font-black text-gray-900">{val}건</div>
                   </div>
                 )
               })}
-              <div className="col-span-2 mt-4 pt-4 border-t border-gray-100 flex items-center justify-between">
+              <div className="col-span-2 mt-2 pt-2 border-t border-gray-100 flex items-center justify-between">
                 <div className="flex flex-col">
-                  <span className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Closed Conversion</span>
-                  <span className="text-lg font-black text-emerald-600">{closingRate}% 성사율</span>
+                  <span className="text-xs font-black text-emerald-600 leading-none">{closingRate}% 성사율</span>
                 </div>
-                <div className="w-10 h-10 bg-emerald-50 rounded-xl flex items-center justify-center text-emerald-600">
-                  <CheckCircleIcon className="w-6 h-6" />
+                <div className="w-8 h-8 bg-emerald-50 rounded-lg flex items-center justify-center text-emerald-600">
+                  <CheckCircleIcon className="w-5 h-5" />
                 </div>
               </div>
             </div>
@@ -141,45 +142,45 @@ export default function PerformanceCharts({ leads, visitStats }: PerformanceChar
         </div>
 
         {/* 2. Weekly Activity Performance */}
-        <div className="bg-white rounded-[2.5rem] shadow-xl p-8 border border-gray-100">
-          <div className="flex items-center justify-between mb-8">
-            <h4 className="text-xl font-black text-gray-900 tracking-tight flex items-center gap-2">
-              <ArrowTrendingUpIcon className="w-6 h-6 text-indigo-600" />
-              주간 활동 성과 지표
+        <div className="bg-white rounded-[2rem] shadow-xl p-6 border border-gray-100 flex flex-col">
+          <div className="flex items-center justify-between mb-4">
+            <h4 className="text-lg font-black text-gray-900 tracking-tight flex items-center gap-2">
+              <ArrowTrendingUpIcon className="w-5 h-5 text-indigo-600" />
+              주간 활동 성과
             </h4>
             <span className="text-[10px] font-black text-gray-300 uppercase tracking-widest">Past 7 Days Activity</span>
           </div>
 
           <div className="flex flex-col h-full">
-            <div className="flex-1 flex items-end justify-between gap-4 h-56 pt-8 pb-4">
+            <div className="flex-1 flex items-end justify-between gap-3 h-40 pt-10 pb-2">
               {weeklyData.map((d, i) => (
-                <div key={i} className="flex-1 flex flex-col items-center gap-3 h-full group">
-                  <div className="flex-1 w-full flex items-end justify-center gap-1.5 relative">
+                <div key={i} className="flex-1 flex flex-col items-center gap-2 h-full group">
+                  <div className="flex-1 w-full flex items-end justify-center gap-1 relative">
                     {/* Visitor Pulse (scaled) */}
                     <motion.div 
                       initial={{ height: 0 }}
                       animate={{ height: `${(d.visits / 20 / maxVal) * 100}%` }}
-                      className="w-1.5 bg-indigo-100 rounded-full group-hover:bg-indigo-300 transition-colors"
+                      className="w-1 bg-indigo-100 rounded-full group-hover:bg-indigo-300 transition-colors"
                     />
                     {/* Leads Bar */}
                     <motion.div 
                       initial={{ height: 0 }}
                       animate={{ height: `${(d.leads / maxVal) * 100}%` }}
-                      className="w-3 bg-indigo-600 rounded-full shadow-lg shadow-indigo-100 relative"
+                      className="w-2.5 bg-indigo-600 rounded-full shadow-lg shadow-indigo-100 relative"
                     >
                       {d.leads > 0 && (
-                        <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-indigo-900 text-white text-[10px] font-black px-2 py-0.5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity">
+                        <div className="absolute -top-7 left-1/2 -translate-x-1/2 bg-indigo-900 text-white text-[9px] font-black px-1.5 py-0.5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity">
                           {d.leads}
                         </div>
                       )}
                     </motion.div>
                   </div>
-                  <div className="text-[10px] font-black text-gray-400 rotate-[-45deg] whitespace-nowrap mt-2">{d.date}</div>
+                  <div className="text-[9px] font-black text-gray-400 rotate-[-45deg] whitespace-nowrap mt-1">{d.date}</div>
                 </div>
               ))}
             </div>
 
-            <div className="mt-12 flex items-center justify-between gap-6">
+            <div className="mt-8 flex items-center justify-between gap-4">
               <div className="flex items-center gap-4">
                 <div className="flex items-center gap-2">
                   <div className="w-3 h-3 bg-indigo-600 rounded-full" />
