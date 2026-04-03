@@ -195,11 +195,11 @@ export default function CustomerCRM({
           <table className="w-full">
             <thead>
               <tr className="bg-gray-50/50 text-left">
-                <th className="px-8 py-4 text-xs font-black text-gray-400 uppercase tracking-[0.2em] whitespace-nowrap">고객 정보</th>
-                <th className="px-8 py-4 text-xs font-black text-gray-400 uppercase tracking-[0.2em] whitespace-nowrap">연락처/주소</th>
-                <th className="px-8 py-4 text-xs font-black text-gray-400 uppercase tracking-[0.2em] text-center whitespace-nowrap">상령일 (D-Day)</th>
-                <th className="px-8 py-4 text-xs font-black text-gray-400 uppercase tracking-[0.2em] whitespace-nowrap">주요 담보</th>
-                <th className="px-8 py-4 text-xs font-black text-gray-400 uppercase tracking-[0.2em] text-right whitespace-nowrap">터치 / 관리</th>
+                <th className="px-4 py-3 text-xs font-black text-gray-400 uppercase tracking-[0.2em] whitespace-nowrap">고객 정보</th>
+                <th className="px-4 py-3 text-xs font-black text-gray-400 uppercase tracking-[0.2em] whitespace-nowrap">연락처/주소</th>
+                <th className="px-4 py-3 text-xs font-black text-gray-400 uppercase tracking-[0.2em] text-center whitespace-nowrap">상령일 (D-Day)</th>
+                <th className="px-4 py-3 text-xs font-black text-gray-400 uppercase tracking-[0.2em] whitespace-nowrap">주요 담보</th>
+                <th className="px-4 py-3 text-xs font-black text-gray-400 uppercase tracking-[0.2em] text-right whitespace-nowrap">터치 / 관리</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-50 text-sm">
@@ -241,39 +241,39 @@ export default function CustomerCRM({
                       </>
                     ) : (
                       <>
-                        <td className="px-8 py-6 whitespace-nowrap">
+                        <td className="px-4 py-4 whitespace-nowrap border-b border-gray-50">
                           <div className="flex flex-col gap-1">
                             <div className="flex items-center gap-2">
-                              <span className="font-black text-gray-900 text-base">{c.name}</span>
+                              <span className="font-black text-gray-900 text-sm leading-none">{c.name}</span>
                               {c.last_touch_at && differenceInDays(new Date(), parseISO(c.last_touch_at)) >= 30 && (
-                                <span className="flex items-center gap-1 px-2 py-0.5 bg-rose-50 text-rose-600 text-[10px] font-black rounded-lg border border-rose-100 animate-pulse">
-                                  <ExclamationCircleIcon className="w-3 h-3" />
-                                  관리 필요
+                                <span className="flex items-center gap-1 px-1.5 py-0.5 bg-rose-50 text-rose-600 text-[9px] font-black rounded-md border border-rose-100">
+                                  <ExclamationCircleIcon className="w-2.5 h-2.5" />
+                                  관리필요
                                 </span>
                               )}
                             </div>
-                            <div className="flex items-center gap-2 text-[11px] text-gray-400 font-bold uppercase tracking-wider">
+                            <div className="flex items-center gap-2 text-[10px] text-gray-400 font-bold uppercase tracking-wider">
                               <span>생일: {safeFormat(c.birth_date, 'yy.MM.dd')}</span>
                               <span className="w-px h-2 bg-gray-200" />
                               <span className="text-primary-600">가족: {c.family_count}명</span>
                             </div>
                           </div>
                         </td>
-                        <td className="px-8 py-6 whitespace-nowrap">
-                          <div className="flex flex-col gap-1">
-                            <span className="font-mono tracking-tighter text-gray-600 font-bold">{c.phone || '-'}</span>
-                            <span className="text-[11px] text-gray-400 font-medium truncate max-w-[180px]">{c.address || '-'}</span>
+                        <td className="px-4 py-4 whitespace-nowrap border-b border-gray-50">
+                          <div className="flex flex-col gap-0.5">
+                            <span className="font-mono tracking-tighter text-gray-600 font-bold text-xs">{c.phone || '-'}</span>
+                            <span className="text-[10px] text-gray-400 font-medium truncate max-w-[150px]">{c.address || '-'}</span>
                           </div>
                         </td>
-                        <td className="px-8 py-6 text-center whitespace-nowrap">
+                        <td className="px-4 py-4 text-center whitespace-nowrap border-b border-gray-50">
                           {(() => {
                             const dDay = getInsuranceAge(c.birth_date);
                             return (
                               <div className="flex flex-col items-center justify-center">
                                 {dDay ? (
-                                  <div className={`px-3 py-1.5 rounded-xl font-black text-xs tracking-tight shadow-sm ${
+                                  <div className={`px-2 py-1 rounded-lg font-black text-[10px] tracking-tight shadow-sm ${
                                     dDay.includes('-') && parseInt(dDay.split('-')[1]) <= 14 
-                                      ? 'bg-rose-600 text-white shadow-lg shadow-rose-100 animate-bounce' 
+                                      ? 'bg-rose-600 text-white shadow-lg shadow-rose-100' 
                                       : dDay === 'D-Day' ? 'bg-rose-600 text-white shadow-rose-100' : 'bg-primary-50 text-primary-600 border border-primary-100'
                                   }`}>
                                     {dDay}
@@ -285,67 +285,67 @@ export default function CustomerCRM({
                             );
                           })()}
                         </td>
-                        <td className="px-8 py-6 text-gray-500 font-bold text-xs whitespace-nowrap">
-                          <div className="max-w-[150px] truncate bg-gray-50 px-3 py-1.5 rounded-lg border border-gray-100">
+                        <td className="px-4 py-4 text-gray-500 font-bold text-xs whitespace-nowrap border-b border-gray-50">
+                          <div className="max-w-[130px] truncate bg-gray-50 px-2 py-1 rounded-lg border border-gray-100">
                             {(c.riders || []).join(', ') || '특약 없음'}
                           </div>
                         </td>
-                        <td className="px-8 py-6 text-right whitespace-nowrap">
-                          <div className="flex items-center justify-end gap-6">
-                            <div className="flex flex-col items-end gap-1.5 group/touch">
-                              <div className="flex items-center gap-2">
-                                <div className="flex items-center bg-gray-50 rounded-xl p-0.5 border border-gray-100 group-hover/touch:border-primary-200 group-hover/touch:bg-white transition-all">
+                        <td className="px-4 py-4 text-right whitespace-nowrap border-b border-gray-50">
+                          <div className="flex items-center justify-end gap-3">
+                            <div className="flex flex-col items-end gap-1 group/touch">
+                              <div className="flex items-center gap-1.5">
+                                <div className="flex items-center bg-gray-50 rounded-lg p-0.5 border border-gray-100 group-hover/touch:border-primary-200 group-hover/touch:bg-white transition-all">
                                   <button 
                                     onClick={() => onDecrementTouch(c.id, c.touch_count)}
-                                    className="p-1.5 hover:text-primary-600 text-gray-400 transition-colors"
+                                    className="p-1 hover:text-primary-600 text-gray-400 transition-colors"
                                   >
-                                    <MinusIcon className="w-4 h-4" />
+                                    <MinusIcon className="w-3.5 h-3.5" />
                                   </button>
-                                  <span className="px-3 text-xs font-black text-primary-600 min-w-[2.5rem] text-center">
+                                  <span className="px-2 text-[10px] font-black text-primary-600 min-w-[2rem] text-center">
                                     {c.touch_count}회
                                   </span>
                                   <button 
                                     onClick={() => onIncrementTouch(c.id, c.touch_count)}
-                                    className="p-1.5 hover:text-primary-600 text-gray-400 transition-colors"
+                                    className="p-1 hover:text-primary-600 text-gray-400 transition-colors"
                                   >
-                                    <PlusIcon className="w-4 h-4" />
+                                    <PlusIcon className="w-3.5 h-3.5" />
                                   </button>
                                 </div>
                                 <button
                                   onClick={() => handleMarkContacted(c.id, c.touch_count)}
                                   disabled={isUpdating === c.id}
-                                  className="p-2 bg-primary-100 text-primary-700 rounded-xl font-black text-[10px] hover:bg-primary-600 hover:text-white transition-all disabled:opacity-50"
+                                  className="px-2 py-1.5 bg-primary-100 text-primary-700 rounded-lg font-black text-[9px] hover:bg-primary-600 hover:text-white transition-all disabled:opacity-50"
                                   title="컨택 완료 체크"
                                 >
-                                  {isUpdating === c.id ? <ClockIcon className="w-4 h-4 animate-spin" /> : '체크'}
+                                  {isUpdating === c.id ? <ClockIcon className="w-3.5 h-3.5 animate-spin" /> : '체크'}
                                 </button>
                               </div>
                               {c.last_touch_at && (
-                                <span className={`text-[10px] font-black underline underline-offset-2 transition-colors ${
+                                <span className={`text-[9px] font-black underline underline-offset-2 transition-colors ${
                                   differenceInDays(new Date(), parseISO(c.last_touch_at)) >= 30 ? 'text-rose-500' : 'text-gray-300 group-hover/touch:text-primary-400'
                                 }`}>
-                                  {safeFormat(c.last_touch_at, 'MM.dd')} 컨택완료 ({differenceInDays(new Date(), parseISO(c.last_touch_at))}일전)
+                                  {safeFormat(c.last_touch_at, 'MM.dd')} ({differenceInDays(new Date(), parseISO(c.last_touch_at))}일전)
                                 </span>
                               )}
                             </div>
                             
-                            <div className="flex items-center gap-3 border-l border-gray-100 pl-6">
+                            <div className="flex items-center gap-2 border-l border-gray-100 pl-3">
                               <button 
                                 onClick={() => onToggleMemo(c)}
-                                className={`${expandedMemoId === c.id ? 'text-primary-600 bg-primary-50' : 'text-gray-400 hover:bg-gray-50'} p-2 rounded-xl transition-all`}
+                                className={`${expandedMemoId === c.id ? 'text-primary-600 bg-primary-50' : 'text-gray-400 hover:bg-gray-50'} p-1.5 rounded-lg transition-all`}
                                 title="메모 작성"
                               >
-                                <ChatBubbleLeftEllipsisIcon className="w-5 h-5" />
+                                <ChatBubbleLeftEllipsisIcon className="w-4 h-4" />
                               </button>
                               <button 
                                 onClick={() => onShareCard(c.name, c.phone)}
-                                className="text-gray-400 hover:text-primary-600 hover:bg-primary-50 p-2 rounded-xl transition-all"
+                                className="text-gray-400 hover:text-primary-600 hover:bg-primary-50 p-1.5 rounded-lg transition-all"
                                 title="명함 메시지 복사"
                               >
-                                <ShareIcon className="w-5 h-5" />
+                                <ShareIcon className="w-4 h-4" />
                               </button>
-                              <button onClick={() => onStartEditing(c)} className="text-gray-400 hover:text-primary-600 hover:bg-primary-50 p-2 rounded-xl transition-all">
-                                <PencilIcon className="w-4 h-4" />
+                              <button onClick={() => onStartEditing(c)} className="text-gray-400 hover:text-primary-600 hover:bg-primary-50 p-1.5 rounded-lg transition-all">
+                                <PencilIcon className="w-3.5 h-3.5" />
                               </button>
                               <button onClick={() => onDeleteCustomer(c.id)} className="text-gray-400 hover:text-rose-500 hover:bg-rose-50 p-2 rounded-xl transition-all">
                                 <TrashIcon className="w-4 h-4" />
