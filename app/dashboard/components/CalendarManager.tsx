@@ -129,17 +129,31 @@ export default function CalendarManager({
                       {day}
                     </div>
                   ))}
-                  {calendarDays.map((day, i) => {
-                    const dayCustomers = customers.filter(c => c.appointment_at && isSameDay(new Date(c.appointment_at), day))
-                    const dayTodos = todos.filter(t => isSameDay(new Date(t.target_date), day))
-                    const isOutside = !isSameMonth(day, monthStart)
-                    const isSelected = isSameDay(day, new Date(todoDate))
-                    const isToday = isSameDay(day, new Date())
-                    const stripeColor = MONTH_PASTELS[getStripeMonth(day, monthStart)]
-                    const holidayName = holidays[format(day, 'yyyy-MM-dd')]
-                    const isRedDay = !!holidayName || getDay(day) === 0
+                    {calendarDays.map((day, i) => {
+                      const dayCustomers = customers.filter(c => c.appointment_at && isSameDay(new Date(c.appointment_at), day))
+                      const dayTodos = todos.filter(t => isSameDay(new Date(t.target_date), day))
+                      
+                      const dayBirthdays = customers.filter(c => {
+                        if (!c.birth_date) return false
+                        const b = new Date(c.birth_date)
+                        return b.getMonth() === day.getMonth() && b.getDate() === day.getDate()
+                      })
 
-                    return (
+                      const dayInsAgeUps = customers.filter(c => {
+                        if (!c.birth_date) return false
+                        const b = new Date(c.birth_date)
+                        const upDate = addMonths(b, 6)
+                        return upDate.getMonth() === day.getMonth() && upDate.getDate() === day.getDate()
+                      })
+
+                      const isOutside = !isSameMonth(day, monthStart)
+                      const isSelected = isSameDay(day, new Date(todoDate))
+                      const isToday = isSameDay(day, new Date())
+                      const stripeColor = MONTH_PASTELS[getStripeMonth(day, monthStart)]
+                      const holidayName = holidays[format(day, 'yyyy-MM-dd')]
+                      const isRedDay = !!holidayName || getDay(day) === 0
+
+                      return (
                       <div
                         key={i}
                         className={`min-h-[75px] md:min-h-[90px] p-1.5 border-r border-b border-gray-100 transition-all cursor-pointer relative group/day ${
@@ -168,11 +182,21 @@ export default function CalendarManager({
                         <div className="mt-2 flex flex-col gap-1 max-h-[50px] overflow-hidden">
                           {dayCustomers.map(cust => (
                             <div key={cust.id} className="bg-white/90 text-primary-700 px-1.5 py-0.5 rounded-lg text-[9px] font-black truncate border border-primary-100 shadow-sm" title={cust.name}>
-                              👤 <span className="hidden md:inline">{cust.name}</span>
+                              👤 <span className="hidden md:inline">{cust.name} (상담)</span>
+                            </div>
+                          ))}
+                          {dayBirthdays.map(cust => (
+                            <div key={`bday-${cust.id}`} className="bg-indigo-50 text-indigo-700 px-1.5 py-0.5 rounded-lg text-[9px] font-black truncate border border-indigo-100 shadow-sm" title={`${cust.name} 생일`}>
+                              🎂 <span className="hidden md:inline">{cust.name} (생일)</span>
+                            </div>
+                          ))}
+                          {dayInsAgeUps.map(cust => (
+                            <div key={`ins-${cust.id}`} className="bg-rose-50 text-rose-700 px-1.5 py-0.5 rounded-lg text-[9px] font-black truncate border border-rose-100 shadow-sm" title={`${cust.name} 상령일`}>
+                              📈 <span className="hidden md:inline">{cust.name} (상령일)</span>
                             </div>
                           ))}
                           {dayTodos.map(todo => (
-                            <div key={todo.id} className={`${todo.is_completed ? 'bg-gray-100/50 text-gray-300 line-through' : 'bg-white text-indigo-700 border-indigo-100'} px-1.5 py-0.5 rounded-lg text-[9px] font-black truncate border shadow-sm`} title={todo.content}>
+                            <div key={todo.id} className={`${todo.is_completed ? 'bg-gray-100/50 text-gray-300 line-through' : 'bg-white text-gray-600 border-gray-100'} px-1.5 py-0.5 rounded-lg text-[9px] font-black truncate border shadow-sm`} title={todo.content}>
                               📌 <span className="hidden md:inline">{todo.content}</span>
                             </div>
                           ))}
