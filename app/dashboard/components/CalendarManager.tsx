@@ -259,63 +259,108 @@ export default function CalendarManager({
             </div>
           </div>
 
-          {/* Todo Items */}
-          <div className="space-y-6">
-            {todos.filter(t => isSameDay(new Date(t.target_date), new Date(todoDate))).length === 0 ? (
-              <div className="py-20 text-center border-4 border-dashed border-gray-50 rounded-[3rem] bg-gray-50/30">
-                <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-4 shadow-sm">
-                  <span className="text-2xl">✨</span>
-                </div>
-                <p className="text-gray-300 font-black text-lg italic tracking-tight">등록된 할 일이 없습니다. 즐거운 하루 되세요!</p>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {todos.filter(t => isSameDay(new Date(t.target_date), new Date(todoDate))).map(todo => (
-                    <div 
-                      key={todo.id} 
-                      className={`flex items-center gap-4 p-5 rounded-[2rem] border transition-all group ${
-                        todo.is_completed ? 'bg-gray-50 border-gray-100 opacity-60' : 'bg-white border-gray-100 hover:shadow-2xl hover:border-primary-100 hover:-translate-y-1'
-                      } shadow-sm`}
-                    >
-                      <button 
-                        onClick={() => onToggleTodo(todo.id, todo.is_completed)}
-                        className={`w-8 h-8 rounded-xl flex items-center justify-center transition-all ${
-                          todo.is_completed ? 'bg-emerald-500 text-white shadow-emerald-200' : 'bg-gray-100 text-transparent hover:bg-gray-200'
-                        } shadow-lg`}
-                      >
-                        <CheckIcon className="w-5 h-5" />
-                      </button>
-                      
-                      {editingTodoId === todo.id ? (
-                        <div className="flex-1 flex gap-2">
-                          <input 
-                            type="text"
-                            value={editTodoContent}
-                            onChange={(e) => onUpdateState('editTodoContent', e.target.value)}
-                            onKeyDown={(e) => e.key === 'Enter' && onSaveTodoEdit(todo.id)}
-                            className="flex-1 px-4 py-2 bg-gray-50 border-none rounded-xl text-sm font-black focus:ring-4 focus:ring-primary-500/10 transition-all outline-none shadow-inner"
-                            autoFocus
-                          />
-                          <button onClick={() => onSaveTodoEdit(todo.id)} className="text-primary-600 font-black text-xs px-2">저장</button>
-                        </div>
-                      ) : (
-                        <>
-                          <span className={`flex-1 text-base font-black tracking-tight transition-all ${
-                            todo.is_completed ? 'text-gray-300 line-through decoration-emerald-500/50 decoration-2' : 'text-gray-700'
-                          }`}>
-                            {todo.content}
-                          </span>
-                          <div className="flex items-center gap-2 opacity-100 md:opacity-0 group-hover:opacity-100 transition-all">
-                            <button onClick={() => onStartEditingTodo(todo)} className="p-2.5 bg-gray-50 hover:bg-indigo-50 text-indigo-400 hover:text-indigo-600 rounded-xl transition-all"><PencilIcon className="w-4 h-4" /></button>
-                            <button onClick={() => onDeleteTodo(todo.id)} className="p-2.5 bg-gray-50 hover:bg-rose-50 text-rose-300 hover:text-rose-500 rounded-xl transition-all"><TrashIcon className="w-4 h-4" /></button>
-                          </div>
-                        </>
-                      )}
+          {/* Combined Events and Todos */}
+          {(() => {
+            const selectedDateObj = new Date(todoDate)
+            const selectedTodos = todos.filter(t => isSameDay(new Date(t.target_date), selectedDateObj))
+            const selectedBirthdays = customers.filter(c => {
+              if (!c.birth_date) return false
+              const b = new Date(c.birth_date)
+              return b.getMonth() === selectedDateObj.getMonth() && b.getDate() === selectedDateObj.getDate()
+            })
+            const selectedInsUps = customers.filter(c => {
+              if (!c.birth_date) return false
+              const b = new Date(c.birth_date)
+              const upDate = addMonths(b, 6)
+              return upDate.getMonth() === selectedDateObj.getMonth() && upDate.getDate() === selectedDateObj.getDate()
+            })
+
+            const hasAnyItems = selectedTodos.length > 0 || selectedBirthdays.length > 0 || selectedInsUps.length > 0
+
+            return (
+              <div className="space-y-6">
+                {!hasAnyItems ? (
+                  <div className="py-20 text-center border-4 border-dashed border-gray-50 rounded-[3rem] bg-gray-50/30">
+                    <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-4 shadow-sm">
+                      <span className="text-2xl">✨</span>
                     </div>
-                ))}
+                    <p className="text-gray-300 font-black text-lg italic tracking-tight">등록된 할 일이 없습니다. 즐거운 하루 되세요!</p>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {/* Auto-generated Birthday notifications */}
+                    {selectedBirthdays.map(c => (
+                      <div key={`bday-todo-${c.id}`} className="flex items-center gap-4 p-5 rounded-[2rem] border bg-indigo-50/50 border-indigo-100 shadow-sm transition-all hover:shadow-lg">
+                        <div className="w-8 h-8 rounded-xl bg-indigo-500 text-white flex items-center justify-center shadow-lg shadow-indigo-100">
+                          🎂
+                        </div>
+                        <span className="flex-1 text-base font-black text-indigo-900 tracking-tight">
+                          {c.name}님의 <span className="underline underline-offset-4 decoration-indigo-300">생일</span>입니다 🎉
+                        </span>
+                      </div>
+                    ))}
+
+                    {/* Auto-generated Insurance Age Increase notifications */}
+                    {selectedInsUps.map(c => (
+                      <div key={`ins-todo-${c.id}`} className="flex items-center gap-4 p-5 rounded-[2rem] border bg-rose-50/50 border-rose-100 shadow-sm transition-all hover:shadow-lg">
+                        <div className="w-8 h-8 rounded-xl bg-rose-500 text-white flex items-center justify-center shadow-lg shadow-rose-100 font-black text-xs">
+                          📈
+                        </div>
+                        <span className="flex-1 text-base font-black text-rose-900 tracking-tight">
+                          {c.name}님의 <span className="underline underline-offset-4 decoration-rose-300">상령일</span>(보험료 인상) ⚠️
+                        </span>
+                      </div>
+                    ))}
+
+                    {/* Manual Todos */}
+                    {selectedTodos.map(todo => (
+                        <div 
+                          key={todo.id} 
+                          className={`flex items-center gap-4 p-5 rounded-[2rem] border transition-all group ${
+                            todo.is_completed ? 'bg-gray-50 border-gray-100 opacity-60' : 'bg-white border-gray-100 hover:shadow-2xl hover:border-primary-100 hover:-translate-y-1'
+                          } shadow-sm`}
+                        >
+                          <button 
+                            onClick={() => onToggleTodo(todo.id, todo.is_completed)}
+                            className={`w-8 h-8 rounded-xl flex items-center justify-center transition-all ${
+                              todo.is_completed ? 'bg-emerald-500 text-white shadow-emerald-200' : 'bg-gray-100 text-transparent hover:bg-gray-200'
+                            } shadow-lg`}
+                          >
+                            <CheckIcon className="w-5 h-5" />
+                          </button>
+                          
+                          {editingTodoId === todo.id ? (
+                            <div className="flex-1 flex gap-2">
+                              <input 
+                                type="text"
+                                value={editTodoContent}
+                                onChange={(e) => onUpdateState('editTodoContent', e.target.value)}
+                                onKeyDown={(e) => e.key === 'Enter' && onSaveTodoEdit(todo.id)}
+                                className="flex-1 px-4 py-2 bg-gray-50 border-none rounded-xl text-sm font-black focus:ring-4 focus:ring-primary-500/10 transition-all outline-none shadow-inner"
+                                autoFocus
+                              />
+                              <button onClick={() => onSaveTodoEdit(todo.id)} className="text-primary-600 font-black text-xs px-2">저장</button>
+                            </div>
+                          ) : (
+                            <>
+                              <span className={`flex-1 text-base font-black tracking-tight transition-all ${
+                                todo.is_completed ? 'text-gray-300 line-through decoration-emerald-500/50 decoration-2' : 'text-gray-700'
+                              }`}>
+                                {todo.content}
+                              </span>
+                              <div className="flex items-center gap-2 opacity-100 md:opacity-0 group-hover:opacity-100 transition-all">
+                                <button onClick={() => onStartEditingTodo(todo)} className="p-2.5 bg-gray-50 hover:bg-indigo-50 text-indigo-400 hover:text-indigo-600 rounded-xl transition-all"><PencilIcon className="w-4 h-4" /></button>
+                                <button onClick={() => onDeleteTodo(todo.id)} className="p-2.5 bg-gray-50 hover:bg-rose-50 text-rose-300 hover:text-rose-500 rounded-xl transition-all"><TrashIcon className="w-4 h-4" /></button>
+                              </div>
+                            </>
+                          )}
+                        </div>
+                    ))}
+                  </div>
+                )}
               </div>
-            )}
-          </div>
+            )
+          })()}
         </div>
       </div>
     </div>
