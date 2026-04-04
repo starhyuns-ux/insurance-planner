@@ -262,7 +262,7 @@ export default function CustomerCRM({
                         <td className="px-4 py-4 whitespace-nowrap border-b border-gray-50">
                           <div className="flex flex-col gap-0.5">
                             <span className="font-mono tracking-tighter text-gray-600 font-bold text-xs">{c.phone || '-'}</span>
-                            <span className="text-[10px] text-gray-400 font-medium truncate max-w-[150px]">{c.address || '-'}</span>
+                            <span className="text-[10px] text-gray-400 font-medium truncate max-w-[150px]" title={c.address || ''}>{c.address || '-'}</span>
                           </div>
                         </td>
                         <td className="px-4 py-4 text-center whitespace-nowrap border-b border-gray-50">

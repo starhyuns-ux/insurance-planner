@@ -222,7 +222,7 @@ export default function CalendarManager({
               PLANNERS TO-DO LIST
             </h3>
             <span className="text-xs font-black text-white bg-primary-600 px-4 py-1.5 rounded-full shadow-lg shadow-primary-100 uppercase tracking-widest">
-              Selected: {format(new Date(todoDate), 'MM.dd')}
+              Selected: {todoDate ? format(new Date(todoDate), 'MM.dd') : ''}
             </span>
           </div>
 
