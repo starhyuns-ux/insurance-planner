@@ -8,13 +8,15 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: '이름과 휴대폰 번호를 모두 입력해주세요.' }, { status: 400 })
     }
 
-    // TODO: Integrate actual SMS gateway (e.g., Aligo, PortOne, Toss) here.
-    // For now, we use a mock approach where the code is always '123456'.
-    console.log(`[Mock SMS] Sending verification code 123456 to ${phone} for ${name}`)
+    // SMS Gateway Integration Point
+    // Current behavior: Mock verification code for testing purposes.
+    const MOCK_CODE = '123456'
+    
+    console.log(`[SMS AUTH] Sending verification code ${MOCK_CODE} to ${phone} for ${name}`)
 
     return NextResponse.json({ 
       success: true, 
-      message: '인증번호(123456)가 발송되었습니다.' 
+      message: `인증번호(${MOCK_CODE})가 발송되었습니다.` 
     })
 
   } catch (err) {

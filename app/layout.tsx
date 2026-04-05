@@ -66,6 +66,10 @@ export const metadata: Metadata = {
   },
 }
 
+import Script from 'next/script'
+import QueryProvider from '@/lib/providers/QueryProvider'
+import { PlannerProvider } from '@/lib/providers/PlannerProvider'
+import { Toaster } from 'sonner'
 import { LanguageProvider } from '@/lib/contexts/LanguageContext'
 import ChatWidget from '@/components/ChatWidget'
 import ReferralTracker from '@/components/ReferralTracker'
@@ -80,15 +84,24 @@ export default function RootLayout({
   return (
     <html lang="ko">
       <body className={`${notoSansKr.variable} ${dancingScript.variable} font-sans antialiased bg-gray-50 text-gray-900 break-keep break-words w-full overflow-x-hidden`}>
-        <script src="https://t2.kakaocdn.net/kakao_js_sdk/2.7.0/kakao.min.js" crossOrigin="anonymous" async></script>
-        <LanguageProvider>
-          <VisitTracker />
-          <Suspense fallback={null}>
-            <ReferralTracker />
-          </Suspense>
-          {children}
-          <ChatWidget />
-        </LanguageProvider>
+        <Script 
+          src="https://t2.kakaocdn.net/kakao_js_sdk/2.7.0/kakao.min.js" 
+          strategy="afterInteractive"
+          crossOrigin="anonymous" 
+        />
+        <QueryProvider>
+          <PlannerProvider>
+            <LanguageProvider>
+              <VisitTracker />
+              <Suspense fallback={null}>
+                <ReferralTracker />
+              </Suspense>
+              {children}
+              <ChatWidget />
+              <Toaster position="top-center" richColors />
+            </LanguageProvider>
+          </PlannerProvider>
+        </QueryProvider>
       </body>
     </html>
   )

@@ -48,6 +48,9 @@ export default function LeadPipeline({
     return (l.status || 'New') === activeStatus
   })
 
+  // Get current status label for empty state
+  const currentStatusLabel = statusCategories.find(c => c.id === activeStatus)?.label || activeStatus
+
   const handleUpdateStatus = async (id: string, newStatus: string) => {
     setIsUpdating(id)
     try {
@@ -139,16 +142,19 @@ export default function LeadPipeline({
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
-              <tr className="bg-gray-50/50 text-left">
-                <th className="px-8 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest">상태</th>
-                <th className="px-8 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest text-right">관리 액션</th>
+              <tr className="bg-gray-50/50 text-left border-b border-gray-100 uppercase tracking-widest">
+                <th className="px-8 py-4 text-[10px] font-black text-gray-400">신청인</th>
+                <th className="px-8 py-4 text-[10px] font-black text-gray-400">연락처</th>
+                <th className="px-8 py-4 text-[10px] font-black text-gray-400">신청일시</th>
+                <th className="px-8 py-4 text-[10px] font-black text-gray-400">상태</th>
+                <th className="px-8 py-4 text-[10px] font-black text-gray-400 text-right">관리 액션</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-50">
               {filteredLeads.length === 0 ? (
                 <tr>
                   <td colSpan={5} className="px-8 py-12 text-center text-gray-400 font-medium italic">
-                    {activeStatus === 'All' ? '아직 접수된 상담 신청이 없습니다.' : `${activeStatus} 상태의 신청 건이 없습니다.`}
+                    {activeStatus === 'All' ? '아직 접수된 상담 신청이 없습니다.' : `${currentStatusLabel} 상태의 신청 건이 없습니다.`}
                   </td>
                 </tr>
               ) : (
@@ -162,7 +168,9 @@ export default function LeadPipeline({
                           {l.name}
                         </div>
                       </td>
-                      <td className="px-8 py-5 text-gray-600 font-mono tracking-tight">{l.phone.replace(/(\d{3})(\d{4})(\d{4})/, '$1-$2-$3')}</td>
+                      <td className="px-8 py-5 text-gray-600 font-mono tracking-tight text-sm">
+                        {l.phone ? l.phone.replace(/(\d{3})(\d{4})(\d{4})/, '$1-$2-$3') : '-'}
+                      </td>
                       <td className="px-8 py-5 text-gray-400 text-sm">{new Date(l.created_at).toLocaleString()}</td>
                       <td className="px-8 py-5">
                         {getStatusBadge(l.status)}

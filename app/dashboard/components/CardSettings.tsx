@@ -161,11 +161,11 @@ export default function CardSettings({
         <div className="absolute top-0 right-0 -mr-20 -mt-20 w-80 h-80 bg-primary-500 rounded-full opacity-10 blur-[100px]" />
         <div className="absolute bottom-0 left-0 -ml-20 -mb-20 w-80 h-80 bg-indigo-500 rounded-full opacity-10 blur-[100px]" />
         
-        <h4 className="text-lg font-black mb-1.5 flex items-center gap-3">
+        <h4 className="text-lg font-black mb-1.5 flex items-center gap-3 text-white">
           <div className="w-2 h-6 bg-primary-400 rounded-full" />
           나의 공식 디지털 명함 공유 주소
         </h4>
-        <p className="text-xs text-primary-300 font-bold mb-8 uppercase tracking-widest opacity-60">Personalized Digital Card URL</p>
+        <p className="text-xs text-primary-200 font-black mb-8 uppercase tracking-[0.2em]">Personalized Digital Card URL</p>
         
         <div className="flex flex-col gap-4">
           <div className="flex flex-col md:flex-row items-center gap-3">
