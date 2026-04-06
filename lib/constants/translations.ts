@@ -215,7 +215,7 @@ export const translations = {
     heroResultComplete: '분석 완료',
     heroResultTitle: '예상 절감 효과',
     heroResultUnit: '원',
-    heroResultDesc1: '쓸데없는 지출은 줄이고,',
+    heroResultDesc1: '꼭 필요한 보장은 채우고,',
     heroResultDesc2: '우리가족 필수 보장은 든든하게!',
 
     // Footer
@@ -248,7 +248,7 @@ export const translations = {
     formDesc: '매달 빠져나가는 아까운 보험료, 전문가와 함께 10분만 투자하면 평생 내는 보험료를 아낄 수 있습니다.',
     formDescWithPlanner: '고객님의 상황에 맞는 다양한 상품을 안내해 드립니다.',
     formStep1: '전문가 1:1 맞춤 분석',
-    formStep2: '중복/불필요 특약 제거',
+    formStep2: '비효율 특약 제거 및 조정',
     formStep3: '필수 핵심 보장 보완',
     formSubmitTitle: '상담 신청하기',
     formName: '이름',
@@ -299,7 +299,7 @@ export const translations = {
     servicesTitle: '인슈닷 서비스, 이렇게 진행됩니다',
     servicesDesc: '복잡하고 어려운 보험, 검증된 전문가가 A부터 Z까지 투명하게 분석해드립니다.',
     servicesSteps: [
-      { title: '현재 상태 정밀 진단', desc: '현재 가입된 모든 보험을 모아 불필요한 지출과 보장 공백을 찾아냅니다.' },
+      { title: '현재 상태 정밀 진단', desc: '현재 가입된 모든 보험을 모아 보장 공백과 효율성을 찾아냅니다.' },
       { title: '맞춤형 리모델링 플랜', desc: '유지할 것은 두고, 조정이 필요한 것은 바꾸는 명확한 가이드를 제공합니다.' },
       { title: '상황에 맞는 합리적인 보장', desc: '상담을 통해 내 상황에 맞는 합리적인 보장 구성을 안내해 드립니다.' },
     ],
@@ -322,10 +322,10 @@ export const translations = {
     concernsTitle: '혹시 이런 고민, 해보신 적 있나요?',
     concernsDesc: '하나라도 해당된다면, 보험 점검이 꼭 필요한 시점입니다.',
     concernsBannerTitle: '내 보험, 잘 가입된 걸까? 꼼꼼하게 점검해드릴게요!',
-    concernsBannerDesc: '불필요한 지출은 줄이고 든든한 보장만 채우세요.',
+    concernsBannerDesc: '든든한 보장만 채우세요.',
     concernsBannerBtn: '1분만에 상담 신청',
     concernsItems: ['매달 나가는 보험료가 부담스러운데, 해지하자니 왠지 불안해요.', '지인에게 가입한 보험, 도대체 무슨 보장인지 1도 모르겠어요.', '갱신형 보험이라 나중에 보험료가 얼마나 오를지 겁나요.', '홈쇼핑이나 전화로 가입한 보험, 정말 나에게 맞는 걸까요?'],
-    concernsOutroBase: '몰라서 낭비하는 돈,',
+    concernsOutroBase: '나도 모르게 새어나가는 보험료,',
     concernsOutroHighlight: '이제는 멈춰야 합니다.',
 
     // AdvancedRadiation section

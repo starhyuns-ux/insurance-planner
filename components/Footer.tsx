@@ -10,13 +10,13 @@ export default function Footer() {
   return (
     <footer className="bg-gray-50 border-t border-gray-200 pt-16 pb-8 text-sm">
       <div className="container max-w-6xl">
-        <div className="grid md:grid-cols-4 gap-8 mb-12">
-          <div className="md:col-span-2 pr-4">
+        <div className="flex flex-col md:flex-row justify-between mb-12 gap-12">
+          <div className="max-w-md">
             <Link href="/" className="inline-block font-black text-3xl tracking-tighter text-gray-900 mb-4 flex items-baseline">
               <span>인슈</span>
               <span className="text-primary-600 ml-px">닷</span>
             </Link>
-            <p className="text-gray-500 mb-6 leading-relaxed max-w-sm text-[15px]">
+            <p className="text-gray-500 mb-6 leading-relaxed text-[15px]">
               {t('footerDesc')}
             </p>
             <div className="flex gap-4">
@@ -29,21 +29,7 @@ export default function Footer() {
             </div>
           </div>
 
-          <div>
-            <h4 className="font-bold text-gray-900 mb-5">{t('footerQuickMenu')}</h4>
-            <ul className="space-y-3.5 text-gray-500 font-medium">
-              <li><Link href="/#about" className="hover:text-primary-600 transition-colors">{t('footerMenuAbout')}</Link></li>
-              <li><Link href="/#services" className="hover:text-primary-600 transition-colors">{t('footerMenuProcess')}</Link></li>
-              <li><Link href="/#reviews" className="hover:text-primary-600 transition-colors">{t('footerMenuCases')}</Link></li>
-              <li><Link href="/#faq" className="hover:text-primary-600 transition-colors">{t('footerMenuFaq')}</Link></li>
-              <li><Link href="/guide/5th-gen" className="text-primary-600 font-bold hover:text-primary-700 transition-colors">{t('footerMenuSilbi5')}</Link></li>
-              <li><Link href="/guide/critical-illness-relief" className="text-primary-600 font-bold hover:text-primary-700 transition-colors">{t('footerMenuCriticalIllness')}</Link></li>
-              <li><Link href="/guide/advanced-radiation" className="text-primary-600 font-bold hover:text-primary-700 transition-colors">{t('footerMenuRadiation')}</Link></li>
-              <li><Link href="/guide/hifu-therapy" className="text-primary-600 font-bold hover:text-primary-700 transition-colors">{t('footerMenuHifu')}</Link></li>
-            </ul>
-          </div>
-
-          <div>
+          <div className="shrink-0">
             <h4 className="font-bold text-gray-900 mb-5">{t('footerCustomerCenter')}</h4>
             <ul className="space-y-2 text-gray-600">
               <li className="font-extrabold text-2xl text-gray-900 tracking-tight">010-6303-5561</li>
@@ -60,8 +46,6 @@ export default function Footer() {
 
         <div className="pt-8 border-t border-gray-200 flex flex-col md:flex-row justify-between md:items-center gap-6 text-xs text-gray-400 leading-relaxed">
           <div>
-            <p className="mb-1"><span className="text-gray-500 font-medium">{t('footerCompany')}</span> | {t('footerCEO').includes('대표') ? t('footerCEO') : `대표: ${t('footerCEO')}`} | {t('footerBusinessNum').includes('등록번호') ? t('footerBusinessNum') : `사업자등록번호: ${t('footerBusinessNum')}`}</p>
-            <p className="mb-3">{t('footerAddress')} | {t('footerPrivacyOfficer').includes('책임자') ? t('footerPrivacyOfficer') : `개인정보보호책임자: ${t('footerPrivacyOfficer')}`}</p>
             <p className="opacity-70">{t('footerCopyright')(year)} <br className="md:hidden" />{t('footerCopyrightNotice')}</p>
           </div>
           <div className="flex gap-4 md:self-end">
