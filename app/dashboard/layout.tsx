@@ -21,6 +21,7 @@ import {
 import { motion, AnimatePresence } from 'framer-motion'
 import { usePlanner } from '@/lib/providers/PlannerProvider'
 import { supabase } from '@/lib/supabaseClient'
+import { clearAttribution } from '@/lib/attribution'
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
@@ -29,6 +30,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const router = useRouter()
 
   const handleLogout = async () => {
+    clearAttribution()
     await supabase.auth.signOut()
     router.push('/login')
   }

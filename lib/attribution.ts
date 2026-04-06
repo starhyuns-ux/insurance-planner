@@ -66,3 +66,9 @@ export function useAttribution() {
 
   return { planner, loading }
 }
+
+export function clearAttribution() {
+  if (typeof window === 'undefined') return
+  document.cookie = `${ATTRIBUTION_COOKIE}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`
+  localStorage.removeItem(ATTRIBUTION_COOKIE)
+}
