@@ -16,12 +16,14 @@ import PlannerBranding from '@/components/PlannerBranding'
 import PageTracker from '@/components/PageTracker'
 import { useAttribution } from '@/lib/attribution'
 import { usePlanner } from '@/lib/providers/PlannerProvider'
+import { usePathname } from 'next/navigation'
 
 export default function Home() {
   const { planner, loading: attrLoading } = useAttribution()
-  const { user: loggedInPlanner, loading: plannerLoading } = usePlanner()
+  const { planner: loggedInPlanner, loading: plannerLoading } = usePlanner()
+  const pathname = usePathname()
 
-  const showProfessionalContent = !!planner || !!loggedInPlanner;
+  const showProfessionalContent = !!planner || (!!loggedInPlanner && pathname !== '/');
   const isLoading = attrLoading && plannerLoading;
 
   return (

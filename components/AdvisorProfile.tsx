@@ -31,68 +31,69 @@ export default function AdvisorProfile({ name, phone, profileImage, businessCard
   const points = t('profilePoints') as { title: string, desc: string }[];
 
   return (
-    <section className="py-24 bg-gray-900 text-white relative overflow-hidden">
-      <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-gray-700 to-transparent"></div>
+    <section className="py-24 text-white relative overflow-hidden" style={{background: 'linear-gradient(180deg, #0f172a 0%, #172554 100%)'}}>
+      {/* Background Decor */}
+      <div className="absolute top-0 right-0 -mr-20 -mt-20 w-96 h-96 bg-primary-600 rounded-full opacity-10 blur-[130px]" />
+      <div className="absolute bottom-0 left-0 -ml-20 -mb-20 w-80 h-80 bg-blue-500 rounded-full opacity-10 blur-[110px]" />
+      <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>
 
-      <div className="container max-w-5xl px-4">
+      <div className="container max-w-5xl px-4 relative z-10">
         <div className="grid md:grid-cols-5 gap-12 lg:gap-16 items-center">
-          <div className="md:col-span-2 relative mx-auto md:mx-0 w-64 h-64 md:w-full md:h-auto md:aspect-[4/5] rounded-[2rem] overflow-hidden border border-gray-700 bg-gray-800 shadow-2xl">
+          <div className="md:col-span-2 relative mx-auto md:mx-0 w-64 h-64 md:w-full md:h-auto md:aspect-[4/5] rounded-[2.5rem] overflow-hidden border border-white/10 bg-white/5 shadow-2xl flex items-center justify-center">
             {profileImage ? (
               <img src={profileImage} alt={name || t('profileExpert')} className="absolute inset-0 w-full h-full object-cover" />
             ) : (
               <div className="absolute inset-0 flex flex-col items-center justify-center p-6 text-center z-10">
-                <div className="bg-gray-700/50 p-4 rounded-full backdrop-blur-md mb-6 border border-gray-600">
-                  <svg className="w-16 h-16 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                <div className="bg-white/10 p-5 rounded-full backdrop-blur-xl mb-6 border border-white/20 shadow-lg">
+                  <svg className="w-16 h-16 text-primary-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                   </svg>
                 </div>
-                <div className="text-primary-400 font-bold tracking-widest text-sm mb-2 shadow-sm">
-                  {region} | {affiliation}
+                <div className="text-yellow-400 font-black tracking-[0.2em] text-xs mb-3 uppercase drop-shadow-sm">
+                  {region || '전국'} | {affiliation || '인슈닷'}
                 </div>
-                <div className="text-2xl font-extrabold text-white">
+                <div className="text-2xl font-black text-white leading-tight">
                   {name ? `${name}${locale === 'ko' ? '' : ' '}${t('regStatusVal')}` : t('experienceVal')}
                 </div>
               </div>
             )}
 
             {!profileImage && (
-              <>
-                <div className="absolute inset-0 bg-gradient-to-br from-gray-700 via-gray-800 to-gray-900 opacity-50 pointer-events-none"></div>
-                <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-gray-900 to-transparent h-2/3 pointer-events-none"></div>
-                <div className="absolute top-0 inset-x-0 bg-gradient-to-b from-gray-900 to-transparent h-1/4 pointer-events-none"></div>
-              </>
+              <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-white/0 pointer-events-none"></div>
             )}
 
-            <div className="absolute bottom-6 inset-x-0 text-center text-sm font-medium text-gray-400 z-10 flex items-center justify-center gap-2">
-              <svg className="w-4 h-4 text-green-400" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" /></svg>
-              {t('regStatusVal')} {phone && `(${phone})`}
+            <div className="absolute bottom-6 inset-x-0 text-center z-10 flex items-center justify-center">
+              <div className="bg-white/10 backdrop-blur-md px-4 py-1.5 rounded-full border border-white/20 text-[11px] font-black tracking-wide text-white flex items-center gap-2 shadow-lg">
+                <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse shadow-[0_0_8px_rgba(74,222,128,0.5)]" />
+                {t('regStatusVal')} {phone && `(${phone})`}
+              </div>
             </div>
           </div>
 
           <div className="md:col-span-3">
-            <h2 className="text-3xl md:text-4xl lg:text-[2.5rem] font-extrabold mb-8 tracking-tight leading-tight">
+            <h2 className="text-3xl md:text-4xl lg:text-[2.8rem] font-black mb-10 tracking-tight leading-[1.1] text-white">
               {message || (name ? t('profileTitlePlanner')(name) : t('profileTitleDefault'))}
               {!message && (
                 <>
                   <br /> 
-                  <span className="text-primary-400">
+                  <span className="bg-gradient-to-r from-yellow-300 to-yellow-500 bg-clip-text text-transparent italic">
                     {name ? t('profilePromisePlanner') : t('profilePromiseDefault')}
                   </span>
                 </>
               )}
             </h2>
 
-            <div className="space-y-6">
+            <div className="space-y-8">
               {Array.isArray(points) && points.map((p, idx) => (
-                <div key={idx} className="flex items-start gap-5">
-                  <div className="mt-1 bg-gray-800/80 p-2.5 rounded-xl text-primary-400 shrink-0 border border-gray-700 shadow-md">
+                <div key={idx} className="flex items-start gap-6 group">
+                  <div className="mt-1 bg-white/5 p-3 rounded-2xl text-yellow-400 shrink-0 border border-white/10 shadow-xl group-hover:bg-yellow-400 group-hover:text-amber-900 transition-all duration-300">
                     <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
                     </svg>
                   </div>
                   <div>
-                    <h4 className="text-xl font-bold mb-2 tracking-tight text-white">{p.title}</h4>
-                    <p className="text-gray-400 leading-relaxed text-sm md:text-base">
+                    <h4 className="text-xl font-black mb-2 tracking-tight text-white group-hover:text-yellow-300 transition-colors">{p.title}</h4>
+                    <p className="text-blue-100/70 leading-relaxed font-bold text-sm md:text-base">
                       {p.desc}
                     </p>
                   </div>
@@ -100,42 +101,45 @@ export default function AdvisorProfile({ name, phone, profileImage, businessCard
               ))}
               
               {kakaoUrl && (
-                <div className="mt-8 pt-6 border-t border-gray-800">
+                <div className="mt-12 pt-10 border-t border-white/10">
                   <a 
                     href={kakaoUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-3 bg-[#FEE500] text-gray-900 px-8 py-4 rounded-2xl font-black text-lg hover:bg-[#FADB00] transition-all shadow-xl shadow-yellow-900/20 w-fit"
+                    className="inline-flex items-center gap-4 bg-yellow-400 text-amber-950 px-10 py-5 rounded-[1.8rem] font-black text-xl hover:bg-yellow-300 hover:-translate-y-1 transition-all shadow-2xl shadow-yellow-900/40 w-fit active:scale-95 group"
                   >
-                    <svg className="w-7 h-7" viewBox="0 0 24 24" fill="currentColor">
+                    <svg className="w-8 h-8 group-hover:scale-110 transition-transform" viewBox="0 0 24 24" fill="currentColor">
                       <path d="M12 3C6.477 3 2 6.477 2 10.75c0 2.766 1.91 5.148 4.755 6.477-.168 1.488-1.503 3.51-1.637 3.68-.13.167-.17.34-.044.47.126.13.29.145.42.103.13-.042 1.956-.843 4.156-2.316.435.05.88.086 1.35.086 5.523 0 10-3.477 10-7.75S17.523 3 12 3z"/>
                     </svg>
                     {t('kakaoTalk')}
                   </a>
-                  <p className="mt-3 text-gray-500 text-xs font-bold pl-1 font-sans">※ {t('profileKakaoNotice')}</p>
+                  <p className="mt-4 text-blue-300/50 text-[11px] font-black pl-2 tracking-widest uppercase font-mono">※ {t('profileKakaoNotice')}</p>
                 </div>
               )}
 
               {businessCard && (
-                <div className="mt-8 pt-8 border-t border-gray-800">
-                  <div className="flex items-center justify-between mb-4">
-                    <p className="text-xs font-bold text-gray-500 uppercase tracking-widest">{t('profileBusinessCard')}</p>
+                <div className="mt-12 pt-10 border-t border-white/10">
+                  <div className="flex items-center justify-between mb-6">
+                    <div className="flex items-center gap-3">
+                      <div className="w-1.5 h-4 bg-yellow-400 rounded-full" />
+                      <p className="text-[11px] font-black text-white uppercase tracking-[0.2em]">{t('profileBusinessCard')}</p>
+                    </div>
                     <button 
                       onClick={handleCopyLink}
-                      className="text-xs font-bold text-primary-400 hover:text-primary-300 transition-colors flex items-center gap-1.5"
+                      className="text-[11px] font-black text-yellow-400 hover:text-white transition-colors flex items-center gap-2 uppercase tracking-wider"
                     >
-                      {copied ? <CheckIcon className="w-3.5 h-3.5" /> : <ShareIcon className="w-3.5 h-3.5" />}
+                      {copied ? <CheckIcon className="w-4 h-4" /> : <ShareIcon className="w-4 h-4" />}
                       {copied ? t('profileCopied') : t('profileCopyCard')}
                     </button>
                   </div>
                   <div 
                     onClick={handleCopyLink}
-                    className="group relative cursor-pointer overflow-hidden rounded-xl shadow-lg border border-gray-700 max-w-xs transition-transform hover:scale-[1.02]"
+                    className="group relative cursor-pointer overflow-hidden rounded-3xl shadow-2xl border border-white/10 max-w-sm transition-all hover:scale-[1.02] active:scale-[0.98] shadow-white/5"
                   >
                     <img src={businessCard} alt={t('profileCardAlt')} className="w-full h-auto" />
-                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                      <div className="bg-white/10 backdrop-blur-md px-4 py-2 rounded-full border border-white/20 text-sm font-bold text-white flex items-center gap-2">
-                        <ShareIcon className="w-4 h-4" />
+                    <div className="absolute inset-0 bg-primary-950/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-sm">
+                      <div className="bg-white text-primary-900 px-6 py-3 rounded-2xl border border-white/20 text-sm font-black shadow-2xl flex items-center gap-3">
+                        <ShareIcon className="w-5 h-5" />
                         {t('profileCopyAddress')}
                       </div>
                     </div>
