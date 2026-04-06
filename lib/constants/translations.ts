@@ -115,6 +115,8 @@ export const translations = {
     cancerTreatmentDesc: '로봇수술부터 중입자치료까지 최신 암 치료 일람',
     diseaseCode: '질병코드 검색',
     diseaseCodeDesc: '진단서의 질병코드로 실무 보상 여부 확인',
+    insuranceLink: '보험사 바로가기',
+    insuranceLinkDesc: '전 보험사 공통 전산 및 업무 안내 바로가기',
 
     // Alerts & Notices
     alertBirthDate: '생년월일이나 진료비를 입력해 주세요.',
@@ -462,6 +464,8 @@ export const translations = {
     cancerTreatmentDesc: 'From robotic surgery to heavy ion therapy - latest treatments',
     diseaseCode: 'Disease Code Search',
     diseaseCodeDesc: 'Check insurance coverage by medical disease codes',
+    insuranceLink: 'Insurance Shortcut',
+    insuranceLinkDesc: 'Direct shortcuts to all insurance company systems',
 
     // Alerts & Notices
     alertBirthDate: 'Please enter birth date or medical expenses.',
@@ -1040,6 +1044,8 @@ export const translations = {
     customerCenterNoResults: '未找到相关结果。',
     customerCenterLife: '寿险',
     customerCenterNonLife: '损险',
+    insuranceLink: '保险公司便捷通道',
+    insuranceLinkDesc: '直达各大保险公司系统及业务指南',
 
   }
 };

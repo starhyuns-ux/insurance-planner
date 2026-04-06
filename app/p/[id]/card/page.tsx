@@ -32,7 +32,7 @@ export async function generateMetadata({ params }: { params: { id: string } }): 
       title,
       description,
       url: `https://stroy.kr/p/${id}/card`,
-      siteName: '내 보험 다이어트',
+      siteName: '인슈닷',
       images: [{ url: ogImage, width: 600, height: 600, alt: `${planner.name} 프로필` }],
       type: 'profile',
     },

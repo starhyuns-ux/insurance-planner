@@ -9,6 +9,7 @@ import DetailedClaimForm from '@/components/DetailedClaimForm'
 
 interface ClaimCenterProps {
   claims: any[]
+  plannerId?: string
   transmittingClaimId: string | null
   onTransmitClaim: (id: string) => void
   onUpdateClaimStatus: (id: string, status: string) => void
@@ -17,6 +18,7 @@ interface ClaimCenterProps {
 
 export default function ClaimCenter({
   claims,
+  plannerId,
   transmittingClaimId,
   onTransmitClaim,
   onUpdateClaimStatus,
@@ -25,7 +27,7 @@ export default function ClaimCenter({
   return (
     <div className="space-y-6">
       {/* Submit New Claim (Detailed) */}
-      <DetailedClaimForm onSuccess={() => {}} />
+      <DetailedClaimForm onSuccess={() => {}} plannerId={plannerId} />
 
       {/* Claims List */}
       <div className="bg-white rounded-[2rem] shadow-xl border border-gray-100 overflow-hidden">

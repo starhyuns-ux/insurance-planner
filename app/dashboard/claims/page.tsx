@@ -30,6 +30,8 @@ export default function ClaimsPage() {
     <div className="animate-in fade-in slide-in-from-bottom-2 duration-500">
       <ClaimCenter 
         claims={claims}
+        plannerId={planner?.id}
+        transmittingClaimId={null}
         onDeleteClaim={async (id) => {
           if (!confirm('삭제하시겠습니까?')) return
           const { error } = await supabase.from('claims').delete().eq('id', id)
@@ -38,7 +40,7 @@ export default function ClaimsPage() {
             fetchClaims()
           }
         }}
-        onUpdateStatus={async (id, status) => {
+        onUpdateClaimStatus={async (id, status) => {
           const { error } = await supabase.from('claims').update({ status }).eq('id', id)
           if (!error) {
             toast.success('상태가 업데이트되었습니다.')

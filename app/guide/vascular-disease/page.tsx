@@ -1,6 +1,4 @@
 import type { Metadata } from 'next'
-import NavBar from '@/components/NavBar'
-import Footer from '@/components/Footer'
 import PlannerBranding from '@/components/PlannerBranding'
 import Link from 'next/link'
 
@@ -10,15 +8,13 @@ export const metadata: Metadata = {
     openGraph: {
         title: '혈관질환 스터디 | 허혈성 심장질환 가이드',
         description: '협심증부터 심근경색까지, 허혈성 심장질환의 모든 것을 정리했습니다. 내 보험과 대비 상황을 점검하세요.',
-        url: 'https://insurance-planner-eosin.vercel.app/guide/vascular-disease',
+        url: 'https://stroy.kr/guide/vascular-disease',
     }
 }
 
 export default function VascularDiseaseStudyPage() {
     return (
-        <main className="min-h-screen bg-gray-50 flex flex-col pt-16">
-            <NavBar />
-
+        <div className="bg-gray-50 flex flex-col min-h-screen">
             {/* Header Section */}
             <header className="bg-rose-900 text-white min-h-[400px] flex items-center relative overflow-hidden">
                 <div className="absolute top-0 left-0 w-full h-full overflow-hidden">
@@ -197,10 +193,9 @@ export default function VascularDiseaseStudyPage() {
 
                     </div>
                 </div>
-            </div >
+            </div>
 
             <PlannerBranding />
-            <Footer />
-        </main >
+        </div>
     )
 }

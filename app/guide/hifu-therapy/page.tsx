@@ -1,6 +1,4 @@
 import type { Metadata } from 'next'
-import NavBar from '@/components/NavBar'
-import Footer from '@/components/Footer'
 import PlannerBranding from '@/components/PlannerBranding'
 import Link from 'next/link'
 import Image from 'next/image'
@@ -11,15 +9,13 @@ export const metadata: Metadata = {
     openGraph: {
         title: '하이푸(HIFU) 시술 안내 | 인슈닷',
         description: '칼을 대지 않고 종양을 태우는 차세대 암 치료, 하이푸. 암 수술 전 필수가 된 이 시술에 내 보험은 준비되어 있을까요?',
-        url: 'https://insurance-planner-eosin.vercel.app/guide/hifu-therapy',
+        url: 'https://stroy.kr/guide/hifu-therapy',
     }
 }
 
 export default function HifuTherapyGuidePage() {
     return (
-        <main className="min-h-screen bg-gray-50 flex flex-col pt-16">
-            <NavBar />
-
+        <div className="bg-gray-50 flex flex-col min-h-screen">
             {/* Header Section */}
             <header className="bg-primary-900 text-white min-h-[400px] flex items-center relative overflow-hidden">
                 <div className="absolute top-0 left-0 w-full h-full overflow-hidden">
@@ -70,7 +66,7 @@ export default function HifuTherapyGuidePage() {
                                 하이푸(HIFU, High Intensity Focused Ultrasound)는 <strong>고강도 초음파 에너지를 한 점에 집중시켜 종양이나 병변 조직을 열로 괴사시키는 비침습적 치료 방법</strong>입니다. 수술처럼 절개를 하지 않고 초음파를 이용해 병변을 치료하는 것이 큰 특징입니다.
                             </p>
 
-                            {/* Image Placeholder */}
+                            {/* Image Box */}
                             <div className="w-full rounded-2xl overflow-hidden shadow-inner border border-gray-200 mb-8 relative aspect-[16/9] bg-gray-100">
                                 <Image
                                     src="/images/hifu-image-v2.jpg"
@@ -198,7 +194,6 @@ export default function HifuTherapyGuidePage() {
             </div>
 
             <PlannerBranding />
-            <Footer />
-        </main>
+        </div>
     )
 }

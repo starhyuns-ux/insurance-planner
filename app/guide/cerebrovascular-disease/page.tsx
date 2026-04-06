@@ -1,6 +1,4 @@
 import type { Metadata } from 'next'
-import NavBar from '@/components/NavBar'
-import Footer from '@/components/Footer'
 import PlannerBranding from '@/components/PlannerBranding'
 import Link from 'next/link'
 
@@ -10,15 +8,13 @@ export const metadata: Metadata = {
     openGraph: {
         title: '뇌혈관질환 스터디 | 뇌졸중 가이드',
         description: '뇌졸중(뇌경색, 뇌출혈)의 증상, 대처법, 예방 및 치료의 핵심을 전문가의 시선으로 정리했습니다.',
-        url: 'https://insurance-planner-eosin.vercel.app/guide/cerebrovascular-disease',
+        url: 'https://stroy.kr/guide/cerebrovascular-disease',
     }
 }
 
 export default function CerebrovascularDiseaseStudyPage() {
     return (
-        <main className="min-h-screen bg-gray-50 flex flex-col pt-16">
-            <NavBar />
-
+        <div className="bg-gray-50 flex flex-col min-h-screen">
             {/* Header Section */}
             <header className="bg-indigo-900 text-white min-h-[400px] flex items-center relative overflow-hidden">
                 <div className="absolute top-0 left-0 w-full h-full overflow-hidden">
@@ -235,7 +231,7 @@ export default function CerebrovascularDiseaseStudyPage() {
                             <h3 className="text-2xl font-bold text-indigo-900 mb-4">내 뇌혈관 질환 진단비, &apos;뇌경색&apos;도 보장되나요?</h3>
                             <p className="text-indigo-800 mb-8 max-w-lg mx-auto leading-relaxed">
                                 오래전 가입한 보험이라면 뇌졸중 전체의 20%에 불과한 <strong>&apos;뇌출혈&apos;</strong>만 보장될 확률이 높습니다.<br />
-                                뇌졸중의 대부분인 <strong>&apos;뇌경색(허혈성 뇌졸중)&apos;</strong>과 가벼운 초기 증상까지 폭넓게 대비했는지 꼭 확인하세요.
+                                뇌졸중의 대부분인 <strong>&apos;뇌경색(허혈성 뇌졸중)&apos;</strong>과 가벼운 초기 증상까지 폭폭게 대비했는지 꼭 확인하세요.
                             </p>
                             <Link href="/#consultation" className="inline-block bg-indigo-600 text-white font-bold px-8 py-4 rounded-xl shadow-lg hover:bg-indigo-700 transition-colors">
                                 내 뇌혈관 보험 무료 점검하기
@@ -244,10 +240,9 @@ export default function CerebrovascularDiseaseStudyPage() {
 
                     </div>
                 </div>
-            </div >
+            </div>
 
             <PlannerBranding />
-            <Footer />
-        </main >
+        </div>
     )
 }

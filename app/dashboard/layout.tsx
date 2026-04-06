@@ -171,6 +171,16 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                   <DocumentTextIcon className="w-4 h-4 shrink-0" />
                   상품공시실 (약관)
                 </Link>
+                <a
+                  href="http://www.gasupport.co.kr/Gasys/mega/inc/pop_insuCon.asp"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-semibold transition-all text-sm text-gray-600 hover:bg-gray-50"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  <GlobeAltIcon className="w-4 h-4 shrink-0 text-blue-500" />
+                  보험사 바로가기
+                </a>
               </div>
             </div>
 

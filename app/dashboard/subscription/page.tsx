@@ -13,7 +13,6 @@ export default function SubscriptionPage() {
     <div className="animate-in fade-in slide-in-from-bottom-2 duration-500">
       <SubscriptionTab 
         planner={planner}
-        onUpdate={refreshPlanner}
       />
     </div>
   )

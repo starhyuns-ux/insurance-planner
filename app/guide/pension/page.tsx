@@ -1,10 +1,7 @@
 import type { Metadata } from 'next'
-import NavBar from '@/components/NavBar'
-import Footer from '@/components/Footer'
 import PlannerBranding from '@/components/PlannerBranding'
 import PensionGuide from '@/components/PensionGuide'
 import Link from 'next/link'
-import { LanguageProvider } from '@/lib/contexts/LanguageContext'
 
 export const metadata: Metadata = {
   title: '연금 준비 전략 | 40대·50대 노후 준비 가이드 | 인슈닷',
@@ -18,37 +15,31 @@ export const metadata: Metadata = {
 
 export default function PensionGuidePage() {
   return (
-    <LanguageProvider>
-      <main className="min-h-screen bg-gray-50 flex flex-col pt-16">
-        <NavBar />
+    <div className="bg-gray-50 min-h-screen py-20">
+      <div className="container max-w-5xl px-4 mb-24">
+        <div className="bg-white rounded-[3rem] shadow-xl overflow-hidden border border-gray-100 p-6 md:p-12">
+          <PensionGuide />
 
-        <div className="container max-w-5xl px-4 py-20 mb-24">
-          <div className="bg-white rounded-[3rem] shadow-xl overflow-hidden border border-gray-100 p-6 md:p-12">
-            <PensionGuide />
+          {/* CTA Section */}
+          <div className="bg-gradient-to-br from-indigo-900 to-slate-900 p-10 md:p-14 rounded-[2.5rem] text-center relative overflow-hidden text-white mt-16">
+            <div className="absolute top-0 right-0 w-80 h-80 bg-indigo-500 rounded-full mix-blend-multiply opacity-20 blur-3xl"></div>
 
-            {/* CTA Section */}
-            <div className="bg-gradient-to-br from-indigo-900 to-slate-900 p-10 md:p-14 rounded-[2.5rem] text-center relative overflow-hidden text-white mt-16">
-              <div className="absolute top-0 right-0 w-80 h-80 bg-indigo-500 rounded-full mix-blend-multiply opacity-20 blur-3xl"></div>
-
-              <h3 className="text-2xl md:text-3xl font-bold mb-6 relative z-10 break-keep">
-                내 연금 준비, 전문가에게 점검받아 보세요
-              </h3>
-              <p className="text-slate-300 mb-10 max-w-xl mx-auto leading-relaxed relative z-10 break-keep text-lg">
-                40대인지 50대인지에 따라 전략이 달라집니다. 지금 상황에 맞는 최적의 연금 플랜을 전문가와 함께 설계하세요.
-              </p>
-              <Link
-                href="/#consultation"
-                className="inline-flex items-center justify-center bg-indigo-500 hover:bg-indigo-600 text-white font-bold px-10 py-5 rounded-2xl shadow-xl shadow-indigo-900/40 transition-all hover:-translate-y-1 relative z-10 text-xl"
-              >
-                1:1 무료 연금 상담 신청
-              </Link>
-            </div>
+            <h3 className="text-2xl md:text-3xl font-bold mb-6 relative z-10 break-keep">
+              내 연금 준비, 전문가에게 점검받아 보세요
+            </h3>
+            <p className="text-slate-300 mb-10 max-w-xl mx-auto leading-relaxed relative z-10 break-keep text-lg">
+              40대인지 50대인지에 따라 전략이 달라집니다. 지금 상황에 맞는 최적의 연금 플랜을 전문가와 함께 설계하세요.
+            </p>
+            <Link
+              href="/#consultation"
+              className="inline-flex items-center justify-center bg-indigo-500 hover:bg-indigo-600 text-white font-bold px-10 py-5 rounded-2xl shadow-xl shadow-indigo-900/40 transition-all hover:-translate-y-1 relative z-10 text-xl"
+            >
+              1:1 무료 연금 상담 신청
+            </Link>
           </div>
         </div>
-
-        <PlannerBranding />
-        <Footer />
-      </main>
-    </LanguageProvider>
+      </div>
+      <PlannerBranding />
+    </div>
   )
 }

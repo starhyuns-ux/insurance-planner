@@ -1,3 +1,5 @@
+'use client'
+
 import NavBar from '@/components/NavBar'
 import Hero from '@/components/Hero'
 import Concerns from '@/components/Concerns'
@@ -12,8 +14,16 @@ import CaseCollection from '@/components/CaseCollection'
 import AdvancedRadiation from '@/components/AdvancedRadiation'
 import PlannerBranding from '@/components/PlannerBranding'
 import PageTracker from '@/components/PageTracker'
+import { useAttribution } from '@/lib/attribution'
+import { usePlanner } from '@/lib/providers/PlannerProvider'
 
 export default function Home() {
+  const { planner, loading: attrLoading } = useAttribution()
+  const { user: loggedInPlanner, loading: plannerLoading } = usePlanner()
+
+  const showProfessionalContent = !!planner || !!loggedInPlanner;
+  const isLoading = attrLoading && plannerLoading;
+
   return (
     <main className="min-h-screen flex flex-col">
       <PageTracker />
@@ -25,18 +35,32 @@ export default function Home() {
         <ConsultationForm id="consultation-top" />
         <Concerns />
         <Services />
-        <AdvancedRadiation />
-        <Reviews />
-        <CaseCollection />
+        
+        {/* Professional Sections: Only shown if attributed or logged-in planner */}
+        {showProfessionalContent && !isLoading && (
+          <>
+            <AdvancedRadiation />
+            <Reviews />
+            <CaseCollection />
+          </>
+        )}
+        
+        {!showProfessionalContent && !isLoading && (
+           <Reviews />
+        )}
       </div>
 
       <div className="bg-gray-50">
         <About />
-        <AdvisorProfile />
+        {showProfessionalContent && !isLoading && (
+          <AdvisorProfile />
+        )}
       </div>
 
       <div className="bg-white">
-        <CommunityLinks />
+        {showProfessionalContent && !isLoading && (
+          <CommunityLinks />
+        )}
         <PlannerBranding />
       </div>
 

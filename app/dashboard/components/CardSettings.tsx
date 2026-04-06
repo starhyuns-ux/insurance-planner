@@ -22,7 +22,7 @@ interface CardSettingsProps {
   isSaving: boolean
   urlCopied: boolean
   onUpdateState: (key: string, value: any) => void
-  onUpdateProfile: () => Promise<void>
+  onUpdateProfile: (e?: React.FormEvent) => Promise<void>
   onFileUpload: (e: React.ChangeEvent<HTMLInputElement>, type: 'profile' | 'card') => Promise<void>
   onCopyUrl: (id: string) => void
   onUpdate: () => Promise<void>
@@ -156,27 +156,30 @@ export default function CardSettings({
       </div>
 
       {/* 3. Personalized URL Section */}
-      <div className="bg-primary-950 rounded-[2.5rem] p-10 text-white shadow-2xl relative overflow-hidden border border-white/5">
+      <div className="rounded-[2.5rem] p-10 text-white shadow-2xl relative overflow-hidden" style={{background: 'linear-gradient(135deg, #1e3a8a 0%, #1d4ed8 40%, #7c3aed 100%)'}}>
         {/* Glow Decors */}
-        <div className="absolute top-0 right-0 -mr-20 -mt-20 w-80 h-80 bg-primary-500 rounded-full opacity-10 blur-[100px]" />
-        <div className="absolute bottom-0 left-0 -ml-20 -mb-20 w-80 h-80 bg-indigo-500 rounded-full opacity-10 blur-[100px]" />
+        <div className="absolute top-0 right-0 -mr-16 -mt-16 w-72 h-72 bg-blue-400 rounded-full opacity-20 blur-[80px]" />
+        <div className="absolute bottom-0 left-0 -ml-16 -mb-16 w-72 h-72 bg-violet-400 rounded-full opacity-20 blur-[80px]" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-32 bg-indigo-300 rounded-full opacity-10 blur-[60px]" />
         
-        <h4 className="text-lg font-black mb-1.5 flex items-center gap-3 text-white">
-          <div className="w-2 h-6 bg-primary-400 rounded-full" />
+        <h4 className="text-xl font-black mb-1.5 flex items-center gap-3 text-white drop-shadow">
+          <div className="w-2 h-7 bg-yellow-300 rounded-full shadow-lg shadow-yellow-300/50" />
           나의 공식 디지털 명함 공유 주소
         </h4>
-        <p className="text-xs text-primary-200 font-black mb-8 uppercase tracking-[0.2em]">Personalized Digital Card URL</p>
+        <p className="text-sm text-blue-200 font-bold mb-8 uppercase tracking-[0.2em]">Personalized Digital Card URL</p>
         
         <div className="flex flex-col gap-4">
           <div className="flex flex-col md:flex-row items-center gap-3">
-            <div className="flex-1 w-full bg-white/5 backdrop-blur-2xl rounded-2xl px-6 py-4 border border-white/10 font-mono text-xs md:text-sm truncate text-primary-100 flex items-center justify-between group/url">
-              <span className="truncate">https://stroy.kr/p/{planner?.id}/card</span>
-              <div className="w-2 h-2 bg-primary-500 rounded-full animate-pulse group-hover/url:scale-150 transition-transform" />
+            <div className="flex-1 w-full bg-white/15 backdrop-blur-2xl rounded-2xl px-6 py-4 border border-white/30 font-mono text-xs md:text-sm truncate text-white flex items-center justify-between shadow-inner">
+              <span className="truncate font-bold">https://stroy.kr/p/{planner?.id}/card</span>
+              <div className="w-2.5 h-2.5 bg-green-400 rounded-full animate-pulse shadow-lg shadow-green-400/70 ml-3 shrink-0" />
             </div>
             <button
               onClick={() => planner?.id && onCopyUrl(planner.id)}
               className={`w-full md:w-auto px-8 py-4 rounded-2xl transition-all flex items-center justify-center gap-3 font-black text-sm shadow-xl active:scale-95 ${
-                urlCopied ? 'bg-emerald-500 text-white shadow-emerald-500/20' : 'bg-white text-primary-950 hover:bg-primary-50'
+                urlCopied 
+                  ? 'bg-green-400 text-green-950 shadow-green-400/40' 
+                  : 'bg-yellow-300 text-blue-950 hover:bg-yellow-200 shadow-yellow-300/40'
               }`}
             >
               {urlCopied ? (
@@ -195,13 +198,14 @@ export default function CardSettings({
           <Link 
             href={`/p/${planner?.id}/card`} 
             target="_blank"
-            className="w-full bg-white/10 backdrop-blur-md text-white py-4 rounded-2xl font-black text-sm text-center hover:bg-white/20 transition-all flex items-center justify-center gap-3 border border-white/20"
+            className="w-full bg-white/20 backdrop-blur-md text-white py-4 rounded-2xl font-black text-sm text-center hover:bg-white/30 transition-all flex items-center justify-center gap-3 border border-white/40 shadow-lg"
           >
-            <GlobeAltIcon className="w-5 h-5 text-primary-400" />
+            <GlobeAltIcon className="w-5 h-5 text-yellow-300" />
             내 명함 페이지 미리보기
           </Link>
         </div>
       </div>
+
     </div>
   )
 }

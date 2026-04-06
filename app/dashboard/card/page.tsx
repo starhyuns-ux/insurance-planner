@@ -30,8 +30,8 @@ export default function CardPage() {
     }
   }, [planner])
 
-  const handleUpdateProfile = async (e: React.FormEvent) => {
-    e.preventDefault()
+  const handleUpdateProfile = async (e?: React.FormEvent) => {
+    e?.preventDefault()
     if (!planner) return
     setIsSaving(true)
     try {

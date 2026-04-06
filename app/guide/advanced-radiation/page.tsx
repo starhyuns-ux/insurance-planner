@@ -1,6 +1,4 @@
 import type { Metadata } from 'next'
-import NavBar from '@/components/NavBar'
-import Footer from '@/components/Footer'
 import PlannerBranding from '@/components/PlannerBranding'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -11,15 +9,13 @@ export const metadata: Metadata = {
     openGraph: {
         title: '첨단 방사선 치료 가이드 | 인슈닷',
         description: '수천만 원대의 첨단 방사선 치료비, 내 보험으로 감당 가능할까? 전문가와 함께 미리 점검하세요.',
-        url: 'https://insurance-planner-eosin.vercel.app/guide/advanced-radiation',
+        url: 'https://stroy.kr/guide/advanced-radiation',
     }
 }
 
 export default function AdvancedRadiationGuidePage() {
     return (
-        <main className="min-h-screen bg-gray-50 flex flex-col pt-16">
-            <NavBar />
-
+        <div className="bg-gray-50 flex flex-col min-h-screen">
             {/* Header Section */}
             <header className="bg-primary-900 text-white min-h-[400px] flex items-center relative overflow-hidden">
                 <div className="absolute top-0 left-0 w-full h-full overflow-hidden">
@@ -200,10 +196,9 @@ export default function AdvancedRadiationGuidePage() {
 
                     </div>
                 </div>
-            </div >
+            </div>
 
             <PlannerBranding />
-            <Footer />
-        </main >
+        </div>
     )
 }

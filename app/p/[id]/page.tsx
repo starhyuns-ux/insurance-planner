@@ -38,6 +38,7 @@ export async function generateMetadata({ params }: { params: { id: string } }): 
     openGraph: {
       title,
       description,
+      siteName: '인슈닷',
       images: [{ url: ogImage }],
     },
     twitter: {

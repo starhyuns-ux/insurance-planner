@@ -9,8 +9,9 @@ import {
   ExclamationTriangleIcon, BanknotesIcon, PaperAirplaneIcon,
   ShieldCheckIcon, PhoneIcon, XMarkIcon,
 } from '@heroicons/react/24/outline'
+import { submitClaimAction } from '@/lib/actions/claimActions'
 
-const INSURANCE_COMPANIES: Record<string, { phone: string; fax?: string; web?: string }> = {
+const INSURANCE_COMPANIES: Record<string, { phone: string; fax?: string; web?: string; callFirst?: boolean }> = {
   '삼성화재':    { phone: '1588-5114', web: 'https://www.samsungfire.com' },
   '현대해상':    { phone: '1588-5656', web: 'https://www.hi.co.kr' },
   'KB손해보험':  { phone: '1544-0114', web: 'https://www.kbinsure.co.kr' },
@@ -21,14 +22,14 @@ const INSURANCE_COMPANIES: Record<string, { phone: string; fax?: string; web?: s
   'MG손해보험':  { phone: '1588-5959', web: 'https://www.mgfire.co.kr' },
   '흥국화재':    { phone: '1688-1688', web: 'https://www.흥국화재.kr' },
   '하나손해보험': { phone: '1566-3000', web: 'https://www.hanainsurance.co.kr' },
-  '삼성생명':    { phone: '1588-3114', web: 'https://www.samsunglife.com' },
-  '교보생명':    { phone: '1588-1001', web: 'https://www.kyobo.co.kr' },
-  '한화생명':    { phone: '1577-6301', web: 'https://www.hanwhalife.com' },
-  '신한라이프':  { phone: '1588-5580', web: 'https://www.shinhanlife.co.kr' },
-  'ABL생명':    { phone: '1588-6500', web: 'https://www.abllife.co.kr' },
-  'AIA생명':    { phone: '1588-9898', web: 'https://www.aia.co.kr' },
-  '동양생명':    { phone: '1577-1004', web: 'https://www.myangel.co.kr' },
-  '메트라이프생명': { phone: '1588-9600', web: 'https://www.metlife.co.kr' },
+  '삼성생명':    { phone: '1588-3114', web: 'https://www.samsunglife.com', callFirst: true },
+  '교보생명':    { phone: '1588-1001', web: 'https://www.kyobo.co.kr', callFirst: true },
+  '한화생명':    { phone: '1577-6301', web: 'https://www.hanwhalife.com', callFirst: true },
+  '신한라이프':  { phone: '1588-5580', web: 'https://www.shinhanlife.co.kr', callFirst: true },
+  'ABL생명':    { phone: '1588-6500', web: 'https://www.abllife.co.kr', callFirst: true },
+  'AIA생명':    { phone: '1588-9898', web: 'https://www.aia.co.kr', callFirst: true },
+  '동양생명':    { phone: '1577-1004', web: 'https://www.myangel.co.kr', callFirst: true },
+  '메트라이프생명': { phone: '1588-9600', web: 'https://www.metlife.co.kr', callFirst: true },
 }
 
 const COMPANY_NAMES = Object.keys(INSURANCE_COMPANIES)
@@ -54,10 +55,17 @@ function SignatureCanvas({ onSave }: { onSave: (dataUrl: string) => void }) {
 
   const getPos = (e: MouseEvent | TouchEvent, canvas: HTMLCanvasElement) => {
     const rect = canvas.getBoundingClientRect()
-    if ('touches' in e) {
-      return { x: e.touches[0].clientX - rect.left, y: e.touches[0].clientY - rect.top }
+    const clientX = 'touches' in e ? e.touches[0].clientX : (e as MouseEvent).clientX
+    const clientY = 'touches' in e ? e.touches[0].clientY : (e as MouseEvent).clientY
+    
+    // Scale coordinates based on canvas internal width vs visual width
+    const scaleX = canvas.width / rect.width
+    const scaleY = canvas.height / rect.height
+    
+    return { 
+      x: (clientX - rect.left) * scaleX, 
+      y: (clientY - rect.top) * scaleY 
     }
-    return { x: (e as MouseEvent).clientX - rect.left, y: (e as MouseEvent).clientY - rect.top }
   }
 
   const startDraw = useCallback((e: MouseEvent | TouchEvent) => {
@@ -121,30 +129,33 @@ function SignatureCanvas({ onSave }: { onSave: (dataUrl: string) => void }) {
 
   return (
     <div className="space-y-3">
-      <div className="border-2 border-dashed border-primary-200 rounded-2xl bg-gray-50 overflow-hidden relative" style={{ touchAction: 'none' }}>
-        <div className="absolute top-2 left-3 text-[10px] text-gray-300 font-bold pointer-events-none">여기에 서명하세요</div>
+      <div className="border-2 border-dashed border-gray-300 rounded-[2rem] bg-white overflow-hidden relative shadow-inner" style={{ touchAction: 'none' }}>
+        <div className="absolute top-4 left-6 text-xs text-gray-300 font-black uppercase tracking-widest pointer-events-none flex items-center gap-2">
+          <ShieldCheckIcon className="w-4 h-4" /> 자필 서명란 (Signature Area)
+        </div>
         <canvas
           ref={canvasRef}
           width={520}
           height={180}
-          className="w-full h-44 cursor-crosshair"
+          className="w-full h-48 cursor-crosshair"
         />
       </div>
-      <div className="flex gap-2">
-        <button type="button" onClick={clear} className="px-4 py-2 text-xs font-bold text-gray-500 border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors">
-          다시 그리기
+      <div className="flex flex-col sm:flex-row items-center gap-3">
+        <button type="button" onClick={clear} className="w-full sm:w-auto px-6 py-3 text-xs font-bold text-gray-500 border border-gray-200 rounded-2xl hover:bg-gray-50 transition-colors">
+          서명 지우기
         </button>
-        <button type="button" onClick={save} className="px-4 py-2 text-xs font-black text-white bg-primary-600 rounded-xl hover:bg-primary-700 transition-colors">
-          서명 확인 완료
+        <button type="button" onClick={save} className="w-full sm:w-auto flex-1 px-8 py-3 text-sm font-black text-white bg-primary-600 rounded-2xl hover:bg-primary-700 transition-all shadow-lg shadow-primary-100 flex items-center justify-center gap-2">
+          <CheckCircleIcon className="w-5 h-5" /> 서명 확인 완료 (저장)
         </button>
       </div>
+      <p className="text-[10px] text-primary-500 font-bold text-center">※ 위 버튼을 클릭해야 서명이 최종 저장됩니다.</p>
     </div>
   )
 }
 
 function InsurancePopup({ company, info, onClose }: {
   company: string
-  info: { phone: string; web?: string }
+  info: { phone: string; web?: string; callFirst?: boolean }
   onClose: () => void
 }) {
   return (
@@ -167,12 +178,16 @@ function InsurancePopup({ company, info, onClose }: {
             <CheckCircleIcon className="w-6 h-6 text-emerald-500 shrink-0" />
             <div>
               <p className="text-sm font-black text-emerald-800">청구가 성공적으로 접수되었습니다</p>
-              <p className="text-xs text-emerald-600 mt-0.5">담당 설계사님이 보험사에 자료를 직접 송신합니다</p>
+              <p className="text-xs text-emerald-600 mt-0.5">
+                {info.callFirst ? '콜센터 상담 후 팩스번호를 발급받으세요' : '담당 설계사님이 보험사에 자료를 직접 송신합니다'}
+              </p>
             </div>
           </div>
 
           <div>
-            <p className="text-xs font-black text-gray-400 uppercase tracking-widest mb-3">보험사 직접 문의 방법</p>
+            <p className="text-xs font-black text-gray-400 uppercase tracking-widest mb-3">
+              {info.callFirst ? '가상 팩스번호 발급 콜센터' : '보험사 직접 문의 방법'}
+            </p>
             <a
               href={`tel:${info.phone}`}
               className="flex items-center gap-3 p-4 bg-gray-50 rounded-2xl hover:bg-primary-50 border border-gray-100 hover:border-primary-200 transition-all group"
@@ -198,8 +213,10 @@ function InsurancePopup({ company, info, onClose }: {
             </a>
           )}
 
-          <div className="bg-amber-50 border border-amber-100 rounded-2xl p-3 text-xs text-amber-700 font-medium leading-relaxed">
-            📋 보험금 지급까지는 서류 심사 기간이 필요합니다. 설계사님이 진행 상황을 카카오톡/전화로 안내드립니다.
+          <div className={`border rounded-2xl p-3 text-xs font-medium leading-relaxed ${info.callFirst ? 'bg-primary-50 border-primary-100 text-primary-700' : 'bg-amber-50 border-amber-100 text-amber-700'}`}>
+            {info.callFirst 
+              ? '💡 이 보험사는 보안 정책상 콜센터를 통해 당일 전용 팩스번호를 발급받아야 접수가 가능합니다. 지금 바로 전화하여 번호를 안내받으세요.'
+              : '📋 보험금 지급까지는 서류 심사 기간이 필요합니다. 설계사님이 진행 상황을 카카오톡/전화로 안내드립니다.'}
           </div>
 
           <button onClick={onClose} className="w-full py-3 bg-gray-900 text-white rounded-2xl text-sm font-black hover:bg-gray-800 transition-colors">
@@ -211,8 +228,9 @@ function InsurancePopup({ company, info, onClose }: {
   )
 }
 
-export default function DetailedClaimForm({ onSuccess }: { onSuccess?: () => void }) {
-  const { planner } = useAttribution()
+export default function DetailedClaimForm({ onSuccess, plannerId }: { onSuccess?: () => void, plannerId?: string }) {
+  const { planner: attributedPlanner } = useAttribution()
+  const planner = plannerId ? { id: plannerId } : attributedPlanner
   const [currentStep, setCurrentStep] = useState(1)
   const [submitting, setSubmitting] = useState(false)
 
@@ -246,7 +264,7 @@ export default function DetailedClaimForm({ onSuccess }: { onSuccess?: () => voi
   const [images, setImages] = useState<File[]>([])
 
   const [consentThirdParty, setConsentThirdParty] = useState(false)
-  const [signatureType, setSignatureType] = useState<'FACE' | 'NON_FACE'>('NON_FACE')
+  const [signatureType] = useState<'FACE'>('FACE') // Default to FACE and remove NON_FACE
   const [signatureDataUrl, setSignatureDataUrl] = useState<string>('')
   const [signatureSaved, setSignatureSaved] = useState(false)
 
@@ -264,7 +282,7 @@ export default function DetailedClaimForm({ onSuccess }: { onSuccess?: () => voi
       }
       case 4: return bankName && bankAccount && bankHolder
       case 5: return insuranceCompany
-      case 6: return consentThirdParty && (signatureType === 'NON_FACE' || signatureSaved)
+      case 6: return consentThirdParty && signatureSaved
       default: return false
     }
   }
@@ -274,18 +292,30 @@ export default function DetailedClaimForm({ onSuccess }: { onSuccess?: () => voi
     setSignatureSaved(true)
   }
 
+  const dataURLtoBlob = (dataurl: string) => {
+    const arr = dataurl.split(',')
+    const mime = arr[0].match(/:(.*?);/)![1]
+    const bstr = atob(arr[1])
+    let n = bstr.length
+    const u8arr = new Uint8Array(n)
+    while (n--) {
+      u8arr[n] = bstr.charCodeAt(n)
+    }
+    return new Blob([u8arr], { type: mime })
+  }
+
   const handleSubmit = async () => {
     if (!consentThirdParty) return
-    if (signatureType === 'FACE' && !signatureSaved) {
-      alert('서명을 완료해 주세요.')
+    if (!signatureSaved) {
+      alert('자필 서명을 완료한 후 [서명 확인 완료] 버튼을 눌러주세요.')
       return
     }
     setSubmitting(true)
     try {
       const uploadedUrls: string[] = []
 
-      if (signatureType === 'FACE' && signatureDataUrl) {
-        const blob = await (await fetch(signatureDataUrl)).blob()
+      if (signatureDataUrl) {
+        const blob = dataURLtoBlob(signatureDataUrl)
         const sigFile = new File([blob], 'signature.png', { type: 'image/png' })
         const sigPath = `claims/customer/sig_${Date.now()}.png`
         const { error: sigErr } = await supabase.storage.from('planner-assets').upload(sigPath, sigFile)
@@ -306,7 +336,7 @@ export default function DetailedClaimForm({ onSuccess }: { onSuccess?: () => voi
 
       const maskedResident = residentBack ? `${residentFront}-${residentBack[0]}******` : residentFront
 
-      const { error } = await supabase.from('claims').insert({
+      const { success } = await submitClaimAction({
         planner_id: planner?.id || null,
         customer_name: name,
         customer_phone: phone,
@@ -336,7 +366,7 @@ export default function DetailedClaimForm({ onSuccess }: { onSuccess?: () => voi
         transmission_status: 'NOT_SENT',
       })
 
-      if (error) throw error
+      if (!success) throw new Error('데이터 저장에 실패했습니다.')
 
       setSubmittedCompany(insuranceCompany)
       setShowPopup(true)
@@ -597,7 +627,7 @@ export default function DetailedClaimForm({ onSuccess }: { onSuccess?: () => voi
               <>
                 <div className="mb-8">
                   <label className="block text-sm font-black text-gray-700 uppercase tracking-widest mb-3">청구 대상 보험사 *</label>
-                  <select value={insuranceCompany} onChange={e => setInsuranceCompany(e.target.value)} className="w-full md:w-1/2 border-2 border-primary-200 rounded-xl px-5 py-4 text-base focus:outline-none focus:ring-2 focus:ring-primary-400 bg-primary-50 text-primary-900 font-bold shadow-sm">
+                  <select value={insuranceCompany} onChange={e => setInsuranceCompany(e.target.value)} className="w-full md:w-1/2 border-2 border-primary-200 rounded-xl px-4 py-3.5 text-base focus:outline-none focus:ring-2 focus:ring-primary-400 bg-primary-50 text-primary-900 font-bold shadow-sm">
                     <option value="">이곳을 눌러 보험사를 찾아주세요</option>
                     <optgroup label="손해보험사">
                       {COMPANY_NAMES.slice(0, 10).map(c => <option key={c} value={c}>{c}</option>)}
@@ -606,6 +636,15 @@ export default function DetailedClaimForm({ onSuccess }: { onSuccess?: () => voi
                       {COMPANY_NAMES.slice(10).map(c => <option key={c} value={c}>{c}</option>)}
                     </optgroup>
                   </select>
+                  {insuranceCompany && INSURANCE_COMPANIES[insuranceCompany]?.callFirst && (
+                    <div className="mt-4 p-4 bg-primary-50 border border-primary-200 rounded-2xl flex items-start gap-3">
+                      <PhoneIcon className="w-5 h-5 text-primary-600 mt-0.5 shrink-0" />
+                      <div>
+                        <p className="text-xs font-black text-primary-900">상담이 필요한 보험사입니다</p>
+                        <p className="text-[11px] text-primary-700 mt-0.5 leading-relaxed font-medium">이 보험사는 개인 정보 보안상 콜센터를 통해 가상 팩스번호를 발급받아야 합니다. 접수 완료 후 안내대로 전화를 진행해 주세요.</p>
+                      </div>
+                    </div>
+                  )}
                 </div>
                 
                 <div className="h-px bg-gray-100 mb-8" />
@@ -665,34 +704,27 @@ export default function DetailedClaimForm({ onSuccess }: { onSuccess?: () => voi
                 </label>
 
                 <div className="border-t border-gray-100 pt-6">
-                  <label className="block text-xs font-black text-gray-500 uppercase tracking-widest mb-4">자필 서명 진행</label>
-                  
-                  {/* Signature Type */}
-                  <div className="flex gap-4 mb-5 border-b border-gray-100 pb-5">
-                    {[{ val: 'NON_FACE', label: '모바일 비대면 인증 (자동 동의 처리)' }, { val: 'FACE', label: '단말기에 직접 자필 서명하여 첨부' }].map(opt => (
-                      <label key={opt.val} className="flex items-center gap-2 cursor-pointer group">
-                        <input type="radio" checked={signatureType === opt.val} onChange={() => { setSignatureType(opt.val as any); setSignatureSaved(false); setSignatureDataUrl('') }} className="w-5 h-5 text-primary-600 focus:ring-primary-500" />
-                        <span className={`text-sm tracking-tight transition-colors ${signatureType === opt.val ? 'font-black text-primary-700' : 'font-bold text-gray-500 group-hover:text-gray-700'}`}>{opt.label}</span>
-                      </label>
-                    ))}
+                  <div className="flex items-center gap-2 mb-4">
+                    <ShieldCheckIcon className="w-5 h-5 text-primary-600" />
+                    <label className="text-sm font-black text-gray-800 uppercase tracking-widest">실명 자필 서명 진행 *</label>
                   </div>
-
-                  {signatureType === 'FACE' && (
-                    <div className="bg-white rounded-2xl overflow-hidden border border-gray-200">
-                      {signatureSaved ? (
-                        <div className="relative">
-                          <img src={signatureDataUrl} alt="서명" className="w-full h-40 md:h-56 object-contain bg-emerald-50" />
-                          <div className="absolute inset-0 border-2 border-emerald-400 rounded-2xl pointer-events-none" />
-                          <button type="button" onClick={() => { setSignatureSaved(false); setSignatureDataUrl('') }}
-                            className="absolute top-3 right-3 px-4 py-2 text-xs font-bold text-white bg-black/60 rounded-xl hover:bg-black transition-colors backdrop-blur-sm shadow-xl flex items-center gap-1.5">
-                            <XMarkIcon className="w-3.5 h-3.5" /> 다시 서명하기
-                          </button>
-                        </div>
-                      ) : (
-                        <div className="p-1"><SignatureCanvas onSave={handleSignatureSave} /></div>
-                      )}
-                    </div>
-                  )}
+                  
+                  {/* Removed Signature Type Selection */}
+                  
+                  <div className="bg-white rounded-2xl overflow-hidden border border-gray-200">
+                    {signatureSaved ? (
+                      <div className="relative">
+                        <img src={signatureDataUrl} alt="서명" className="w-full h-40 md:h-56 object-contain bg-emerald-50" />
+                        <div className="absolute inset-0 border-2 border-emerald-400 rounded-2xl pointer-events-none" />
+                        <button type="button" onClick={() => { setSignatureSaved(false); setSignatureDataUrl('') }}
+                          className="absolute top-3 right-3 px-4 py-2 text-xs font-bold text-white bg-black/60 rounded-xl hover:bg-black transition-colors backdrop-blur-sm shadow-xl flex items-center gap-1.5">
+                          <XMarkIcon className="w-3.5 h-3.5" /> 다시 서명하기
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="p-1"><SignatureCanvas onSave={handleSignatureSave} /></div>
+                    )}
+                  </div>
                 </div>
               </div>
             )}

@@ -136,9 +136,10 @@ export default function NavBar() {
           </div>
         </div>
 
-        {/* Bottom Row: Desktop Navigation Links */}
-        <div className="hidden lg:flex items-center justify-center py-2.5 border-t border-gray-50/50">
-          <div className="flex items-center space-x-8 text-[13px] lg:text-sm font-bold text-gray-600">
+        {/* Bottom Row: Desktop Navigation Links (Only visible if planner is attributed or user is logged in) */}
+        {(planner || user) && (
+          <div className="hidden lg:flex items-center justify-center py-2.5 border-t border-gray-50/50">
+            <div className="flex items-center space-x-8 text-[13px] lg:text-sm font-bold text-gray-600">
             <Link href="/calculator/insurance-premium" className="text-amber-600 font-black hover:text-amber-700 transition-colors whitespace-nowrap">{t('navPremiumCalc')}</Link>
             <Link href="/guide/pension" className="text-indigo-600 font-bold hover:text-indigo-700 transition-colors whitespace-nowrap">{t('navPension')}</Link>
             <Link href="/guide/critical-illness-relief" className="text-indigo-600 font-bold hover:text-indigo-700 transition-colors whitespace-nowrap">{t('navCriticalIllness')}</Link>
@@ -172,8 +173,9 @@ export default function NavBar() {
             <Link href="/calculator" className="text-primary-600 font-bold hover:text-primary-700 transition-colors whitespace-nowrap">{t('navSilbiCalc')}</Link>
             <Link href="/disease-codes" className="text-primary-600 font-bold hover:text-primary-700 transition-colors whitespace-nowrap">{t('navDiseaseSearch')}</Link>
             <Link href="/contacts" className="text-primary-600 font-bold hover:text-primary-700 transition-colors whitespace-nowrap">{t('navCustomerCenter')}</Link>
+            </div>
           </div>
-        </div>
+        )}
       </div>
 
 
@@ -181,31 +183,35 @@ export default function NavBar() {
       {isOpen && (
         <div className="lg:hidden absolute top-16 left-0 w-full bg-white border-b border-gray-100 shadow-xl overflow-y-auto max-h-[calc(100vh-4rem)] py-6 fade-in slide-in-from-top-2 duration-200">
           <div className="flex flex-col container space-y-5 px-6">
-            <Link href="/calculator/insurance-premium" onClick={() => setIsOpen(false)} className="text-amber-600 font-black text-xl hover:text-amber-700">{t('navPremiumCalc')}</Link>
-            <Link href="/guide/pension" onClick={() => setIsOpen(false)} className="text-indigo-700 font-bold text-lg hover:text-indigo-600">{t('navPension')}</Link>
-            <Link href="/guide/critical-illness-relief" onClick={() => setIsOpen(false)} className="text-indigo-700 font-bold text-lg hover:text-indigo-600">{t('navCriticalIllness')}</Link>
-            <Link href="/guide/5th-gen" onClick={() => setIsOpen(false)} className="text-gray-800 font-bold text-lg hover:text-primary-600">{t('navSilbiGen5')} {t('noticeTitle')}</Link>
-            
-            <div className="space-y-3 pt-2">
-              <span className="text-xs font-black text-rose-400 uppercase tracking-widest pl-1">{t('navDiseaseStudy')}</span>
-              <div className="flex flex-col gap-3 pl-4 border-l-2 border-rose-100 italic">
-                <Link href="/guide/vascular-disease" onClick={() => setIsOpen(false)} className="text-gray-600 font-bold text-base hover:text-rose-600">{t('navHeartStudy')}</Link>
-                <Link href="/guide/cerebrovascular-disease" onClick={() => setIsOpen(false)} className="text-gray-600 font-bold text-base hover:text-rose-600">{t('navBrainStudy')}</Link>
-              </div>
-            </div>
-            
-            <div className="space-y-3 pt-2">
-              <span className="text-xs font-black text-gray-400 uppercase tracking-widest pl-1">{t('navCancerTreat')}</span>
-              <div className="flex flex-col gap-3 pl-4 border-l-2 border-gray-100 italic">
-                <Link href="/guide/cancer-treatment" onClick={() => setIsOpen(false)} className="text-gray-600 font-bold text-base hover:text-primary-600">{t('navCancerGuide')}</Link>
-                <Link href="/guide/advanced-radiation" onClick={() => setIsOpen(false)} className="text-gray-600 font-bold text-base hover:text-primary-600">{t('navRadiation')} {t('noticeTitle')}</Link>
-                <Link href="/guide/hifu-therapy" onClick={() => setIsOpen(false)} className="text-gray-600 font-bold text-base hover:text-primary-600">{t('navHifu')} {t('noticeTitle')}</Link>
-              </div>
-            </div>
+            {(planner || user) && (
+              <>
+                <Link href="/calculator/insurance-premium" onClick={() => setIsOpen(false)} className="text-amber-600 font-black text-xl hover:text-amber-700">{t('navPremiumCalc')}</Link>
+                <Link href="/guide/pension" onClick={() => setIsOpen(false)} className="text-indigo-700 font-bold text-lg hover:text-indigo-600">{t('navPension')}</Link>
+                <Link href="/guide/critical-illness-relief" onClick={() => setIsOpen(false)} className="text-indigo-700 font-bold text-lg hover:text-indigo-600">{t('navCriticalIllness')}</Link>
+                <Link href="/guide/5th-gen" onClick={() => setIsOpen(false)} className="text-gray-800 font-bold text-lg hover:text-primary-600">{t('navSilbiGen5')} {t('noticeTitle')}</Link>
+                
+                <div className="space-y-3 pt-2">
+                  <span className="text-xs font-black text-rose-400 uppercase tracking-widest pl-1">{t('navDiseaseStudy')}</span>
+                  <div className="flex flex-col gap-3 pl-4 border-l-2 border-rose-100 italic">
+                    <Link href="/guide/vascular-disease" onClick={() => setIsOpen(false)} className="text-gray-600 font-bold text-base hover:text-rose-600">{t('navHeartStudy')}</Link>
+                    <Link href="/guide/cerebrovascular-disease" onClick={() => setIsOpen(false)} className="text-gray-600 font-bold text-base hover:text-rose-600">{t('navBrainStudy')}</Link>
+                  </div>
+                </div>
+                
+                <div className="space-y-3 pt-2">
+                  <span className="text-xs font-black text-gray-400 uppercase tracking-widest pl-1">{t('navCancerTreat')}</span>
+                  <div className="flex flex-col gap-3 pl-4 border-l-2 border-gray-100 italic">
+                    <Link href="/guide/cancer-treatment" onClick={() => setIsOpen(false)} className="text-gray-600 font-bold text-base hover:text-primary-600">{t('navCancerGuide')}</Link>
+                    <Link href="/guide/advanced-radiation" onClick={() => setIsOpen(false)} className="text-gray-600 font-bold text-base hover:text-primary-600">{t('navRadiation')} {t('noticeTitle')}</Link>
+                    <Link href="/guide/hifu-therapy" onClick={() => setIsOpen(false)} className="text-gray-600 font-bold text-base hover:text-primary-600">{t('navHifu')} {t('noticeTitle')}</Link>
+                  </div>
+                </div>
 
-            <Link href="/calculator" onClick={() => setIsOpen(false)} className="text-gray-800 font-bold text-lg hover:text-primary-600">{t('navSilbiCalc')}</Link>
-            <Link href="/disease-codes" onClick={() => setIsOpen(false)} className="text-gray-800 font-bold text-lg hover:text-primary-600">{t('navDiseaseSearch')}</Link>
-            <Link href="/contacts" onClick={() => setIsOpen(false)} className="text-gray-800 font-bold text-lg hover:text-primary-600">{t('navCustomerCenter')}</Link>
+                <Link href="/calculator" onClick={() => setIsOpen(false)} className="text-gray-800 font-bold text-lg hover:text-primary-600">{t('navSilbiCalc')}</Link>
+                <Link href="/disease-codes" onClick={() => setIsOpen(false)} className="text-gray-800 font-bold text-lg hover:text-primary-600">{t('navDiseaseSearch')}</Link>
+                <Link href="/contacts" onClick={() => setIsOpen(false)} className="text-gray-800 font-bold text-lg hover:text-primary-600">{t('navCustomerCenter')}</Link>
+              </>
+            )}
             
             <div className="pt-4 mt-4 border-t border-gray-100 flex flex-col gap-4">
               {/* Language switcher in mobile menu */}

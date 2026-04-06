@@ -19,6 +19,10 @@ const dancingScript = Dancing_Script({
 export const metadata: Metadata = {
   metadataBase: new URL('https://stroy.kr'),
   title: '보험 리모델링 | 5세대 실손보험 가이드',
+  applicationName: '인슈닷',
+  appleWebApp: {
+    title: '인슈닷',
+  },
   description: '전문가의 보험 리모델링으로 새는 보험료를 막아드립니다. 상담을 통해 합리적인 보장을 안내해 드립니다.',
   keywords: [
     '보험전문가', '보험리모델링', '보험료절약', '실손의료보험', '종신보험정리', '무료보험진단',

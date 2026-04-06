@@ -8,7 +8,8 @@ import {
   DocumentTextIcon, 
   SparklesIcon, 
   MagnifyingGlassIcon,
-  BanknotesIcon
+  BanknotesIcon,
+  GlobeAltIcon
 } from '@heroicons/react/24/outline'
 import { useLanguage } from '@/lib/contexts/LanguageContext'
 

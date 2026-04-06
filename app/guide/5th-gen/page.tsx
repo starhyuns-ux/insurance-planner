@@ -1,9 +1,6 @@
-import NavBar from '@/components/NavBar'
-import Footer from '@/components/Footer'
 import Link from 'next/link'
 import PlannerBranding from '@/components/PlannerBranding'
 import FifthGenGuide from '@/components/FifthGenGuide'
-import { LanguageProvider } from '@/lib/contexts/LanguageContext'
 
 export const metadata = {
     title: '5세대 실손보험 가이드 | 인슈닷',
@@ -12,27 +9,22 @@ export const metadata = {
 
 export default function FifthGenGuidePage() {
     return (
-        <LanguageProvider>
-            <main className="min-h-screen flex flex-col bg-gray-50">
-                <NavBar />
-
-                <div className="flex-1 py-20 px-4 mt-16">
-                    <div className="max-w-4xl mx-auto bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
-                        <div className="p-6 md:p-12">
-                            <FifthGenGuide />
-                            
-                            <div className="text-center pt-8 mt-12 border-t border-gray-100">
-                                <Link href="/#consultation" className="inline-block bg-blue-600 text-white font-bold px-8 py-4 rounded-xl shadow-lg hover:bg-blue-700 transition-colors">
-                                    내 보험 추가 안내 받기
-                                </Link>
-                            </div>
+        <div className="bg-gray-50 flex flex-col min-h-screen">
+            <div className="flex-1 py-20 px-4 mt-8">
+                <div className="max-w-4xl mx-auto bg-white rounded-[2.5rem] shadow-xl border border-gray-100 overflow-hidden">
+                    <div className="p-6 md:p-12">
+                        <FifthGenGuide />
+                        
+                        <div className="text-center pt-8 mt-12 border-t border-gray-100">
+                            <Link href="/#consultation" className="inline-block bg-primary-600 text-white font-bold px-8 py-4 rounded-xl shadow-lg hover:bg-primary-700 transition-all hover:-translate-y-1">
+                                내 보험 추가 안내 받기
+                            </Link>
                         </div>
                     </div>
                 </div>
+            </div>
 
-                <PlannerBranding />
-                <Footer />
-            </main>
-        </LanguageProvider>
+            <PlannerBranding />
+        </div>
     )
 }

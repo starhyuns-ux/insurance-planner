@@ -20,6 +20,8 @@ export default function CustomersPage() {
   const [newCustFamily, setNewCustFamily] = useState('1')
   const [newCustRiders, setNewCustRiders] = useState('')
   const [newCustAppt, setNewCustAppt] = useState('')
+  const [newCustIsContracted, setNewCustIsContracted] = useState(false)
+  const [activeTab, setActiveTab] = useState<'all' | 'contracted' | 'prospect'>('all')
 
   // Edit State
   const [editingId, setEditingId] = useState<string | null>(null)
@@ -32,6 +34,7 @@ export default function CustomersPage() {
   const [editCustFamily, setEditCustFamily] = useState('1')
   const [editCustRiders, setEditCustRiders] = useState('')
   const [editCustAppt, setEditCustAppt] = useState('')
+  const [editCustIsContracted, setEditCustIsContracted] = useState(false)
 
   const fetchCustomers = async () => {
     if (!planner) return
@@ -61,7 +64,8 @@ export default function CustomersPage() {
         birth_date: newCustBirth || null,
         family_count: parseInt(newCustFamily) || 1,
         riders: newCustRiders.split(',').map(r => r.trim()).filter(r => r !== ''),
-        appointment_at: newCustAppt || null
+        appointment_at: newCustAppt || null,
+        is_contracted: newCustIsContracted
       })
 
     if (!error) {
@@ -73,6 +77,7 @@ export default function CustomersPage() {
       setNewCustFamily('1')
       setNewCustRiders('')
       setNewCustAppt('')
+      setNewCustIsContracted(false)
       fetchCustomers()
     } else {
       toast.error('등록 중 오류가 발생했습니다.')
@@ -101,6 +106,10 @@ export default function CustomersPage() {
         editCustFamily={editCustFamily}
         editCustRiders={editCustRiders}
         editCustAppt={editCustAppt}
+        editCustIsContracted={editCustIsContracted}
+        newCustIsContracted={newCustIsContracted}
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
         onUpdateState={(key, value) => {
           if (key === 'newCustName') setNewCustName(value)
           if (key === 'newCustPhone') setNewCustPhone(value)
@@ -118,6 +127,8 @@ export default function CustomersPage() {
           if (key === 'editCustFamily') setEditCustFamily(value)
           if (key === 'editCustRiders') setEditCustRiders(value)
           if (key === 'editCustAppt') setEditCustAppt(value)
+          if (key === 'editCustIsContracted') setEditCustIsContracted(value)
+          if (key === 'newCustIsContracted') setNewCustIsContracted(value)
         }}
         onAddCustomer={addCustomer}
         onIncrementTouch={async (id, count) => {
@@ -156,6 +167,7 @@ export default function CustomersPage() {
           setEditCustFamily(c.family_count.toString())
           setEditCustRiders(c.riders.join(', '))
           setEditCustAppt(c.appointment_at ? c.appointment_at.slice(0, 10) : '')
+          setEditCustIsContracted(c.is_contracted || false)
         }}
         onSaveEdit={async () => {
           if (!editingId) return
@@ -168,7 +180,8 @@ export default function CustomersPage() {
               birth_date: editCustBirth || null,
               family_count: parseInt(editCustFamily) || 1,
               riders: editCustRiders.split(',').map(r => r.trim()).filter(r => r !== ''),
-              appointment_at: editCustAppt || null
+              appointment_at: editCustAppt || null,
+              is_contracted: editCustIsContracted
             })
             .eq('id', editingId)
           if (!error) {

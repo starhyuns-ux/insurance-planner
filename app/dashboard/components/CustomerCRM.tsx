@@ -33,6 +33,10 @@ interface CustomerCRMProps {
   editCustFamily: string
   editCustRiders: string
   editCustAppt: string
+  editCustIsContracted: boolean
+  newCustIsContracted: boolean
+  activeTab: 'all' | 'contracted' | 'prospect'
+  setActiveTab: (tab: 'all' | 'contracted' | 'prospect') => void
   onUpdateState: (key: string, value: any) => void
   onAddCustomer: (e: React.FormEvent) => void
   onIncrementTouch: (id: string, count: number) => void
@@ -66,6 +70,10 @@ export default function CustomerCRM({
   editCustFamily,
   editCustRiders,
   editCustAppt,
+  editCustIsContracted,
+  newCustIsContracted,
+  activeTab,
+  setActiveTab,
   onUpdateState,
   onAddCustomer,
   onIncrementTouch,
@@ -116,6 +124,13 @@ export default function CustomerCRM({
     }
     
     return getPriority(a) - getPriority(b)
+  })
+
+  const filteredCustomers = sortedCustomers.filter(c => {
+    if (activeTab === 'all') return true
+    if (activeTab === 'contracted') return c.is_contracted === true
+    if (activeTab === 'prospect') return c.is_contracted !== true
+    return true
   })
   return (
     <div className="space-y-6">
@@ -183,13 +198,49 @@ export default function CustomerCRM({
               className="w-full px-5 py-4 bg-gray-50 border border-transparent rounded-2xl focus:bg-white focus:border-primary-500 transition-all outline-none text-sm font-bold shadow-inner"
             />
           </div>
+          <div className="md:col-span-1">
+            <label className="block text-xs font-black text-gray-400 uppercase mb-2 ml-1 tracking-widest">고객 구분</label>
+            <div className="flex bg-gray-50 p-1 rounded-2xl border border-transparent">
+              <button
+                type="button"
+                onClick={() => onUpdateState('newCustIsContracted', false)}
+                className={`flex-1 py-3 text-[10px] font-black rounded-xl transition-all ${!newCustIsContracted ? 'bg-white shadow-sm text-gray-900 border border-gray-100' : 'text-gray-400'}`}
+              >
+                가망고객
+              </button>
+              <button
+                type="button"
+                onClick={() => onUpdateState('newCustIsContracted', true)}
+                className={`flex-1 py-3 text-[10px] font-black rounded-xl transition-all ${newCustIsContracted ? 'bg-primary-600 shadow-sm text-white' : 'text-gray-400'}`}
+              >
+                계약고객
+              </button>
+            </div>
+          </div>
         </form>
       </div>
 
       <div className="bg-white rounded-[2rem] shadow-xl overflow-hidden border border-gray-100">
         <div className="px-8 py-6 border-b border-gray-50 flex items-center justify-between">
-          <h3 className="font-black text-gray-900 text-xl">내 고객 관리 리스트</h3>
-          <span className="text-xs font-black text-primary-600 bg-primary-50 px-4 py-1.5 rounded-full border border-primary-100">{customers.length}명 관리중</span>
+          <div className="flex items-center gap-8">
+            <h3 className="font-black text-gray-900 text-xl">내 고객 관리 리스트</h3>
+            <div className="flex items-center bg-gray-50 p-1 rounded-xl border border-gray-100">
+              {[
+                { id: 'all', label: '전체' },
+                { id: 'contracted', label: '계약고객' },
+                { id: 'prospect', label: '가망고객' }
+              ].map(tab => (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id as any)}
+                  className={`px-4 py-1.5 text-[10px] font-black rounded-lg transition-all ${activeTab === tab.id ? 'bg-white shadow-sm text-primary-600' : 'text-gray-400 hover:text-gray-600'}`}
+                >
+                  {tab.label}
+                </button>
+              ))}
+            </div>
+          </div>
+          <span className="text-xs font-black text-primary-600 bg-primary-50 px-4 py-1.5 rounded-full border border-primary-100">{filteredCustomers.length}명 관리중</span>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full">
@@ -203,14 +254,14 @@ export default function CustomerCRM({
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-50 text-sm">
-              {sortedCustomers.length === 0 ? (
+              {filteredCustomers.length === 0 ? (
                 <tr>
                   <td colSpan={5} className="px-8 py-20 text-center text-gray-300 font-bold italic">
-                    아직 등록된 고객 정보가 없습니다. 고객을 등록하고 체계적으로 관리해보세요!
+                    {activeTab === 'all' ? '아직 등록된 고객 정보가 없습니다. 고객을 등록하고 체계적으로 관리해보세요!' : `${activeTab === 'contracted' ? '계약고객' : '가망고객'} 데이터가 없습니다.`}
                   </td>
                 </tr>
               ) : (
-                sortedCustomers.map(c => (
+                filteredCustomers.map(c => (
                   <Fragment key={c.id}>
                     <tr className="hover:bg-gray-50/50 transition-colors group">
                     {editingId === c.id ? (
@@ -231,7 +282,27 @@ export default function CustomerCRM({
                           <span className="text-xs font-bold text-gray-400">가족수</span>
                           <input type="number" min="1" value={editCustFamily} onChange={e => onUpdateState('editCustFamily', e.target.value)} className="w-full px-2 py-2 border rounded-xl text-center" />
                         </td>
-                        <td className="px-4 py-3"><input value={editCustRiders} onChange={e => onUpdateState('editCustRiders', e.target.value)} placeholder="특약 사항" className="w-full px-3 py-2 border rounded-xl" /></td>
+                        <td className="px-4 py-3">
+                          <div className="space-y-2">
+                            <input value={editCustRiders} onChange={e => onUpdateState('editCustRiders', e.target.value)} placeholder="특약 사항" className="w-full px-3 py-2 border rounded-xl" />
+                            <div className="flex bg-gray-100 p-1 rounded-xl">
+                              <button
+                                type="button"
+                                onClick={() => onUpdateState('editCustIsContracted', false)}
+                                className={`flex-1 py-1.5 text-[9px] font-black rounded-lg transition-all ${!editCustIsContracted ? 'bg-white shadow-sm text-gray-900' : 'text-gray-400'}`}
+                              >
+                                가망고객
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => onUpdateState('editCustIsContracted', true)}
+                                className={`flex-1 py-1.5 text-[9px] font-black rounded-lg transition-all ${editCustIsContracted ? 'bg-primary-600 shadow-sm text-white' : 'text-gray-400'}`}
+                              >
+                                계약고객
+                              </button>
+                            </div>
+                          </div>
+                        </td>
                         <td className="px-4 py-3 text-right">
                           <div className="flex justify-end gap-2">
                             <button onClick={onSaveEdit} className="px-3 py-1.5 bg-primary-600 text-white font-black rounded-lg text-xs">저장</button>
@@ -245,6 +316,9 @@ export default function CustomerCRM({
                           <div className="flex flex-col gap-1">
                             <div className="flex items-center gap-2">
                               <span className="font-black text-gray-900 text-sm leading-none">{c.name}</span>
+                              <span className={`px-2 py-0.5 rounded-full text-[9px] font-black border ${c.is_contracted ? 'bg-primary-50 text-primary-600 border-primary-100' : 'bg-gray-50 text-gray-400 border-gray-100'}`}>
+                                {c.is_contracted ? '계약고객' : '가망고객'}
+                              </span>
                               {c.last_touch_at && differenceInDays(new Date(), parseISO(c.last_touch_at)) >= 30 && (
                                 <span className="flex items-center gap-1 px-1.5 py-0.5 bg-rose-50 text-rose-600 text-[9px] font-black rounded-md border border-rose-100">
                                   <ExclamationCircleIcon className="w-2.5 h-2.5" />
