@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
+import { usePathname } from 'next/navigation'
 import { supabase } from '@/lib/supabaseClient'
 import { format } from 'date-fns'
 import { ko } from 'date-fns/locale'
@@ -16,7 +17,13 @@ type Message = {
 const SESSION_KEY = 'chat_session_id'
 
 export default function ChatWidget() {
+  const pathname = usePathname()
   const [open, setOpen] = useState(false)
+
+  // Hide widget on dashboard or admin/login routes
+  if (pathname?.startsWith('/dashboard') || pathname?.startsWith('/login') || pathname?.startsWith('/admin')) {
+    return null
+  }
   const [step, setStep] = useState<'intro' | 'chat'>('intro')
   const [visitorName, setVisitorName] = useState('')
   const [visitorPhone, setVisitorPhone] = useState('')
