@@ -124,6 +124,16 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                   상담 알림 / 현황
                 </Link>
                 <Link
+                  href="/dashboard/chat"
+                  className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-semibold transition-all text-sm ${
+                    isActive('/dashboard/chat') ? 'bg-primary-600 text-white shadow-md' : 'text-gray-600 hover:bg-gray-50'
+                  }`}
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  <ChatBubbleBottomCenterTextIcon className="w-4 h-4 shrink-0" />
+                  1:1 채팅 관리
+                </Link>
+                <Link
                   href="/dashboard/customers"
                   className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-semibold transition-all text-sm ${
                     isActive('/dashboard/customers') ? 'bg-primary-600 text-white shadow-md' : 'text-gray-600 hover:bg-gray-50'
