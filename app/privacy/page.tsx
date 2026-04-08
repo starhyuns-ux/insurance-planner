@@ -278,8 +278,8 @@ export default function PrivacyPage() {
                         <div className="relative flex flex-col md:flex-row md:items-center justify-between gap-8">
                           <div>
                             <p className="text-primary-400 font-black uppercase tracking-widest text-[10px] mb-2">Personal Information Manager</p>
-                            <h3 className="text-3xl font-black mb-1">이광현 대표</h3>
-                            <p className="text-gray-400 font-bold">인슈닷 대표이사</p>
+                            <h3 className="text-3xl font-black mb-1">(주)인터커스텀</h3>
+                            <p className="text-gray-400 font-bold">개인정보 보호책임자</p>
                           </div>
                           <div className="space-y-3 font-bold text-sm">
                             <div className="flex items-center gap-3 text-gray-300 hover:text-white transition-colors">
