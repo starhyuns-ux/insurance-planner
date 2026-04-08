@@ -95,15 +95,6 @@ export default function NavBar() {
                 {t('navAdminLogin')}
               </Link>
             )}
-            <a
-              href={planner?.kakao_url || "#consultation"}
-              target={planner?.kakao_url ? "_blank" : undefined}
-              rel={planner?.kakao_url ? "noopener noreferrer" : undefined}
-              className="inline-flex items-center justify-center px-5 py-2 text-sm font-semibold text-white bg-gray-900 rounded-full hover:bg-gray-800 transition-colors shadow-sm whitespace-nowrap"
-            >
-              {planner ? t('navConsultationRealtime') : t('navConsultationFree')}
-            </a>
-            
             <LanguageSwitcher />
           </div>
 
@@ -172,7 +163,6 @@ export default function NavBar() {
 
             <Link href="/calculator" className="text-primary-600 font-bold hover:text-primary-700 transition-colors whitespace-nowrap">{t('navSilbiCalc')}</Link>
             <Link href="/disease-codes" className="text-primary-600 font-bold hover:text-primary-700 transition-colors whitespace-nowrap">{t('navDiseaseSearch')}</Link>
-            <Link href="/contacts" className="text-primary-600 font-bold hover:text-primary-700 transition-colors whitespace-nowrap">{t('navCustomerCenter')}</Link>
             </div>
           </div>
         )}
@@ -209,26 +199,14 @@ export default function NavBar() {
 
                 <Link href="/calculator" onClick={() => setIsOpen(false)} className="text-gray-800 font-bold text-lg hover:text-primary-600">{t('navSilbiCalc')}</Link>
                 <Link href="/disease-codes" onClick={() => setIsOpen(false)} className="text-gray-800 font-bold text-lg hover:text-primary-600">{t('navDiseaseSearch')}</Link>
-                <Link href="/contacts" onClick={() => setIsOpen(false)} className="text-gray-800 font-bold text-lg hover:text-primary-600">{t('navCustomerCenter')}</Link>
               </>
             )}
             
             <div className="pt-4 mt-4 border-t border-gray-100 flex flex-col gap-4">
-              {/* Language switcher in mobile menu */}
               <div className="flex items-center justify-between">
                 <span className="text-xs font-black text-gray-400 uppercase tracking-widest">언어</span>
                 <LanguageSwitcher />
               </div>
-              {/* Consultation button */}
-              <a
-                href={planner?.kakao_url || "#consultation"}
-                target={planner?.kakao_url ? "_blank" : undefined}
-                rel={planner?.kakao_url ? "noopener noreferrer" : undefined}
-                onClick={() => setIsOpen(false)}
-                className="w-full text-center py-3 text-sm font-semibold text-white bg-gray-900 rounded-2xl hover:bg-gray-800 transition-colors"
-              >
-                {planner ? t('navConsultationRealtime') : t('navConsultationFree')}
-              </a>
               {/* Dashboard or Login */}
               {user ? (
                 <Link href="/dashboard" onClick={() => setIsOpen(false)} className="flex items-center gap-2 text-gray-600 font-bold hover:text-gray-900">

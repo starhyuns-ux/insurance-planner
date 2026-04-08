@@ -101,7 +101,6 @@ export default function RootLayout({
                 <ReferralTracker />
               </Suspense>
               {children}
-              <ChatWidget />
               <Toaster position="top-center" richColors />
             </LanguageProvider>
           </PlannerProvider>

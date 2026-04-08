@@ -69,24 +69,68 @@ export async function POST(request: Request) {
                 // 2) 비회원 추천인 조회
                 const { data: guestReferrer } = await supabaseAdmin
                     .from('guest_referrers')
-                    .select('id, phone')
+                    .select('id, phone, points_balance, total_referrals')
                     .eq('referral_code', meta.referrer_code)
                     .single()
 
-                if (guestReferrer && guestReferrer.phone !== phone) {
+                // 리워드 지급 조건: 이름, 번호(기본) + 생년월일, 월보험료 필수
+                const hasRequiredFields = meta?.birth_date && meta?.monthly_premium;
+
+                if (guestReferrer && guestReferrer.phone !== phone && hasRequiredFields) {
+                    // 소개 보상(500p) 및 통계 업데이트
                     await supabaseAdmin.from('referrals').insert({
                         referrer_guest_id: guestReferrer.id,
                         referee_name: name,
                         referee_phone: phone,
                         referee_type: 'CONSULTATION',
                         referred_consultation_id: consultationId,
-                        status: 'PENDING'
+                        reward_amount: 500,
+                        status: 'APPROVED' // 실시간 포인트 적립을 위해 자동 승인 처리
                     })
+
+                    // 비회원 추천인의 포인트 잔액 및 총 추천 수 업데이트
+                    await supabaseAdmin
+                        .from('guest_referrers')
+                        .update({ 
+                            points_balance: (guestReferrer.points_balance || 0) + 500,
+                            total_referrals: (guestReferrer.total_referrals || 0) + 1
+                        })
+                        .eq('id', guestReferrer.id)
                 }
             }
         }
 
-        // 2. 구글 앱스 스크립트로 데이터 전송 (기존 로직 유지)
+        // 2. 신청자 본인의 '리워드 지갑' 자동 생성/조회 (Auto-create Wallet for Applicant)
+        let applicantReferralCode = '';
+        try {
+            const { data: existingGuest } = await supabaseAdmin
+                .from('guest_referrers')
+                .select('referral_code')
+                .eq('phone', phone)
+                .single()
+
+            if (existingGuest) {
+                applicantReferralCode = existingGuest.referral_code;
+            } else {
+                // 새 지갑 생성
+                const newCode = Math.random().toString(36).substring(2, 8).toUpperCase();
+                const { data: newGuest } = await supabaseAdmin
+                    .from('guest_referrers')
+                    .insert({
+                        name,
+                        phone,
+                        referral_code: newCode
+                    })
+                    .select('referral_code')
+                    .single()
+                
+                if (newGuest) applicantReferralCode = newGuest.referral_code;
+            }
+        } catch (walletErr) {
+            console.error('Auto Wallet Creation Error:', walletErr)
+        }
+
+        // 3. 구글 앱스 스크립트로 데이터 전송 (기존 로직 유지)
         const scriptUrl = process.env.GOOGLE_WEBAPP_URL
 
         if (scriptUrl) {
@@ -101,7 +145,7 @@ export async function POST(request: Request) {
             }).catch(e => console.error("Google WebApp Error:", e))
         }
 
-        // 3. 브라우저 푸시 알림 전송
+        // 4. 브라우저 푸시 알림 전송
         if (planner_id && VAPID_PUBLIC_KEY && VAPID_PRIVATE_KEY) {
             try {
                 const { data: subscriptions } = await supabaseAdmin
@@ -138,7 +182,10 @@ export async function POST(request: Request) {
             }
         }
 
-        return NextResponse.json({ success: true })
+        return NextResponse.json({ 
+            success: true, 
+            referral_code: applicantReferralCode 
+        })
     } catch (err: any) {
         console.error('Consultation POST error:', err)
         return NextResponse.json({ error: '서버 에러가 발생했습니다.' }, { status: 500 })
