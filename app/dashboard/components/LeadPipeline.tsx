@@ -7,7 +7,8 @@ import {
   CheckCircleIcon,
   ArrowPathIcon,
   NoSymbolIcon,
-  InboxIcon
+  InboxIcon,
+  ChatBubbleLeftRightIcon
 } from '@heroicons/react/24/outline'
 import { supabase } from '@/lib/supabaseClient'
 
@@ -109,6 +110,16 @@ export default function LeadPipeline({
             {pushLoading ? '처리 중...' : pushEnabled ? '알림 끄기' : '🔔 알림 켜기'}
           </button>
         </div>
+      </div>
+
+      <div className="flex justify-end pr-4">
+        <button 
+          onClick={() => window.location.href = '/dashboard/chat'}
+          className="flex items-center gap-2 px-6 py-3 bg-emerald-50 text-emerald-600 rounded-2xl font-black text-sm hover:bg-emerald-100 transition-all shadow-sm border border-emerald-100"
+        >
+          <ChatBubbleLeftRightIcon className="w-5 h-5" />
+          실시간 채팅 상담창 열기
+        </button>
       </div>
       {/* Status Tabs */}
       <div className="flex items-center gap-2 overflow-x-auto pb-2 no-scrollbar">

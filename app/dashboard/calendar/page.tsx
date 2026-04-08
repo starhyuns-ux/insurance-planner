@@ -18,6 +18,7 @@ export default function CalendarPage() {
   const [leads, setLeads] = useState<any[]>([])
   const [visitStats, setVisitStats] = useState<any[]>([])
   const [totalVisits, setTotalVisits] = useState(0)
+  const [activeChatCount, setActiveChatCount] = useState(0)
   const [newTodoContent, setNewTodoContent] = useState('')
   const [editingTodoId, setEditingTodoId] = useState<string | null>(null)
   const [editTodoContent, setEditTodoContent] = useState('')
@@ -48,6 +49,12 @@ export default function CalendarPage() {
       .eq('planner_id', planner.id)
       .order('created_at', { ascending: false })
     if (leadData) setLeads(leadData)
+
+    // Fetch Active Chat Sessions
+    const { count } = await supabase
+      .from('chat_sessions')
+      .select('*', { count: 'exact', head: true })
+    if (count !== null) setActiveChatCount(count)
 
     // Fetch Visit Stats
     try {
@@ -149,6 +156,7 @@ export default function CalendarPage() {
         totalVisits={totalVisits}
         visitStats={visitStats}
         getInsuranceAge={getInsuranceAge}
+        activeChatCount={activeChatCount}
       />
     </div>
   )

@@ -14,6 +14,7 @@ import {
   IdentificationIcon,
   DocumentCheckIcon,
   ChatBubbleBottomCenterTextIcon,
+  ChatBubbleLeftRightIcon,
   DocumentTextIcon,
   GlobeAltIcon,
   GiftIcon
@@ -130,7 +131,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                   }`}
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
-                  <ChatBubbleBottomCenterTextIcon className="w-4 h-4 shrink-0" />
+                  <ChatBubbleLeftRightIcon className="w-4 h-4 shrink-0" />
                   1:1 채팅 관리
                 </Link>
                 <Link

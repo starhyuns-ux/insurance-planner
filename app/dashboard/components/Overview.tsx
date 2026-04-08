@@ -3,7 +3,8 @@
 import React from 'react'
 import { 
   UsersIcon, 
-  ChartBarIcon
+  ChartBarIcon,
+  ChatBubbleLeftRightIcon
 } from '@heroicons/react/24/outline'
 import { isSameDay } from 'date-fns'
 import PerformanceCharts from './PerformanceCharts'
@@ -14,10 +15,11 @@ interface OverviewProps {
   planner: any | null
   totalVisits?: number
   visitStats?: any[]
+  activeChatCount?: number
   getInsuranceAge: (birthDate: string | null) => string | null
 }
 
-export default function Overview({ leads, customers, planner, getInsuranceAge }: OverviewProps) {
+export default function Overview({ leads, customers, planner, getInsuranceAge, activeChatCount = 0 }: OverviewProps) {
   const { differenceInDays, parseISO } = require('date-fns')
   
   const todayLeads = leads.filter(l => isSameDay(new Date(l.created_at), new Date())).length
@@ -63,6 +65,23 @@ export default function Overview({ leads, customers, planner, getInsuranceAge }:
         <div>
           <h4 className="text-3xl font-black text-gray-900 mb-1">{customers.length.toLocaleString()}명</h4>
           <p className="text-[10px] text-gray-400 font-bold tracking-tight mt-1 uppercase">Total Registered Customers</p>
+        </div>
+      </div>
+
+      {/* Active Chats */}
+      <div 
+        onClick={() => window.location.href = '/dashboard/chat'}
+        className="bg-white rounded-[2rem] shadow-xl p-6 border border-gray-100 flex flex-col justify-between transition-all hover:shadow-2xl hover:-translate-y-1 cursor-pointer group"
+      >
+        <div className="flex items-center justify-between mb-4">
+          <span className="text-xs font-black text-emerald-500 uppercase tracking-widest">실시간 채팅</span>
+          <div className="w-10 h-10 bg-emerald-50 rounded-2xl flex items-center justify-center text-emerald-600 group-hover:scale-110 transition-transform">
+            <ChatBubbleLeftRightIcon className="w-5 h-5" />
+          </div>
+        </div>
+        <div>
+          <h4 className="text-3xl font-black text-gray-900 mb-1">{activeChatCount}건</h4>
+          <p className="text-[10px] text-gray-400 font-bold tracking-tight mt-1 uppercase">Active Chat Sessions</p>
         </div>
       </div>
     </div>
