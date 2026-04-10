@@ -37,6 +37,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   }
 
   const isActive = (path: string) => {
+    if (!pathname) return false
     if (path === '/dashboard' && pathname === '/dashboard') return true
     return pathname.startsWith(path) && path !== '/dashboard'
   }

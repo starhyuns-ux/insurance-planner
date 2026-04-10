@@ -55,8 +55,8 @@ export default function NavBar() {
               </div>
               <span className="font-black text-2xl tracking-tighter text-gray-900 flex items-baseline">
                 {(() => {
-                  const name = t('brandName') as string
-                  if (name.includes('인슈')) {
+                  const name = t('brandName')
+                  if (typeof name === 'string' && name.includes('인슈')) {
                     const parts = name.split('닷')
                     return (
                       <>
@@ -65,7 +65,7 @@ export default function NavBar() {
                       </>
                     )
                   }
-                  return <span>{name}</span>
+                  return <span>{typeof name === 'string' ? name : '인슈닷'}</span>
                 })()}
               </span>
             </div>
@@ -128,7 +128,7 @@ export default function NavBar() {
         </div>
 
         {/* Bottom Row: Desktop Navigation Links (Only visible if planner is attributed OR user is logged in on a sub-page) */}
-        {( (planner && user?.id !== planner.id) || (user && pathname !== '/')) && (
+        {( (planner && user?.id !== planner.id) || (user && typeof pathname === 'string' && pathname !== '/')) && (
           <div className="hidden lg:flex items-center justify-center py-2.5 border-t border-gray-50/50">
             <div className="flex items-center space-x-8 text-[13px] lg:text-sm font-bold text-gray-600">
             <Link href="/calculator/insurance-premium" className="text-amber-600 font-black hover:text-amber-700 transition-colors whitespace-nowrap">{t('navPremiumCalc')}</Link>
@@ -173,7 +173,7 @@ export default function NavBar() {
       {isOpen && (
         <div className="lg:hidden absolute top-16 left-0 w-full bg-white border-b border-gray-100 shadow-xl overflow-y-auto max-h-[calc(100vh-4rem)] py-6 fade-in slide-in-from-top-2 duration-200">
           <div className="flex flex-col container space-y-5 px-6">
-            {( (planner && user?.id !== planner.id) || (user && pathname !== '/')) && (
+            {( (planner && user?.id !== planner.id) || (user && typeof pathname === 'string' && pathname !== '/')) && (
               <>
                 <Link href="/calculator/insurance-premium" onClick={() => setIsOpen(false)} className="text-amber-600 font-black text-xl hover:text-amber-700">{t('navPremiumCalc')}</Link>
                 <Link href="/guide/pension" onClick={() => setIsOpen(false)} className="text-indigo-700 font-bold text-lg hover:text-indigo-600">{t('navPension')}</Link>

@@ -5,21 +5,26 @@ import { faxClient } from '@/lib/fax-client'
 
 // Mapping of insurance companies to their central fax numbers (placeholder values)
 const INSURANCE_FAX_NUMBERS: Record<string, string> = {
-  '삼성화재': '0505-161-1335',
-  '현대해상': '0505-181-0001',
-  'KB손해보험': '0505-181-0002',
-  'DB손해보험': '0505-181-0003',
-  '메리츠화재': '0505-181-0004',
-  '한화손해보험': '0505-181-0005',
-  '삼성생명': '0505-181-0006',
-  '교보생명': '0505-181-0007',
-  '한화생명': '0505-181-0008',
-  '신한라이프': '0505-181-0009',
+  '삼성화재': '0505-162-0777',
+  '현대해상': '0507-774-6060',
+  'DB손해보험': '0505-181-4861',
+  'KB손해보험': '0505-136-6500',
+  '메리츠화재': '0505-021-3400',
+  '흥국화재': '0504-800-0168',
+  '롯데손해보험': '0507-333-9999',
+  'MG손해보험': '0505-088-1646',
+  '한화손해보험': '0505-181-0005', // 기존 placeholder
+  '교보생명': '02-721-3842',
+  'KB라이프생명': '02-6220-9912',
+  'NH농협생명': '02-3786-8540',
+  '동양생명': '0502-779-1004',
+  '미래에셋생명': '0505-130-0000',
+  // 삼성생명, 한화생명, 신한라이프 등은 고정 팩스 없음 (UI에서 입력을 유도해야 함)
 }
 
 export async function POST(req: NextRequest) {
   try {
-    const { claimId } = await req.json()
+    const { claimId, overrideFax } = await req.json()
     if (!claimId) {
       return NextResponse.json({ error: 'claimId is required' }, { status: 400 })
     }
@@ -52,8 +57,7 @@ export async function POST(req: NextRequest) {
     if (claim.image_urls && claim.image_urls.length > 0) {
       for (const url of claim.image_urls) {
         try {
-          // Extract path from public URL
-          const path = url.split('/').slice(-3).join('/') // e.g., claims/id/file.jpg
+          const path = url.split('/').slice(-3).join('/')
           const { data: fileData, error: dlError } = await supabaseAdmin.storage
             .from('planner-assets')
             .download(path)
@@ -68,8 +72,15 @@ export async function POST(req: NextRequest) {
     }
 
     // 5. Transmit via Fax API
-    const targetFax = INSURANCE_FAX_NUMBERS[claim.insurance_company] || '0505-000-0000'
+    // 우선순위: overrideFax (사용자 입력) > INSURANCE_FAX_NUMBERS (매핑) > Default
+    const targetFax = overrideFax || INSURANCE_FAX_NUMBERS[claim.insurance_company] || '0505-000-0000'
     
+    if (targetFax === '0505-000-0000' && !overrideFax) {
+      return NextResponse.json({ 
+        error: `${claim.insurance_company}의 팩스 번호가 등록되어 있지 않습니다. 직접 팩스 번호를 입력해주세요.` 
+      }, { status: 400 })
+    }
+
     const faxResult = await faxClient.sendFax({
       receiverName: claim.insurance_company || '보험사 보상과',
       receiverNum: targetFax,

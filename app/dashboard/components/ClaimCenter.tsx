@@ -11,10 +11,14 @@ interface ClaimCenterProps {
   claims: any[]
   plannerId?: string
   transmittingClaimId: string | null
-  onTransmitClaim: (id: string) => void
+  onTransmitClaim: (id: string, overrideFax?: string) => void
   onUpdateClaimStatus: (id: string, status: string) => void
   onDeleteClaim: (id: string) => void
+  onCheckStatus: (id: string, getPreview?: boolean) => void
+  checkingStatusId: string | null
 }
+
+const COMPANIES_NEEDING_MANUAL_FAX = ['삼성생명', '한화생명', '신한라이프', 'ABL생명', 'AIA생명', '동양생명', '메트라이프생명']
 
 export default function ClaimCenter({
   claims,
@@ -22,8 +26,29 @@ export default function ClaimCenter({
   transmittingClaimId,
   onTransmitClaim,
   onUpdateClaimStatus,
-  onDeleteClaim
+  onDeleteClaim,
+  onCheckStatus,
+  checkingStatusId
 }: ClaimCenterProps) {
+  
+  const handleTransmit = (claim: any) => {
+    const needsManual = COMPANIES_NEEDING_MANUAL_FAX.includes(claim.insurance_company)
+    
+    if (needsManual) {
+      const manualFax = prompt(`[${claim.insurance_company}]은(는) 고정 팩스 번호가 없습니다.\n\n콜센터를 통해 발급받으신 가상 팩스번호를 입력해주세요.\n(예: 0505-000-0000)`, '')
+      if (!manualFax) {
+        alert('팩스 번호를 입력해야 송신이 가능합니다.')
+        return
+      }
+      onTransmitClaim(claim.id, manualFax)
+    } else {
+      // 일반 보험사도 가끔 팩스 번호가 바뀌거나 실패할 경우를 위해 확인창 제공
+      if (confirm(`${claim.insurance_company}으로 서류를 송신하시겠습니까?`)) {
+        onTransmitClaim(claim.id)
+      }
+    }
+  }
+
   return (
     <div className="space-y-6">
       {/* Submit New Claim (Detailed) */}
@@ -72,7 +97,20 @@ export default function ClaimCenter({
                           {claim.status === 'PENDING' ? '접수 대기' : claim.status === 'IN_PROGRESS' ? '처리 중' : '지급 완료'}
                         </span>
                         {claim.transmission_status === 'SENT' && (
-                          <span className="px-3 py-1 text-[10px] font-black rounded-full bg-teal-600 text-white shadow-lg shadow-teal-100">📤 보험사 송신완료</span>
+                          <span className={`px-3 py-1 text-[10px] font-black rounded-full shadow-lg ${
+                            claim.fax_status === 'COMPLETED' ? 'bg-emerald-600 text-white shadow-emerald-100' :
+                            claim.fax_status === 'FAILED' ? 'bg-rose-600 text-white shadow-rose-100' :
+                            'bg-teal-600 text-white shadow-teal-100'
+                          }`}>
+                            {claim.fax_status === 'COMPLETED' ? '✅ 보험사 전송 완료' : 
+                             claim.fax_status === 'FAILED' ? '❌ 전송 실패' : 
+                             '📤 보험사 송신 완료'}
+                          </span>
+                        )}
+                        {claim.fax_error && (
+                          <span className="px-3 py-1 text-[10px] font-bold rounded-full bg-rose-50 text-rose-500 border border-rose-100 italic">
+                            {claim.fax_error}
+                          </span>
                         )}
                       </div>
                     </div>
@@ -105,7 +143,7 @@ export default function ClaimCenter({
                   <div className="flex items-center gap-2 md:flex-col md:items-end md:gap-3 pt-4 md:pt-2 shrink-0">
                     {claim.insurance_company && claim.transmission_status !== 'SENT' && (
                       <button
-                        onClick={() => onTransmitClaim(claim.id)}
+                        onClick={() => handleTransmit(claim)}
                         disabled={transmittingClaimId === claim.id}
                         className="px-6 py-3 bg-primary-600 text-white hover:bg-primary-700 rounded-xl text-xs font-black transition-all w-full md:w-auto text-center flex items-center gap-2 justify-center shadow-xl shadow-primary-100 disabled:opacity-50 active:scale-95"
                       >
@@ -113,6 +151,29 @@ export default function ClaimCenter({
                         {transmittingClaimId === claim.id ? '송신 중...' : `${claim.insurance_company} 송신`}
                       </button>
                     )}
+                    
+                    {claim.fax_receipt_id && (
+                      <div className="flex flex-col gap-2 w-full md:w-auto">
+                        <button
+                          onClick={() => onCheckStatus(claim.id)}
+                          disabled={checkingStatusId === claim.id}
+                          className="px-6 py-2 bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 rounded-xl text-xs font-bold transition-all flex items-center gap-2 justify-center shadow-sm disabled:opacity-50"
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className={`w-3.5 h-3.5 ${checkingStatusId === claim.id ? 'animate-spin' : ''}`}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
+                          </svg>
+                          상태 확인
+                        </button>
+                        <button
+                          onClick={() => onCheckStatus(claim.id, true)}
+                          disabled={checkingStatusId === claim.id}
+                          className="px-6 py-2 bg-gray-50 text-gray-400 hover:text-primary-600 hover:bg-primary-50 rounded-xl text-[10px] font-bold transition-all flex items-center gap-2 justify-center border border-transparent hover:border-primary-100"
+                        >
+                          팩스 파일 보기 (원본)
+                        </button>
+                      </div>
+                    )}
+
                     {claim.status !== 'COMPLETED' && (
                       <button 
                         onClick={() => onUpdateClaimStatus(claim.id, 'COMPLETED')} 

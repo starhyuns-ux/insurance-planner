@@ -25,7 +25,7 @@ export default function Home() {
   const { planner: loggedInPlanner, loading: plannerLoading } = usePlanner()
   const pathname = usePathname()
 
-  const showProfessionalContent = (!!planner && planner.id !== loggedInPlanner?.id) || (!!loggedInPlanner && pathname !== '/');
+  const showProfessionalContent = (!!planner && planner.id !== loggedInPlanner?.id) || (!!loggedInPlanner && typeof pathname === 'string' && pathname !== '/');
   const isLoading = attrLoading && plannerLoading;
 
   return (

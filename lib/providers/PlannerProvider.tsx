@@ -39,7 +39,8 @@ export function PlannerProvider({ children }: { children: ReactNode }) {
     const { data: { user } } = await supabase.auth.getUser()
     
     if (!user) {
-      if (pathname.startsWith('/dashboard')) {
+      // Ensure pathname is a string before checking startsWith to avoid null pointer crashes during hydration
+      if (typeof pathname === 'string' && pathname.startsWith('/dashboard')) {
         router.push('/login')
       }
       setLoading(false)

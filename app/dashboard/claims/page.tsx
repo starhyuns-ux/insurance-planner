@@ -9,6 +9,8 @@ import { toast } from 'sonner'
 export default function ClaimsPage() {
   const { planner, loading: plannerLoading } = usePlanner()
   const [claims, setClaims] = useState<any[]>([])
+  const [transmittingClaimId, setTransmittingClaimId] = useState<string | null>(null)
+  const [checkingStatusId, setCheckingStatusId] = useState<string | null>(null)
 
   const fetchClaims = async () => {
     if (!planner) return
@@ -31,7 +33,8 @@ export default function ClaimsPage() {
       <ClaimCenter 
         claims={claims}
         plannerId={planner?.id}
-        transmittingClaimId={null}
+        transmittingClaimId={transmittingClaimId}
+        checkingStatusId={checkingStatusId}
         onDeleteClaim={async (id) => {
           if (!confirm('삭제하시겠습니까?')) return
           const { error } = await supabase.from('claims').delete().eq('id', id)
@@ -47,13 +50,14 @@ export default function ClaimsPage() {
             fetchClaims()
           }
         }}
-        onTransmitClaim={async (id) => {
+        onTransmitClaim={async (id, overrideFax) => {
+          setTransmittingClaimId(id)
           toast.info('데이터 전송을 시작합니다...')
           try {
             const res = await fetch('/api/claims/transmit', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ claimId: id }),
+              body: JSON.stringify({ claimId: id, overrideFax }),
             })
             const json = await res.json()
             if (!res.ok) throw new Error(json.error)
@@ -61,6 +65,33 @@ export default function ClaimsPage() {
             fetchClaims()
           } catch (err: any) {
             toast.error('송신 오류: ' + err.message)
+          } finally {
+            setTransmittingClaimId(null)
+          }
+        }}
+        onCheckStatus={async (id, getPreview) => {
+          setCheckingStatusId(id)
+          if (!getPreview) toast.info('팩스 전송 상태를 확인 중입니다...')
+          
+          try {
+            const res = await fetch('/api/claims/status', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ claimId: id, getPreview }),
+            })
+            const json = await res.json()
+            if (!res.ok) throw new Error(json.error)
+            
+            if (getPreview && json.previewUrl) {
+              window.open(json.previewUrl, '_blank')
+            } else {
+              toast.success(`상태 확인 완료: ${json.status}`)
+              fetchClaims()
+            }
+          } catch (err: any) {
+            toast.error('상태 확인 오류: ' + err.message)
+          } finally {
+            setCheckingStatusId(null)
           }
         }}
       />

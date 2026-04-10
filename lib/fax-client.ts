@@ -40,11 +40,7 @@ export class FaxClient {
     }
 
     const popbill = require('popbill')
-    popbill.config({
-      LinkID: this.apiKey,
-      SecretKey: this.apiSecret,
-      IsTest: false, // Set to false for production
-    })
+    this.configurePopbill(popbill)
 
     const faxService = popbill.FaxService()
     const corpNum = this.corpNum!
@@ -77,10 +73,97 @@ export class FaxClient {
         },
         (error: any) => {
           console.error('[FAX ERROR]', error)
+          let friendlyMessage = error.message
+          if (error.code === -11010014) {
+            friendlyMessage = '발신번호가 등록되지 않았습니다. 팝빌 설정에서 발신번호를 등록해주세요.'
+          } else if (error.code === -11010008) {
+            friendlyMessage = '해당 기업번호로 등록된 사용자가 아닙니다.'
+          }
+          reject(new Error(`Popbill Error [${error.code}]: ${friendlyMessage}`))
+        },
+        userId
+      )
+    })
+  }
+
+  /**
+   * Get the status and result of a sent fax
+   */
+  async getFaxResult(receiptId: string): Promise<any> {
+    if (this.isMock || receiptId.startsWith('MOCK_')) {
+      return {
+        state: 3, // Finished
+        result: 1, // Success
+        receiptId: receiptId,
+        sendDT: new Date().toISOString(),
+        resultDT: new Date().toISOString(),
+        sendPageCnt: 1,
+        successPageCnt: 1,
+        failPageCnt: 0,
+      }
+    }
+
+    const popbill = require('popbill')
+    this.configurePopbill(popbill)
+
+    const faxService = popbill.FaxService()
+    const corpNum = this.corpNum!
+    const userId = this.userId!
+
+    return new Promise((resolve, reject) => {
+      faxService.getFaxResult(
+        corpNum,
+        receiptId,
+        (result: any) => {
+          // result is often an array or single object depending on batch
+          // Since we send one by one, we'll take the first one if it's an array
+          const status = Array.isArray(result) ? result[0] : result
+          resolve(status)
+        },
+        (error: any) => {
           reject(new Error(`Popbill Error [${error.code}]: ${error.message}`))
         },
         userId
       )
+    })
+  }
+
+  /**
+   * Get a temporary URL to preview the fax document
+   */
+  async getPreviewURL(receiptId: string): Promise<string> {
+    if (this.isMock || receiptId.startsWith('MOCK_')) {
+      return 'https://example.com/mock-fax-preview'
+    }
+
+    const popbill = require('popbill')
+    this.configurePopbill(popbill)
+
+    const faxService = popbill.FaxService()
+    const corpNum = this.corpNum!
+    const userId = this.userId!
+
+    return new Promise((resolve, reject) => {
+      faxService.getPreviewURL(
+        corpNum,
+        receiptId,
+        (url: string) => resolve(url),
+        (error: any) => {
+          reject(new Error(`Popbill Error [${error.code}]: ${error.message}`))
+        },
+        userId
+      )
+    })
+  }
+
+  /**
+   * Helper to configure popbill SDK
+   */
+  private configurePopbill(popbill: any) {
+    popbill.config({
+      LinkID: this.apiKey,
+      SecretKey: this.apiSecret,
+      IsTest: process.env.NODE_ENV !== 'production', 
     })
   }
 }
