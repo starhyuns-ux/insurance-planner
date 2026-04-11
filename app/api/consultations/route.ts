@@ -73,29 +73,37 @@ export async function POST(request: Request) {
                     .eq('referral_code', meta.referrer_code)
                     .single()
 
-                // 리워드 지급 조건: 이름, 번호(기본) + 생년월일, 월보험료 필수
-                const hasRequiredFields = meta?.birth_date && meta?.monthly_premium;
+                // 리워드 조건 확인 (공백 제거 후 유효성)
+                const isBirthFilled = meta?.birth_date && meta.birth_date.trim().length > 0;
+                const isPremiumFilled = meta?.monthly_premium && meta.monthly_premium.trim().length > 0;
+                const hasRequiredFields = isBirthFilled && isPremiumFilled;
 
-                if (guestReferrer && guestReferrer.phone !== phone && hasRequiredFields) {
-                    // 소개 보상(500p) 및 통계 업데이트
-                    await supabaseAdmin.from('referrals').insert({
-                        referrer_guest_id: guestReferrer.id,
-                        referee_name: name,
-                        referee_phone: phone,
-                        referee_type: 'CONSULTATION',
-                        referred_consultation_id: consultationId,
-                        reward_amount: 500,
-                        status: 'APPROVED' // 실시간 포인트 적립을 위해 자동 승인 처리
-                    })
+                if (guestReferrer && hasRequiredFields) {
+                    // 자기 번호로 꼼수 추천하는 것 방지 (하이픈 제거 후 순수 숫자로만 비교)
+                    const referrerVal = (guestReferrer.phone || '').replace(/[^0-9]/g, '');
+                    const applicantVal = (phone || '').replace(/[^0-9]/g, '');
 
-                    // 비회원 추천인의 포인트 잔액 및 총 추천 수 업데이트
-                    await supabaseAdmin
-                        .from('guest_referrers')
-                        .update({ 
-                            points_balance: (guestReferrer.points_balance || 0) + 500,
-                            total_referrals: (guestReferrer.total_referrals || 0) + 1
+                    if (referrerVal !== applicantVal) {
+                        // 소개 보상(500p) 및 통계 업데이트
+                        await supabaseAdmin.from('referrals').insert({
+                            referrer_guest_id: guestReferrer.id,
+                            referee_name: name,
+                            referee_phone: phone,
+                            referee_type: 'CONSULTATION',
+                            referred_consultation_id: consultationId,
+                            reward_amount: 500,
+                            status: 'APPROVED' // 실시간 자동 승인
                         })
-                        .eq('id', guestReferrer.id)
+
+                        // 비회원 추천인의 포인트 잔액 500 증가 업데이트
+                        await supabaseAdmin
+                            .from('guest_referrers')
+                            .update({ 
+                                points_balance: (guestReferrer.points_balance || 0) + 500,
+                                total_referrals: (guestReferrer.total_referrals || 0) + 1
+                            })
+                            .eq('id', guestReferrer.id)
+                    }
                 }
             }
         }
