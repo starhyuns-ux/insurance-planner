@@ -74,15 +74,19 @@ export default function NotificationsPage() {
           return
         }
         
-        if (!process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY) {
-          toast.error('오류: 푸시 알림 서버 키가 설정되지 않았습니다.')
+        // VAPID Public Key는 공개키이므로 브라우저 쪽에 하드코딩 되어도 안전합니다.
+        // Vercel 환경변수 누락 시 오류를 방지하기 위해 환경변수가 없으면 기본 공개키를 사용합니다.
+        const publicKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY || 'BPx5pVaLAyV0IEQLgPjxub8oez-fD-BplWFKQm1mu9olcTEM43uc_XeyBA4oiFrSKOShnwsatqtLxsat0UQC3gY'
+
+        if (!publicKey) {
+          toast.error('오류: 푸시 알림 서버 키가 유효하지 않습니다.')
           return
         }
 
         const reg = await navigator.serviceWorker.ready
         const sub = await reg.pushManager.subscribe({
           userVisibleOnly: true,
-          applicationServerKey: urlB64ToUint8Array(process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY as string)
+          applicationServerKey: urlB64ToUint8Array(publicKey)
         })
         await fetch('/api/push-subscribe', {
           method: 'POST',
