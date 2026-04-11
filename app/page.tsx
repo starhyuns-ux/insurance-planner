@@ -31,7 +31,7 @@ export default function Home() {
   return (
     <main className="min-h-screen flex flex-col">
       <PageTracker />
-      <NavBar />
+      <NavBar key={`navbar-${pathname}`} />
       
       <Hero />
 
@@ -68,7 +68,7 @@ export default function Home() {
         <PlannerBranding />
       </div>
 
-      <Footer />
+      <Footer key={`footer-${pathname}`} />
       
       {/* Referral Reward System for Guests */}
       <ReferralRewardBanner />

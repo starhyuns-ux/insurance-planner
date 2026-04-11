@@ -86,7 +86,7 @@ export default async function PlannerLandingPage({ params }: { params: { id: str
   return (
     <main className="min-h-screen flex flex-col">
       <AttributionSetter plannerId={planner.id} />
-      <NavBar />
+      <NavBar key={`navbar-${id}`} />
       
       <Hero />
       <TrustStrip />
@@ -133,7 +133,7 @@ export default async function PlannerLandingPage({ params }: { params: { id: str
         />
       </div>
 
-      <Footer />
+      <Footer key={`footer-${id}`} />
     </main>
   )
 }

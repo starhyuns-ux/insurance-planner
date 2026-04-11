@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { supabase } from '@/lib/supabaseClient'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
+import { useRouter, usePathname } from 'next/navigation'
 import NavBar from '@/components/NavBar'
 import Footer from '@/components/Footer'
 import { lookupEmailByPhone } from './actions'
@@ -14,6 +14,7 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const router = useRouter()
+  const pathname = usePathname()
 
   // Forgot password
   const [mode, setMode] = useState<'login' | 'forgot'>('login')
@@ -101,7 +102,7 @@ export default function LoginPage() {
 
   return (
     <main className="min-h-screen flex flex-col bg-gray-50">
-      <NavBar />
+      <NavBar key={`navbar-${pathname}`} />
       <div className="flex-1 flex items-center justify-center p-4">
         <div className="max-w-md w-full bg-white rounded-3xl shadow-xl p-8 border border-gray-100">
 
@@ -239,7 +240,7 @@ export default function LoginPage() {
           )}
         </div>
       </div>
-      <Footer />
+      <Footer key={`footer-${pathname}`} />
     </main>
   )
 }

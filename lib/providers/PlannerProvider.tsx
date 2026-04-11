@@ -1,6 +1,6 @@
 'use client'
 
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react'
+import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback, useMemo } from 'react'
 import { supabase } from '@/lib/supabaseClient'
 import { useRouter, usePathname } from 'next/navigation'
 
@@ -35,11 +35,10 @@ export function PlannerProvider({ children }: { children: ReactNode }) {
   const router = useRouter()
   const pathname = usePathname()
 
-  const refreshPlanner = async () => {
+  const refreshPlanner = useCallback(async () => {
     const { data: { user } } = await supabase.auth.getUser()
     
     if (!user) {
-      // Ensure pathname is a string before checking startsWith to avoid null pointer crashes during hydration
       if (typeof pathname === 'string' && pathname.startsWith('/dashboard')) {
         router.push('/login')
       }
@@ -57,14 +56,20 @@ export function PlannerProvider({ children }: { children: ReactNode }) {
       setPlanner(profile)
     }
     setLoading(false)
-  }
+  }, [pathname, router])
 
   useEffect(() => {
     refreshPlanner()
-  }, [pathname])
+  }, [refreshPlanner])
+
+  const value = useMemo(() => ({
+    planner,
+    loading,
+    refreshPlanner
+  }), [planner, loading, refreshPlanner])
 
   return (
-    <PlannerContext.Provider value={{ planner, loading, refreshPlanner }}>
+    <PlannerContext.Provider value={value}>
       {children}
     </PlannerContext.Provider>
   )
