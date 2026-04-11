@@ -55,16 +55,22 @@ export default function LeadPipeline({
   const handleUpdateStatus = async (id: string, newStatus: string) => {
     setIsUpdating(id)
     try {
-      const { error } = await supabase
-        .from('consultations')
-        .update({ status: newStatus })
-        .eq('id', id)
+      const res = await fetch('/api/consultations/status', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, status: newStatus })
+      })
       
-      if (error) throw error
+      const result = await res.json()
+      
+      if (!res.ok) {
+        throw new Error(result.error || '상태 변경 처리 반환 오류')
+      }
+      
       await onUpdate()
-    } catch (err) {
+    } catch (err: any) {
       console.error('Error updating lead status:', err)
-      alert('상태 변경 중 오류가 발생했습니다.')
+      alert(`상태 변경 중 오류가 발생했습니다: \n${err.message}`)
     } finally {
       setIsUpdating(null)
     }
