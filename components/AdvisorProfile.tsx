@@ -16,13 +16,8 @@ interface AdvisorProfileProps {
 }
 
 export default function AdvisorProfile({ name, phone, profileImage, businessCard, affiliation, region, kakaoUrl, message }: AdvisorProfileProps) {
-  const [mounted, setMounted] = useState(false);
   const [copied, setCopied] = useState(false);
   const { t, locale } = useLanguage();
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   const handleCopyLink = () => {
     if (typeof window === 'undefined') return;
@@ -82,9 +77,9 @@ export default function AdvisorProfile({ name, phone, profileImage, businessCard
           </div>
 
           <div className="md:col-span-3">
-            <h2 className="text-3xl md:text-4xl lg:text-[2.8rem] font-black mb-10 tracking-tight leading-[1.1] text-white">
-              {mounted ? (message || (name ? handleTranslation('profileTitlePlanner', name) : t('profileTitleDefault'))) : '...'}
-              {mounted && !message && (
+            <h2 className="text-3xl md:text-4xl lg:text-[2.8rem] font-black mb-10 tracking-tight leading-[1.1] text-white" suppressHydrationWarning>
+              {message || (name ? handleTranslation('profileTitlePlanner', name) : t('profileTitleDefault'))}
+              {!message && (
                 <>
                   <br /> 
                   <span className="bg-gradient-to-r from-yellow-300 to-yellow-500 bg-clip-text text-transparent italic">

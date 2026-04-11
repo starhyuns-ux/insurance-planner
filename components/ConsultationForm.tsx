@@ -26,13 +26,8 @@ export default function ConsultationForm({ id = "consultation", plannerId, plann
   const [submittedCode, setSubmittedCode] = useState<string | null>(null)
   const [submittedName, setSubmittedName] = useState('')
   
-  const [mounted, setMounted] = useState(false)
   const { planner: sessionPlanner } = useAttribution()
   const { t } = useLanguage()
-
-  useEffect(() => {
-    setMounted(true)
-  }, [])
 
   const handleTranslation = (key: any, ...args: any[]) => {
     const val = t(key);
@@ -141,11 +136,11 @@ export default function ConsultationForm({ id = "consultation", plannerId, plann
           <div className="bg-gray-900 p-10 md:w-5/12 text-white flex flex-col justify-center relative overflow-hidden shrink-0">
             <div className="absolute top-0 right-0 -mr-16 -mt-16 w-64 h-64 bg-primary-600 rounded-full mix-blend-multiply opacity-20 blur-3xl"></div>
 
-            <h3 className="text-3xl font-extrabold mb-4 relative z-10">
-              {mounted ? (finalPlannerName ? handleTranslation('formTitleWithPlanner', finalPlannerName) : t('formTitle')) : '...'}
+            <h3 className="text-3xl font-extrabold mb-4 relative z-10" suppressHydrationWarning>
+              {finalPlannerName ? handleTranslation('formTitleWithPlanner', finalPlannerName) : t('formTitle')}
             </h3>
-            <p className="text-gray-400 mb-8 leading-relaxed relative z-10 text-sm">
-              {mounted ? (finalPlannerName ? t('formDescWithPlanner') : t('formDesc')) : '...'}
+            <p className="text-gray-400 mb-8 leading-relaxed relative z-10 text-sm" suppressHydrationWarning>
+              {finalPlannerName ? t('formDescWithPlanner') : t('formDesc')}
             </p>
 
             <div className="space-y-5 text-sm font-medium relative z-10">

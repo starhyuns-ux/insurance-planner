@@ -12,7 +12,6 @@ import LanguageSwitcher from './LanguageSwitcher'
 import { useLanguage } from '@/lib/contexts/LanguageContext'
 
 export default function NavBar() {
-  const [mounted, setMounted] = useState(false)
   const [isOpen, setIsOpen] = useState(false)
   const [user, setUser] = useState<User | null>(null)
   const { planner, loading: attrLoading } = useAttribution()
@@ -22,7 +21,6 @@ export default function NavBar() {
   const isPlannerPage = pathname?.startsWith('/p/')
 
   useEffect(() => {
-    setMounted(true)
     // Check initial auth state
     supabase.auth.getUser().then(({ data: { user } }) => {
       setUser(user)
@@ -55,8 +53,8 @@ export default function NavBar() {
                 */}
                 {/* <Image src="/logo.png" alt="Logo" width={32} height={32} className="absolute inset-0 object-contain" /> */}
               </div>
-            <span className="font-black text-2xl tracking-tighter text-gray-900 flex items-baseline">
-              {mounted ? (() => {
+            <span className="font-black text-2xl tracking-tighter text-gray-900 flex items-baseline" suppressHydrationWarning>
+              {(() => {
                 const name = t('brandName')
                 if (typeof name === 'string' && name.includes('인슈')) {
                   const parts = name.split('닷')
@@ -68,16 +66,11 @@ export default function NavBar() {
                   )
                 }
                 return <span>{typeof name === 'string' ? name : '인슈닷'}</span>
-              })() : (
-                <>
-                  <span className="tracking-tight">인슈</span>
-                  <span className="text-primary-600 ml-px">닷</span>
-                </>
-              )}
+              })()}
             </span>
           </div>
-          {mounted && planner && user?.id !== planner.id && (
-            <div className="mt-0.5 ml-0.5 flex items-center gap-1 leading-none">
+          {planner && user?.id !== planner.id && (
+            <div className="mt-0.5 ml-0.5 flex items-center gap-1 leading-none" suppressHydrationWarning>
               <span className="text-[8px] font-bold text-gray-400 uppercase tracking-tighter">{t('navAttributedTo')}</span>
               <span className="text-[9px] font-black text-primary-600/70 italic">{planner.name}</span>
             </div>
@@ -86,27 +79,25 @@ export default function NavBar() {
 
           {/* Desktop Top Actions */}
           <div className="hidden lg:flex items-center gap-3">
-            {mounted && (
-              <>
-                {user ? (
-                  <Link
-                    href="/dashboard"
-                    className="flex items-center gap-2 px-4 py-1.5 border border-gray-200 rounded-full text-sm font-bold text-gray-700 hover:bg-gray-50 transition-all"
-                  >
-                    <UserCircleIcon className="w-5 h-5" />
-                    {t('navDashboard')}
-                  </Link>
-                ) : !isPlannerPage && (
-                  <Link
-                    href="/login"
-                    className="text-sm font-bold text-gray-500 hover:text-gray-900 px-4 py-2 transition-colors"
-                  >
-                    {t('navAdminLogin')}
-                  </Link>
-                )}
-                <LanguageSwitcher />
-              </>
+            {user ? (
+              <Link
+                href="/dashboard"
+                className="flex items-center gap-2 px-4 py-1.5 border border-gray-200 rounded-full text-sm font-bold text-gray-700 hover:bg-gray-50 transition-all"
+                suppressHydrationWarning
+              >
+                <UserCircleIcon className="w-5 h-5" />
+                {t('navDashboard')}
+              </Link>
+            ) : !isPlannerPage && (
+              <Link
+                href="/login"
+                className="text-sm font-bold text-gray-500 hover:text-gray-900 px-4 py-2 transition-colors"
+                suppressHydrationWarning
+              >
+                {t('navAdminLogin')}
+              </Link>
             )}
+            <LanguageSwitcher />
           </div>
 
           {/* Mobile: minimal top bar — just login icon + hamburger */}
@@ -139,8 +130,8 @@ export default function NavBar() {
         </div>
 
         {/* Bottom Row: Desktop Navigation Links (Only visible if planner is attributed OR user is logged in on a sub-page) */}
-        {mounted && ((planner && user?.id !== planner.id) || (user && typeof pathname === 'string' && pathname !== '/')) && (
-          <div className="hidden lg:flex items-center justify-center py-2.5 border-t border-gray-50/50">
+        {((planner && user?.id !== planner.id) || (user && typeof pathname === 'string' && pathname !== '/')) && (
+          <div className="hidden lg:flex items-center justify-center py-2.5 border-t border-gray-50/50" suppressHydrationWarning>
             <div className="flex items-center space-x-8 text-[13px] lg:text-sm font-bold text-gray-600">
               <Link href="/calculator/insurance-premium" className="text-amber-600 font-black hover:text-amber-700 transition-colors whitespace-nowrap">{t('navPremiumCalc')}</Link>
               <Link href="/guide/pension" className="text-indigo-600 font-bold hover:text-indigo-700 transition-colors whitespace-nowrap">{t('navPension')}</Link>
