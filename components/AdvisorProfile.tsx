@@ -39,8 +39,6 @@ export default function AdvisorProfile({ name, phone, profileImage, businessCard
     return val;
   };
 
-  if (!mounted) return null;
-
   const points = t('profilePoints') as { title: string, desc: string }[];
 
   return (
@@ -85,8 +83,8 @@ export default function AdvisorProfile({ name, phone, profileImage, businessCard
 
           <div className="md:col-span-3">
             <h2 className="text-3xl md:text-4xl lg:text-[2.8rem] font-black mb-10 tracking-tight leading-[1.1] text-white">
-              {message || (name ? handleTranslation('profileTitlePlanner', name) : t('profileTitleDefault'))}
-              {!message && (
+              {mounted ? (message || (name ? handleTranslation('profileTitlePlanner', name) : t('profileTitleDefault'))) : '...'}
+              {mounted && !message && (
                 <>
                   <br /> 
                   <span className="bg-gradient-to-r from-yellow-300 to-yellow-500 bg-clip-text text-transparent italic">

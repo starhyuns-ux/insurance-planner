@@ -36,19 +36,6 @@ export default function NavBar() {
     return () => subscription.unsubscribe()
   }, [])
 
-  if (!mounted) {
-    return (
-      <nav className="sticky top-0 z-50 bg-white border-b border-gray-100 h-14">
-        <div className="container flex items-center justify-between h-full">
-           <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 bg-primary-600 rounded-xl"></div>
-              <span className="font-black text-2xl tracking-tighter text-gray-900">인슈<span className="text-primary-600">닷</span></span>
-           </div>
-        </div>
-      </nav>
-    )
-  }
-
   return (
     <nav className="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-gray-100">
       <div className="container">
@@ -68,49 +55,58 @@ export default function NavBar() {
                 */}
                 {/* <Image src="/logo.png" alt="Logo" width={32} height={32} className="absolute inset-0 object-contain" /> */}
               </div>
-              <span className="font-black text-2xl tracking-tighter text-gray-900 flex items-baseline">
-                {(() => {
-                  const name = t('brandName')
-                  if (typeof name === 'string' && name.includes('인슈')) {
-                    const parts = name.split('닷')
-                    return (
-                      <>
-                        <span className="tracking-tight">인슈</span>
-                        {name.includes('닷') && <span className="text-primary-600 ml-px">닷</span>}
-                      </>
-                    )
-                  }
-                  return <span>{typeof name === 'string' ? name : '인슈닷'}</span>
-                })()}
-              </span>
+            <span className="font-black text-2xl tracking-tighter text-gray-900 flex items-baseline">
+              {mounted ? (() => {
+                const name = t('brandName')
+                if (typeof name === 'string' && name.includes('인슈')) {
+                  const parts = name.split('닷')
+                  return (
+                    <>
+                      <span className="tracking-tight">인슈</span>
+                      {name.includes('닷') && <span className="text-primary-600 ml-px">닷</span>}
+                    </>
+                  )
+                }
+                return <span>{typeof name === 'string' ? name : '인슈닷'}</span>
+              })() : (
+                <>
+                  <span className="tracking-tight">인슈</span>
+                  <span className="text-primary-600 ml-px">닷</span>
+                </>
+              )}
+            </span>
+          </div>
+          {mounted && planner && user?.id !== planner.id && (
+            <div className="mt-0.5 ml-0.5 flex items-center gap-1 leading-none">
+              <span className="text-[8px] font-bold text-gray-400 uppercase tracking-tighter">{t('navAttributedTo')}</span>
+              <span className="text-[9px] font-black text-primary-600/70 italic">{planner.name}</span>
             </div>
-            {planner && user?.id !== planner.id && (
-              <div className="mt-0.5 ml-0.5 flex items-center gap-1 leading-none">
-                <span className="text-[8px] font-bold text-gray-400 uppercase tracking-tighter">{t('navAttributedTo')}</span>
-                <span className="text-[9px] font-black text-primary-600/70 italic">{planner.name}</span>
-              </div>
-            )}
+          )}
           </Link>
 
           {/* Desktop Top Actions */}
           <div className="hidden lg:flex items-center gap-3">
-            {user ? (
-              <Link
-                href="/dashboard"
-                className="flex items-center gap-2 px-4 py-1.5 border border-gray-200 rounded-full text-sm font-bold text-gray-700 hover:bg-gray-50 transition-all"
-              >
-                <UserCircleIcon className="w-5 h-5" />
-                {t('navDashboard')}
-              </Link>
-            ) : !isPlannerPage && (
-              <Link
-                href="/login"
-                className="text-sm font-bold text-gray-500 hover:text-gray-900 px-4 py-2 transition-colors"
-              >
-                {t('navAdminLogin')}
-              </Link>
+            {mounted && (
+              <>
+                {user ? (
+                  <Link
+                    href="/dashboard"
+                    className="flex items-center gap-2 px-4 py-1.5 border border-gray-200 rounded-full text-sm font-bold text-gray-700 hover:bg-gray-50 transition-all"
+                  >
+                    <UserCircleIcon className="w-5 h-5" />
+                    {t('navDashboard')}
+                  </Link>
+                ) : !isPlannerPage && (
+                  <Link
+                    href="/login"
+                    className="text-sm font-bold text-gray-500 hover:text-gray-900 px-4 py-2 transition-colors"
+                  >
+                    {t('navAdminLogin')}
+                  </Link>
+                )}
+                <LanguageSwitcher />
+              </>
             )}
-            <LanguageSwitcher />
           </div>
 
           {/* Mobile: minimal top bar — just login icon + hamburger */}
@@ -143,41 +139,41 @@ export default function NavBar() {
         </div>
 
         {/* Bottom Row: Desktop Navigation Links (Only visible if planner is attributed OR user is logged in on a sub-page) */}
-        {( (planner && user?.id !== planner.id) || (user && typeof pathname === 'string' && pathname !== '/')) && (
+        {mounted && ((planner && user?.id !== planner.id) || (user && typeof pathname === 'string' && pathname !== '/')) && (
           <div className="hidden lg:flex items-center justify-center py-2.5 border-t border-gray-50/50">
             <div className="flex items-center space-x-8 text-[13px] lg:text-sm font-bold text-gray-600">
-            <Link href="/calculator/insurance-premium" className="text-amber-600 font-black hover:text-amber-700 transition-colors whitespace-nowrap">{t('navPremiumCalc')}</Link>
-            <Link href="/guide/pension" className="text-indigo-600 font-bold hover:text-indigo-700 transition-colors whitespace-nowrap">{t('navPension')}</Link>
-            <Link href="/guide/critical-illness-relief" className="text-indigo-600 font-bold hover:text-indigo-700 transition-colors whitespace-nowrap">{t('navCriticalIllness')}</Link>
-            
-            {/* Disease Study Dropdown */}
-            <div className="relative group py-1">
-              <button className="flex items-center gap-1 text-rose-600 font-bold hover:text-rose-700 transition-colors whitespace-nowrap outline-none">
-                {t('navDiseaseStudy')}
-                <ChevronDownIcon className="w-3.5 h-3.5 transition-transform group-hover:rotate-180" />
-              </button>
-              <div className="absolute top-full left-1/2 -translate-x-1/2 w-48 bg-white border border-gray-100 rounded-2xl shadow-xl py-2 opacity-0 invisible translate-y-2 group-hover:opacity-100 group-hover:visible group-hover:translate-y-0 transition-all z-50">
-                <Link href="/guide/vascular-disease" className="block px-4 py-2.5 text-sm hover:bg-gray-50 text-gray-700 hover:text-rose-600 transition-colors">{t('navHeartStudy')}</Link>
-                <Link href="/guide/cerebrovascular-disease" className="block px-4 py-2.5 text-sm hover:bg-gray-50 text-gray-700 hover:text-rose-600 transition-colors">{t('navBrainStudy')}</Link>
+              <Link href="/calculator/insurance-premium" className="text-amber-600 font-black hover:text-amber-700 transition-colors whitespace-nowrap">{t('navPremiumCalc')}</Link>
+              <Link href="/guide/pension" className="text-indigo-600 font-bold hover:text-indigo-700 transition-colors whitespace-nowrap">{t('navPension')}</Link>
+              <Link href="/guide/critical-illness-relief" className="text-indigo-600 font-bold hover:text-indigo-700 transition-colors whitespace-nowrap">{t('navCriticalIllness')}</Link>
+              
+              {/* Disease Study Dropdown */}
+              <div className="relative group py-1">
+                <button className="flex items-center gap-1 text-rose-600 font-bold hover:text-rose-700 transition-colors whitespace-nowrap outline-none">
+                  {t('navDiseaseStudy')}
+                  <ChevronDownIcon className="w-3.5 h-3.5 transition-transform group-hover:rotate-180" />
+                </button>
+                <div className="absolute top-full left-1/2 -translate-x-1/2 w-48 bg-white border border-gray-100 rounded-2xl shadow-xl py-2 opacity-0 invisible translate-y-2 group-hover:opacity-100 group-hover:visible group-hover:translate-y-0 transition-all z-50">
+                  <Link href="/guide/vascular-disease" className="block px-4 py-2.5 text-sm hover:bg-gray-50 text-gray-700 hover:text-rose-600 transition-colors">{t('navHeartStudy')}</Link>
+                  <Link href="/guide/cerebrovascular-disease" className="block px-4 py-2.5 text-sm hover:bg-gray-50 text-gray-700 hover:text-rose-600 transition-colors">{t('navBrainStudy')}</Link>
+                </div>
               </div>
-            </div>
-            <Link href="/guide/5th-gen" className="text-primary-600 font-bold hover:text-primary-700 transition-colors whitespace-nowrap">{t('navSilbiGen5')}</Link>
-            
-            {/* Cancer Treatment Dropdown */}
-            <div className="relative group py-1">
-              <button className="flex items-center gap-1 text-primary-600 font-bold hover:text-primary-700 transition-colors whitespace-nowrap outline-none">
-                {t('navCancerTreat')}
-                <ChevronDownIcon className="w-3.5 h-3.5 transition-transform group-hover:rotate-180" />
-              </button>
-              <div className="absolute top-full left-1/2 -translate-x-1/2 w-48 bg-white border border-gray-100 rounded-2xl shadow-xl py-2 opacity-0 invisible translate-y-2 group-hover:opacity-100 group-hover:visible group-hover:translate-y-0 transition-all z-50">
-                <Link href="/guide/cancer-treatment" className="block px-4 py-2.5 text-sm hover:bg-gray-50 text-gray-700 hover:text-primary-600 transition-colors">{t('navCancerGuide')}</Link>
-                <Link href="/guide/advanced-radiation" className="block px-4 py-2.5 text-sm hover:bg-gray-50 text-gray-700 hover:text-primary-600 transition-colors">{t('navRadiation')}</Link>
-                <Link href="/guide/hifu-therapy" className="block px-4 py-2.5 text-sm hover:bg-gray-50 text-gray-700 hover:text-primary-600 transition-colors">{t('navHifu')}</Link>
+              <Link href="/guide/5th-gen" className="text-primary-600 font-bold hover:text-primary-700 transition-colors whitespace-nowrap">{t('navSilbiGen5')}</Link>
+              
+              {/* Cancer Treatment Dropdown */}
+              <div className="relative group py-1">
+                <button className="flex items-center gap-1 text-primary-600 font-bold hover:text-primary-700 transition-colors whitespace-nowrap outline-none">
+                  {t('navCancerTreat')}
+                  <ChevronDownIcon className="w-3.5 h-3.5 transition-transform group-hover:rotate-180" />
+                </button>
+                <div className="absolute top-full left-1/2 -translate-x-1/2 w-48 bg-white border border-gray-100 rounded-2xl shadow-xl py-2 opacity-0 invisible translate-y-2 group-hover:opacity-100 group-hover:visible group-hover:translate-y-0 transition-all z-50">
+                  <Link href="/guide/cancer-treatment" className="block px-4 py-2.5 text-sm hover:bg-gray-50 text-gray-700 hover:text-primary-600 transition-colors">{t('navCancerGuide')}</Link>
+                  <Link href="/guide/advanced-radiation" className="block px-4 py-2.5 text-sm hover:bg-gray-50 text-gray-700 hover:text-primary-600 transition-colors">{t('navRadiation')}</Link>
+                  <Link href="/guide/hifu-therapy" className="block px-4 py-2.5 text-sm hover:bg-gray-50 text-gray-700 hover:text-primary-600 transition-colors">{t('navHifu')}</Link>
+                </div>
               </div>
-            </div>
 
-            <Link href="/calculator" className="text-primary-600 font-bold hover:text-primary-700 transition-colors whitespace-nowrap">{t('navSilbiCalc')}</Link>
-            <Link href="/disease-codes" className="text-primary-600 font-bold hover:text-primary-700 transition-colors whitespace-nowrap">{t('navDiseaseSearch')}</Link>
+              <Link href="/calculator" className="text-primary-600 font-bold hover:text-primary-700 transition-colors whitespace-nowrap">{t('navSilbiCalc')}</Link>
+              <Link href="/disease-codes" className="text-primary-600 font-bold hover:text-primary-700 transition-colors whitespace-nowrap">{t('navDiseaseSearch')}</Link>
             </div>
           </div>
         )}

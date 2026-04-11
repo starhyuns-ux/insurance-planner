@@ -40,8 +40,6 @@ export default function ConsultationForm({ id = "consultation", plannerId, plann
     return val;
   };
 
-  if (!mounted) return null
-
   // Determine final planner info
   const finalPlannerId = plannerId || sessionPlanner?.id
   const finalPlannerName = plannerInfo?.name || sessionPlanner?.name
@@ -144,10 +142,10 @@ export default function ConsultationForm({ id = "consultation", plannerId, plann
             <div className="absolute top-0 right-0 -mr-16 -mt-16 w-64 h-64 bg-primary-600 rounded-full mix-blend-multiply opacity-20 blur-3xl"></div>
 
             <h3 className="text-3xl font-extrabold mb-4 relative z-10">
-              {finalPlannerName ? handleTranslation('formTitleWithPlanner', finalPlannerName) : t('formTitle')}
+              {mounted ? (finalPlannerName ? handleTranslation('formTitleWithPlanner', finalPlannerName) : t('formTitle')) : '...'}
             </h3>
             <p className="text-gray-400 mb-8 leading-relaxed relative z-10 text-sm">
-              {finalPlannerName ? t('formDescWithPlanner') : t('formDesc')}
+              {mounted ? (finalPlannerName ? t('formDescWithPlanner') : t('formDesc')) : '...'}
             </p>
 
             <div className="space-y-5 text-sm font-medium relative z-10">

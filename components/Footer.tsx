@@ -18,8 +18,6 @@ export default function Footer() {
     return val;
   };
 
-  if (!mounted) return null;
-
   return (
     <footer className="bg-gray-50 border-t border-gray-200 pt-16 pb-8 text-sm">
       <div className="container max-w-6xl">
@@ -37,12 +35,12 @@ export default function Footer() {
 
         <div className="pt-8 border-t border-gray-200 flex flex-col md:flex-row justify-between md:items-center gap-6 text-xs text-gray-400 leading-relaxed">
           <div>
-            <p className="opacity-70">{handleTranslation('footerCopyright', year)} <br className="md:hidden" />{t('footerCopyrightNotice')}</p>
+            <p className="opacity-70">{mounted ? handleTranslation('footerCopyright', year) : `© ${year} InterCustom.`} <br className="md:hidden" />{mounted && t('footerCopyrightNotice')}</p>
           </div>
           <div className="flex gap-4 md:self-end">
-            <a href="#" className="hover:text-gray-600 transition-colors">{t('footerTerms')}</a>
+            <a href="#" className="hover:text-gray-600 transition-colors">{mounted && t('footerTerms')}</a>
             <div className="w-px h-3 bg-gray-300 rounded self-center"></div>
-            <Link href="/privacy" className="font-bold text-gray-600 hover:text-gray-800 transition-colors">{t('footerPrivacy')}</Link>
+            <Link href="/privacy" className="font-bold text-gray-600 hover:text-gray-800 transition-colors">{mounted && t('footerPrivacy')}</Link>
           </div>
         </div>
       </div>
