@@ -19,11 +19,6 @@ const SESSION_KEY = 'chat_session_id'
 export default function ChatWidget() {
   const pathname = usePathname()
   const [open, setOpen] = useState(false)
-
-  // Hide widget on dashboard or admin/login routes
-  if (pathname?.startsWith('/dashboard') || pathname?.startsWith('/login') || pathname?.startsWith('/admin')) {
-    return null
-  }
   const [step, setStep] = useState<'intro' | 'chat'>('intro')
   const [visitorName, setVisitorName] = useState('')
   const [visitorPhone, setVisitorPhone] = useState('')
@@ -144,6 +139,11 @@ export default function ChatWidget() {
 
   const safeDate = (str: string) => {
     try { return format(new Date(str), 'HH:mm', { locale: ko }) } catch { return '' }
+  }
+
+  // Hide widget on dashboard or admin/login routes
+  if (pathname?.startsWith('/dashboard') || pathname?.startsWith('/login') || pathname?.startsWith('/admin')) {
+    return null
   }
 
   return (
