@@ -16,8 +16,13 @@ interface AdvisorProfileProps {
 }
 
 export default function AdvisorProfile({ name, phone, profileImage, businessCard, affiliation, region, kakaoUrl, message }: AdvisorProfileProps) {
+  const [mounted, setMounted] = useState(false);
   const [copied, setCopied] = useState(false);
   const { t, locale } = useLanguage();
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const handleCopyLink = () => {
     if (typeof window === 'undefined') return;
@@ -27,6 +32,14 @@ export default function AdvisorProfile({ name, phone, profileImage, businessCard
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
+
+  const handleTranslation = (key: any, ...args: any[]) => {
+    const val = t(key);
+    if (typeof val === 'function') return val(...args);
+    return val;
+  };
+
+  if (!mounted) return null;
 
   const points = t('profilePoints') as { title: string, desc: string }[];
 
@@ -72,7 +85,7 @@ export default function AdvisorProfile({ name, phone, profileImage, businessCard
 
           <div className="md:col-span-3">
             <h2 className="text-3xl md:text-4xl lg:text-[2.8rem] font-black mb-10 tracking-tight leading-[1.1] text-white">
-              {message || (name ? t('profileTitlePlanner')(name) : t('profileTitleDefault'))}
+              {message || (name ? handleTranslation('profileTitlePlanner', name) : t('profileTitleDefault'))}
               {!message && (
                 <>
                   <br /> 

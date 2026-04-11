@@ -12,6 +12,7 @@ import LanguageSwitcher from './LanguageSwitcher'
 import { useLanguage } from '@/lib/contexts/LanguageContext'
 
 export default function NavBar() {
+  const [mounted, setMounted] = useState(false)
   const [isOpen, setIsOpen] = useState(false)
   const [user, setUser] = useState<User | null>(null)
   const { planner, loading: attrLoading } = useAttribution()
@@ -21,6 +22,7 @@ export default function NavBar() {
   const isPlannerPage = pathname?.startsWith('/p/')
 
   useEffect(() => {
+    setMounted(true)
     // Check initial auth state
     supabase.auth.getUser().then(({ data: { user } }) => {
       setUser(user)
@@ -33,6 +35,19 @@ export default function NavBar() {
 
     return () => subscription.unsubscribe()
   }, [])
+
+  if (!mounted) {
+    return (
+      <nav className="sticky top-0 z-50 bg-white border-b border-gray-100 h-14">
+        <div className="container flex items-center justify-between h-full">
+           <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 bg-primary-600 rounded-xl"></div>
+              <span className="font-black text-2xl tracking-tighter text-gray-900">인슈<span className="text-primary-600">닷</span></span>
+           </div>
+        </div>
+      </nav>
+    )
+  }
 
   return (
     <nav className="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-gray-100">

@@ -4,8 +4,21 @@ import Link from 'next/link'
 import { useLanguage } from '@/lib/contexts/LanguageContext'
 
 export default function Footer() {
+  const [mounted, setMounted] = useState(false)
   const { t } = useLanguage()
   const year = new Date().getFullYear()
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  const handleTranslation = (key: any, ...args: any[]) => {
+    const val = t(key);
+    if (typeof val === 'function') return val(...args);
+    return val;
+  };
+
+  if (!mounted) return null;
 
   return (
     <footer className="bg-gray-50 border-t border-gray-200 pt-16 pb-8 text-sm">
@@ -24,7 +37,7 @@ export default function Footer() {
 
         <div className="pt-8 border-t border-gray-200 flex flex-col md:flex-row justify-between md:items-center gap-6 text-xs text-gray-400 leading-relaxed">
           <div>
-            <p className="opacity-70">{t('footerCopyright')(year)} <br className="md:hidden" />{t('footerCopyrightNotice')}</p>
+            <p className="opacity-70">{handleTranslation('footerCopyright', year)} <br className="md:hidden" />{t('footerCopyrightNotice')}</p>
           </div>
           <div className="flex gap-4 md:self-end">
             <a href="#" className="hover:text-gray-600 transition-colors">{t('footerTerms')}</a>
