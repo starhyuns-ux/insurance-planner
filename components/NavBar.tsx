@@ -144,7 +144,7 @@ export default function NavBar() {
             </button>
 
             <Link href="/calculator" className="text-primary-600 font-bold hover:text-primary-700 transition-colors">{t('navSilbiCalc')}</Link>
-            <Link href="/disease-codes" className="text-primary-600 font-bold hover:text-primary-700 transition-colors">{t('navDiseaseSearch')}</Link>
+            <Link href="/guide/disease-codes" className="text-primary-600 font-bold hover:text-primary-700 transition-colors">{t('navDiseaseSearch')}</Link>
           </div>
         </div>
 
@@ -229,7 +229,7 @@ export default function NavBar() {
                   <Link href="/guide/5th-gen" onClick={() => setIsOpen(false)} className="flex items-center justify-between p-3.5 bg-gray-50 rounded-xl font-bold text-gray-700">
                     <span>{t('navSilbiGen5')}</span>
                   </Link>
-                  <Link href="/disease-codes" onClick={() => setIsOpen(false)} className="flex items-center justify-between p-3.5 bg-gray-50 rounded-xl font-bold text-gray-700">
+                  <Link href="/guide/disease-codes" onClick={() => setIsOpen(false)} className="flex items-center justify-between p-3.5 bg-gray-50 rounded-xl font-bold text-gray-700">
                     <span>{t('navDiseaseSearch')}</span>
                   </Link>
                 </div>
