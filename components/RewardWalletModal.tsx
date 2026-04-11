@@ -44,6 +44,36 @@ export default function RewardWalletModal({ isOpen, onClose }: { isOpen: boolean
             if (data.success) {
                 setReferralInfo(data.data)
                 setStep('DASHBOARD')
+
+                // Supabase 실시간 소켓 연결을 통해 포인트가 오를 때 자동(모션) 업데이트
+                if (data.data.id) {
+                    const { supabase } = await import('@/lib/supabaseClient')
+                    
+                    const channel = supabase
+                        .channel('schema-db-changes')
+                        .on(
+                            'postgres_changes',
+                            {
+                                event: 'UPDATE',
+                                schema: 'public',
+                                table: 'guest_referrers',
+                                filter: `id=eq.${data.data.id}`
+                            },
+                            (payload) => {
+                                const newData = payload.new as ReferralInfo
+                                setReferralInfo(prev => prev ? { 
+                                    ...prev, 
+                                    points_balance: newData.points_balance,
+                                    total_referrals: newData.total_referrals
+                                } : null)
+                            }
+                        )
+                        .subscribe()
+
+                    return () => {
+                        supabase.removeChannel(channel)
+                    }
+                }
             }
         } catch (e) {
             console.error('Fetch info error:', e)
