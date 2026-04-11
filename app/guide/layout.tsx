@@ -17,7 +17,7 @@ export default function GuideLayout({
 }) {
   return (
     <ClientAccessGuard>
-      <div className="min-h-screen flex flex-col pt-16">
+      <div className="min-h-screen flex flex-col">
         <NavBar />
         <main className="flex-1">
           {children}
