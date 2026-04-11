@@ -126,47 +126,44 @@ export default function NavBar() {
             >
               {isOpen ? <XMarkIcon className="w-7 h-7" /> : <Bars3Icon className="w-7 h-7" />}
             </button>
-          </div>
-        </div>
-
-        {/* Bottom Row: Desktop Navigation Links (Always visible) */}
-        <div className="hidden lg:flex items-center justify-center py-2.5 border-t border-gray-50/50" suppressHydrationWarning>
-            <div className="flex items-center space-x-8 text-[13px] lg:text-sm font-bold text-gray-600">
-              <Link href="/calculator/insurance-premium" className="text-amber-600 font-black hover:text-amber-700 transition-colors whitespace-nowrap">{t('navPremiumCalc')}</Link>
-              <Link href="/guide/pension" className="text-indigo-600 font-bold hover:text-indigo-700 transition-colors whitespace-nowrap">{t('navPension')}</Link>
-              <Link href="/guide/critical-illness-relief" className="text-indigo-600 font-bold hover:text-indigo-700 transition-colors whitespace-nowrap">{t('navCriticalIllness')}</Link>
-              
-              {/* Disease Study Dropdown */}
-              <div className="relative group py-1">
-                <button className="flex items-center gap-1 text-rose-600 font-bold hover:text-rose-700 transition-colors whitespace-nowrap outline-none">
-                  {t('navDiseaseStudy')}
-                  <ChevronDownIcon className="w-3.5 h-3.5 transition-transform group-hover:rotate-180" />
-                </button>
-                <div className="absolute top-full left-1/2 -translate-x-1/2 w-48 bg-white border border-gray-100 rounded-2xl shadow-xl py-2 opacity-0 invisible translate-y-2 group-hover:opacity-100 group-hover:visible group-hover:translate-y-0 transition-all z-50">
-                  <Link href="/guide/vascular-disease" className="block px-4 py-2.5 text-sm hover:bg-gray-50 text-gray-700 hover:text-rose-600 transition-colors">{t('navHeartStudy')}</Link>
-                  <Link href="/guide/cerebrovascular-disease" className="block px-4 py-2.5 text-sm hover:bg-gray-50 text-gray-700 hover:text-rose-600 transition-colors">{t('navBrainStudy')}</Link>
-                </div>
+        {/* Desktop Bottom Row: Service Tabs (Inside Container for better alignment) */}
+        <div className="hidden lg:flex items-center justify-center py-3 border-t border-gray-100/50" suppressHydrationWarning>
+          <div className="flex items-center space-x-7 text-[13px] lg:text-sm font-bold text-gray-600">
+            <Link href="/calculator/insurance-premium" className="text-amber-600 font-extrabold hover:text-amber-700 transition-colors whitespace-nowrap">{t('navPremiumCalc')}</Link>
+            <Link href="/guide/pension" className="text-indigo-600 font-bold hover:text-indigo-700 transition-colors whitespace-nowrap">{t('navPension')}</Link>
+            <Link href="/guide/critical-illness-relief" className="text-indigo-600 font-bold hover:text-indigo-700 transition-colors whitespace-nowrap">{t('navCriticalIllness')}</Link>
+            
+            {/* Disease Study Dropdown */}
+            <div className="relative group py-1">
+              <button className="flex items-center gap-1 text-rose-600 font-bold hover:text-rose-700 transition-colors whitespace-nowrap outline-none">
+                {t('navDiseaseStudy')}
+                <ChevronDownIcon className="w-3.5 h-3.5 transition-transform group-hover:rotate-180" />
+              </button>
+              <div className="absolute top-full left-1/2 -translate-x-1/2 w-48 bg-white border border-gray-100 rounded-2xl shadow-xl py-2 opacity-0 invisible translate-y-2 group-hover:opacity-100 group-hover:visible group-hover:translate-y-0 transition-all z-50">
+                <Link href="/guide/vascular-disease" className="block px-4 py-2.5 text-sm hover:bg-gray-50 text-gray-700 hover:text-rose-600 transition-colors">{t('navHeartStudy')}</Link>
+                <Link href="/guide/cerebrovascular-disease" className="block px-4 py-2.5 text-sm hover:bg-gray-50 text-gray-700 hover:text-rose-600 transition-colors">{t('navBrainStudy')}</Link>
               </div>
-              <Link href="/guide/5th-gen" className="text-primary-600 font-bold hover:text-primary-700 transition-colors whitespace-nowrap">{t('navSilbiGen5')}</Link>
-              
-              {/* Cancer Treatment Dropdown */}
-              <div className="relative group py-1">
-                <button className="flex items-center gap-1 text-primary-600 font-bold hover:text-primary-700 transition-colors whitespace-nowrap outline-none">
-                  {t('navCancerTreat')}
-                  <ChevronDownIcon className="w-3.5 h-3.5 transition-transform group-hover:rotate-180" />
-                </button>
-                <div className="absolute top-full left-1/2 -translate-x-1/2 w-48 bg-white border border-gray-100 rounded-2xl shadow-xl py-2 opacity-0 invisible translate-y-2 group-hover:opacity-100 group-hover:visible group-hover:translate-y-0 transition-all z-50">
-                  <Link href="/guide/cancer-treatment" className="block px-4 py-2.5 text-sm hover:bg-gray-50 text-gray-700 hover:text-primary-600 transition-colors">{t('navCancerGuide')}</Link>
-                  <Link href="/guide/advanced-radiation" className="block px-4 py-2.5 text-sm hover:bg-gray-50 text-gray-700 hover:text-primary-600 transition-colors">{t('navRadiation')}</Link>
-                  <Link href="/guide/hifu-therapy" className="block px-4 py-2.5 text-sm hover:bg-gray-50 text-gray-700 hover:text-primary-600 transition-colors">{t('navHifu')}</Link>
-                </div>
-              </div>
-
-              <Link href="/calculator" className="text-primary-600 font-bold hover:text-primary-700 transition-colors whitespace-nowrap">{t('navSilbiCalc')}</Link>
-              <Link href="/disease-codes" className="text-primary-600 font-bold hover:text-primary-700 transition-colors whitespace-nowrap">{t('navDiseaseSearch')}</Link>
             </div>
+            <Link href="/guide/5th-gen" className="text-primary-600 font-bold hover:text-primary-700 transition-colors whitespace-nowrap">{t('navSilbiGen5')}</Link>
+            
+            {/* Cancer Treatment Dropdown */}
+            <div className="relative group py-1">
+              <button className="flex items-center gap-1 text-primary-600 font-bold hover:text-primary-700 transition-colors whitespace-nowrap outline-none">
+                {t('navCancerTreat')}
+                <ChevronDownIcon className="w-3.5 h-3.5 transition-transform group-hover:rotate-180" />
+              </button>
+              <div className="absolute top-full left-1/2 -translate-x-1/2 w-48 bg-white border border-gray-100 rounded-2xl shadow-xl py-2 opacity-0 invisible translate-y-2 group-hover:opacity-100 group-hover:visible group-hover:translate-y-0 transition-all z-50">
+                <Link href="/guide/cancer-treatment" className="block px-4 py-2.5 text-sm hover:bg-gray-50 text-gray-700 hover:text-primary-600 transition-colors">{t('navCancerGuide')}</Link>
+                <Link href="/guide/advanced-radiation" className="block px-4 py-2.5 text-sm hover:bg-gray-50 text-gray-700 hover:text-primary-600 transition-colors">{t('navRadiation')}</Link>
+                <Link href="/guide/hifu-therapy" className="block px-4 py-2.5 text-sm hover:bg-gray-50 text-gray-700 hover:text-primary-600 transition-colors">{t('navHifu')}</Link>
+              </div>
+            </div>
+
+            <Link href="/calculator" className="text-primary-600 font-bold hover:text-primary-700 transition-colors whitespace-nowrap">{t('navSilbiCalc')}</Link>
+            <Link href="/disease-codes" className="text-primary-600 font-bold hover:text-primary-700 transition-colors whitespace-nowrap">{t('navDiseaseSearch')}</Link>
           </div>
         </div>
+      </div>
       </div>
 
 
