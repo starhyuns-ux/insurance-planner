@@ -1,1 +1,1 @@
-# Temp file to verify thinking
+// Temporary file cleared to resolve Next.js build error.
