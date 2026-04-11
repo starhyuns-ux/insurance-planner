@@ -161,12 +161,12 @@ export default function NavBar() {
               <div className="flex items-center justify-center py-4 px-6 gap-8">
                 {activeMenu === 'disease' && (
                   <>
-                    <Link href="/guide/vascular-disease" onClick={() => setActiveMenu(null)} className="flex flex-col items-center p-3 rounded-xl hover:bg-white transition-colors group">
+                    <Link href="/guide/vascular-disease" className="flex flex-col items-center p-3 rounded-xl hover:bg-white transition-colors group">
                       <span className="text-rose-600 font-black text-sm group-hover:-translate-y-0.5 transition-transform">{t('navHeartStudy')}</span>
                       <span className="text-[10px] text-gray-500 font-bold mt-1">심혈관질환 가이드</span>
                     </Link>
                     <div className="w-px h-8 bg-gray-200"></div>
-                    <Link href="/guide/cerebrovascular-disease" onClick={() => setActiveMenu(null)} className="flex flex-col items-center p-3 rounded-xl hover:bg-white transition-colors group">
+                    <Link href="/guide/cerebrovascular-disease" className="flex flex-col items-center p-3 rounded-xl hover:bg-white transition-colors group">
                       <span className="text-rose-600 font-black text-sm group-hover:-translate-y-0.5 transition-transform">{t('navBrainStudy')}</span>
                       <span className="text-[10px] text-gray-500 font-bold mt-1">뇌혈관질환 가이드</span>
                     </Link>
@@ -174,17 +174,17 @@ export default function NavBar() {
                 )}
                 {activeMenu === 'cancer' && (
                   <>
-                    <Link href="/guide/cancer-treatment" onClick={() => setActiveMenu(null)} className="flex flex-col items-center p-3 rounded-xl hover:bg-white transition-colors group">
+                    <Link href="/guide/cancer-treatment" className="flex flex-col items-center p-3 rounded-xl hover:bg-white transition-colors group">
                       <span className="text-primary-600 font-black text-sm group-hover:-translate-y-0.5 transition-transform">{t('navCancerGuide')}</span>
                       <span className="text-[10px] text-gray-500 font-bold mt-1">기본 항암 치료</span>
                     </Link>
                     <div className="w-px h-8 bg-gray-200"></div>
-                    <Link href="/guide/advanced-radiation" onClick={() => setActiveMenu(null)} className="flex flex-col items-center p-3 rounded-xl hover:bg-white transition-colors group">
+                    <Link href="/guide/advanced-radiation" className="flex flex-col items-center p-3 rounded-xl hover:bg-white transition-colors group">
                       <span className="text-primary-600 font-black text-sm group-hover:-translate-y-0.5 transition-transform">{t('navRadiation')}</span>
                       <span className="text-[10px] text-gray-500 font-bold mt-1">표적/중입자 방사선</span>
                     </Link>
                     <div className="w-px h-8 bg-gray-200"></div>
-                    <Link href="/guide/hifu-therapy" onClick={() => setActiveMenu(null)} className="flex flex-col items-center p-3 rounded-xl hover:bg-white transition-colors group">
+                    <Link href="/guide/hifu-therapy" className="flex flex-col items-center p-3 rounded-xl hover:bg-white transition-colors group">
                       <span className="text-primary-600 font-black text-sm group-hover:-translate-y-0.5 transition-transform">{t('navHifu')}</span>
                       <span className="text-[10px] text-gray-500 font-bold mt-1">비침습 하이푸 시술</span>
                     </Link>
@@ -207,11 +207,11 @@ export default function NavBar() {
           >
             <div className="flex flex-col container mx-auto px-6 py-6 space-y-6">
               <div className="grid grid-cols-2 gap-4">
-                <Link href="/calculator/insurance-premium" onClick={() => setIsOpen(false)} className="flex flex-col p-4 bg-amber-50 rounded-2xl">
+                <Link href="/calculator/insurance-premium" className="flex flex-col p-4 bg-amber-50 rounded-2xl">
                   <span className="text-amber-600 font-black text-lg">{t('navPremiumCalc')}</span>
                   <span className="text-[10px] text-amber-500 font-bold opacity-70">보험료 자가진단</span>
                 </Link>
-                <Link href="/calculator" onClick={() => setIsOpen(false)} className="flex flex-col p-4 bg-blue-50 rounded-2xl">
+                <Link href="/calculator" className="flex flex-col p-4 bg-blue-50 rounded-2xl">
                   <span className="text-blue-600 font-black text-lg">{t('navSilbiCalc')}</span>
                   <span className="text-[10px] text-blue-500 font-bold opacity-70">실비 혜택 비교</span>
                 </Link>
@@ -220,16 +220,16 @@ export default function NavBar() {
               <div className="space-y-4">
                 <span className="text-[11px] font-black text-gray-400 uppercase tracking-widest px-1">보험 가이드 & 스터디</span>
                 <div className="flex flex-col gap-1">
-                  <Link href="/guide/pension" onClick={() => setIsOpen(false)} className="flex items-center justify-between p-3.5 bg-gray-50 rounded-xl font-bold text-gray-700">
+                  <Link href="/guide/pension" className="flex items-center justify-between p-3.5 bg-gray-50 rounded-xl font-bold text-gray-700">
                     <span>{t('navPension')}</span>
                   </Link>
-                  <Link href="/guide/critical-illness-relief" onClick={() => setIsOpen(false)} className="flex items-center justify-between p-3.5 bg-gray-50 rounded-xl font-bold text-gray-700">
+                  <Link href="/guide/critical-illness-relief" className="flex items-center justify-between p-3.5 bg-gray-50 rounded-xl font-bold text-gray-700">
                     <span>{t('navCriticalIllness')}</span>
                   </Link>
-                  <Link href="/guide/5th-gen" onClick={() => setIsOpen(false)} className="flex items-center justify-between p-3.5 bg-gray-50 rounded-xl font-bold text-gray-700">
+                  <Link href="/guide/5th-gen" className="flex items-center justify-between p-3.5 bg-gray-50 rounded-xl font-bold text-gray-700">
                     <span>{t('navSilbiGen5')}</span>
                   </Link>
-                  <Link href="/guide/disease-codes" onClick={() => setIsOpen(false)} className="flex items-center justify-between p-3.5 bg-gray-50 rounded-xl font-bold text-gray-700">
+                  <Link href="/guide/disease-codes" className="flex items-center justify-between p-3.5 bg-gray-50 rounded-xl font-bold text-gray-700">
                     <span>{t('navDiseaseSearch')}</span>
                   </Link>
                 </div>
@@ -240,17 +240,17 @@ export default function NavBar() {
                 <div className="space-y-3 pt-2">
                   <span className="text-xs font-black text-rose-500 uppercase tracking-widest pl-1">{t('navDiseaseStudy')}</span>
                   <div className="flex flex-col gap-2 pl-3 border-l-2 border-rose-100">
-                    <Link href="/guide/vascular-disease" onClick={() => setIsOpen(false)} className="text-gray-600 font-bold text-sm hover:text-rose-600">{t('navHeartStudy')}</Link>
-                    <Link href="/guide/cerebrovascular-disease" onClick={() => setIsOpen(false)} className="text-gray-600 font-bold text-sm hover:text-rose-600">{t('navBrainStudy')}</Link>
+                    <Link href="/guide/vascular-disease" className="text-gray-600 font-bold text-sm hover:text-rose-600">{t('navHeartStudy')}</Link>
+                    <Link href="/guide/cerebrovascular-disease" className="text-gray-600 font-bold text-sm hover:text-rose-600">{t('navBrainStudy')}</Link>
                   </div>
                 </div>
                 
                 <div className="space-y-3 pt-2">
                   <span className="text-xs font-black text-primary-500 uppercase tracking-widest pl-1">{t('navCancerTreat')}</span>
                   <div className="flex flex-col gap-2 pl-3 border-l-2 border-primary-100">
-                    <Link href="/guide/cancer-treatment" onClick={() => setIsOpen(false)} className="text-gray-600 font-bold text-sm hover:text-primary-600">{t('navCancerGuide')}</Link>
-                    <Link href="/guide/advanced-radiation" onClick={() => setIsOpen(false)} className="text-gray-600 font-bold text-sm hover:text-primary-600">{t('navRadiation')}</Link>
-                    <Link href="/guide/hifu-therapy" onClick={() => setIsOpen(false)} className="text-gray-600 font-bold text-sm hover:text-primary-600">{t('navHifu')}</Link>
+                    <Link href="/guide/cancer-treatment" className="text-gray-600 font-bold text-sm hover:text-primary-600">{t('navCancerGuide')}</Link>
+                    <Link href="/guide/advanced-radiation" className="text-gray-600 font-bold text-sm hover:text-primary-600">{t('navRadiation')}</Link>
+                    <Link href="/guide/hifu-therapy" className="text-gray-600 font-bold text-sm hover:text-primary-600">{t('navHifu')}</Link>
                   </div>
                 </div>
               </div>

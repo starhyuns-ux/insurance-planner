@@ -40,6 +40,17 @@ export default function NotificationsPage() {
     }
   }, [])
 
+  const urlB64ToUint8Array = (base64String: string) => {
+    const padding = '='.repeat((4 - base64String.length % 4) % 4)
+    const base64 = (base64String + padding).replace(/\-/g, '+').replace(/_/g, '/')
+    const rawData = window.atob(base64)
+    const outputArray = new Uint8Array(rawData.length)
+    for (let i = 0; i < rawData.length; ++i) {
+      outputArray[i] = rawData.charCodeAt(i)
+    }
+    return outputArray
+  }
+
   const handleTogglePush = async () => {
     if (!planner) return
     setPushLoading(true)
@@ -62,10 +73,16 @@ export default function NotificationsPage() {
           toast.error('알림 권한을 허용해주세요.')
           return
         }
+        
+        if (!process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY) {
+          toast.error('오류: 푸시 알림 서버 키가 설정되지 않았습니다.')
+          return
+        }
+
         const reg = await navigator.serviceWorker.ready
         const sub = await reg.pushManager.subscribe({
           userVisibleOnly: true,
-          applicationServerKey: process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY
+          applicationServerKey: urlB64ToUint8Array(process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY)
         })
         await fetch('/api/push-subscribe', {
           method: 'POST',
