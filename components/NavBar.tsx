@@ -88,18 +88,18 @@ export default function NavBar() {
             </div>
             <div className="hidden lg:flex items-center">
               <Link
-                href="/dashboard"
-                className="text-sm font-black text-gray-700 hover:text-primary-600 transition-colors"
+                href={user ? "/dashboard" : "/login"}
+                className={`text-sm font-black transition-colors ${user ? 'text-gray-700 hover:text-primary-600' : 'text-primary-600 hover:text-primary-700'}`}
                 suppressHydrationWarning
               >
-                {t('navDashboard')}
+                {user ? t('navDashboard') : t('navAdminLogin')}
               </Link>
             </div>
 
             {/* Mobile Actions */}
             <div className="flex items-center lg:hidden gap-1">
               <LanguageSwitcher />
-              <Link href="/dashboard" className="p-2 ml-1 text-gray-600 hover:text-primary-600">
+              <Link href={user ? "/dashboard" : "/login"} className={`p-2 ml-1 ${user ? 'text-gray-600 hover:text-primary-600' : 'text-primary-600 hover:text-primary-700'}`}>
                 <UserCircleIcon className="w-6 h-6" />
               </Link>
               <button
