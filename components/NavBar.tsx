@@ -131,7 +131,7 @@ export default function NavBar() {
 
         {/* Desktop Bottom Row: Service Tabs (Inside Container for better alignment) */}
         <div className="hidden lg:flex items-center justify-center py-3 border-t border-gray-100/50" suppressHydrationWarning>
-          <div className="flex items-center space-x-7 text-[13px] lg:text-sm font-bold text-gray-600">
+          <div className="flex items-center lg:space-x-4 xl:space-x-6 text-[13px] lg:text-sm font-bold text-gray-600 tracking-tight">
             <Link href="/calculator/insurance-premium" className="text-amber-600 font-extrabold hover:text-amber-700 transition-colors whitespace-nowrap">{t('navPremiumCalc')}</Link>
             <Link href="/guide/pension" className="text-indigo-600 font-bold hover:text-indigo-700 transition-colors whitespace-nowrap">{t('navPension')}</Link>
             <Link href="/guide/critical-illness-relief" className="text-indigo-600 font-bold hover:text-indigo-700 transition-colors whitespace-nowrap">{t('navCriticalIllness')}</Link>
