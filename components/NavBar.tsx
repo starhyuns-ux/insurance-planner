@@ -126,6 +126,9 @@ export default function NavBar() {
             >
               {isOpen ? <XMarkIcon className="w-7 h-7" /> : <Bars3Icon className="w-7 h-7" />}
             </button>
+          </div>
+        </div>
+
         {/* Desktop Bottom Row: Service Tabs (Inside Container for better alignment) */}
         <div className="hidden lg:flex items-center justify-center py-3 border-t border-gray-100/50" suppressHydrationWarning>
           <div className="flex items-center space-x-7 text-[13px] lg:text-sm font-bold text-gray-600">
