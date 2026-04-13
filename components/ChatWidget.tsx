@@ -153,14 +153,16 @@ export default function ChatWidget() {
     <>
       {/* Floating button group */}
       <div className="fixed bottom-6 right-6 z-50 flex flex-col items-center gap-3">
-        {/* Wallet button */}
+        {/* Wallet button - expands on hover */}
         <button
           onClick={() => setWalletOpen(w => !w)}
-          className="w-12 h-12 bg-white border-2 border-primary-200 text-primary-600 rounded-full shadow-xl hover:bg-primary-50 transition-all hover:scale-105 flex items-center justify-center"
+          className="group flex items-center gap-2 h-11 bg-white border-2 border-primary-200 text-primary-600 rounded-full shadow-xl hover:bg-primary-600 hover:text-white hover:border-primary-600 transition-all duration-300 overflow-hidden px-3"
           aria-label="리워드 지갑"
-          title="리워드 지갑 열기"
         >
-          <WalletIcon className="w-5 h-5" />
+          <WalletIcon className="w-5 h-5 shrink-0" />
+          <span className="max-w-0 group-hover:max-w-[6rem] overflow-hidden whitespace-nowrap transition-all duration-300 text-sm font-bold">
+            리워드 지갑열기
+          </span>
         </button>
 
         {/* Chat button */}
