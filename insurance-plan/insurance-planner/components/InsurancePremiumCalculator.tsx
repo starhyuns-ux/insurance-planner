@@ -12,6 +12,7 @@ import {
   HeartIcon,
   BoltIcon
 } from '@heroicons/react/24/outline'
+import { useLanguage } from '@/lib/contexts/LanguageContext'
 
 // --- Rate Tables ---
 
@@ -34,6 +35,27 @@ const cancerRateTable: Record<number, { male: number; female: number }> = {
   60:{male:15780,female:15190},61:{male:16140,female:15510},62:{male:16500,female:15830},63:{male:16860,female:16150},
   64:{male:17220,female:16470},65:{male:17580,female:16790},66:{male:17940,female:17110},67:{male:18300,female:17430},
   68:{male:18660,female:17750},69:{male:19020,female:18070},70:{male:19380,female:18390}
+};
+
+const cancerTreatmentRateTable: Record<number, { male: number; female: number }> = {
+  0:{male:832,female:832},1:{male:844,female:844},2:{male:856,female:856},3:{male:869,female:869},
+  4:{male:881,female:881},5:{male:893,female:893},6:{male:905,female:905},7:{male:918,female:918},
+  8:{male:930,female:930},9:{male:942,female:942},10:{male:954,female:954},11:{male:967,female:967},
+  12:{male:979,female:979},13:{male:991,female:991},14:{male:1003,female:1003},15:{male:1016,female:1016},
+  16:{male:1028,female:1028},17:{male:1040,female:1040},18:{male:1052,female:1052},19:{male:1065,female:1065},
+  20:{male:1077,female:1077},21:{male:1089,female:1089},22:{male:1101,female:1101},23:{male:1114,female:1114},
+  24:{male:1126,female:1126},25:{male:1138,female:1138},26:{male:1150,female:1150},27:{male:1163,female:1163},
+  28:{male:1175,female:1175},29:{male:1187,female:1187},30:{male:1199,female:1199},31:{male:1212,female:1212},
+  32:{male:1224,female:1224},33:{male:1236,female:1236},34:{male:1248,female:1248},35:{male:1261,female:1261},
+  36:{male:1273,female:1273},37:{male:1285,female:1285},38:{male:1297,female:1297},39:{male:1309,female:1309},
+  40:{male:1322,female:1322},41:{male:1334,female:1334},42:{male:1346,female:1346},43:{male:1358,female:1358},
+  44:{male:1371,female:1371},45:{male:1383,female:1383},46:{male:1395,female:1395},47:{male:1407,female:1407},
+  48:{male:1420,female:1420},49:{male:1432,female:1432},50:{male:1444,female:1444},51:{male:1456,female:1456},
+  52:{male:1469,female:1469},53:{male:1481,female:1481},54:{male:1493,female:1493},55:{male:1505,female:1505},
+  56:{male:1518,female:1518},57:{male:1530,female:1530},58:{male:1542,female:1542},59:{male:1554,female:1554},
+  60:{male:1567,female:1567},61:{male:1579,female:1579},62:{male:1591,female:1591},63:{male:1603,female:1603},
+  64:{male:1616,female:1616},65:{male:1628,female:1628},66:{male:1640,female:1640},67:{male:1652,female:1652},
+  68:{male:1665,female:1665},69:{male:1677,female:1677},70:{male:1689,female:1689}
 };
 
 const brainRateTable: Record<number, { male: number; female: number }> = {
@@ -103,26 +125,26 @@ const injurySurgeryRateTable: Record<number, { male: number; female: number }> =
 };
 
 const diseaseSurgeryRateTable: Record<number, { male: number; female: number }> = {
-  0:{male:7300,female:7300}, 1:{male:7300,female:7300}, 2:{male:7300,female:7300}, 3:{male:7300,female:7300},
-  4:{male:7300,female:7300}, 5:{male:7300,female:7300}, 6:{male:7300,female:7300}, 7:{male:7300,female:7300},
-  8:{male:7300,female:7300}, 9:{male:7300,female:7300}, 10:{male:7300,female:7300}, 11:{male:7300,female:7300},
-  12:{male:7300,female:7300}, 13:{male:7300,female:7300}, 14:{male:7300,female:7300}, 15:{male:7300,female:7300},
-  16:{male:7300,female:7300}, 17:{male:7300,female:7300}, 18:{male:7300,female:7300}, 19:{male:7300,female:7300},
-  20:{male:7300,female:7300},
-  21:{male:17700,female:17700}, 22:{male:17700,female:17700}, 23:{male:17700,female:17700}, 24:{male:17700,female:17700},
-  25:{male:17700,female:17700}, 26:{male:17700,female:17700}, 27:{male:17700,female:17700}, 28:{male:17700,female:17700},
-  29:{male:17700,female:17700}, 30:{male:17700,female:17700}, 31:{male:17700,female:17700}, 32:{male:17700,female:17700},
-  33:{male:17700,female:17700}, 34:{male:17700,female:17700}, 35:{male:17700,female:17700}, 36:{male:17700,female:17700},
-  37:{male:17700,female:17700}, 38:{male:17700,female:17700}, 39:{male:17700,female:17700}, 40:{male:17700,female:17700},
-  41:{male:21000,female:21000}, 42:{male:21000,female:21000}, 43:{male:21000,female:21000}, 44:{male:21000,female:21000},
-  45:{male:21000,female:21000}, 46:{male:21000,female:21000}, 47:{male:21000,female:21000}, 48:{male:21000,female:21000},
-  49:{male:21000,female:21000}, 50:{male:21000,female:21000},
-  51:{male:24000,female:24000}, 52:{male:24000,female:24000}, 53:{male:24000,female:24000}, 54:{male:24000,female:24000},
-  55:{male:24000,female:24000}, 56:{male:24000,female:24000}, 57:{male:24000,female:24000}, 58:{male:24000,female:24000},
-  59:{male:24000,female:24000}, 60:{male:24000,female:24000},
-  61:{male:32000,female:32000}, 62:{male:32000,female:32000}, 63:{male:32000,female:32000}, 64:{male:32000,female:32000},
-  65:{male:32000,female:32000}, 66:{male:32000,female:32000}, 67:{male:32000,female:32000}, 68:{male:32000,female:32000},
-  69:{male:32000,female:32000}, 70:{male:32000,female:32000}
+  0:{male:2865,female:2865}, 1:{male:2985,female:2985}, 2:{male:3105,female:3105}, 3:{male:3225,female:3225},
+  4:{male:3350,female:3350}, 5:{male:3470,female:3470}, 6:{male:3590,female:3590}, 7:{male:3710,female:3710},
+  8:{male:3830,female:3830}, 9:{male:3950,female:3950}, 10:{male:4070,female:4070}, 11:{male:4195,female:4195},
+  12:{male:4315,female:4315}, 13:{male:4435,female:4435}, 14:{male:4555,female:4555}, 15:{male:4675,female:4675},
+  16:{male:4795,female:4795}, 17:{male:4920,female:4920}, 18:{male:5040,female:5040}, 19:{male:5160,female:5160},
+  20:{male:5280,female:5280},
+  21:{male:5480,female:5480}, 22:{male:5685,female:5685}, 23:{male:5885,female:5885}, 24:{male:6090,female:6090},
+  25:{male:6290,female:6290}, 26:{male:6490,female:6490}, 27:{male:6695,female:6695}, 28:{male:6895,female:6895},
+  29:{male:7100,female:7100}, 30:{male:7300,female:7300}, 31:{male:7505,female:7505}, 32:{male:7710,female:7710},
+  33:{male:7915,female:7915}, 34:{male:8120,female:8120}, 35:{male:8325,female:8325}, 36:{male:8530,female:8530},
+  37:{male:8735,female:8735}, 38:{male:8940,female:8940}, 39:{male:9145,female:9145}, 40:{male:9350,female:9350},
+  41:{male:9555,female:9555}, 42:{male:9760,female:9760}, 43:{male:9965,female:9965}, 44:{male:10170,female:10170},
+  45:{male:10375,female:10375}, 46:{male:10580,female:10580}, 47:{male:10785,female:10785}, 48:{male:10990,female:10990},
+  49:{male:11195,female:11195}, 50:{male:11400,female:11400},
+  51:{male:12000,female:12000}, 52:{male:12000,female:12000}, 53:{male:12000,female:12000}, 54:{male:12000,female:12000},
+  55:{male:12000,female:12000}, 56:{male:12000,female:12000}, 57:{male:12000,female:12000}, 58:{male:12000,female:12000},
+  59:{male:12000,female:12000}, 60:{male:12000,female:12000},
+  61:{male:16000,female:16000}, 62:{male:16000,female:16000}, 63:{male:16000,female:16000}, 64:{male:16000,female:16000},
+  65:{male:16000,female:16000}, 66:{male:16000,female:16000}, 67:{male:16000,female:16000}, 68:{male:16000,female:16000},
+  69:{male:16000,female:16000}, 70:{male:16000,female:16000}
 };
 
 const BASE_AMOUNT_MANWON = 1000;
@@ -149,25 +171,32 @@ function calcPremium(amountManwon: number, premiumPer1000: number): number {
   return (amountManwon / BASE_AMOUNT_MANWON) * premiumPer1000;
 }
 
-function formatMoney(value: number): string {
-  return Math.round(value).toLocaleString('ko-KR') + '원';
-}
-
 // --- Component ---
 
 export default function InsurancePremiumCalculator() {
+  const { t, locale } = useLanguage();
+  const [inputType, setInputType] = useState<'birthDate' | 'age'>('birthDate');
+  const [directAge, setDirectAge] = useState<string>('');
   const [gender, setGender] = useState<'male' | 'female'>('male');
   const [birthDate, setBirthDate] = useState<string>('');
-  const [cancerAmount, setCancerAmount] = useState<number>(5000);
+  
+  const [cancerAmount, setCancerAmount] = useState<number>(10000);
   const [brainAmount, setBrainAmount] = useState<number>(2000);
   const [heartAmount, setHeartAmount] = useState<number>(2000);
   const [injurySurgeryAmount, setInjurySurgeryAmount] = useState<number>(1500);
   const [diseaseSurgeryAmount, setDiseaseSurgeryAmount] = useState<number>(2000);
+  const [cancerTreatmentAmount, setCancerTreatmentAmount] = useState<number>(10000);
   
   const [isCalculated, setIsCalculated] = useState(false);
   const [showResults, setShowResults] = useState(false);
 
-  const insuranceAge = useMemo(() => getInsuranceAge(birthDate), [birthDate]);
+  const insuranceAge = useMemo(() => {
+    if (inputType === 'age') {
+      const parsedAge = parseInt(directAge, 10);
+      return isNaN(parsedAge) ? null : parsedAge;
+    }
+    return getInsuranceAge(birthDate);
+  }, [inputType, directAge, birthDate]);
 
   const results = useMemo(() => {
     if (insuranceAge === null || insuranceAge < 0 || insuranceAge > 70) return null;
@@ -178,6 +207,7 @@ export default function InsurancePremiumCalculator() {
       heart: calcPremium(heartAmount, heartRateTable[insuranceAge][gender]),
       injurySurgery: calcPremium(injurySurgeryAmount, injurySurgeryRateTable[insuranceAge][gender]),
       diseaseSurgery: calcPremium(diseaseSurgeryAmount, diseaseSurgeryRateTable[insuranceAge][gender]),
+      cancerTreatment: calcPremium(cancerTreatmentAmount, cancerTreatmentRateTable[insuranceAge][gender]),
     };
 
     const total = Object.values(premiums).reduce((acc, curr) => acc + curr, 0);
@@ -186,24 +216,32 @@ export default function InsurancePremiumCalculator() {
       premiums,
       total,
       age: insuranceAge,
-      genderLabel: gender === 'male' ? '남성' : '여성'
+      genderLabel: gender === 'male' ? t('male') : t('female')
     };
-  }, [gender, insuranceAge, cancerAmount, brainAmount, heartAmount, injurySurgeryAmount, diseaseSurgeryAmount]);
+  }, [gender, insuranceAge, cancerAmount, brainAmount, heartAmount, injurySurgeryAmount, diseaseSurgeryAmount, cancerTreatmentAmount, t]);
+
+  const formatMoney = (amount: number) => {
+    if (amount <= 0) return `0 ${t('currencyUnit')}`
+    return `${Math.round(amount).toLocaleString()} ${t('currencyUnit')}`;
+  }
 
   const handleCalculate = () => {
-    if (!birthDate) {
-      alert('생년월일을 입력해 주세요.');
+    if (inputType === 'birthDate' && !birthDate) {
+      alert(t('alertBirthDate'));
+      return;
+    }
+    if (inputType === 'age' && !directAge) {
+      alert(t('alertAgeEligible'));
       return;
     }
     if (insuranceAge === null || insuranceAge < 0 || insuranceAge > 70) {
-      alert('보험 가능 연령(0~70세)이 아닙니다.');
+      alert(t('alertAgeEligible'));
       return;
     }
     
     setIsCalculated(true);
     setShowResults(true);
     
-    // Scroll to results
     setTimeout(() => {
       const element = document.getElementById('calculation-results');
       if (element) {
@@ -226,13 +264,13 @@ export default function InsurancePremiumCalculator() {
           <div className="bg-white rounded-3xl shadow-xl shadow-gray-200/50 p-6 md:p-8 border border-gray-100">
             <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
               <CalculatorIcon className="w-6 h-6 text-primary-600" />
-              가입 정보 입력
+              {t('inputInfo')}
             </h2>
             
             <div className="space-y-6">
               {/* Gender Selection */}
               <div>
-                <label className="block text-sm font-bold text-gray-700 mb-3 ml-1">성별</label>
+                <label className="block text-sm font-bold text-gray-700 mb-3 ml-1">{t('gender')}</label>
                 <div className="grid grid-cols-2 gap-3">
                   <button
                     onClick={() => setGender('male')}
@@ -243,7 +281,7 @@ export default function InsurancePremiumCalculator() {
                     }`}
                   >
                     <UserIcon className="w-5 h-5" />
-                    남성
+                    {t('male')}
                   </button>
                   <button
                     onClick={() => setGender('female')}
@@ -254,33 +292,79 @@ export default function InsurancePremiumCalculator() {
                     }`}
                   >
                     <UserIcon className="w-5 h-5" />
-                    여성
+                    {t('female')}
                   </button>
                 </div>
               </div>
 
-              {/* Birth Date */}
+              {/* Input Type Toggle */}
               <div>
-                <label htmlFor="birthDate" className="block text-sm font-bold text-gray-700 mb-2 ml-1">
-                  생년월일
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                    <CalendarIcon className="h-5 w-5 text-gray-400" />
-                  </div>
-                  <input
-                    type="date"
-                    id="birthDate"
-                    value={birthDate}
-                    onChange={(e) => setBirthDate(e.target.value)}
-                    className="block w-full pl-11 pr-4 py-3.5 bg-gray-50 border-2 border-transparent focus:border-primary-500 focus:bg-white rounded-2xl text-gray-900 font-medium transition-all outline-none"
-                    placeholder="YYYY-MM-DD"
-                  />
+                <label className="block text-sm font-bold text-gray-700 mb-3 ml-1">{t('inputTypeTitle')}</label>
+                <div className="grid grid-cols-2 gap-3 mb-4">
+                  <button
+                    onClick={() => setInputType('birthDate')}
+                    className={`flex items-center justify-center gap-2 py-3 rounded-2xl font-bold transition-all border-2 ${
+                      inputType === 'birthDate' 
+                        ? 'bg-primary-50 border-primary-500 text-primary-700 shadow-sm' 
+                        : 'bg-gray-50 border-transparent text-gray-500 hover:bg-gray-100'
+                    }`}
+                  >
+                    <CalendarIcon className="w-5 h-5" />
+                    {t('inputTypeBirthDate')}
+                  </button>
+                  <button
+                    onClick={() => setInputType('age')}
+                    className={`flex items-center justify-center gap-2 py-3 rounded-2xl font-bold transition-all border-2 ${
+                      inputType === 'age' 
+                        ? 'bg-emerald-50 border-emerald-500 text-emerald-700 shadow-sm' 
+                        : 'bg-gray-50 border-transparent text-gray-500 hover:bg-gray-100'
+                    }`}
+                  >
+                    <UserIcon className="w-5 h-5" />
+                    {t('inputTypeAge')}
+                  </button>
                 </div>
-                {insuranceAge !== null && insuranceAge >= 0 && (
-                  <p className="mt-2 text-sm font-medium text-primary-600 ml-1">
-                    보험나이: {insuranceAge}세
-                  </p>
+
+                {/* Age Input Dynamic Render */}
+                {inputType === 'birthDate' ? (
+                  <div>
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                        <CalendarIcon className="h-5 w-5 text-gray-400" />
+                      </div>
+                      <input
+                        type="date"
+                        id="birthDate"
+                        value={birthDate}
+                        onChange={(e) => setBirthDate(e.target.value)}
+                        className="block w-full pl-11 pr-4 py-3.5 bg-gray-50 border-2 border-transparent focus:border-primary-500 focus:bg-white rounded-2xl text-gray-900 font-medium transition-all outline-none"
+                        placeholder="YYYY-MM-DD"
+                      />
+                    </div>
+                    {insuranceAge !== null && insuranceAge >= 0 && (
+                      <p className="mt-2 text-sm font-medium text-primary-600 ml-1">
+                        {t('insuranceAge')}: {insuranceAge} {t('ageUnit')}
+                      </p>
+                    )}
+                  </div>
+                ) : (
+                  <div>
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                        <UserIcon className="h-5 w-5 text-gray-400" />
+                      </div>
+                      <input
+                        type="number"
+                        id="directAge"
+                        value={directAge}
+                        onChange={(e) => setDirectAge(e.target.value)}
+                        className="block w-full pl-11 pr-4 py-3.5 bg-gray-50 border-2 border-transparent focus:border-emerald-500 focus:bg-white rounded-2xl text-gray-900 font-medium transition-all outline-none"
+                        placeholder={t('inputAgePlaceholder') || '0~70'}
+                        min="0"
+                        max="70"
+                      />
+                    </div>
+                  </div>
                 )}
               </div>
 
@@ -288,15 +372,16 @@ export default function InsurancePremiumCalculator() {
 
               {/* Coverage Amounts */}
               <div className="space-y-4">
-                <h3 className="text-sm font-bold text-gray-400 uppercase tracking-wider ml-1">보장 금액 설정 (만원)</h3>
+                <h3 className="text-sm font-bold text-gray-400 uppercase tracking-wider ml-1">{t('coverageSettings')}</h3>
                 
                 <div className="space-y-4">
                   {[
-                    { id: 'cancer', label: '암진단금', value: cancerAmount, setter: setCancerAmount, icon: ShieldCheckIcon, color: 'text-amber-500' },
-                    { id: 'brain', label: '뇌혈관진단금', value: brainAmount, setter: setBrainAmount, icon: BoltIcon, color: 'text-blue-500' },
-                    { id: 'heart', label: '허혈성심장진단비', value: heartAmount, setter: setHeartAmount, icon: HeartIcon, color: 'text-rose-500' },
-                    { id: 'injury', label: '상해 1~5종 수술비', value: injurySurgeryAmount, setter: setInjurySurgeryAmount, icon: BoltIcon, color: 'text-green-500' },
-                    { id: 'disease', label: '질병 1~5종 수술비', value: diseaseSurgeryAmount, setter: setDiseaseSurgeryAmount, icon: ShieldCheckIcon, color: 'text-indigo-500' },
+                    { id: 'cancer', label: t('cancerLabel'), value: cancerAmount, setter: setCancerAmount, icon: ShieldCheckIcon, color: 'text-amber-500' },
+                    { id: 'brain', label: t('brainLabel'), value: brainAmount, setter: setBrainAmount, icon: BoltIcon, color: 'text-blue-500' },
+                    { id: 'heart', label: t('heartLabel'), value: heartAmount, setter: setHeartAmount, icon: HeartIcon, color: 'text-rose-500' },
+                    { id: 'injury', label: t('injurySurgery'), value: injurySurgeryAmount, setter: setInjurySurgeryAmount, icon: BoltIcon, color: 'text-green-500' },
+                    { id: 'disease', label: t('diseaseSurgery'), value: diseaseSurgeryAmount, setter: setDiseaseSurgeryAmount, icon: ShieldCheckIcon, color: 'text-indigo-500' },
+                    { id: 'cancerTreatment', label: t('cancerTreatmentLabel') || '비급여 암주요치료비', value: cancerTreatmentAmount, setter: setCancerTreatmentAmount, icon: ShieldCheckIcon, color: 'text-purple-500' },
                   ].map((item) => (
                     <div key={item.id}>
                       <div className="flex justify-between items-center mb-1.5 ml-1">
@@ -304,7 +389,7 @@ export default function InsurancePremiumCalculator() {
                           <item.icon className={`w-4 h-4 ${item.color}`} />
                           {item.label}
                         </label>
-                        <span className="text-xs font-bold text-gray-400">{item.value.toLocaleString()}만원</span>
+                        <span className="text-xs font-bold text-gray-400">{item.value.toLocaleString()} {t('manwonUnit')}</span>
                       </div>
                       <input
                         type="number"
@@ -324,7 +409,7 @@ export default function InsurancePremiumCalculator() {
                 onClick={handleCalculate}
                 className="w-full bg-gray-900 text-white py-4 rounded-2xl font-black text-lg shadow-lg hover:bg-gray-800 transition-all hover:-translate-y-1 active:translate-y-0"
               >
-                보험료 계산하기
+                {t('calculatePremium')}
               </button>
             </div>
           </div>
@@ -337,9 +422,11 @@ export default function InsurancePremiumCalculator() {
               <div className="bg-white p-6 rounded-full shadow-sm mb-6">
                 <CalculatorIcon className="w-12 h-12 text-gray-300" />
               </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-2">계산 결과가 여기에 표시됩니다</h3>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">
+                {t('calcPlaceholderTitle')}
+              </h3>
               <p className="text-gray-500 max-w-xs mx-auto">
-                가입 정보를 입력하고 '보험료 계산하기' 버튼을 눌러주세요.
+                {t('calcPlaceholderDesc')}
               </p>
             </div>
           ) : (
@@ -353,24 +440,25 @@ export default function InsurancePremiumCalculator() {
                       {results.genderLabel}
                     </span>
                     <span className="px-3 py-1 rounded-full bg-gray-100 text-gray-600 text-xs font-bold">
-                      보험나이 {results.age}세
+                       {t('insuranceAge')} {results.age} {t('ageUnit')}
                     </span>
                   </div>
-                  <h2 className="text-2xl font-black text-gray-900">예상 보험료 산출 결과</h2>
+                  <h2 className="text-2xl font-black text-gray-900">{t('calcResults')}</h2>
                 </div>
                 <div className="text-right">
-                  <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">총 월 예상 보험료</p>
+                  <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">{t('totalMonthly')}</p>
                   <p className="text-3xl font-black text-primary-600 tracking-tight">{formatMoney(results.total)}</p>
                 </div>
               </div>
 
               <div className="space-y-4 flex-1">
                 {[
-                  { label: '암진단비', amount: cancerAmount, premium: results.premiums.cancer, icon: ShieldCheckIcon, bg: 'bg-amber-50', text: 'text-amber-700', iconColor: 'text-amber-500' },
-                  { label: '뇌혈관질환 진단비', amount: brainAmount, premium: results.premiums.brain, icon: BoltIcon, bg: 'bg-blue-50', text: 'text-blue-700', iconColor: 'text-blue-500' },
-                  { label: '허혈성심장질환 진단비', amount: heartAmount, premium: results.premiums.heart, icon: HeartIcon, bg: 'bg-rose-50', text: 'text-rose-700', iconColor: 'text-rose-500' },
-                  { label: '상해 1~5종 수술비', amount: injurySurgeryAmount, premium: results.premiums.injurySurgery, icon: BoltIcon, bg: 'bg-green-50', text: 'text-green-700', iconColor: 'text-green-500' },
-                  { label: '질병 1~5종 수술비', amount: diseaseSurgeryAmount, premium: results.premiums.diseaseSurgery, icon: ShieldCheckIcon, bg: 'bg-indigo-50', text: 'text-indigo-700', iconColor: 'text-indigo-500' },
+                  { label: t('cancerLabel'), amount: cancerAmount, premium: results.premiums.cancer, icon: ShieldCheckIcon, bg: 'bg-amber-50', text: 'text-amber-700', iconColor: 'text-amber-500' },
+                  { label: t('brainLabel'), amount: brainAmount, premium: results.premiums.brain, icon: BoltIcon, bg: 'bg-blue-50', text: 'text-blue-700', iconColor: 'text-blue-500' },
+                  { label: t('heartLabel'), amount: heartAmount, premium: results.premiums.heart, icon: HeartIcon, bg: 'bg-rose-50', text: 'text-rose-700', iconColor: 'text-rose-500' },
+                  { label: t('injurySurgery'), amount: injurySurgeryAmount, premium: results.premiums.injurySurgery, icon: BoltIcon, bg: 'bg-green-50', text: 'text-green-700', iconColor: 'text-green-500' },
+                  { label: t('diseaseSurgery'), amount: diseaseSurgeryAmount, premium: results.premiums.diseaseSurgery, icon: ShieldCheckIcon, bg: 'bg-indigo-50', text: 'text-indigo-700', iconColor: 'text-indigo-500' },
+                  { label: t('cancerTreatmentLabel') || '비급여 암주요치료비', amount: cancerTreatmentAmount, premium: results.premiums.cancerTreatment, icon: ShieldCheckIcon, bg: 'bg-purple-50', text: 'text-purple-700', iconColor: 'text-purple-500' },
                 ].map((item, idx) => (
                   <div key={idx} className="group p-5 rounded-2xl bg-gray-50 border border-transparent hover:border-gray-200 transition-all">
                     <div className="flex items-center justify-between mb-3">
@@ -380,7 +468,9 @@ export default function InsurancePremiumCalculator() {
                         </div>
                         <div>
                           <p className="text-sm font-bold text-gray-900">{item.label}</p>
-                          <p className="text-[11px] font-bold text-gray-400">가입금액: {item.amount.toLocaleString()}만원</p>
+                          <p className="text-[11px] font-bold text-gray-400">
+                             {t('limitVal') || (locale === 'ko' ? '가입금액' : (locale === 'en' ? 'Limit' : '保额'))}: {item.amount.toLocaleString()} {t('manwonUnit')}
+                          </p>
                         </div>
                       </div>
                       <div className="text-right">
@@ -402,13 +492,15 @@ export default function InsurancePremiumCalculator() {
                 <div className="absolute top-0 right-0 -mr-10 -mt-10 w-40 h-40 bg-white/10 rounded-full blur-3xl group-hover:bg-white/20 transition-all duration-700" />
                 <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
                   <div>
-                    <h4 className="text-lg font-black mb-1">나에게 딱 맞는 보험료인가요?</h4>
+                    <h4 className="text-lg font-black mb-1">
+                      {t('consultationTitle')}
+                    </h4>
                     <p className="text-white/80 text-sm font-medium">
-                      고객님만을 위한 보험 다이어트 전문가가<br className="hidden md:block" /> 1:1 맞춤형 보장 분석을 도와드립니다.
+                       {t('consultationDesc')}
                     </p>
                   </div>
                   <a href="/#consultation" className="bg-white text-primary-600 px-6 py-3 rounded-xl font-black text-sm shadow-xl hover:shadow-white/20 transition-all whitespace-nowrap">
-                    전문가 상담 신청
+                    {t('requestConsultation')}
                   </a>
                 </div>
               </div>
@@ -418,7 +510,7 @@ export default function InsurancePremiumCalculator() {
                 className="mt-6 text-sm font-bold text-gray-400 hover:text-gray-600 transition-colors flex items-center justify-center gap-2"
               >
                 <ArrowPathIcon className="w-4 h-4" />
-                다시 계산하기
+                {t('resetCalc')}
               </button>
             </div>
           )}
@@ -426,12 +518,14 @@ export default function InsurancePremiumCalculator() {
           <div className="mt-8 bg-amber-50/50 rounded-2xl p-6 border border-amber-100 flex items-start gap-4">
             <InformationCircleIcon className="w-6 h-6 text-amber-500 shrink-0 mt-0.5" />
             <div>
-              <h4 className="font-bold text-amber-900 mb-2">안내드립니다</h4>
-              <ul className="text-sm text-amber-800/80 space-y-1.5 list-disc list-inside break-keep">
-                <li>본 계산기는 요율표를 기반으로 한 <strong>단순 예상치</strong>이며, 실제 보험료는 가입 연령, 직업, 건강 상태, 회사별 할인 혜택 등에 따라 달라질 수 있습니다.</li>
-                <li>암진단금 등 각 보장 항목의 가입 금액은 가입하시는 목적에 따라 조절이 필요합니다.</li>
-                <li>보험나이는 만나이와는 다르며, 실제 생일에서 6개월을 기준으로 산출됩니다.</li>
-                <li>더 정확한 보험료와 보장 범위는 <strong>보험 다이어트 상담</strong>을 통해 확인해 보시기 바랍니다.</li>
+              <h4 className="font-bold text-amber-900 mb-2">{t('noticeTitle')}</h4>
+              <p className="text-sm text-amber-800/80 leading-relaxed break-keep">
+                {t('noticePremium')}
+              </p>
+              <ul className="mt-3 text-xs text-amber-800/70 space-y-1 list-disc list-inside">
+                <li>본 계산 결과는 참고용입니다.</li>
+                <li>상품 추천 또는 가입 권유 목적이 아닙니다.</li>
+                <li>실제 보험료는 조건에 따라 달라질 수 있습니다.</li>
               </ul>
             </div>
           </div>
