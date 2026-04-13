@@ -11,7 +11,8 @@ import {
   CheckCircleIcon,
   ExclamationCircleIcon,
   ClockIcon,
-  DocumentArrowUpIcon
+  DocumentArrowUpIcon,
+  ArrowDownTrayIcon
 } from '@heroicons/react/24/outline'
 import { supabase } from '@/lib/supabaseClient'
 import { differenceInDays, parseISO } from 'date-fns'
@@ -147,13 +148,30 @@ export default function CustomerCRM({
             onAddCustomersBulk(parsedData)
          }
       } else {
-         alert('추출할 수 있는 행 데이터가 존재하지 않습니다.')
+         alert('추출할 수 있는 행 데이터가 존재하지 않습니다. 엑셀 파일 형식을 확인해주세요.')
       }
     } catch (err) {
       console.error(err)
-      alert('엑셀 파싱 중 오류가 발생했습니다.')
+      alert('엑셀 파싱 중 오류가 발생했습니다. 파일 형식이 맞지 않거나 내용에 오류가 있을 수 있습니다.')
     } finally {
       if (fileInputRef.current) fileInputRef.current.value = ''
+    }
+  }
+
+  const handleDownloadTemplate = async () => {
+    try {
+      const XLSX = await import('xlsx')
+      const templateData = [
+        { '고객명': '홍길동', '전화번호': '010-1234-5678', '생년월일': '1980-01-01', '주소': '서울시 강남구 테헤란로', '특약사항': '암, 뇌혈관질환, 허혈성', '고객구분': '계약고객', '가족수': 3 },
+        { '고객명': '김영희', '전화번호': '010-9876-5432', '생년월일': '1992-05-15', '주소': '부산시 해운대구', '특약사항': '실손의료비', '고객구분': '가망고객', '가족수': 1 }
+      ]
+      const worksheet = XLSX.utils.json_to_sheet(templateData)
+      const workbook = XLSX.utils.book_new()
+      XLSX.utils.book_append_sheet(workbook, worksheet, '고객일괄등록양식')
+      XLSX.writeFile(workbook, '고객일괄등록_양식.xlsx')
+    } catch (err) {
+      console.error(err)
+      alert('양식을 다운로드하는 중 오류가 발생했습니다.')
     }
   }
 
@@ -204,14 +222,21 @@ export default function CustomerCRM({
       <div className="bg-white rounded-[2rem] shadow-xl p-8 border border-gray-100">
         <div className="flex items-center justify-between mb-8">
           <h3 className="text-2xl font-black text-gray-900 uppercase tracking-tight">고객 정보 등록</h3>
-          <div>
+          <div className="flex items-center gap-2">
+            <button 
+              onClick={handleDownloadTemplate} 
+              className="text-sm px-4 py-2 bg-gray-50 text-gray-600 font-bold rounded-xl flex items-center gap-2 hover:bg-gray-100 transition-colors shadow-sm border border-gray-200"
+              title="엑셀(XLSX) 업로드용 기본 양식을 다운로드합니다."
+            >
+              <ArrowDownTrayIcon className="w-5 h-5" /> 양식 다운로드
+            </button>
             <input type="file" ref={fileInputRef} onChange={handleFileUpload} accept=".xlsx, .xls, .csv" className="hidden" />
             <button 
               onClick={() => fileInputRef.current?.click()} 
-              className="text-sm px-4 py-2 bg-emerald-50 text-emerald-600 font-bold rounded-xl flex items-center gap-2 hover:bg-emerald-100 transition-colors shadow-sm"
+              className="text-sm px-4 py-2 bg-emerald-50 text-emerald-600 font-bold rounded-xl flex items-center gap-2 hover:bg-emerald-100 transition-colors shadow-sm border border-emerald-100"
               title="엑셀(XLSX, CSV) 파일을 업로드하여 다수의 고객을 한 번에 추가합니다."
             >
-              <DocumentArrowUpIcon className="w-5 h-5" /> 엑셀 일괄 등록
+              <DocumentArrowUpIcon className="w-5 h-5" /> 엑셀 파일 올리기
             </button>
           </div>
         </div>
