@@ -18,7 +18,7 @@ export default function ReferralRewardBanner() {
                     initial={{ y: 100, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
                     exit={{ y: 100, opacity: 0 }}
-                    className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[60] w-[92%] max-w-lg"
+                    className="fixed bottom-24 lg:bottom-6 left-1/2 -translate-x-1/2 z-[60] w-[92%] max-w-lg"
                 >
                     <div className="bg-gradient-to-r from-primary-600 via-indigo-600 to-primary-600 bg-[length:200%_auto] animate-gradient-x text-white p-4 rounded-3xl shadow-2xl shadow-primary-200/50 flex items-center justify-between gap-4 border border-white/20 backdrop-blur-md">
                         <div className="flex items-center gap-4">
