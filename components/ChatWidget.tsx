@@ -151,7 +151,7 @@ export default function ChatWidget() {
       {/* Floating button */}
       <button
         onClick={() => setOpen(o => !o)}
-        className="fixed bottom-24 lg:bottom-8 right-6 z-50 w-14 h-14 bg-primary-600 text-white rounded-full shadow-2xl hover:bg-primary-700 transition-all hover:scale-105 flex items-center justify-center"
+        className="fixed bottom-32 lg:bottom-28 right-6 z-50 w-14 h-14 bg-primary-600 text-white rounded-full shadow-2xl hover:bg-primary-700 transition-all hover:scale-105 flex items-center justify-center"
         aria-label="상담 채팅"
       >
         {open ? (
@@ -170,7 +170,7 @@ export default function ChatWidget() {
  
       {/* Chat Window */}
       {open && (
-        <div className="fixed bottom-40 lg:bottom-24 right-6 z-50 w-80 sm:w-96 bg-white rounded-3xl shadow-2xl border border-gray-100 flex flex-col overflow-hidden" style={{ height: '520px' }}>
+        <div className="fixed bottom-48 lg:bottom-44 right-6 z-50 w-80 sm:w-96 bg-white rounded-3xl shadow-2xl border border-gray-100 flex flex-col overflow-hidden" style={{ height: '520px' }}>
           {/* Header */}
           <div className="bg-primary-600 px-5 py-4 text-white">
             <div className="flex items-center gap-3">

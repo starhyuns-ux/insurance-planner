@@ -48,10 +48,10 @@ export default function RewardWalletSuccess({ referralCode, userName }: RewardWa
         <CheckCircleIcon className="w-10 h-10 text-green-600" />
       </motion.div>
 
-      <h3 className="text-2xl font-black text-gray-900 mb-2 text-center">
+      <h3 className="text-xl sm:text-2xl font-black text-gray-900 mb-2 text-center">
         상담 신청 완료!
       </h3>
-      <p className="text-gray-500 text-center mb-8 text-sm">
+      <p className="text-gray-500 text-center mb-8 text-xs sm:text-sm">
         {userName}님의 <span className="font-bold text-primary-600">리워드 지갑</span>이 생성되었습니다.
       </p>
 
@@ -60,25 +60,25 @@ export default function RewardWalletSuccess({ referralCode, userName }: RewardWa
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.2 }}
-        className="w-full bg-gradient-to-br from-gray-900 to-gray-800 rounded-2xl p-6 shadow-2xl relative overflow-hidden mb-8"
+        className="w-full bg-gradient-to-br from-gray-900 to-gray-800 rounded-3xl p-4 sm:p-6 shadow-2xl relative overflow-hidden mb-8"
       >
         <div className="absolute top-0 right-0 w-32 h-32 bg-primary-500/10 rounded-full blur-3xl -mr-16 -mt-16"></div>
         
-        <div className="flex justify-between items-start mb-10">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-8 sm:mb-10">
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-lg bg-primary-500/20 flex items-center justify-center">
               <WalletIcon className="w-5 h-5 text-primary-400" />
             </div>
-            <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">My Reward Wallet</span>
+            <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">My Reward Wallet</span>
           </div>
-          <span className="text-[10px] font-mono text-gray-500">{referralCode}</span>
+          <span className="text-[10px] font-mono text-gray-400/50 uppercase bg-white/5 px-2 py-1 rounded-md">{referralCode}</span>
         </div>
 
         <div className="mb-2">
-          <span className="text-gray-400 text-xs font-medium">현재 포인트 잔액</span>
+          <span className="text-gray-400 text-[10px] sm:text-xs font-medium">현재 리워드 잔액</span>
           <div className="flex items-baseline gap-1 mt-1">
-            <span className="text-4xl font-black text-white">0</span>
-            <span className="text-xl font-bold text-primary-400">P</span>
+            <span className="text-3xl sm:text-4xl font-black text-white">0</span>
+            <span className="text-lg sm:text-xl font-bold text-primary-400">P</span>
           </div>
         </div>
 

@@ -9,6 +9,8 @@ import { format } from 'date-fns'
 import { HOLIDAYS } from '@/lib/constants/holidays'
 import { getInsuranceAge } from '@/lib/time'
 
+import DashboardGreeting from '../components/DashboardGreeting'
+
 export default function CalendarPage() {
   const { planner, loading: plannerLoading } = usePlanner()
   const [currentMonth, setCurrentMonth] = useState(new Date())
@@ -115,6 +117,12 @@ export default function CalendarPage() {
 
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-500">
+      <DashboardGreeting 
+        planner={planner}
+        todos={todos}
+        customers={customers}
+      />
+
       <CalendarManager 
         currentMonth={currentMonth}
         todoDate={todoDate}

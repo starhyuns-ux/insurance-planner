@@ -84,6 +84,30 @@ export default function CustomersPage() {
     }
   }
 
+  const onAddCustomersBulk = async (customersData: any[]) => {
+    if (!planner || customersData.length === 0) return
+    
+    const rows = customersData.map(c => ({
+      planner_id: planner.id,
+      name: c.name,
+      phone: c.phone || '',
+      address: c.address || '',
+      birth_date: c.birth_date || null,
+      family_count: c.family_count || 1,
+      riders: c.riders || [],
+      is_contracted: c.is_contracted || false
+    }))
+
+    const { error } = await supabase.from('customers').insert(rows)
+    if (!error) {
+      toast.success(`${rows.length}명의 고객 정보가 일괄 등록되었습니다.`)
+      fetchCustomers()
+    } else {
+      toast.error('일괄 등록 중 오류가 발생했습니다.')
+      console.error(error)
+    }
+  }
+
   if (plannerLoading) return null
 
   return (
@@ -131,6 +155,7 @@ export default function CustomersPage() {
           if (key === 'newCustIsContracted') setNewCustIsContracted(value)
         }}
         onAddCustomer={addCustomer}
+        onAddCustomersBulk={onAddCustomersBulk}
         onIncrementTouch={async (id, count) => {
           await supabase.from('customers').update({ touch_count: count + 1, last_touch_at: new Date().toISOString() }).eq('id', id)
           fetchCustomers()
