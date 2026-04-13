@@ -10,7 +10,8 @@ import {
   TrashIcon,
   CheckCircleIcon,
   ExclamationCircleIcon,
-  ClockIcon
+  ClockIcon,
+  DocumentArrowUpIcon
 } from '@heroicons/react/24/outline'
 import { supabase } from '@/lib/supabaseClient'
 import { differenceInDays, parseISO } from 'date-fns'
@@ -39,6 +40,7 @@ interface CustomerCRMProps {
   setActiveTab: (tab: 'all' | 'contracted' | 'prospect') => void
   onUpdateState: (key: string, value: any) => void
   onAddCustomer: (e: React.FormEvent) => void
+  onAddCustomersBulk: (data: any[]) => void
   onIncrementTouch: (id: string, count: number) => void
   onDecrementTouch: (id: string, count: number) => void
   onToggleMemo: (customer: any) => void
@@ -76,6 +78,7 @@ export default function CustomerCRM({
   setActiveTab,
   onUpdateState,
   onAddCustomer,
+  onAddCustomersBulk,
   onIncrementTouch,
   onDecrementTouch,
   onToggleMemo,
@@ -89,6 +92,70 @@ export default function CustomerCRM({
   onUpdate
 }: CustomerCRMProps) {
   const [isUpdating, setIsUpdating] = useState<string | null>(null)
+  const fileInputRef = React.useRef<HTMLInputElement>(null)
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    try {
+      const XLSX = await import('xlsx')
+      const data = await file.arrayBuffer()
+      const workbook = XLSX.read(data)
+      const worksheet = workbook.Sheets[workbook.SheetNames[0]]
+      const jsonData = XLSX.utils.sheet_to_json(worksheet)
+      
+      const parsedData = jsonData.map((row: any) => {
+        // Smart parse column names with spaces removed
+        const getVal = (keywords: string[]) => {
+          for (const key of Object.keys(row)) {
+            if (keywords.some(k => key.replace(/\s+/g, '').includes(k))) {
+              return row[key]
+            }
+          }
+          return ''
+        }
+
+        const name = getVal(['이름', '고객명', '성명', 'name'])
+        const phone = getVal(['전화', '연락처', '휴대폰', 'phone', '번호'])
+        const address = getVal(['주소', 'address', '거주지'])
+        let rawBirth = getVal(['생년월일', '생일', 'birth', '주민'])
+        let birth_date = null
+        if (typeof rawBirth === 'number') {
+           const dateInfo = XLSX.SSF.parse_date_code(rawBirth)
+           if (dateInfo) {
+              birth_date = `${dateInfo.y}-${String(dateInfo.m).padStart(2, '0')}-${String(dateInfo.d).padStart(2, '0')}`
+           }
+        } else if (rawBirth) {
+           birth_date = String(rawBirth).replace(/\./g, '-').slice(0, 10)
+        }
+
+        const rawRiders = getVal(['특약', '보장', '담보', '가입내역'])
+        const riders = rawRiders ? String(rawRiders).split(',').map(r => r.trim()).filter(Boolean) : []
+
+        const is_contracted = getVal(['구분', '계약', '유형', '상태'])
+        const contracted = String(is_contracted).includes('계약') || String(is_contracted).includes('기존')
+
+        const family_countStr = getVal(['가족', '가구', '식구'])
+        const family_count = parseInt(family_countStr as string) || 1
+
+        return { name: name || '이름없음', phone, address, birth_date, riders, is_contracted: contracted, family_count }
+      })
+
+      if (parsedData.length > 0) {
+         if (confirm(`총 ${parsedData.length}명의 고객 정보를 대량 등록하겠습니까?`)) {
+            onAddCustomersBulk(parsedData)
+         }
+      } else {
+         alert('추출할 수 있는 행 데이터가 존재하지 않습니다.')
+      }
+    } catch (err) {
+      console.error(err)
+      alert('엑셀 파싱 중 오류가 발생했습니다.')
+    } finally {
+      if (fileInputRef.current) fileInputRef.current.value = ''
+    }
+  }
 
   const handleMarkContacted = async (id: string, currentTouchCount: number) => {
     setIsUpdating(id)
@@ -137,6 +204,16 @@ export default function CustomerCRM({
       <div className="bg-white rounded-[2rem] shadow-xl p-8 border border-gray-100">
         <div className="flex items-center justify-between mb-8">
           <h3 className="text-2xl font-black text-gray-900 uppercase tracking-tight">고객 정보 등록</h3>
+          <div>
+            <input type="file" ref={fileInputRef} onChange={handleFileUpload} accept=".xlsx, .xls, .csv" className="hidden" />
+            <button 
+              onClick={() => fileInputRef.current?.click()} 
+              className="text-sm px-4 py-2 bg-emerald-50 text-emerald-600 font-bold rounded-xl flex items-center gap-2 hover:bg-emerald-100 transition-colors shadow-sm"
+              title="엑셀(XLSX, CSV) 파일을 업로드하여 다수의 고객을 한 번에 추가합니다."
+            >
+              <DocumentArrowUpIcon className="w-5 h-5" /> 엑셀 일괄 등록
+            </button>
+          </div>
         </div>
         <form onSubmit={onAddCustomer} className="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
           <div className="md:col-span-1">
