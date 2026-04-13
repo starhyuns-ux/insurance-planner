@@ -18,7 +18,6 @@ import { useAttribution } from '@/lib/attribution'
 import { usePlanner } from '@/lib/providers/PlannerProvider'
 import { usePathname } from 'next/navigation'
 
-import ReferralRewardBanner from '@/components/ReferralRewardBanner'
 
 export default function Home() {
   const { planner, loading: attrLoading } = useAttribution()
@@ -70,8 +69,7 @@ export default function Home() {
 
       <Footer key={`footer-${pathname}`} />
       
-      {/* Referral Reward System for Guests */}
-      <ReferralRewardBanner />
+      
     </main>
   )
 }
