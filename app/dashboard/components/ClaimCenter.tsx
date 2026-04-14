@@ -30,6 +30,7 @@ export default function ClaimCenter({
   onUpdateClaimStatus,
   onDeleteClaim,
   onCheckStatus,
+  onPreviewClaim,
   checkingStatusId
 }: ClaimCenterProps) {
   
