@@ -13,6 +13,7 @@ interface ClaimCenterProps {
   plannerId?: string
   transmittingClaimId: string | null
   onTransmitClaim: (id: string, overrideFax?: string) => void
+  onUpdateClaimStatus: (id: string, status: string) => void
   onDeleteClaim: (id: string) => void
   onCheckStatus: (id: string, getPreview?: boolean) => void
   onPreviewClaim: (id: string) => void
