@@ -260,10 +260,11 @@ export default function DetailedClaimForm({ onSuccess, plannerId }: { onSuccess?
   const [bankHolder, setBankHolder] = useState('')
   const [paymentMethod, setPaymentMethod] = useState<'GENERAL' | 'AUTO_DEBIT'>('GENERAL')
 
-  const [insuranceCompany, setInsuranceCompany] = useState('')
+  const [selectedCompanies, setSelectedCompanies] = useState<string[]>([])
   const [images, setImages] = useState<File[]>([])
 
   const [consentThirdParty, setConsentThirdParty] = useState(false)
+  const [consentSensitive, setConsentSensitive] = useState(false)
   const [signatureType] = useState<'FACE'>('FACE') // Default to FACE and remove NON_FACE
   const [signatureDataUrl, setSignatureDataUrl] = useState<string>('')
   const [signatureSaved, setSignatureSaved] = useState(false)
@@ -281,8 +282,8 @@ export default function DetailedClaimForm({ onSuccess, plannerId }: { onSuccess?
         return true
       }
       case 4: return bankName && bankAccount && bankHolder
-      case 5: return insuranceCompany
-      case 6: return consentThirdParty && signatureSaved
+      case 5: return selectedCompanies.length > 0
+      case 6: return consentThirdParty && consentSensitive && signatureSaved
       default: return false
     }
   }
@@ -334,41 +335,48 @@ export default function DetailedClaimForm({ onSuccess, plannerId }: { onSuccess?
         uploadedUrls.push(publicUrl)
       }
 
-      const maskedResident = residentBack ? `${residentFront}-${residentBack[0]}******` : residentFront
+      const fullResident = residentBack ? `${residentFront}-${residentBack}` : residentFront
 
-      const { success } = await submitClaimAction({
-        planner_id: planner?.id || null,
-        customer_name: name,
-        customer_phone: phone,
-        address,
-        resident_number: maskedResident,
-        same_as_policyholder: sameAsPolicyholder,
-        policyholder_name: sameAsPolicyholder ? name : policyholderName,
-        notification_person: notificationPerson,
-        accident_type: accidentType,
-        accident_detail: accidentDetail,
-        description: `[${accidentType}] ${accidentDetail}`,
-        car_accident_detail: accidentType === '교통사고' ? carAccidentDetail : null,
-        car_insurance_claim: accidentType === '교통사고' ? carInsuranceClaim : null,
-        car_insurance_company: accidentType === '교통사고' ? carInsuranceCompany || null : null,
-        car_agent_phone: accidentType === '교통사고' ? carAgentPhone || null : null,
-        car_plate_number: accidentType === '교통사고' ? carPlateNumber || null : null,
-        bank_name: bankName,
-        bank_account: bankAccount,
-        bank_holder: bankHolder,
-        payment_method: paymentMethod,
-        insurance_company: insuranceCompany,
-        image_urls: uploadedUrls,
-        signature_type: signatureType,
-        consent_third_party: consentThirdParty,
-        consent_at: new Date().toISOString(),
-        status: 'PENDING',
-        transmission_status: 'NOT_SENT',
-      })
+      // Loop through all selected companies and create individual claims
+      for (const company of selectedCompanies) {
+        const { success } = await submitClaimAction({
+          planner_id: planner?.id || null,
+          customer_name: name,
+          customer_phone: phone,
+          address,
+          resident_number: fullResident,
+          same_as_policyholder: sameAsPolicyholder,
+          policyholder_name: sameAsPolicyholder ? name : policyholderName,
+          notification_person: notificationPerson,
+          accident_type: accidentType,
+          accident_detail: accidentDetail,
+          description: `[${accidentType}] ${accidentDetail}`,
+          car_accident_detail: accidentType === '교통사고' ? carAccidentDetail : null,
+          car_insurance_claim: accidentType === '교통사고' ? carInsuranceClaim : null,
+          car_insurance_company: accidentType === '교통사고' ? carInsuranceCompany || null : null,
+          car_agent_phone: accidentType === '교통사고' ? carAgentPhone || null : null,
+          car_plate_number: accidentType === '교통사고' ? carPlateNumber || null : null,
+          bank_name: bankName,
+          bank_account: bankAccount,
+          bank_holder: bankHolder,
+          payment_method: paymentMethod,
+          insurance_company: company,
+          image_urls: uploadedUrls,
+          signature_type: signatureType,
+          consent_third_party: consentThirdParty,
+          consent_at: new Date().toISOString(),
+          status: 'PENDING',
+          transmission_status: 'NOT_SENT',
+        })
 
-      if (!success) throw new Error('데이터 저장에 실패했습니다.')
+        if (!success) throw new Error(`${company} 데이터 저장에 실패했습니다.`)
+      }
 
-      setSubmittedCompany(insuranceCompany)
+      const summaryLabel = selectedCompanies.length > 1 
+        ? `${selectedCompanies[0]} 외 ${selectedCompanies.length - 1}건`
+        : selectedCompanies[0]
+        
+      setSubmittedCompany(summaryLabel)
       setShowPopup(true)
       
       if (onSuccess) {
@@ -626,22 +634,69 @@ export default function DetailedClaimForm({ onSuccess, plannerId }: { onSuccess?
             {currentStep === 5 && (
               <>
                 <div className="mb-8">
-                  <label className="block text-sm font-black text-gray-700 uppercase tracking-widest mb-3">청구 대상 보험사 *</label>
-                  <select value={insuranceCompany} onChange={e => setInsuranceCompany(e.target.value)} className="w-full md:w-1/2 border-2 border-primary-200 rounded-xl px-4 py-3.5 text-base focus:outline-none focus:ring-2 focus:ring-primary-400 bg-primary-50 text-primary-900 font-bold shadow-sm">
-                    <option value="">이곳을 눌러 보험사를 찾아주세요</option>
-                    <optgroup label="손해보험사">
-                      {COMPANY_NAMES.slice(0, 10).map(c => <option key={c} value={c}>{c}</option>)}
-                    </optgroup>
-                    <optgroup label="생명보험사">
-                      {COMPANY_NAMES.slice(10).map(c => <option key={c} value={c}>{c}</option>)}
-                    </optgroup>
-                  </select>
-                  {insuranceCompany && INSURANCE_COMPANIES[insuranceCompany]?.callFirst && (
-                    <div className="mt-4 p-4 bg-primary-50 border border-primary-200 rounded-2xl flex items-start gap-3">
-                      <PhoneIcon className="w-5 h-5 text-primary-600 mt-0.5 shrink-0" />
+                  <div className="flex items-center justify-between mb-4">
+                    <label className="block text-sm font-black text-gray-700 uppercase tracking-widest">청구 대상 보험사 (다중 선택 가능) *</label>
+                    <span className="text-xs font-bold text-primary-600 bg-primary-50 px-3 py-1 rounded-full">{selectedCompanies.length}개 선택됨</span>
+                  </div>
+                  
+                  <div className="space-y-6">
+                    <div>
+                      <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3">손해보험사</p>
+                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                        {COMPANY_NAMES.slice(0, 10).map(c => (
+                          <button
+                            key={c}
+                            type="button"
+                            onClick={() => {
+                              setSelectedCompanies(prev => 
+                                prev.includes(c) ? prev.filter(item => item !== c) : [...prev, c]
+                              )
+                            }}
+                            className={`px-4 py-3 rounded-xl text-xs sm:text-sm font-bold border-2 transition-all text-center ${
+                              selectedCompanies.includes(c) 
+                                ? 'border-primary-600 bg-primary-50 text-primary-700 shadow-sm' 
+                                : 'border-gray-100 bg-white text-gray-500 hover:border-gray-300'
+                            }`}
+                          >
+                            {c}
+                            {selectedCompanies.includes(c) && <CheckCircleIcon className="w-4 h-4 inline-block ml-1" />}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div>
+                      <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3">생명보험사</p>
+                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                        {COMPANY_NAMES.slice(10).map(c => (
+                          <button
+                            key={c}
+                            type="button"
+                            onClick={() => {
+                              setSelectedCompanies(prev => 
+                                prev.includes(c) ? prev.filter(item => item !== c) : [...prev, c]
+                              )
+                            }}
+                            className={`px-4 py-3 rounded-xl text-xs sm:text-sm font-bold border-2 transition-all text-center ${
+                              selectedCompanies.includes(c) 
+                                ? 'border-primary-600 bg-primary-50 text-primary-700 shadow-sm' 
+                                : 'border-gray-100 bg-white text-gray-500 hover:border-gray-300'
+                            }`}
+                          >
+                            {c}
+                            {selectedCompanies.includes(c) && <CheckCircleIcon className="w-4 h-4 inline-block ml-1" />}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
+                  {selectedCompanies.some(c => INSURANCE_COMPANIES[c]?.callFirst) && (
+                    <div className="mt-6 p-4 bg-amber-50 border border-amber-200 rounded-2xl flex items-start gap-3">
+                      <ExclamationTriangleIcon className="w-5 h-5 text-amber-600 mt-0.5 shrink-0" />
                       <div>
-                        <p className="text-xs font-black text-primary-900">상담이 필요한 보험사입니다</p>
-                        <p className="text-[11px] text-primary-700 mt-0.5 leading-relaxed font-medium">이 보험사는 개인 정보 보안상 콜센터를 통해 가상 팩스번호를 발급받아야 합니다. 접수 완료 후 안내대로 전화를 진행해 주세요.</p>
+                        <p className="text-xs font-black text-amber-900">주의: 상담이 필요한 보험사가 포함되어 있습니다</p>
+                        <p className="text-[11px] text-amber-700 mt-0.5 leading-relaxed font-medium">선택하신 보험사 중 일부는 보안 정책상 콜센터를 통해 팩스번호를 직접 발급받아야 합니다. 접수 완료 후 안내를 확인해 주세요.</p>
                       </div>
                     </div>
                   )}
@@ -698,10 +753,17 @@ export default function DetailedClaimForm({ onSuccess, plannerId }: { onSuccess?
                   </div>
                 </div>
                 
-                <label className={`flex items-center gap-3 p-5 rounded-2xl border-2 cursor-pointer transition-all ${consentThirdParty ? 'border-primary-600 bg-primary-100/30' : 'border-gray-200 bg-white hover:border-gray-300'}`}>
-                  <input type="checkbox" checked={consentThirdParty} onChange={e => setConsentThirdParty(e.target.checked)} className="w-6 h-6 outline-none text-primary-600 focus:ring-0 rounded cursor-pointer" />
-                  <span className="text-sm md:text-base font-black text-gray-800">모든 사항을 이해했으며 이에 동의합니다. (필수)</span>
-                </label>
+                <div className="space-y-3">
+                  <label className={`flex items-center gap-3 p-4 rounded-xl border-2 cursor-pointer transition-all ${consentThirdParty ? 'border-primary-600 bg-primary-100/30' : 'border-gray-100 bg-white hover:border-gray-200'}`}>
+                    <input type="checkbox" checked={consentThirdParty} onChange={e => setConsentThirdParty(e.target.checked)} className="w-5 h-5 text-primary-600 rounded" />
+                    <span className="text-xs md:text-sm font-black text-gray-700">[필수] 개인정보 수집 및 이용 동의 (보험금 청구 목적)</span>
+                  </label>
+                  
+                  <label className={`flex items-center gap-3 p-4 rounded-xl border-2 cursor-pointer transition-all ${consentSensitive ? 'border-primary-600 bg-primary-100/30' : 'border-gray-100 bg-white hover:border-gray-200'}`}>
+                    <input type="checkbox" checked={consentSensitive} onChange={e => setConsentSensitive(e.target.checked)} className="w-5 h-5 text-primary-600 rounded" />
+                    <span className="text-xs md:text-sm font-black text-gray-700">[필수] 민감정보(건강정보) 및 고유식별정보 처리 동의</span>
+                  </label>
+                </div>
 
                 <div className="border-t border-gray-100 pt-6">
                   <div className="flex items-center gap-2 mb-4">

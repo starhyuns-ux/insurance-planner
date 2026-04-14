@@ -233,7 +233,7 @@ export default function LoginPage() {
               )}
 
               <div className="mt-10 pt-6 border-t border-gray-100 text-center text-[11px] text-gray-400">
-                <p className="font-bold mb-1">인터커스텀</p>
+                <p className="font-bold mb-1">인슈닷</p>
                 <p>사업자 등록번호: 207-30-62021</p>
               </div>
             </>

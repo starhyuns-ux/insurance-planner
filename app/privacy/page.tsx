@@ -91,7 +91,7 @@ export default function PrivacyPage() {
                   
                   <section className="mb-16">
                     <p className="text-lg font-bold text-gray-800 leading-relaxed bg-gray-50/50 p-8 rounded-[2rem] border border-gray-100 italic">
-                      "인슈닷(인터커스텀)(이하 “회사”라 합니다)는 「개인정보 보호법」 등 관련 법령을 준수하며, 이용자의 개인정보를 보호하기 위하여 최선을 다하고 있습니다. 회사는 본 개인정보처리방침을 통하여 이용자의 개인정보가 어떠한 용도와 방식으로 처리되고 있는지 안내드립니다."
+                      "인슈닷(이하 “회사”라 합니다)는 「개인정보 보호법」 등 관련 법령을 준수하며, 이용자의 개인정보를 보호하기 위하여 최선을 다하고 있습니다. 회사는 본 개인정보처리방침을 통하여 이용자의 개인정보가 어떠한 용도와 방식으로 처리되고 있는지 안내드립니다."
                     </p>
                   </section>
 
@@ -131,6 +131,7 @@ export default function PrivacyPage() {
                           <h3 className="font-black text-gray-900 mb-4 text-lg">가. 회원가입 시 수집항목</h3>
                           <ul className="space-y-2 font-medium">
                             <li className="flex gap-2"><span className="text-primary-600 font-black">• 필수항목:</span> 이름, 아이디, 비밀번호, 이메일 주소, 휴대전화번호</li>
+                            <li className="flex gap-2"><span className="text-primary-600 font-black">• 보험금 청구 시 추가수집:</span> 주민등록번호(마스킹), 계좌정보, **사고/질병 내역(민감정보)**, 진료비 영수증 이미지</li>
                             <li className="flex gap-2"><span className="text-gray-400 font-black">• 선택항목:</span> 주소, 생년월일, 성별</li>
                           </ul>
                         </div>
@@ -182,6 +183,7 @@ export default function PrivacyPage() {
                       <p>회사는 원칙적으로 이용자의 개인정보를 외부에 제공하지 않습니다. 다만, 다음의 경우에는 예외로 합니다.</p>
                       <ul className="list-disc pl-5 mt-4 space-y-2 font-medium">
                         <li>이용자가 사전에 동의한 경우</li>
+                        <li>**보험금 청구 목적**: 전송 대상 보험사 (청구서 및 증빙 서류 전달)</li>
                         <li>법령에 특별한 규정이 있는 경우</li>
                         <li>수사기관 등 관계기관의 적법한 요청이 있는 경우</li>
                       </ul>
@@ -193,10 +195,10 @@ export default function PrivacyPage() {
                         5. 개인정보 처리의 위탁
                       </h2>
                       <p className="mb-6">회사는 원활한 서비스 제공을 위하여 필요한 경우 개인정보 처리업무를 외부에 위탁할 수 있습니다.</p>
-                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
-                        {['호스팅 서비스', '문자 발송', '이메일 발송', '결제 서비스'].map(svc => (
+                      <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-4">
+                        {['호스팅 서비스', '문자 발송', '이메일 발송', '결제 서비스', '팩스 전송(팝빌)'].map(svc => (
                           <div key={svc} className="text-center p-3 bg-gray-50 border border-gray-100 rounded-xl text-xs font-bold text-gray-500">
-                            {svc} 업체
+                            {svc}
                           </div>
                         ))}
                       </div>
@@ -278,7 +280,7 @@ export default function PrivacyPage() {
                         <div className="relative flex flex-col md:flex-row md:items-center justify-between gap-8">
                           <div>
                             <p className="text-primary-400 font-black uppercase tracking-widest text-[10px] mb-2">Personal Information Manager</p>
-                            <h3 className="text-3xl font-black mb-1">인터커스텀</h3>
+                            <h3 className="text-3xl font-black mb-1">인슈닷</h3>
                             <p className="text-gray-400 font-bold">개인정보 보호책임자</p>
                           </div>
                           <div className="space-y-3 font-bold text-sm text-gray-400">

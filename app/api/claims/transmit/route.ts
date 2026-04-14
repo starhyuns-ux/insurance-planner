@@ -121,7 +121,20 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: `팩스 전송 실패: ${faxErr.message}` }, { status: 502 })
     }
 
-    // 6. Update Database with transmission details
+    // 6. Update Database with transmission details & MASK sensitive data (PIPA Compliance)
+    console.log(`[CLAIM TRANSMIT] Masking sensitive data for Claim ID: ${claimId} after success...`)
+    
+    // Create masked versions of sensitive data
+    const rawResNum = claim.resident_number || ''
+    const maskedResNum = rawResNum.includes('-') 
+      ? `${rawResNum.split('-')[0]}-${rawResNum.split('-')[1].charAt(0)}******`
+      : `${rawResNum.substring(0, 6)}-*******`
+
+    const rawBankAcc = claim.bank_account || ''
+    const maskedBankAcc = rawBankAcc.length > 4
+      ? rawBankAcc.substring(0, 2) + '*'.repeat(rawBankAcc.length - 4) + rawBankAcc.slice(-2)
+      : '****'
+
     const { error: updateError } = await supabaseAdmin
       .from('claims')
       .update({
@@ -131,6 +144,9 @@ export async function POST(req: NextRequest) {
         fax_status: faxResult.status,
         fax_sent_at: new Date().toISOString(),
         fax_pages: filesToTransmit.length,
+        // PIPA: Overwrite original sensitive data with masked versions
+        resident_number: maskedResNum,
+        bank_account: maskedBankAcc,
         updated_at: new Date().toISOString(),
       })
       .eq('id', claimId)
