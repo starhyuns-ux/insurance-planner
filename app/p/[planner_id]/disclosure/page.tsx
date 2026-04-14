@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { useParams, useSearchParams } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import { 
@@ -14,7 +14,7 @@ import {
 } from '@heroicons/react/24/outline'
 import { toast, Toaster } from 'sonner'
 
-export default function PublicDisclosurePage() {
+function DisclosureContent() {
   const { planner_id } = useParams()
   const searchParams = useSearchParams()
   const customerId = searchParams.get('c')
@@ -296,5 +296,17 @@ export default function PublicDisclosurePage() {
         }
       `}</style>
     </div>
+  )
+}
+
+export default function PublicDisclosurePage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <ArrowPathIcon className="w-10 h-10 animate-spin text-primary-600" />
+      </div>
+    }>
+      <DisclosureContent />
+    </Suspense>
   )
 }
