@@ -74,12 +74,20 @@ export class FaxClient {
         (error: any) => {
           console.error('[FAX ERROR]', error)
           let friendlyMessage = error.message
-          if (error.code === -11010014) {
-            friendlyMessage = '발신번호가 등록되지 않았습니다. 팝빌 설정에서 발신번호를 등록해주세요.'
-          } else if (error.code === -11010008) {
-            friendlyMessage = '해당 기업번호로 등록된 사용자가 아닙니다.'
+          // Common Popbill Fax Error Codes
+          const errorMap: Record<number, string> = {
+            [-11010014]: '발신번호가 등록되지 않았습니다. 팝빌 설정에서 발신번호를 등록해주세요.',
+            [-11010008]: '해당 기업번호로 등록된 사용자가 아닙니다.',
+            [-11010005]: '팝빌 기업번호(POPBILL_CORP_NUM) 형식이 올바르지 않습니다.',
+            [-11010001]: '팝빌 인증 정보(API Key)가 올바르지 않습니다.',
+            [-14010006]: '팝빌 잔액(포인트)이 부족합니다. 충전 후 다시 시도해주세요.',
+            [-14010007]: '팩스 수신번호 형식이 올바르지 않습니다.',
           }
-          reject(new Error(`Popbill Error [${error.code}]: ${friendlyMessage}`))
+          
+          if (errorMap[error.code]) {
+            friendlyMessage = errorMap[error.code]
+          }
+          reject(new Error(`팝빌 전송 오류 [${error.code}]: ${friendlyMessage}`))
         },
         userId
       )

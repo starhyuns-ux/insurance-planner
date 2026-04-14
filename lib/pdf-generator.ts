@@ -7,10 +7,21 @@ import fontkit from '@pdf-lib/fontkit'
  */
 export async function generateClaimPDF(claim: any, planner: any) {
   // Load fonts for Korean support
-  // Note: For production, you should use a local font file.
-  // Using a generic URL for NanumGothic from a public CDN for this implementation.
   const fontUrl = 'https://cdn.jsdelivr.net/gh/webfontworld/nanum/NanumGothic.ttf'
-  const fontBytes = await fetch(fontUrl).then(res => res.arrayBuffer())
+  let fontBytes: ArrayBuffer
+  try {
+    const controller = new AbortController()
+    const timeoutId = setTimeout(() => controller.abort(), 10000) // 10s timeout
+    
+    const response = await fetch(fontUrl, { signal: controller.signal })
+    clearTimeout(timeoutId)
+    
+    if (!response.ok) throw new Error(`Font download failed with status: ${response.status}`)
+    fontBytes = await response.arrayBuffer()
+  } catch (err: any) {
+    console.error('[PDF GENERATOR] Font loading failed:', err)
+    throw new Error(`한글 폰트 로드 실패 (네트워크 확인 필요): ${err.message}`)
+  }
 
   const pdfDoc = await PDFDocument.create()
   pdfDoc.registerFontkit(fontkit)

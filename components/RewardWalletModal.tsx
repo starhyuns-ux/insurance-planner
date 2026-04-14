@@ -37,6 +37,48 @@ export default function RewardWalletModal({ isOpen, onClose }: { isOpen: boolean
         }
     }, [isOpen])
 
+    // Supabase 실시간 소켓 연결을 통해 포인트가 오를 때 자동 업데이트
+    useEffect(() => {
+        if (!referralInfo?.id) return
+
+        let channel: any
+        
+        const setupSubscription = async () => {
+            const { supabase: supabaseClient } = await import('@/lib/supabaseClient')
+            
+            channel = supabaseClient
+                .channel(`reward_points_${referralInfo.id}`)
+                .on(
+                    'postgres_changes',
+                    {
+                        event: 'UPDATE',
+                        schema: 'public',
+                        table: 'guest_referrers',
+                        filter: `id=eq.${referralInfo.id}`
+                    },
+                    (payload) => {
+                        const newData = payload.new as ReferralInfo
+                        setReferralInfo(prev => prev ? { 
+                            ...prev, 
+                            points_balance: newData.points_balance,
+                            total_referrals: newData.total_referrals
+                        } : null)
+                    }
+                )
+                .subscribe()
+        }
+
+        setupSubscription()
+
+        return () => {
+            if (channel) {
+                import('@/lib/supabaseClient').then(({ supabase: supabaseClient }) => {
+                    supabaseClient.removeChannel(channel)
+                })
+            }
+        }
+    }, [referralInfo?.id])
+
     const fetchMyInfo = async (p: string) => {
         try {
             const res = await fetch(`/api/guest/referral/me?phone=${p}`)
@@ -44,36 +86,6 @@ export default function RewardWalletModal({ isOpen, onClose }: { isOpen: boolean
             if (data.success) {
                 setReferralInfo(data.data)
                 setStep('DASHBOARD')
-
-                // Supabase 실시간 소켓 연결을 통해 포인트가 오를 때 자동(모션) 업데이트
-                if (data.data.id) {
-                    const { supabase } = await import('@/lib/supabaseClient')
-                    
-                    const channel = supabase
-                        .channel('schema-db-changes')
-                        .on(
-                            'postgres_changes',
-                            {
-                                event: 'UPDATE',
-                                schema: 'public',
-                                table: 'guest_referrers',
-                                filter: `id=eq.${data.data.id}`
-                            },
-                            (payload) => {
-                                const newData = payload.new as ReferralInfo
-                                setReferralInfo(prev => prev ? { 
-                                    ...prev, 
-                                    points_balance: newData.points_balance,
-                                    total_referrals: newData.total_referrals
-                                } : null)
-                            }
-                        )
-                        .subscribe()
-
-                    return () => {
-                        supabase.removeChannel(channel)
-                    }
-                }
             }
         } catch (e) {
             console.error('Fetch info error:', e)
@@ -156,9 +168,9 @@ export default function RewardWalletModal({ isOpen, onClose }: { isOpen: boolean
                                     <div className="inline-flex items-center justify-center w-14 h-14 bg-primary-50 rounded-2xl mb-4">
                                         <WalletIcon className="w-8 h-8 text-primary-600" />
                                     </div>
-                                    <h2 className="text-2xl font-black text-gray-900 tracking-tight">나의 리워드 지갑 열기</h2>
-                                    <p className="text-gray-500 text-sm mt-2 font-medium leading-relaxed">
-                                        상담 신청할 지인을 초대해 보세요.<br />
+                                    <h2 className="text-xl sm:text-2xl font-black text-gray-900 tracking-tight">나의 리워드 지갑 열기</h2>
+                                    <p className="text-gray-500 text-xs sm:text-sm mt-2 font-medium leading-relaxed">
+                                        상담 신청할 지인을 초대해 보세요.<br className="hidden sm:block" />
                                         초대받은 분이 상담 신청 시 <span className="text-primary-600 font-bold">500P</span>가 즉시 쌓입니다.
                                     </p>
                                 </div>
@@ -200,31 +212,31 @@ export default function RewardWalletModal({ isOpen, onClose }: { isOpen: boolean
                         ) : (
                             <div className="space-y-6">
                                 <div className="text-center mb-2">
-                                    <h2 className="text-2xl font-black text-gray-900 tracking-tight">나의 리워드 지갑</h2>
-                                    <p className="text-gray-500 text-sm mt-1 font-medium italic">
+                                    <h2 className="text-xl sm:text-2xl font-black text-gray-900 tracking-tight">나의 리워드 지갑</h2>
+                                    <p className="text-gray-500 text-[11px] sm:text-sm mt-1 font-medium italic">
                                         {referralInfo?.name}님의 소중한 리워드 자산
                                     </p>
                                 </div>
 
                                 {/* Premium Wallet Card Design */}
-                                <div className="bg-gradient-to-br from-gray-900 to-gray-800 rounded-3xl p-6 shadow-2xl relative overflow-hidden">
+                                <div className="bg-gradient-to-br from-gray-900 to-gray-800 rounded-3xl p-4 sm:p-6 shadow-2xl relative overflow-hidden">
                                      <div className="absolute top-0 right-0 w-32 h-32 bg-primary-500/10 rounded-full blur-3xl -mr-16 -mt-16"></div>
                                      
-                                     <div className="flex justify-between items-start mb-10">
+                                     <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-8 sm:mb-10">
                                          <div className="flex items-center gap-2">
                                              <div className="w-8 h-8 rounded-lg bg-primary-500/20 flex items-center justify-center">
                                                  <WalletIcon className="w-5 h-5 text-primary-400" />
                                              </div>
                                              <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">InsuDot Reward Card</span>
                                          </div>
-                                         <span className="text-[10px] font-mono text-gray-500 uppercase">{referralInfo?.referral_code}</span>
+                                         <span className="text-[10px] font-mono text-gray-400/50 uppercase bg-white/5 px-2 py-1 rounded-md">{referralInfo?.referral_code}</span>
                                      </div>
 
                                      <div className="mb-2">
-                                         <span className="text-gray-400 text-xs font-medium">현재 리워드 잔액</span>
+                                         <span className="text-gray-400 text-[10px] sm:text-xs font-medium">현재 리워드 잔액</span>
                                          <div className="flex items-baseline gap-1 mt-1">
-                                             <span className="text-4xl font-black text-white">{(referralInfo?.points_balance ?? 0).toLocaleString()}</span>
-                                             <span className="text-xl font-bold text-primary-400">P</span>
+                                             <span className="text-3xl sm:text-4xl font-black text-white">{(referralInfo?.points_balance ?? 0).toLocaleString()}</span>
+                                             <span className="text-lg sm:text-xl font-bold text-primary-400">P</span>
                                          </div>
                                      </div>
 
