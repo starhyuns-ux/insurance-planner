@@ -6,21 +6,39 @@ import fontkit from '@pdf-lib/fontkit'
  * Generates a standardized Korean insurance claim form from claim and planner data.
  */
 export async function generateClaimPDF(claim: any, planner: any) {
-  // Load fonts for Korean support
-  const fontUrl = 'https://cdn.jsdelivr.net/gh/webfontworld/nanum/NanumGothic.ttf'
-  let fontBytes: ArrayBuffer
-  try {
-    const controller = new AbortController()
-    const timeoutId = setTimeout(() => controller.abort(), 10000) // 10s timeout
-    
-    const response = await fetch(fontUrl, { signal: controller.signal })
-    clearTimeout(timeoutId)
-    
-    if (!response.ok) throw new Error(`Font download failed with status: ${response.status}`)
-    fontBytes = await response.arrayBuffer()
-  } catch (err: any) {
-    console.error('[PDF GENERATOR] Font loading failed:', err)
-    throw new Error(`한글 폰트 로드 실패 (네트워크 확인 필요): ${err.message}`)
+  // Load fonts for Korean support from reliable CDNs
+  const fontUrls = [
+    'https://cdn.jsdelivr.net/gh/google/fonts/ofl/nanumgothic/NanumGothic-Regular.ttf',
+    'https://github.com/google/fonts/raw/main/ofl/nanumgothic/NanumGothic-Regular.ttf',
+    'https://raw.githubusercontent.com/google/fonts/main/ofl/nanumgothic/NanumGothic-Regular.ttf'
+  ]
+  
+  let fontBytes: ArrayBuffer | null = null
+  let lastError = ''
+
+  for (const url of fontUrls) {
+    try {
+      console.log(`[PDF GENERATOR] Trying font URL: ${url}`)
+      const controller = new AbortController()
+      const timeoutId = setTimeout(() => controller.abort(), 7000) 
+      
+      const response = await fetch(url, { signal: controller.signal })
+      clearTimeout(timeoutId)
+      
+      if (response.ok) {
+        fontBytes = await response.arrayBuffer()
+        console.log(`[PDF GENERATOR] Successfully loaded font from: ${url}`)
+        break
+      }
+      lastError = `Status ${response.status} from ${url}`
+    } catch (err: any) {
+      lastError = err.message
+      console.warn(`[PDF GENERATOR] Failed to load font from ${url}:`, err.message)
+    }
+  }
+
+  if (!fontBytes) {
+    throw new Error(`모든 한글 폰트 서버 접속에 실패했습니다. (네트워크/방화벽 확인 필요): ${lastError}`)
   }
 
   const pdfDoc = await PDFDocument.create()
