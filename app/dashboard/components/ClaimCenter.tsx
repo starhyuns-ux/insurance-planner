@@ -3,7 +3,8 @@
 import React from 'react'
 import { 
   DocumentCheckIcon,
-  PaperAirplaneIcon
+  PaperAirplaneIcon,
+  MagnifyingGlassCircleIcon
 } from '@heroicons/react/24/outline'
 import DetailedClaimForm from '@/components/DetailedClaimForm'
 
@@ -12,9 +13,9 @@ interface ClaimCenterProps {
   plannerId?: string
   transmittingClaimId: string | null
   onTransmitClaim: (id: string, overrideFax?: string) => void
-  onUpdateClaimStatus: (id: string, status: string) => void
   onDeleteClaim: (id: string) => void
   onCheckStatus: (id: string, getPreview?: boolean) => void
+  onPreviewClaim: (id: string) => void
   checkingStatusId: string | null
 }
 
@@ -141,6 +142,14 @@ export default function ClaimCenter({
                   
                   {/* Actions */}
                   <div className="flex items-center gap-2 md:flex-col md:items-end md:gap-3 pt-4 md:pt-2 shrink-0">
+                    <button
+                      onClick={() => onPreviewClaim(claim.id)}
+                      className="px-6 py-2 bg-indigo-50 text-indigo-700 hover:bg-indigo-100 rounded-xl text-xs font-black transition-all w-full md:w-auto text-center flex items-center gap-2 justify-center border border-indigo-100 shadow-sm"
+                    >
+                      <MagnifyingGlassCircleIcon className="w-4 h-4" />
+                      청구 서류 확인
+                    </button>
+
                     {claim.insurance_company && claim.transmission_status !== 'SENT' && (
                       <button
                         onClick={() => handleTransmit(claim)}

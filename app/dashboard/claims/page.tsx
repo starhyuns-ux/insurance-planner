@@ -112,6 +112,9 @@ export default function ClaimsPage() {
             setCheckingStatusId(null)
           }
         }}
+        onPreviewClaim={(id) => {
+          window.open(`/api/claims/preview?claimId=${id}`, '_blank')
+        }}
       />
     </div>
   )
