@@ -177,6 +177,16 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               </div>
               <div className="p-2 space-y-0.5">
                 <Link
+                  href="/dashboard/medical-support"
+                  className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-semibold transition-all text-sm ${
+                    isActive('/dashboard/medical-support') ? 'bg-indigo-600 text-white shadow-md' : 'text-gray-600 hover:bg-gray-50'
+                  }`}
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  <IdentificationIcon className="w-4 h-4 shrink-0 text-indigo-500" />
+                  진료기록 열람 가이드
+                </Link>
+                <Link
                   href="/dashboard/hospital"
                   className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-semibold transition-all text-sm ${
                     isActive('/dashboard/hospital') ? 'bg-teal-600 text-white shadow-md' : 'text-gray-600 hover:bg-gray-50'
