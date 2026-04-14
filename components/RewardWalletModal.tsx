@@ -14,6 +14,7 @@ import { toast } from 'sonner'
 import { shareToKakao } from '@/lib/kakao-share'
 
 interface ReferralInfo {
+    id: string;
     name: string;
     referral_code: string;
     points_balance: number;
