@@ -12,7 +12,10 @@ import {
   ExclamationCircleIcon,
   ClockIcon,
   DocumentArrowUpIcon,
-  ArrowDownTrayIcon
+  ArrowDownTrayIcon,
+  ClipboardDocumentListIcon,
+  HeartIcon,
+  ArchiveBoxIcon
 } from '@heroicons/react/24/outline'
 import { supabase } from '@/lib/supabaseClient'
 import { differenceInDays, parseISO } from 'date-fns'
@@ -53,6 +56,7 @@ interface CustomerCRMProps {
   getInsuranceAge: (birthDate: string | null) => string | null
   safeFormat: (date: string | null, format: string) => string
   onUpdate: () => Promise<void>
+  planner: any | null
 }
 
 export default function CustomerCRM({
@@ -90,10 +94,14 @@ export default function CustomerCRM({
   onShareCard,
   getInsuranceAge,
   safeFormat,
-  onUpdate
+  onUpdate,
+  planner
 }: CustomerCRMProps) {
   const [isUpdating, setIsUpdating] = useState<string | null>(null)
+  const [activeSubTab, setActiveSubTab] = useState<'memo' | 'medical'>('memo')
+  const [newDisease, setNewDisease] = useState({ name: '', date: '', hospital: '', status: '완치' })
   const fileInputRef = React.useRef<HTMLInputElement>(null)
+  const medicalPdfRef = React.useRef<HTMLInputElement>(null)
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -432,6 +440,14 @@ export default function CustomerCRM({
                               <span>생일: {safeFormat(c.birth_date, 'yy.MM.dd')}</span>
                               <span className="w-px h-2 bg-gray-200" />
                               <span className="text-primary-600">가족: {c.family_count}명</span>
+                              {(c.memo || '').includes('[질병고지 제출완료]') && (
+                                <>
+                                  <span className="w-px h-2 bg-gray-200" />
+                                  <span className="text-emerald-500 flex items-center gap-0.5">
+                                    <CheckCircleIcon className="w-2.5 h-2.5" /> 고지완료
+                                  </span>
+                                </>
+                              )}
                             </div>
                           </div>
                         </td>
@@ -468,6 +484,18 @@ export default function CustomerCRM({
                         </td>
                         <td className="px-4 py-4 text-right whitespace-nowrap border-b border-gray-50">
                           <div className="flex items-center justify-end gap-3">
+                            <button 
+                              onClick={() => {
+                                if (!planner) return
+                                const url = `${window.location.origin}/p/${planner.id}/disclosure?c=${c.id}`
+                                navigator.clipboard.writeText(url)
+                                alert('질병고지 요청 URL이 복사되었습니다.\n고객에게 전달하여 작성을 요청하세요.')
+                              }}
+                              className="text-gray-400 hover:text-emerald-600 hover:bg-emerald-50 p-1.5 rounded-lg transition-all"
+                              title="질병고지 요청 링크 복사"
+                            >
+                              <ClipboardDocumentListIcon className="w-4 h-4" />
+                            </button>
                             <div className="flex flex-col items-end gap-1 group/touch">
                               <div className="flex items-center gap-1.5">
                                 <div className="flex items-center bg-gray-50 rounded-lg p-0.5 border border-gray-100 group-hover/touch:border-primary-200 group-hover/touch:bg-white transition-all">
@@ -535,33 +563,126 @@ export default function CustomerCRM({
                   {expandedMemoId === c.id && (
                     <tr className="bg-primary-50/40">
                       <td colSpan={5} className="px-8 py-6">
-                        <div className="flex flex-col gap-4 animate-in slide-in-from-top-2 duration-300">
-                          <div className="flex items-center justify-between">
-                            <span className="text-[11px] font-black text-primary-600 uppercase tracking-[0.2em] flex items-center gap-2">
-                              <div className="w-1.5 h-4 bg-primary-500 rounded-full" />
-                              고객 상세 메모 ({c.name})
-                            </span>
+                        <div className="flex flex-col gap-6 animate-in slide-in-from-top-2 duration-300">
+                          
+                          {/* Sub Tabs */}
+                          <div className="flex items-center gap-4 border-b border-gray-100">
                             <button 
-                              onClick={() => onUpdateState('expandedMemoId', null)}
-                              className="text-[10px] font-black text-gray-400 hover:text-gray-600 uppercase tracking-widest bg-white px-3 py-1 rounded-full shadow-sm"
+                              onClick={() => setActiveSubTab('memo')}
+                              className={`px-4 py-2 text-xs font-black transition-all border-b-2 ${activeSubTab === 'memo' ? 'border-primary-600 text-primary-600' : 'border-transparent text-gray-400'}`}
                             >
-                              Close
+                              상담 메모
+                            </button>
+                            <button 
+                              onClick={() => setActiveSubTab('medical')}
+                              className={`px-4 py-2 text-xs font-black transition-all border-b-2 ${activeSubTab === 'medical' ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-gray-400'}`}
+                            >
+                              질병 및 진료 이력
                             </button>
                           </div>
-                          <textarea
-                            value={memoValue}
-                            onChange={(e) => onUpdateState('memoValue', e.target.value)}
-                            placeholder="이 고객에 대한 영업 인사이트를 기록하세요 (예: 관심 보험 종류, 가입된 담보, 가족 스케줄 등)"
-                            className="w-full h-32 p-5 text-sm font-medium border-0 focus:ring-4 focus:ring-primary-500/10 rounded-[1.5rem] bg-white shadow-xl resize-none outline-none leading-relaxed"
-                          />
-                          <div className="flex justify-end">
-                            <button 
-                              onClick={() => onSaveMemo(c.id)}
-                              className="px-8 py-3 bg-primary-600 text-white text-xs font-black rounded-xl shadow-xl shadow-primary-200 hover:bg-primary-700 hover:-translate-y-0.5 active:translate-y-0 transition-all"
-                            >
-                              메모 저장하기
-                            </button>
-                          </div>
+
+                          {activeSubTab === 'memo' ? (
+                            <div className="space-y-4">
+                              <div className="flex items-center justify-between">
+                                <span className="text-[11px] font-black text-primary-600 uppercase tracking-[0.2em] flex items-center gap-2">
+                                  <div className="w-1.5 h-4 bg-primary-500 rounded-full" />
+                                  고객 상세 메모 ({c.name})
+                                </span>
+                                <button 
+                                  onClick={() => onUpdateState('expandedMemoId', null)}
+                                  className="text-[10px] font-black text-gray-400 hover:text-gray-600 uppercase tracking-widest bg-white px-3 py-1 rounded-full shadow-sm"
+                                >
+                                  Close
+                                </button>
+                              </div>
+                              <textarea
+                                value={memoValue}
+                                onChange={(e) => onUpdateState('memoValue', e.target.value)}
+                                placeholder="이 고객에 대한 영업 인사이트를 기록하세요..."
+                                className="w-full h-32 p-5 text-sm font-medium border-0 focus:ring-4 focus:ring-primary-500/10 rounded-[1.5rem] bg-white shadow-xl resize-none outline-none leading-relaxed"
+                              />
+                              <div className="flex justify-end">
+                                <button 
+                                  onClick={() => onSaveMemo(c.id)}
+                                  className="px-8 py-3 bg-primary-600 text-white text-xs font-black rounded-xl shadow-xl shadow-primary-200 hover:bg-primary-700 transition-all"
+                                >
+                                  메모 저장하기
+                                </button>
+                              </div>
+                            </div>
+                          ) : (
+                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                              {/* Disease History Table */}
+                              <div className="space-y-4">
+                                <div className="flex items-center justify-between">
+                                  <h4 className="text-[11px] font-black text-indigo-600 uppercase tracking-[0.2em] flex items-center gap-2">
+                                    <HeartIcon className="w-4 h-4" /> 질병 히스토리
+                                  </h4>
+                                </div>
+                                <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                                  <table className="w-full text-[11px]">
+                                    <thead className="bg-gray-50 text-gray-400 font-black">
+                                      <tr>
+                                        <th className="px-3 py-2 text-left">질병명</th>
+                                        <th className="px-3 py-2 text-left">진료일</th>
+                                        <th className="px-3 py-2 text-left">병원</th>
+                                        <th className="px-3 py-2 text-center">상태</th>
+                                      </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-gray-50">
+                                      {/* Mock Disease Data - Real implementation would pull from DB */}
+                                      <tr className="bg-indigo-50/20 text-indigo-700 font-bold">
+                                        <td className="px-3 py-2">급성 위염</td>
+                                        <td className="px-3 py-2">2023.10.12</td>
+                                        <td className="px-3 py-2">서울내과</td>
+                                        <td className="px-3 py-2 text-center">완치</td>
+                                      </tr>
+                                      <tr>
+                                        <td colSpan={4} className="p-3">
+                                          <div className="flex gap-2">
+                                            <input type="text" placeholder="질병명" className="flex-1 px-2 py-1.5 border border-gray-200 rounded-lg outline-none focus:border-indigo-400" />
+                                            <input type="text" placeholder="2024.01.01" className="w-20 px-2 py-1.5 border border-gray-200 rounded-lg outline-none focus:border-indigo-400" />
+                                            <button className="px-4 py-1.5 bg-indigo-600 text-white font-black rounded-lg">추가</button>
+                                          </div>
+                                        </td>
+                                      </tr>
+                                    </tbody>
+                                  </table>
+                                </div>
+                              </div>
+
+                              {/* PDF List */}
+                              <div className="space-y-4">
+                                <div className="flex items-center justify-between">
+                                  <h4 className="text-[11px] font-black text-indigo-600 uppercase tracking-[0.2em] flex items-center gap-2">
+                                    <ArchiveBoxIcon className="w-4 h-4" /> 진료기록 서류 (PDF)
+                                  </h4>
+                                  <button 
+                                    onClick={() => medicalPdfRef.current?.click()}
+                                    className="px-3 py-1 bg-gray-900 text-white text-[10px] font-black rounded-lg hover:bg-black transition-all"
+                                  >
+                                    파일 업로드
+                                  </button>
+                                  <input type="file" ref={medicalPdfRef} className="hidden" accept=".pdf,.jpg,.png" />
+                                </div>
+                                <div className="space-y-2">
+                                  <div className="p-3 bg-white border border-gray-100 rounded-xl flex items-center justify-between group hover:border-indigo-200 transition-all cursor-pointer">
+                                    <div className="flex items-center gap-3">
+                                      <DocumentTextIcon className="w-5 h-5 text-indigo-500" />
+                                      <div>
+                                        <p className="text-[11px] font-bold text-gray-800">심평원_진료기록_231012.pdf</p>
+                                        <p className="text-[9px] text-gray-400">2023.10.12 14:30 · 1.2MB</p>
+                                      </div>
+                                    </div>
+                                    <ArrowDownTrayIcon className="w-4 h-4 text-gray-300 group-hover:text-indigo-500" />
+                                  </div>
+                                  <p className="text-[10px] text-gray-400 text-center py-4 border border-dashed border-gray-200 rounded-xl">
+                                    추가된 서류가 없습니다. 고객으로부터 받은 기록을 업로드하세요.
+                                  </p>
+                                </div>
+                              </div>
+                            </div>
+                          )}
                         </div>
                       </td>
                     </tr>
