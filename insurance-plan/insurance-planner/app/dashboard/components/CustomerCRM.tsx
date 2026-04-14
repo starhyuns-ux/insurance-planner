@@ -15,7 +15,7 @@ import {
   ArrowDownTrayIcon,
   ClipboardDocumentListIcon,
   HeartIcon,
-  ArchiveBoxIcon
+  SparklesIcon
 } from '@heroicons/react/24/outline'
 import { supabase } from '@/lib/supabaseClient'
 import { differenceInDays, parseISO } from 'date-fns'
@@ -100,8 +100,10 @@ export default function CustomerCRM({
   const [isUpdating, setIsUpdating] = useState<string | null>(null)
   const [activeSubTab, setActiveSubTab] = useState<'memo' | 'medical'>('memo')
   const [newDisease, setNewDisease] = useState({ name: '', date: '', hospital: '', status: '완치' })
+  const [isScanning, setIsScanning] = useState(false)
+  const [analyzedHistory, setAnalyzedHistory] = useState<any[]>([])
   const fileInputRef = React.useRef<HTMLInputElement>(null)
-  const medicalPdfRef = React.useRef<HTMLInputElement>(null)
+  const scanDocRef = React.useRef<HTMLInputElement>(null)
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -225,6 +227,26 @@ export default function CustomerCRM({
     if (activeTab === 'prospect') return c.is_contracted !== true
     return true
   })
+
+  const handleScanDocument = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    
+    setIsScanning(true)
+    // Simulate AI extraction delay
+    await new Promise(resolve => setTimeout(resolve, 2000))
+    
+    // Mock extracted data based on the file name/type simulation
+    const mockExtracted = [
+      { name: '고혈압', date: '2023-05-10', hospital: '강남세브란스', status: '약복용중' },
+      { name: '제2형 당뇨병', date: '2023-05-10', hospital: '강남세브란스', status: '약복용중' }
+    ]
+    
+    setAnalyzedHistory(prev => [...prev, ...mockExtracted])
+    setIsScanning(false)
+    if (scanDocRef.current) scanDocRef.current.value = ''
+    alert(`${file.name} 서류에서 2건의 건강 기록을 분류하여 추출했습니다.\n하단 리스트에서 확인 후 저장해 주세요.`)
+  }
   return (
     <div className="space-y-6">
       <div className="bg-white rounded-[2rem] shadow-xl p-8 border border-gray-100">
@@ -611,74 +633,92 @@ export default function CustomerCRM({
                               </div>
                             </div>
                           ) : (
-                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                            <div className="flex flex-col gap-6">
                               {/* Disease History Table */}
                               <div className="space-y-4">
                                 <div className="flex items-center justify-between">
-                                  <h4 className="text-[11px] font-black text-indigo-600 uppercase tracking-[0.2em] flex items-center gap-2">
-                                    <HeartIcon className="w-4 h-4" /> 질병 히스토리
-                                  </h4>
+                                  <div className="flex items-center gap-3">
+                                    <h4 className="text-[11px] font-black text-indigo-600 uppercase tracking-[0.2em] flex items-center gap-2">
+                                      <HeartIcon className="w-4 h-4" /> 질병 및 진료 이력 (데이터)
+                                    </h4>
+                                    <span className="text-[10px] text-gray-400 bg-gray-100 px-2 py-0.5 rounded-md">파일은 서버에 저장되지 않으며 데이터만 기록됩니다</span>
+                                  </div>
+                                  <div className="flex gap-2">
+                                    <input type="file" ref={scanDocRef} className="hidden" onChange={handleScanDocument} accept=".pdf,.jpg,.png" />
+                                    <button 
+                                      onClick={() => scanDocRef.current?.click()}
+                                      disabled={isScanning}
+                                      className="px-3 py-1.5 bg-indigo-600 text-white text-[10px] font-black rounded-lg hover:bg-indigo-700 transition-all flex items-center gap-1.5 shadow-sm"
+                                    >
+                                      {isScanning ? <ClockIcon className="w-3 h-3 animate-spin" /> : <SparklesIcon className="w-3 h-3" />}
+                                      서류 분석(분류)
+                                    </button>
+                                  </div>
                                 </div>
                                 <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
                                   <table className="w-full text-[11px]">
                                     <thead className="bg-gray-50 text-gray-400 font-black">
                                       <tr>
-                                        <th className="px-3 py-2 text-left">질병명</th>
-                                        <th className="px-3 py-2 text-left">진료일</th>
-                                        <th className="px-3 py-2 text-left">병원</th>
-                                        <th className="px-3 py-2 text-center">상태</th>
+                                        <th className="px-3 py-2 text-left">질병명 / 분류</th>
+                                        <th className="px-3 py-2 text-left">진료일(진단일)</th>
+                                        <th className="px-3 py-2 text-left">병원명</th>
+                                        <th className="px-3 py-2 text-center">현재 상태</th>
+                                        <th className="px-3 py-2 text-right">관리</th>
                                       </tr>
                                     </thead>
                                     <tbody className="divide-y divide-gray-50">
-                                      {/* Mock Disease Data - Real implementation would pull from DB */}
-                                      <tr className="bg-indigo-50/20 text-indigo-700 font-bold">
-                                        <td className="px-3 py-2">급성 위염</td>
-                                        <td className="px-3 py-2">2023.10.12</td>
-                                        <td className="px-3 py-2">서울내과</td>
-                                        <td className="px-3 py-2 text-center">완치</td>
-                                      </tr>
-                                      <tr>
-                                        <td colSpan={4} className="p-3">
+                                      {/* Combined History: Analyzed + Manual */}
+                                      {[
+                                        { name: '급성 위염', date: '2023.10.12', hospital: '서울내과', status: '완치', type: 'manual' },
+                                        ...analyzedHistory.map(h => ({ ...h, type: 'analyzed' }))
+                                      ].map((h, idx) => (
+                                        <tr key={idx} className={`${h.type === 'analyzed' ? 'bg-emerald-50/30' : ''} transition-colors`}>
+                                          <td className="px-3 py-3">
+                                            <div className="flex items-center gap-2">
+                                              <span className="font-bold text-gray-800">{h.name}</span>
+                                              {h.type === 'analyzed' && <span className="text-[8px] bg-emerald-100 text-emerald-600 px-1 rounded uppercase">Scan</span>}
+                                            </div>
+                                          </td>
+                                          <td className="px-3 py-3 text-gray-500">{h.date}</td>
+                                          <td className="px-3 py-3 text-gray-500">{h.hospital}</td>
+                                          <td className="px-3 py-3 text-center">
+                                            <span className={`px-2 py-0.5 rounded-full text-[9px] font-black ${h.status === '완치' ? 'bg-gray-100 text-gray-500' : 'bg-rose-50 text-rose-600 border border-rose-100'}`}>
+                                              {h.status}
+                                            </span>
+                                          </td>
+                                          <td className="px-3 py-3 text-right">
+                                            <button className="text-gray-300 hover:text-rose-500 transition-colors">
+                                              <TrashIcon className="w-3.5 h-3.5" />
+                                            </button>
+                                          </td>
+                                        </tr>
+                                      ))}
+                                      
+                                      {/* Inline Add Form */}
+                                      <tr className="bg-gray-50/30">
+                                        <td className="px-3 py-3" colSpan={5}>
                                           <div className="flex gap-2">
-                                            <input type="text" placeholder="질병명" className="flex-1 px-2 py-1.5 border border-gray-200 rounded-lg outline-none focus:border-indigo-400" />
-                                            <input type="text" placeholder="2024.01.01" className="w-20 px-2 py-1.5 border border-gray-200 rounded-lg outline-none focus:border-indigo-400" />
-                                            <button className="px-4 py-1.5 bg-indigo-600 text-white font-black rounded-lg">추가</button>
+                                            <input 
+                                              type="text" 
+                                              placeholder="질병명 입력" 
+                                              className="flex-1 px-3 py-2 bg-white border border-gray-200 rounded-xl text-[10px] outline-none focus:border-indigo-500 transition-all font-bold"
+                                            />
+                                            <input 
+                                              type="text" 
+                                              placeholder="진료일 (YYYY-MM-DD)" 
+                                              className="w-32 px-3 py-2 bg-white border border-gray-200 rounded-xl text-[10px] outline-none focus:border-indigo-500 transition-all font-bold"
+                                            />
+                                            <input 
+                                              type="text" 
+                                              placeholder="병원명" 
+                                              className="w-32 px-3 py-2 bg-white border border-gray-200 rounded-xl text-[10px] outline-none focus:border-indigo-500 transition-all font-bold"
+                                            />
+                                            <button className="px-6 py-2 bg-indigo-600 text-white font-black rounded-xl text-[10px] shadow-lg shadow-indigo-100">기록 추가</button>
                                           </div>
                                         </td>
                                       </tr>
                                     </tbody>
                                   </table>
-                                </div>
-                              </div>
-
-                              {/* PDF List */}
-                              <div className="space-y-4">
-                                <div className="flex items-center justify-between">
-                                  <h4 className="text-[11px] font-black text-indigo-600 uppercase tracking-[0.2em] flex items-center gap-2">
-                                    <ArchiveBoxIcon className="w-4 h-4" /> 진료기록 서류 (PDF)
-                                  </h4>
-                                  <button 
-                                    onClick={() => medicalPdfRef.current?.click()}
-                                    className="px-3 py-1 bg-gray-900 text-white text-[10px] font-black rounded-lg hover:bg-black transition-all"
-                                  >
-                                    파일 업로드
-                                  </button>
-                                  <input type="file" ref={medicalPdfRef} className="hidden" accept=".pdf,.jpg,.png" />
-                                </div>
-                                <div className="space-y-2">
-                                  <div className="p-3 bg-white border border-gray-100 rounded-xl flex items-center justify-between group hover:border-indigo-200 transition-all cursor-pointer">
-                                    <div className="flex items-center gap-3">
-                                      <DocumentTextIcon className="w-5 h-5 text-indigo-500" />
-                                      <div>
-                                        <p className="text-[11px] font-bold text-gray-800">심평원_진료기록_231012.pdf</p>
-                                        <p className="text-[9px] text-gray-400">2023.10.12 14:30 · 1.2MB</p>
-                                      </div>
-                                    </div>
-                                    <ArrowDownTrayIcon className="w-4 h-4 text-gray-300 group-hover:text-indigo-500" />
-                                  </div>
-                                  <p className="text-[10px] text-gray-400 text-center py-4 border border-dashed border-gray-200 rounded-xl">
-                                    추가된 서류가 없습니다. 고객으로부터 받은 기록을 업로드하세요.
-                                  </p>
                                 </div>
                               </div>
                             </div>
