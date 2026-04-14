@@ -5,7 +5,8 @@ import {
   ArrowTopRightOnSquareIcon, 
   ArrowPathIcon,
   ExclamationCircleIcon,
-  MagnifyingGlassIcon
+  MagnifyingGlassIcon,
+  ShieldCheckIcon
 } from '@heroicons/react/24/outline'
 
 export default function HiraViewPage() {
