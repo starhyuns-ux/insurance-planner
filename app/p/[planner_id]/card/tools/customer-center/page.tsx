@@ -9,7 +9,7 @@ import ToolPageHeader from '@/components/ToolPageHeader'
 export default async function PlannerCardCustomerCenterPage({ params }: { params: { planner_id: string } }) {
   const { planner_id } = await params
 
-  const { data: planner } = await supabaseAdmin.from('planners').select('name').eq('id', id).single()
+  const { data: planner } = await supabaseAdmin.from('planners').select('name').eq('id', planner_id).single()
   if (!planner) notFound()
 
   return (

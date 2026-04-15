@@ -10,12 +10,12 @@ import AttributionSetter from '@/components/AttributionSetter'
 export default async function PlannerCardSilbiPage({ params }: { params: { planner_id: string } }) {
   const { planner_id } = await params
 
-  const { data: planner } = await supabaseAdmin.from('planners').select('name').eq('id', id).single()
+  const { data: planner } = await supabaseAdmin.from('planners').select('name').eq('id', planner_id).single()
   if (!planner) notFound()
 
   return (
     <main className="min-h-screen flex flex-col bg-gray-50">
-      <AttributionSetter plannerId={id} />
+      <AttributionSetter plannerId={planner_id} />
       <NavBar />
       <div className="flex-1 container mx-auto px-4 py-8 max-w-4xl">
         <ToolPageHeader id={planner_id} type="silbi" />
