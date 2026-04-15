@@ -171,7 +171,9 @@ export default function CardSettings({
         <div className="flex flex-col gap-4">
           <div className="flex flex-col md:flex-row items-center gap-3">
             <div className="flex-1 w-full bg-white/15 backdrop-blur-2xl rounded-2xl px-6 py-4 border border-white/30 font-mono text-xs md:text-sm truncate text-white flex items-center justify-between shadow-inner">
-              <span className="truncate font-bold">https://stroy.kr/p/{planner?.id}/card</span>
+              <span className="truncate font-bold">
+                {typeof window !== 'undefined' ? window.location.origin : ''}/p/{planner?.id}/card
+              </span>
               <div className="w-2.5 h-2.5 bg-green-400 rounded-full animate-pulse shadow-lg shadow-green-400/70 ml-3 shrink-0" />
             </div>
             <button

@@ -23,7 +23,7 @@ export async function generateMetadata({ params }: { params: { id: string } }): 
     ? `${planner.affiliation} ${planner.name} 설계사 | ${planner.region || '전국'} 상담 가능 | 무료 보험 진단 & 리모델링`
     : `${planner.name} 설계사 | 무료 보험 진단 & 리모델링 상담`
 
-  const ogImage = planner.profile_image_url || 'https://stroy.kr/og-image.png'
+  const ogImage = planner.profile_image_url || '/og-image.png'
 
   return {
     title,
@@ -31,7 +31,6 @@ export async function generateMetadata({ params }: { params: { id: string } }): 
     openGraph: {
       title,
       description,
-      url: `https://stroy.kr/p/${id}/card`,
       siteName: '인슈닷',
       images: [{ url: ogImage, width: 600, height: 600, alt: `${planner.name} 프로필` }],
       type: 'profile',

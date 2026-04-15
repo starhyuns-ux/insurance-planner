@@ -115,7 +115,7 @@ export default function CardPage() {
         onUpdateProfile={handleUpdateProfile}
         onFileUpload={handleFileUpload}
         onCopyUrl={(id) => {
-          const url = `https://stroy.kr/p/${id}/card?source=copy`
+          const url = `${window.location.origin}/p/${id}/card?source=copy`
           navigator.clipboard.writeText(url)
           setUrlCopied(true)
           toast.success('공유 URL이 복사되었습니다.')
