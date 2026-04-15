@@ -76,7 +76,18 @@ export default function NavBar() {
                 인슈<span className="text-primary-600">닷</span>
               </span>
               {planner && (
-                <span className="text-[9px] font-bold text-gray-400 -mt-0.5 tracking-tighter">by {planner.name}</span>
+                <div className="flex items-center gap-1.5 -mt-0.5">
+                  <div className="w-3.5 h-3.5 rounded-full overflow-hidden border border-primary-200">
+                    {planner.profile_image_url ? (
+                      <img src={planner.profile_image_url} alt={planner.name} className="w-full h-full object-cover" />
+                    ) : (
+                      <div className="w-full h-full bg-primary-600 flex items-center justify-center text-[6px] text-white font-black">
+                        {planner.name[0]}
+                      </div>
+                    )}
+                  </div>
+                  <span className="text-[9px] font-black text-primary-600 tracking-tighter">{planner.name} 설계사</span>
+                </div>
               )}
             </div>
           </Link>
