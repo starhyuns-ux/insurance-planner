@@ -17,13 +17,13 @@ import { notFound } from 'next/navigation'
 import { Metadata } from 'next'
 import AttributionSetter from '@/components/AttributionSetter'
 
-export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
-  const { id } = await params
+export async function generateMetadata({ params }: { params: { planner_id: string } }): Promise<Metadata> {
+  const { planner_id } = await params
   
   const { data: planner } = await supabaseAdmin
     .from('planners')
     .select('name, profile_image_url, affiliation')
-    .eq('id', id)
+    .eq('id', planner_id)
     .single()
 
   if (!planner) return {}
@@ -50,14 +50,14 @@ export async function generateMetadata({ params }: { params: { id: string } }): 
   }
 }
 
-export default async function PlannerLandingPage({ params }: { params: { id: string } }) {
-  const { id } = await params
+export default async function PlannerLandingPage({ params }: { params: { planner_id: string } }) {
+  const { planner_id } = await params
 
   // Fetch planner info
   const { data: planner, error } = await supabaseAdmin
     .from('planners')
     .select('*')
-    .eq('id', id)
+    .eq('id', planner_id)
     .single()
 
   if (error || !planner) {
@@ -86,7 +86,7 @@ export default async function PlannerLandingPage({ params }: { params: { id: str
   return (
     <main className="min-h-screen flex flex-col">
       <AttributionSetter plannerId={planner.id} />
-      <NavBar key={`navbar-${id}`} />
+      <NavBar key={`navbar-${planner_id}`} />
       
       <Hero />
       <TrustStrip />
@@ -133,7 +133,7 @@ export default async function PlannerLandingPage({ params }: { params: { id: str
         />
       </div>
 
-      <Footer key={`footer-${id}`} />
+      <Footer key={`footer-${planner_id}`} />
     </main>
   )
 }

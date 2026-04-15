@@ -1,14 +1,14 @@
 import { supabaseAdmin } from '@/lib/supabaseServer'
 import { notFound } from 'next/navigation'
-import DiseaseCodeSearch from '@/components/DiseaseCodeSearch'
+import SilbiCalculator from '@/components/SilbiCalculator'
 import NavBar from '@/components/NavBar'
 import Footer from '@/components/Footer'
 import { LanguageProvider } from '@/lib/contexts/LanguageContext'
 import ToolPageHeader from '@/components/ToolPageHeader'
 import AttributionSetter from '@/components/AttributionSetter'
 
-export default async function PlannerCardDiseaseCodePage({ params }: { params: { id: string } }) {
-  const { id } = await params
+export default async function PlannerCardSilbiPage({ params }: { params: { planner_id: string } }) {
+  const { planner_id } = await params
 
   const { data: planner } = await supabaseAdmin.from('planners').select('name').eq('id', id).single()
   if (!planner) notFound()
@@ -18,9 +18,9 @@ export default async function PlannerCardDiseaseCodePage({ params }: { params: {
       <AttributionSetter plannerId={id} />
       <NavBar />
       <div className="flex-1 container mx-auto px-4 py-8 max-w-4xl">
-        <ToolPageHeader id={id} type="disease" />
+        <ToolPageHeader id={planner_id} type="silbi" />
         <div className="bg-white rounded-[2.5rem] shadow-xl p-6 md:p-10 border border-gray-100">
-          <DiseaseCodeSearch />
+          <SilbiCalculator />
         </div>
       </div>
       <Footer />

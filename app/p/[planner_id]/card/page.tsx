@@ -8,12 +8,12 @@ import ToolkitMenu from '@/components/ToolkitMenu'
 import AttributionSetter from '@/components/AttributionSetter'
 import type { Metadata } from 'next'
 
-export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
-  const { id } = await params
+export async function generateMetadata({ params }: { params: { planner_id: string } }): Promise<Metadata> {
+  const { planner_id } = await params
   const { data: planner } = await supabaseAdmin
     .from('planners')
     .select('name, affiliation, profile_image_url, region')
-    .eq('id', id)
+    .eq('id', planner_id)
     .single()
 
   if (!planner) return {}
@@ -48,17 +48,17 @@ export default async function DigitalBusinessCardPage({
   params,
   searchParams
 }: { 
-  params: { id: string },
+  params: { planner_id: string },
   searchParams: { source?: string }
 }) {
-  const { id } = await params
+  const { planner_id } = await params
   const { source } = await searchParams
 
   // Fetch planner info
   const { data: planner, error } = await supabaseAdmin
     .from('planners')
     .select('*')
-    .eq('id', id)
+    .eq('id', planner_id)
     .single()
 
   if (error || !planner) {
@@ -68,7 +68,7 @@ export default async function DigitalBusinessCardPage({
   // Increment visit_count and track acquisition source
   try {
     // 1. Increment planner specific count
-    await supabaseAdmin.rpc('increment_visit_count', { planner_id: id })
+    await supabaseAdmin.rpc('increment_visit_count', { planner_id: planner_id })
     
     // 2. Increment global site visit with source tracking
     await supabaseAdmin.rpc('increment_site_visit', { p_source: source || 'direct' })
@@ -98,7 +98,7 @@ export default async function DigitalBusinessCardPage({
         />
 
         {/* Toolkit Section (Client Component) */}
-        <ToolkitMenu id={id} plannerName={planner.name} />
+        <ToolkitMenu id={planner_id} plannerName={planner.name} />
         
         {/* Advisor Trust Section (Client Component for Localization) */}
         <AdvisorTrust />
