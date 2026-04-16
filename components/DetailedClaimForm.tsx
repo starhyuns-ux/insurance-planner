@@ -409,11 +409,7 @@ export default function DetailedClaimForm({ onSuccess, plannerId }: { onSuccess?
         if (!success) throw new Error(`${company} 데이터 저장에 실패했습니다.`)
       }
 
-      const summaryLabel = selectedCompanies.length > 1 
-        ? `${selectedCompanies[0]} 외 ${selectedCompanies.length - 1}건`
-        : selectedCompanies[0]
-        
-      setSubmittedCompany(summaryLabel)
+      setSubmittedCompany(selectedCompanies[0]) // Always use the first one as representative for the popup
       setShowPopup(true)
       
       if (onSuccess) {
@@ -680,7 +676,7 @@ export default function DetailedClaimForm({ onSuccess, plannerId }: { onSuccess?
                     <div>
                       <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3">손해보험사</p>
                       <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                        {COMPANY_NAMES.slice(0, 13).map(c => (
+                        {COMPANY_NAMES.slice(0, 12).map(c => (
                           <button
                             key={c}
                             type="button"
@@ -705,7 +701,7 @@ export default function DetailedClaimForm({ onSuccess, plannerId }: { onSuccess?
                     <div>
                       <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3">생명보험사</p>
                       <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                        {COMPANY_NAMES.slice(13).map(c => (
+                        {COMPANY_NAMES.slice(12).map(c => (
                           <button
                             key={c}
                             type="button"
