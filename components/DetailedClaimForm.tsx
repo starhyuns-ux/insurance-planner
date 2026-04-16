@@ -36,10 +36,10 @@ const INSURANCE_COMPANIES: Record<string, { phone: string; fax?: string; web?: s
   '한화손해보험': { phone: '1566-8000', web: 'https://www.hwgeneralins.com' },
   '롯데손해보험': { phone: '1588-3344', web: 'https://www.lotteins.co.kr' },
   'MG손해보험':  { phone: '1588-5959', web: 'https://www.mgfire.co.kr' },
-  '흥국화재':    { phone: '1688-1688', web: 'https://www.흥국화재.kr' },
   '하나손해보험': { phone: '1566-3000', web: 'https://www.hanainsurance.co.kr' },
   '라이나손보':    { phone: '1588-3374', web: 'https://www.lina.co.kr' },
   '농협손해보험': { phone: '1644-9000', web: 'https://www.nhfire.co.kr' },
+  'AIG손보':      { phone: '1544-2792', web: 'https://www.aig.co.kr' },
   '삼성생명':    { phone: '1588-3114', web: 'https://www.samsunglife.com', callFirst: true },
   '교보생명':    { phone: '1588-1001', web: 'https://www.kyobo.co.kr', callFirst: true },
   '한화생명':    { phone: '1577-6301', web: 'https://www.hanwhalife.com', callFirst: true },
@@ -680,7 +680,7 @@ export default function DetailedClaimForm({ onSuccess, plannerId }: { onSuccess?
                     <div>
                       <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3">손해보험사</p>
                       <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                        {COMPANY_NAMES.slice(0, 10).map(c => (
+                        {COMPANY_NAMES.slice(0, 13).map(c => (
                           <button
                             key={c}
                             type="button"
@@ -705,7 +705,7 @@ export default function DetailedClaimForm({ onSuccess, plannerId }: { onSuccess?
                     <div>
                       <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3">생명보험사</p>
                       <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                        {COMPANY_NAMES.slice(10).map(c => (
+                        {COMPANY_NAMES.slice(13).map(c => (
                           <button
                             key={c}
                             type="button"
