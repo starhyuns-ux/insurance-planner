@@ -63,6 +63,25 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: `청구서 PDF 생성 실패: ${pdfErr.message}` }, { status: 500 })
     }
 
+    // 3b. Upload PDF to Storage for archiving/viewing
+    let claimPdfUrl = ''
+    try {
+      const pdfPath = `claims/generated/claim_${claimId}_${Date.now()}.pdf`
+      const { error: uploadError } = await supabaseAdmin.storage
+        .from('planner-assets')
+        .upload(pdfPath, claimPdfBuffer, { contentType: 'application/pdf', upsert: true })
+      
+      if (!uploadError) {
+        const { data: { publicUrl } } = supabaseAdmin.storage
+          .from('planner-assets')
+          .getPublicUrl(pdfPath)
+        claimPdfUrl = publicUrl
+        console.log(`[CLAIM TRANSMIT] PDF archived at: ${claimPdfUrl}`)
+      }
+    } catch (archiveErr) {
+      console.warn('[CLAIM TRANSMIT] PDF Archiving failed (non-critical):', archiveErr)
+    }
+
     // 4. Collect All Files (Generated Form + Customer Attachments)
     const filesToTransmit: Buffer[] = [claimPdfBuffer]
     
@@ -147,6 +166,7 @@ export async function POST(req: NextRequest) {
         fax_status: faxResult.status,
         fax_sent_at: new Date().toISOString(),
         fax_pages: filesToTransmit.length,
+        claim_pdf_url: claimPdfUrl, // Save the generated PDF URL
         // PIPA: Overwrite original sensitive data with masked versions
         resident_number: maskedResNum,
         bank_account: maskedBankAcc,
@@ -159,7 +179,8 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({
       success: true,
       message: `${claim.insurance_company} (${targetFax})으로 총 ${filesToTransmit.length}매의 서류가 성공적으로 전송되었습니다.`,
-      receiptId: faxResult.receiptId
+      receiptId: faxResult.receiptId,
+      claimPdfUrl: claimPdfUrl
     })
 
   } catch (err: any) {

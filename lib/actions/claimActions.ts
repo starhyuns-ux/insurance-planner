@@ -31,12 +31,12 @@ export async function submitClaimAction(data: {
   status: string
   transmission_status: string
 }) {
-  const { error } = await supabaseAdmin.from('claims').insert(data)
+  const { data, error } = await supabaseAdmin.from('claims').insert(data).select('id').single()
   
   if (error) {
     console.error('Error inserting claim:', error)
     throw new Error(error.message)
   }
 
-  return { success: true }
+  return { success: true, id: data.id }
 }

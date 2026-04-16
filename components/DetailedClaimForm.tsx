@@ -7,7 +7,7 @@ import {
   DocumentCheckIcon, PhotoIcon, CheckCircleIcon,
   ChevronRightIcon, ChevronLeftIcon, UserIcon, HomeIcon,
   ExclamationTriangleIcon, BanknotesIcon, PaperAirplaneIcon,
-  ShieldCheckIcon, PhoneIcon, XMarkIcon,
+  ShieldCheckIcon, PhoneIcon, XMarkIcon, DocumentTextIcon,
 } from '@heroicons/react/24/outline'
 import { submitClaimAction } from '@/lib/actions/claimActions'
 
@@ -171,11 +171,14 @@ function SignatureCanvas({ onSave }: { onSave: (dataUrl: string) => void }) {
   )
 }
 
-function InsurancePopup({ company, info, onClose }: {
+interface InsurancePopupProps {
   company: string
-  info: { phone: string; web?: string; callFirst?: boolean }
+  info: any
   onClose: () => void
-}) {
+  claimPdfUrl?: string
+}
+
+function InsurancePopup({ company, info, onClose, claimPdfUrl }: InsurancePopupProps) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm" onClick={onClose}>
       <div className="bg-white rounded-3xl shadow-2xl max-w-sm w-full overflow-hidden" onClick={e => e.stopPropagation()}>
@@ -231,6 +234,18 @@ function InsurancePopup({ company, info, onClose }: {
             </a>
           )}
 
+          {claimPdfUrl && (
+            <a
+              href={claimPdfUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block w-full py-4 bg-emerald-600 text-white rounded-2xl text-sm font-black hover:bg-emerald-700 transition-all shadow-lg shadow-emerald-200 flex items-center justify-center gap-2 group"
+            >
+              <DocumentTextIcon className="w-5 h-5 group-hover:scale-110 transition-transform" />
+              작성된 보상청구서(PDF) 확인하기
+            </a>
+          )}
+
           <div className={`border rounded-2xl p-3 text-xs font-medium leading-relaxed ${info.callFirst ? 'bg-primary-50 border-primary-100 text-primary-700' : 'bg-amber-50 border-amber-100 text-amber-700'}`}>
             {info.callFirst 
               ? '💡 이 보험사는 보안 정책상 콜센터를 통해 당일 전용 팩스번호를 발급받아야 접수가 가능합니다. 지금 바로 전화하여 번호를 안내받으세요.'
@@ -254,6 +269,7 @@ export default function DetailedClaimForm({ onSuccess, plannerId }: { onSuccess?
 
   const [showPopup, setShowPopup] = useState(false)
   const [submittedCompany, setSubmittedCompany] = useState('')
+  const [claimPdfUrl, setClaimPdfUrl] = useState('')
 
   const [name, setName] = useState('')
   const [residentFront, setResidentFront] = useState('')
@@ -374,9 +390,11 @@ export default function DetailedClaimForm({ onSuccess, plannerId }: { onSuccess?
 
       const fullResident = residentBack ? `${residentFront}-${residentBack}` : residentFront
 
+      const successClaims: any[] = []
+
       // Loop through all selected companies and create individual claims
       for (const company of selectedCompanies) {
-        const { success } = await submitClaimAction({
+        const result = await submitClaimAction({
           planner_id: planner?.id || null,
           customer_name: name,
           customer_phone: phone,
@@ -406,7 +424,22 @@ export default function DetailedClaimForm({ onSuccess, plannerId }: { onSuccess?
           transmission_status: 'NOT_SENT',
         })
 
-        if (!success) throw new Error(`${company} 데이터 저장에 실패했습니다.`)
+        if (!result.success) throw new Error(`${company} 데이터 저장에 실패했습니다.`)
+        if (result.id) successClaims.push({ id: result.id })
+      }
+
+      // Now trigger transmission for the first company (for popup info)
+      if (successClaims.length > 0) {
+        const response = await fetch('/api/claims/transmit', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ claimId: successClaims[0].id })
+        })
+
+        const transmitResult = await response.json()
+        if (transmitResult.claimPdfUrl) {
+          setClaimPdfUrl(transmitResult.claimPdfUrl)
+        }
       }
 
       setSubmittedCompany(selectedCompanies[0]) // Always use the first one as representative for the popup
@@ -429,6 +462,7 @@ export default function DetailedClaimForm({ onSuccess, plannerId }: { onSuccess?
         <InsurancePopup
           company={submittedCompany}
           info={INSURANCE_COMPANIES[submittedCompany]}
+          claimPdfUrl={claimPdfUrl}
           onClose={() => {
             setShowPopup(false)
             if (onSuccess) onSuccess()
