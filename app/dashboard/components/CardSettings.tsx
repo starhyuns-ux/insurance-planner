@@ -28,6 +28,90 @@ interface CardSettingsProps {
   onUpdate: () => Promise<void>
 }
 
+export default function CardSettings({
+  planner,
+  editName,
+  editAffiliation,
+  editRegion,
+  editPhone,
+  editMessage,
+  editKakaoUrl,
+  isSaving,
+  urlCopied,
+  onUpdateState,
+  onUpdateProfile,
+  onFileUpload,
+  onCopyUrl,
+  onUpdate
+}: CardSettingsProps) {
+  return (
+    <div className="space-y-8">
+      {/* 1. Profile Info Edit */}
+      <div className="bg-white rounded-[2rem] shadow-xl p-8 border border-gray-100">
+        <div className="flex items-center gap-3 mb-8">
+          <div className="w-10 h-10 bg-primary-50 rounded-xl flex items-center justify-center text-primary-600">
+            <UserCircleIcon className="w-6 h-6" />
+          </div>
+          <h4 className="text-2xl font-black text-gray-900 tracking-tight">기본 프로필 정보 수정</h4>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-10">
+          <div className="space-y-2">
+            <label className="text-xs font-black text-gray-400 uppercase tracking-widest ml-1">이름</label>
+            <input 
+              type="text" 
+              value={editName}
+              onChange={(e) => onUpdateState('editName', e.target.value)}
+              className="w-full bg-gray-50 border-2 border-gray-50 rounded-2xl px-6 py-4 focus:bg-white focus:border-primary-500 transition-all outline-none font-bold"
+            />
+          </div>
+          <div className="space-y-2">
+            <label className="text-xs font-black text-gray-400 uppercase tracking-widest ml-1">소속</label>
+            <input 
+              type="text" 
+              value={editAffiliation}
+              onChange={(e) => onUpdateState('editAffiliation', e.target.value)}
+              className="w-full bg-gray-50 border-2 border-gray-50 rounded-2xl px-6 py-4 focus:bg-white focus:border-primary-500 transition-all outline-none font-bold"
+            />
+          </div>
+          <div className="space-y-2">
+            <label className="text-xs font-black text-gray-400 uppercase tracking-widest ml-1">활동 지역</label>
+            <input 
+              type="text" 
+              value={editRegion}
+              onChange={(e) => onUpdateState('editRegion', e.target.value)}
+              className="w-full bg-gray-50 border-2 border-gray-50 rounded-2xl px-6 py-4 focus:bg-white focus:border-primary-500 transition-all outline-none font-bold"
+            />
+          </div>
+          <div className="space-y-2">
+            <label className="text-xs font-black text-gray-400 uppercase tracking-widest ml-1">연락처</label>
+            <input 
+              type="text" 
+              value={editPhone}
+              onChange={(e) => onUpdateState('editPhone', e.target.value)}
+              className="w-full bg-gray-50 border-2 border-gray-50 rounded-2xl px-6 py-4 focus:bg-white focus:border-primary-500 transition-all outline-none font-bold"
+            />
+          </div>
+          <div className="space-y-2 md:col-span-2">
+            <label className="text-xs font-black text-gray-400 uppercase tracking-widest ml-1">한줄 인사말</label>
+            <textarea 
+              value={editMessage}
+              onChange={(e) => onUpdateState('editMessage', e.target.value)}
+              className="w-full bg-gray-50 border-2 border-gray-50 rounded-2xl px-6 py-4 focus:bg-white focus:border-primary-500 transition-all outline-none font-bold min-h-[100px]"
+            />
+          </div>
+          <div className="space-y-2 md:col-span-2">
+            <label className="text-xs font-black text-gray-400 uppercase tracking-widest ml-1">카카오톡 상담 URL</label>
+            <input 
+              type="text" 
+              value={editKakaoUrl}
+              onChange={(e) => onUpdateState('editKakaoUrl', e.target.value)}
+              placeholder="https://open.kakao.com/..."
+              className="w-full bg-gray-50 border-2 border-gray-50 rounded-2xl px-6 py-4 focus:bg-white focus:border-primary-500 transition-all outline-none font-bold"
+            />
+          </div>
+        </div>
+
         <button
           onClick={onUpdateProfile}
           disabled={isSaving}
