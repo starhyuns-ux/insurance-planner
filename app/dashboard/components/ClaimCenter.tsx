@@ -166,14 +166,14 @@ export default function ClaimCenter({
                       보상청구신청서 미리보기
                     </button>
 
-                    {claim.insurance_company && claim.transmission_status !== 'SENT' && (
+                    {claim.insurance_company && (claim.transmission_status !== 'SENT' || claim.fax_status === 'FAILED') && (
                       <button
                         onClick={() => handleTransmit(claim)}
                         disabled={transmittingClaimId === claim.id}
                         className="px-6 py-3 bg-primary-600 text-white hover:bg-primary-700 rounded-xl text-xs font-black transition-all w-full md:w-auto text-center flex items-center gap-2 justify-center shadow-xl shadow-primary-100 disabled:opacity-50 active:scale-95"
                       >
                         <PaperAirplaneIcon className="w-4 h-4 -rotate-45" />
-                        {transmittingClaimId === claim.id ? '송신 중...' : `${claim.insurance_company} 송신`}
+                        {transmittingClaimId === claim.id ? '송신 중...' : `${claim.insurance_company} 재송신`}
                       </button>
                     )}
                     
