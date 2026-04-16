@@ -231,7 +231,6 @@ export async function generateClaimPDF(claim: any, planner: any) {
     height: 140,
     borderColor: rgb(0.7, 0.7, 0.7),
     borderWidth: 1,
-    dashArray: [5, 5],
   })
 
   // Try to embed Signature Image
