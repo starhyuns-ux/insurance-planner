@@ -786,7 +786,6 @@ export default function DetailedClaimForm({ onSuccess, plannerId }: { onSuccess?
                     <h3 className="font-black text-gray-800 text-sm flex items-center gap-2">
                       <ShieldCheckIcon className="w-5 h-5 text-primary-600" /> 개인신용정보 동의 처리서
                     </h3>
-                    <span className="text-[10px] font-bold text-primary-600 bg-primary-50 px-2 py-0.5 rounded-md uppercase tracking-wider">idblife.com</span>
                   </div>
                   
                   <div className="h-64 overflow-y-auto p-5 text-gray-600 space-y-6 scrollbar-thin scrollbar-thumb-gray-200 scrollbar-track-transparent">

@@ -134,14 +134,14 @@ export async function generateClaimPDF(claim: any, planner: any) {
 
   currentY -= 15
 
-  // 4. Consent Info
-  drawRow('4. 동의 정보', null, true)
-  drawRow('개인정보 동의', claim.consent_third_party ? '동의 완료' : '미동의')
+  // 4. Consent Info Summary
+  drawRow('4. 동의 정보 요약', null, true)
+  drawRow('개인정보 동의', claim.consent_third_party ? '동의 완료 (상세 내역 2페이지 참조)' : '미동의')
   drawRow('동의 일시', claim.consent_at ? new Date(claim.consent_at).toLocaleString('ko-KR') : '-')
-  drawRow('서명 방식', claim.signature_type === 'FACE' ? '대면 서명' : '온라인/비대면 서명')
+  drawRow('서명 방식', '전자 자필 서명 (Handwritten)')
 
-  // Footer footer
-  const footerText = '위 내용은 고지된 정보와 일치하며, 보험금 청구를 위한 개인정보 제공에 동의합니다.'
+  // Footer on Page 1
+  const footerText = '본 서류는 보험금 청구를 위한 개인정보 제공 동의서와 함께 법적 효력을 갖습니다.'
   page.drawText(footerText, {
     x: width / 2 - koreanFont.widthOfTextAtSize(footerText, 10) / 2,
     y: 60,
@@ -159,12 +159,134 @@ export async function generateClaimPDF(claim: any, planner: any) {
     color: rgb(0.5, 0.5, 0.5),
   })
 
-  // Final Border
+  // Final Border for Page 1
   page.drawRectangle({
     x: 30,
     y: 30,
     width: width - 60,
     height: height - 60,
+    borderColor: rgb(0.8, 0.8, 0.8),
+    borderWidth: 0.5,
+  })
+
+  // ------------------------------------------------------------------
+  // PAGE 2: Detailed Personal (Credit) Information Consent Form
+  // ------------------------------------------------------------------
+  const consentPage = pdfDoc.addPage([595.28, 841.89])
+  const cpWidth = consentPage.getSize().width
+  const cpHeight = consentPage.getSize().height
+
+  consentPage.drawText('개인(신용)정보 처리 동의서 (보상청구용)', {
+    x: cpWidth / 2 - 140,
+    y: cpHeight - 60,
+    size: 14,
+    font: koreanFontBold,
+  })
+
+  let cpY = cpHeight - 90
+  const drawConsentText = (text: string, size = 8, isBold = false) => {
+    const lines = text.split('\n')
+    for (const line of lines) {
+      consentPage.drawText(line, {
+        x: 50,
+        y: cpY,
+        size,
+        font: isBold ? koreanFontBold : koreanFont,
+      })
+      cpY -= size + 4
+    }
+  }
+
+  drawConsentText('보험사 및 보험협회 등 관계 기관은 「개인정보보호법」 및 「신용정보의 이용 및 보호에 관한 법률」에 따라 \n본인의 개인(신용)정보를 처리하고자 하는 경우 본인의 동의를 얻어야 합니다.', 8)
+  cpY -= 5
+
+  const drawSectionHeader = (num: string, title: string) => {
+    consentPage.drawRectangle({ x: 45, y: cpY - 15, width: cpWidth - 90, height: 18, color: rgb(0.95, 0.95, 0.95) })
+    consentPage.drawText(`${num}. ${title}`, { x: 50, y: cpY - 10, size: 9, font: koreanFontBold })
+    consentPage.drawText('[V] 본인 동의함  [V] 수익자 동의함', { x: cpWidth - 200, y: cpY - 10, size: 8, font: koreanFontBold, color: rgb(0.2, 0.5, 0.2) })
+    cpY -= 25
+  }
+
+  drawSectionHeader('1', '개인(신용)정보 수집·이용에 관한 사항')
+  drawConsentText('- 목적: 보험금 지급·심사, 보험사고 조사, 보험계약 관리, 민원 처리, 법령상 의무이행 등\n- 항목: 성명, 주민번호, 주소, 연락처, 계좌정보, 질병 및 상해정보, 진료기록 등\n- 보유기간: 수집·이용 동의일로부터 거래종료 후 5년까지', 8)
+  cpY -= 10
+
+  drawSectionHeader('2', '개인(신용)정보의 조회에 관한 사항')
+  drawConsentText('- 목적: 보험사고 조사, 보험금 지급·심사\n- 조회기관: 보험요율산출기관, 보험협회, 의료기관, 공공기관 등\n- 조회정보: 보험계약정보, 보험금 지급정보, 사고정보, 질병 및 상해 관련 정보 등', 8)
+  cpY -= 10
+
+  drawSectionHeader('3', '개인(신용)정보의 제공에 관한 사항')
+  drawConsentText('- 제공받는 자: 타 보험사, 재보험사, 보험협회, 손해사정법인, 의료기관, 법률자문 등\n- 목적: 보험사고 조사, 보험금 지급·심사, 분쟁해결, 법령상 업무수행 등\n- 기간: 제공받는 자의 목적 달성 시까지 (최대 5년)', 8)
+  cpY -= 10
+
+  drawSectionHeader('4', '민감정보 및 고유식별정보 처리에 관한 사항')
+  drawConsentText('상기 1~3항의 목적과 관련하여 귀하의 민감정보(질병·상해정보) 및 \n고유식별정보(주민등록번호, 외국인등록번호)를 처리하는 것에 동의합니다.', 8, true)
+  cpY -= 20
+
+  // Signature Block
+  consentPage.drawRectangle({
+    x: cpWidth / 2 - 120,
+    y: cpY - 150,
+    width: 240,
+    height: 140,
+    borderColor: rgb(0.7, 0.7, 0.7),
+    borderWidth: 1,
+    dashArray: [5, 5],
+  })
+
+  // Try to embed Signature Image
+  if (claim.image_urls && claim.image_urls.length > 0) {
+    try {
+      const signatureUrl = claim.image_urls[0] // Standard: First image is signature
+      console.log(`[PDF GENERATOR] Fetching signature image from: ${signatureUrl}`)
+      const sigResponse = await fetch(signatureUrl)
+      if (sigResponse.ok) {
+        const sigImageBytes = await sigResponse.arrayBuffer()
+        const sigImage = await pdfDoc.embedPng(sigImageBytes)
+        
+        const dims = sigImage.scale(0.4)
+        consentPage.drawImage(sigImage, {
+          x: cpWidth / 2 - dims.width / 2,
+          y: cpY - 130,
+          width: dims.width,
+          height: dims.height,
+        })
+      }
+    } catch (err) {
+      console.error('[PDF GENERATOR] Failed to embed signature image:', err)
+      consentPage.drawText('(서명 데이터 로드 실패)', { x: cpWidth / 2 - 40, y: cpY - 80, size: 10, font: koreanFont, color: rgb(1, 0, 0) })
+    }
+  }
+
+  consentPage.drawText('위 본인(및 수익자)은 상기 내용을 충분히 이해하고 동의합니다.', {
+    x: cpWidth / 2 - 130,
+    y: cpY - 180,
+    size: 10,
+    font: koreanFontBold,
+  })
+
+  const signatureName = `${claim.customer_name} (인/서명)`
+  consentPage.drawText(signatureName, {
+    x: cpWidth / 2 - koreanFontBold.widthOfTextAtSize(signatureName, 12) / 2,
+    y: cpY - 200,
+    size: 12,
+    font: koreanFontBold,
+  })
+
+  const finalStamp = `동의 일시: ${new Date(claim.consent_at || claim.created_at).toLocaleString('ko-KR')}`
+  consentPage.drawText(finalStamp, {
+    x: cpWidth / 2 - koreanFont.widthOfTextAtSize(finalStamp, 9) / 2,
+    y: cpY - 220,
+    size: 9,
+    font: koreanFont,
+  })
+
+  // Final Border for Page 2
+  consentPage.drawRectangle({
+    x: 30,
+    y: 30,
+    width: cpWidth - 60,
+    height: cpHeight - 60,
     borderColor: rgb(0.8, 0.8, 0.8),
     borderWidth: 0.5,
   })
