@@ -11,6 +11,22 @@ import {
 } from '@heroicons/react/24/outline'
 import { submitClaimAction } from '@/lib/actions/claimActions'
 
+const ConsentItem = ({ label, insured, setInsured, beneficiary, setBeneficiary }: any) => (
+  <div className="bg-gray-50/50 p-4 rounded-xl border border-gray-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+    <p className="text-xs font-black text-gray-700">{label}</p>
+    <div className="flex gap-4">
+      <label className="flex items-center gap-2 cursor-pointer group">
+        <input type="checkbox" checked={insured} onChange={(e) => setInsured(e.target.checked)} className="w-4 h-4 rounded text-primary-600 focus:ring-primary-500 cursor-pointer" />
+        <span className="text-[11px] font-bold text-gray-500 group-hover:text-primary-600 transition-colors">피보험자 동의</span>
+      </label>
+      <label className="flex items-center gap-2 cursor-pointer group">
+        <input type="checkbox" checked={beneficiary} onChange={(e) => setBeneficiary(e.target.checked)} className="w-4 h-4 rounded text-primary-600 focus:ring-primary-500 cursor-pointer" />
+        <span className="text-[11px] font-bold text-gray-500 group-hover:text-primary-600 transition-colors">수익자 동의</span>
+      </label>
+    </div>
+  </div>
+)
+
 const INSURANCE_COMPANIES: Record<string, { phone: string; fax?: string; web?: string; callFirst?: boolean }> = {
   '삼성화재':    { phone: '1588-5114', web: 'https://www.samsungfire.com' },
   '현대해상':    { phone: '1588-5656', web: 'https://www.hi.co.kr' },
@@ -263,11 +279,30 @@ export default function DetailedClaimForm({ onSuccess, plannerId }: { onSuccess?
   const [selectedCompanies, setSelectedCompanies] = useState<string[]>([])
   const [images, setImages] = useState<File[]>([])
 
-  const [consentThirdParty, setConsentThirdParty] = useState(false)
-  const [consentSensitive, setConsentSensitive] = useState(false)
-  const [signatureType] = useState<'FACE'>('FACE') // Default to FACE and remove NON_FACE
-  const [signatureDataUrl, setSignatureDataUrl] = useState<string>('')
   const [signatureSaved, setSignatureSaved] = useState(false)
+  const [signatureType] = useState<'FACE'>('FACE')
+  const [signatureDataUrl, setSignatureDataUrl] = useState<string>('')
+
+  // Granular Consents (5 sections x 2 roles = 10 checkboxes)
+  const [c1In, setC1In] = useState(false) // 1. Collection - Insured
+  const [c1Be, setC1Be] = useState(false) // 1. Collection - Beneficiary
+  const [c2In, setC2In] = useState(false) // 2. Inquiry - Insured
+  const [c2Be, setC2Be] = useState(false) // 2. Inquiry - Beneficiary
+  const [c3In, setC3In] = useState(false) // 3. Provision - Insured
+  const [c3Be, setC3Be] = useState(false) // 3. Provision - Beneficiary
+  const [c4In, setC4In] = useState(false) // 4a. Disease info - Insured
+  const [c4Be, setC4Be] = useState(false) // 4a. Disease info - Beneficiary
+  const [c5In, setC5In] = useState(false) // 4b. Unique ID info - Insured
+  const [c5Be, setC5Be] = useState(false) // 4b. Unique ID info - Beneficiary
+
+  const allAgreed = c1In && c1Be && c2In && c2Be && c3In && c3Be && c4In && c4Be && c5In && c5Be;
+  const toggleAllConsents = (val: boolean) => {
+    setC1In(val); setC1Be(val);
+    setC2In(val); setC2Be(val);
+    setC3In(val); setC3Be(val);
+    setC4In(val); setC4Be(val);
+    setC5In(val); setC5Be(val);
+  }
 
   const canProceed = () => {
     switch (currentStep) {
@@ -283,7 +318,7 @@ export default function DetailedClaimForm({ onSuccess, plannerId }: { onSuccess?
       }
       case 4: return bankName && bankAccount && bankHolder
       case 5: return selectedCompanies.length > 0
-      case 6: return consentThirdParty && consentSensitive && signatureSaved
+      case 6: return allAgreed && signatureSaved
       default: return false
     }
   }
@@ -306,7 +341,7 @@ export default function DetailedClaimForm({ onSuccess, plannerId }: { onSuccess?
   }
 
   const handleSubmit = async () => {
-    if (!consentThirdParty) return
+    if (!allAgreed) return
     if (!signatureSaved) {
       alert('자필 서명을 완료한 후 [서명 확인 완료] 버튼을 눌러주세요.')
       return
@@ -363,7 +398,7 @@ export default function DetailedClaimForm({ onSuccess, plannerId }: { onSuccess?
           insurance_company: company,
           image_urls: uploadedUrls,
           signature_type: signatureType,
-          consent_third_party: consentThirdParty,
+          consent_third_party: true,
           consent_at: new Date().toISOString(),
           status: 'PENDING',
           transmission_status: 'NOT_SENT',
@@ -744,25 +779,132 @@ export default function DetailedClaimForm({ onSuccess, plannerId }: { onSuccess?
             {/* STEP 6 */}
             {currentStep === 6 && (
               <div className="space-y-6">
-                <div className="bg-primary-50/50 rounded-2xl p-5 md:p-6 border border-primary-100/50">
-                  <h3 className="font-black text-gray-800 text-sm mb-3 flex items-center gap-2 border-b border-primary-100 pb-3">
-                    <ShieldCheckIcon className="w-5 h-5 text-primary-600" /> 개인정보 및 제3자 제공 동의 요약
-                  </h3>
-                  <div className="text-xs sm:text-sm text-gray-600/90 leading-relaxed font-medium">
-                    보험금 청구 및 지급 심사를 목적으로 담당 설계사와 보험사 및 관련 기간에 제출해주신 서류와 인적사항의 내용이 제공됨을 확인하고 동의합니다. (보유 기간: 5년)
+                <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-sm">
+                  <div className="bg-gray-50 px-5 py-3 border-b border-gray-100 flex items-center justify-between">
+                    <h3 className="font-black text-gray-800 text-sm flex items-center gap-2">
+                      <ShieldCheckIcon className="w-5 h-5 text-primary-600" /> 개인신용정보 동의 처리서
+                    </h3>
+                    <span className="text-[10px] font-bold text-primary-600 bg-primary-50 px-2 py-0.5 rounded-md uppercase tracking-wider">idblife.com</span>
+                  </div>
+                  
+                  <div className="h-64 overflow-y-auto p-5 text-gray-600 space-y-6 scrollbar-thin scrollbar-thumb-gray-200 scrollbar-track-transparent">
+                    {/* Intro */}
+                    <section className="space-y-2">
+                      <h4 className="text-xs font-black text-primary-700 bg-primary-50 inline-block px-2 py-1 rounded">개인(신용)정보 처리 동의서 / 소비자 권익보호에 관한 사항</h4>
+                      <p className="text-xs leading-relaxed font-bold text-gray-800">
+                        본 동의를 거부하시는 경우에는 보험금 청구 관련 서비스가 일부 제한될 수 있고 본 동의서에 의한 개인(신용)정보 조회는 귀하의 신용등급에 영향을 주지 않습니다.
+                      </p>
+                    </section>
+
+                    {/* Section 1 */}
+                    <section className="space-y-3">
+                      <div className="flex items-center gap-2">
+                        <span className="w-5 h-5 bg-gray-900 text-white rounded-full flex items-center justify-center text-[10px] font-black">1</span>
+                        <h5 className="text-sm font-black text-gray-800">개인(신용)정보 수집·이용에 관한 동의사항</h5>
+                      </div>
+                      <div className="pl-7 space-y-3">
+                        <div>
+                          <p className="text-[11px] font-black text-gray-400 mb-1">[ 개인(신용)정보의 수집·이용 목적 ]</p>
+                          <ul className="text-xs space-y-1 list-disc pl-4">
+                            <li>보험금지급·심사(보험금청구서류 접수대행 서비스 포함) 및 보험사고 조사(보험사기 조사 포함), 보험계약유지 및 관리, 계좌이체, 보험금 관련 민원처리 및 분쟁대응</li>
+                            <li>금융거래(보험료 및 보험금 등 출·수납을 위한 금융거래 신청, 자동이체 등 접수) 관련 업무</li>
+                          </ul>
+                        </div>
+                        <div>
+                          <p className="text-[11px] font-black text-gray-400 mb-1">[ 수집·이용할 개인(신용)정보의 내용 ]</p>
+                          <ul className="text-xs space-y-1 list-disc pl-4">
+                            <li>개인식별정보(성명, 주민등록번호, 외국인등록번호, 운전면허증번호, 주소, 전화번호, 전자우편주소 등), 계좌정보</li>
+                            <li>보험사고 조사(보험사기 조사 포함) 및 손해사정업무 수행과 관련하여 취득한 개인(신용)정보[경찰, 공공기관, 의료기관 등으로부터 본인의 위임을 받아 취득한 각종 조사서, 증명서, 진료기록 등에 포함된 개인(신용)정보 포함]</li>
+                          </ul>
+                        </div>
+                        <div>
+                          <p className="text-[11px] font-black text-gray-400 mb-1">[ 개인(신용)정보의 보유·이용 기간 ]</p>
+                          <p className="text-xs leading-relaxed pl-4">
+                            수집·이용 동의일로부터 거래종료 후 5년까지(단, 거래종료 후 5년이 경과한 후에는 보험금 지급, 금융사고 조사, 보험사기 방지·적발, 민원처리, 법령상 의무이행을 위한 경우에 한하여 보유·이용하며, 별도 보관)
+                          </p>
+                        </div>
+                      </div>
+                    </section>
+
+                    {/* Section 2 */}
+                    <section className="space-y-3">
+                      <div className="flex items-center gap-2">
+                        <span className="w-5 h-5 bg-gray-900 text-white rounded-full flex items-center justify-center text-[10px] font-black">2</span>
+                        <h5 className="text-sm font-black text-gray-800">개인(신용)정보의 조회에 관한 사항</h5>
+                      </div>
+                      <div className="pl-7 space-y-3">
+                        <div>
+                          <p className="text-[11px] font-black text-gray-400 mb-1">[ 개인(신용)정보 조회목적 ]</p>
+                          <ul className="text-xs space-y-1 list-disc pl-4">
+                            <li>보험금지급·심사(보험금청구서류 접수대행 서비스 포함) 및 보험사고 조사(보험사기 조사 포함)</li>
+                            <li>금융거래(보험료 및 보험금 등 출·수납을 위한 금융거래 신청, 자동이체 등 접수) 관련 업무</li>
+                          </ul>
+                        </div>
+                        <div>
+                          <p className="text-[11px] font-black text-gray-400 mb-1">[ 조회할 개인(신용)정보 ]</p>
+                          <p className="text-xs leading-relaxed pl-4">보험계약정보, 보험금지급 관련 정보(사고정보 포함), 질병 및 상해관련 정보</p>
+                        </div>
+                        <div>
+                          <p className="text-[11px] font-black text-gray-400 mb-1">[ 조회동의 유효 기간 및 보유·이용 기간 ]</p>
+                          <p className="text-xs leading-relaxed pl-4">
+                            수집·이용 동의일로부터 거래종료 후 5년까지(단, 거래종료 후 5년이 경과한 후에는 보험금 지급, 금융사고 조사, 분쟁해결, 민원처리, 법령상 의무이행을 위한 경우에 한하여 보유·이용하며, 별도 보관함)
+                          </p>
+                        </div>
+                      </div>
+                    </section>
+
+                    {/* Section 3 */}
+                    <section className="space-y-3">
+                      <div className="flex items-center gap-2">
+                        <span className="w-5 h-5 bg-gray-900 text-white rounded-full flex items-center justify-center text-[10px] font-black">3</span>
+                        <h5 className="text-sm font-black text-gray-800">개인(신용)정보의 제공에 관한 사항</h5>
+                      </div>
+                      <div className="pl-7 space-y-3 text-xs leading-relaxed">
+                        <p><span className="font-bold text-gray-800">[ 제공받는 자 ] :</span> 생명/손해보험협회, 금융위, 금감원, 국토부, 재보험사, 금융기관, 손해사정업체, 의료기관, 변호사 등</p>
+                        <p><span className="font-bold text-gray-800">[ 이용목적 ] :</span> 신용정보집중관리, 법령에 따른 업무수행, 계약이행에 필요한 업무, 보험사고조사, 진료비심사, 구상금분쟁심의 등</p>
+                        <p><span className="font-bold text-gray-800">[ 보유·이용기간 ] :</span> 개인(신용)정보를 제공받는 자의 이용목적을 달성할 때까지(최대 거래종료 후 5년까지)</p>
+                      </div>
+                    </section>
+
+                    {/* Section 4 */}
+                    <section className="space-y-3">
+                      <div className="flex items-center gap-2">
+                        <span className="w-5 h-5 bg-gray-900 text-white rounded-full flex items-center justify-center text-[10px] font-black">4</span>
+                        <h5 className="text-sm font-black text-gray-800">고유식별정보의 처리에 관한 사항</h5>
+                      </div>
+                      <div className="pl-7 text-xs leading-relaxed">
+                        <p>
+                          「개인정보보호법」 및 「신용정보의 이용 및 보호에 관한 법률」에 따라 상기의 개인(신용)정보에 대한 개별 동의사항에 대하여 귀하의 <span className="font-bold text-primary-600">민감정보(질병·상해정보) 및 고유식별정보(주민번호·외국인등록번호·운전면허증번호)</span>를 처리(수집·이용, 조회, 제공)하는 것에 동의합니다.
+                        </p>
+                      </div>
+                    </section>
+
+                    <div className="p-4 bg-gray-50 rounded-xl text-[10px] text-gray-400 font-bold leading-relaxed border border-gray-100">
+                      ※ 본 동의는 당사 및 당사 업무수탁자가 개인정보보호법 및 신용정보의 이용 및 보호에 관한 법률에 따라 본 보상청구와 관련하여 귀하의 정보를 수집·이용·조회·제공하는 데 필요한 법적 절차입니다.
+                    </div>
                   </div>
                 </div>
-                
-                <div className="space-y-3">
-                  <label className={`flex items-center gap-3 p-4 rounded-xl border-2 cursor-pointer transition-all ${consentThirdParty ? 'border-primary-600 bg-primary-100/30' : 'border-gray-100 bg-white hover:border-gray-200'}`}>
-                    <input type="checkbox" checked={consentThirdParty} onChange={e => setConsentThirdParty(e.target.checked)} className="w-5 h-5 text-primary-600 rounded" />
-                    <span className="text-xs md:text-sm font-black text-gray-700">[필수] 개인정보 수집 및 이용 동의 (보험금 청구 목적)</span>
-                  </label>
-                  
-                  <label className={`flex items-center gap-3 p-4 rounded-xl border-2 cursor-pointer transition-all ${consentSensitive ? 'border-primary-600 bg-primary-100/30' : 'border-gray-100 bg-white hover:border-gray-200'}`}>
-                    <input type="checkbox" checked={consentSensitive} onChange={e => setConsentSensitive(e.target.checked)} className="w-5 h-5 text-primary-600 rounded" />
-                    <span className="text-xs md:text-sm font-black text-gray-700">[필수] 민감정보(건강정보) 및 고유식별정보 처리 동의</span>
-                  </label>
+
+                {/* Granular Consent Checkboxes */}
+                <div className="space-y-4">
+                  <button
+                    type="button"
+                    onClick={() => toggleAllConsents(!allAgreed)}
+                    className={`w-full flex items-center justify-center gap-2 p-4 rounded-2xl border-2 font-black transition-all ${
+                      allAgreed ? 'bg-primary-600 border-primary-600 text-white shadow-lg' : 'bg-white border-gray-200 text-gray-500 hover:border-gray-300'
+                    }`}
+                  >
+                    <CheckCircleIcon className="w-6 h-6" />
+                    약관 내용을 모두 확인했으며 전체 동의합니다
+                  </button>
+
+                  <div className="grid grid-cols-1 gap-3">
+                    <ConsentItem label="1. 수집·이용 동의" insured={c1In} setInsured={setC1In} beneficiary={c1Be} setBeneficiary={setC1Be} />
+                    <ConsentItem label="2. 조회 동의" insured={c2In} setInsured={setC2In} beneficiary={c2Be} setBeneficiary={setC2Be} />
+                    <ConsentItem label="3. 제3자 제공 동의" insured={c3In} setInsured={setC3In} beneficiary={c3Be} setBeneficiary={setC3Be} />
+                    <ConsentItem label="4a. 질병·상해정보 처리 동의" insured={c4In} setInsured={setC4In} beneficiary={c4Be} setBeneficiary={setC4Be} />
+                    <ConsentItem label="4b. 고유식별정보 처리 동의" insured={c5In} setInsured={setC5In} beneficiary={c5Be} setBeneficiary={setC5Be} />
+                  </div>
                 </div>
 
                 <div className="border-t border-gray-100 pt-6">

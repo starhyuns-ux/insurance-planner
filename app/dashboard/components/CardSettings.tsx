@@ -28,96 +28,6 @@ interface CardSettingsProps {
   onUpdate: () => Promise<void>
 }
 
-export default function CardSettings({
-  planner,
-  editName,
-  editAffiliation,
-  editRegion,
-  editPhone,
-  editMessage,
-  editKakaoUrl,
-  isSaving,
-  urlCopied,
-  onUpdateState,
-  onUpdateProfile,
-  onFileUpload,
-  onCopyUrl
-}: CardSettingsProps) {
-  return (
-    <div className="space-y-8">
-      {/* 1. Main Info Form */}
-      <div className="bg-white rounded-[2rem] shadow-xl p-8 border border-gray-100">
-        <div className="flex items-center gap-3 mb-8">
-          <div className="w-12 h-12 bg-primary-100 rounded-2xl flex items-center justify-center text-primary-600 shadow-lg shadow-primary-50">
-            <IdentificationIcon className="w-6 h-6" />
-          </div>
-          <div>
-            <h3 className="text-2xl font-black text-gray-900 tracking-tight">디지털 명함 프로필 설정</h3>
-            <p className="text-xs font-bold text-gray-400 mt-0.5">고객들에게 보여질 전문적인 정보를 입력하세요.</p>
-          </div>
-        </div>
-
-        {/* Profile Photo */}
-        <div className="mb-10">
-          <h4 className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
-            <UserCircleIcon className="w-4 h-4 text-primary-500" />
-            Profile Image
-          </h4>
-          <div className="flex items-center gap-8">
-            <div className="relative group">
-              <input type="file" accept="image/*" onChange={(e) => onFileUpload(e, 'profile')} className="hidden" id="card-profile-upload" />
-              <label htmlFor="card-profile-upload" className="w-40 h-48 bg-gray-50 rounded-[2rem] border-2 border-dashed border-gray-200 flex flex-col items-center justify-center text-gray-400 hover:border-primary-300 transition-all cursor-pointer overflow-hidden relative shadow-inner">
-                {planner?.profile_image_url ? (
-                  <img src={planner.profile_image_url} alt="Profile" className="w-full h-full object-cover" />
-                ) : (
-                  <div className="text-center p-4">
-                    <UserCircleIcon className="w-16 h-16 mx-auto opacity-10 mb-3" />
-                    <p className="text-xs font-black text-gray-300">이미지 업로드</p>
-                  </div>
-                )}
-                <div className="absolute inset-0 bg-primary-900/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center text-white backdrop-blur-sm">
-                  <span className="text-xs font-black uppercase tracking-widest bg-white/20 px-3 py-1.5 rounded-lg border border-white/30">Edit</span>
-                </div>
-              </label>
-            </div>
-            <div className="text-sm text-gray-500 max-w-sm">
-              <p className="font-black text-gray-800 text-lg mb-1.5 tracking-tight leading-tight">신뢰감을 주는 전문적인 사진을 추천합니다.</p>
-              <p className="text-xs text-gray-400 leading-relaxed font-medium">깔끔한 배경의 증명사진이나 영업 현장에서의 자연스러운 사진이 좋습니다.<br/><span className="text-primary-500">※ 명함 공유 시 카카오톡 미리보기에 표시됩니다.</span></p>
-            </div>
-          </div>
-        </div>
-
-        {/* Input Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-          <div className="space-y-2">
-            <label className="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] ml-1">Full Name</label>
-            <input type="text" value={editName} onChange={(e) => onUpdateState('editName', e.target.value)} placeholder="성함을 입력하세요" className="w-full px-6 py-4 bg-gray-50 border border-transparent rounded-2xl focus:bg-white focus:border-primary-500 transition-all outline-none text-sm font-black shadow-inner" />
-          </div>
-          <div className="space-y-2">
-            <label className="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] ml-1">Affiliation / Company</label>
-            <input type="text" value={editAffiliation} onChange={(e) => onUpdateState('editAffiliation', e.target.value)} placeholder="회사 또는 소속 지점을 입력하세요" className="w-full px-6 py-4 bg-gray-50 border border-transparent rounded-2xl focus:bg-white focus:border-primary-500 transition-all outline-none text-sm font-black shadow-inner" />
-          </div>
-          <div className="space-y-2">
-            <label className="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] ml-1">Region / Location</label>
-            <input type="text" value={editRegion} onChange={(e) => onUpdateState('editRegion', e.target.value)} placeholder="예: 서울 강남 / 전국 상담 가능" className="w-full px-6 py-4 bg-gray-50 border border-transparent rounded-2xl focus:bg-white focus:border-primary-500 transition-all outline-none text-sm font-black shadow-inner" />
-          </div>
-          <div className="space-y-2">
-            <label className="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] ml-1">Contact Phone</label>
-            <input type="text" value={editPhone} onChange={(e) => onUpdateState('editPhone', e.target.value)} placeholder="010-0000-0000" className="w-full px-6 py-4 bg-gray-50 border border-transparent rounded-2xl focus:bg-white focus:border-primary-500 transition-all outline-none text-sm font-black shadow-inner" />
-          </div>
-        </div>
-
-        <div className="space-y-6 mb-10">
-          <div className="space-y-2">
-            <label className="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] ml-1">One-line Message / Motto</label>
-            <input type="text" value={editMessage} onChange={(e) => onUpdateState('editMessage', e.target.value)} placeholder="상담 철학이나 인사말을 짧게 입력하세요 (예: 가족같은 마음으로 관리해 드립니다.)" className="w-full px-6 py-4 bg-gray-50 border border-transparent rounded-2xl focus:bg-white focus:border-primary-500 transition-all outline-none text-sm font-black shadow-inner" />
-          </div>
-          <div className="space-y-2">
-            <label className="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] ml-1">Kakao OpenChat URL</label>
-            <input type="text" value={editKakaoUrl} onChange={(e) => onUpdateState('editKakaoUrl', e.target.value)} placeholder="https://open.kakao.com/o/..." className="w-full px-6 py-4 bg-gray-50 border border-transparent rounded-2xl focus:bg-white focus:border-primary-500 transition-all outline-none text-sm font-black shadow-inner" />
-          </div>
-        </div>
-
         <button
           onClick={onUpdateProfile}
           disabled={isSaving}
@@ -157,7 +67,6 @@ export default function CardSettings({
 
       {/* 3. Personalized URL Section */}
       <div className="rounded-[2.5rem] p-10 text-white shadow-2xl relative overflow-hidden" style={{background: 'linear-gradient(135deg, #1e3a8a 0%, #1d4ed8 40%, #7c3aed 100%)'}}>
-        {/* Glow Decors - pointer-events-none ensures they don't block clicks */}
         <div className="absolute top-0 right-0 -mr-16 -mt-16 w-72 h-72 bg-blue-400 rounded-full opacity-20 blur-[80px] pointer-events-none" />
         <div className="absolute bottom-0 left-0 -ml-16 -mb-16 w-72 h-72 bg-violet-400 rounded-full opacity-20 blur-[80px] pointer-events-none" />
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-32 bg-indigo-300 rounded-full opacity-10 blur-[60px] pointer-events-none" />
