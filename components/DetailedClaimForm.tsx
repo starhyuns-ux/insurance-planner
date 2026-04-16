@@ -38,6 +38,8 @@ const INSURANCE_COMPANIES: Record<string, { phone: string; fax?: string; web?: s
   'MG손해보험':  { phone: '1588-5959', web: 'https://www.mgfire.co.kr' },
   '흥국화재':    { phone: '1688-1688', web: 'https://www.흥국화재.kr' },
   '하나손해보험': { phone: '1566-3000', web: 'https://www.hanainsurance.co.kr' },
+  '라이나손보':    { phone: '1588-3374', web: 'https://www.lina.co.kr' },
+  '농협손해보험': { phone: '1644-9000', web: 'https://www.nhfire.co.kr' },
   '삼성생명':    { phone: '1588-3114', web: 'https://www.samsunglife.com', callFirst: true },
   '교보생명':    { phone: '1588-1001', web: 'https://www.kyobo.co.kr', callFirst: true },
   '한화생명':    { phone: '1577-6301', web: 'https://www.hanwhalife.com', callFirst: true },
