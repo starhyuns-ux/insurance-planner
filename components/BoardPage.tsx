@@ -201,13 +201,13 @@ export default function BoardPage({ boardType, boardTitle, boardDesc, accentColo
               {selectedPost && <><span className="text-gray-300">/</span><span className="text-sm font-bold text-gray-700">댓글</span></>}
             </div>
           )}
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-0">
             <div>
-              <h1 className="text-2xl font-black text-gray-900">{boardTitle}</h1>
-              <p className="text-gray-400 text-sm mt-0.5">{boardDesc}</p>
+              <h1 className="text-xl md:text-2xl font-black text-gray-900">{boardTitle}</h1>
+              <p className="text-gray-400 text-xs md:text-sm mt-0.5">{boardDesc}</p>
             </div>
             {planner && !selectedPost && (
-              <div className="flex items-center gap-2 bg-primary-50 text-primary-700 border border-primary-100 rounded-full px-3 py-1 text-xs">
+              <div className="self-start sm:self-auto flex items-center gap-2 bg-primary-50 text-primary-700 border border-primary-100 rounded-full px-3 py-1 text-[10px] md:text-xs">
                 <span className="font-black">{planner.name}</span>
                 {planner.affiliation && <span className="text-primary-400">{planner.affiliation}</span>}
               </div>
@@ -264,7 +264,7 @@ export default function BoardPage({ boardType, boardTitle, boardDesc, accentColo
                         {post.author_name.charAt(0)}
                       </div>
                     )}
-                    <div className={`max-w-[75%] group`}>
+                    <div className="max-w-[85%] sm:max-w-[75%] group">
                       {!isMe(post) && (
                         <p className="text-xs text-gray-400 font-semibold mb-1 ml-1">
                           {post.author_name}{post.author_affiliation && <span className="text-gray-300 ml-1">{post.author_affiliation}</span>}
@@ -374,7 +374,7 @@ export default function BoardPage({ boardType, boardTitle, boardDesc, accentColo
                     {!isMe(c) && (
                       <div className="w-7 h-7 rounded-full bg-gray-100 flex items-center justify-center text-xs font-black text-gray-500 shrink-0 mt-1">{c.author_name.charAt(0)}</div>
                     )}
-                    <div className={`max-w-[75%]`}>
+                    <div className="max-w-[85%] sm:max-w-[75%]">
                       {!isMe(c) && <p className="text-[10px] text-gray-400 font-semibold mb-0.5 ml-1">{c.author_name}</p>}
                       <div className={`rounded-2xl px-3 py-2 text-sm whitespace-pre-wrap break-words ${
                         isMe(c) ? `${accentBubble} text-white rounded-tr-sm` : 'bg-gray-100 text-gray-800 rounded-tl-sm'

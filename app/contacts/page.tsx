@@ -71,12 +71,12 @@ function ContactCard({ data, title, icon: Icon, colorClass }: { data: ContactInf
                     <a 
                         key={idx} 
                         href={`tel:${item.phone.replace(/-/g, '')}`}
-                        className={`group flex items-center justify-between p-4 rounded-2xl border ${colorClass.border} hover:shadow-md transition-all duration-200 ${colorClass.hover}`}
+                        className={`group flex flex-col xs:flex-row items-start xs:items-center justify-between p-4 rounded-2xl border ${colorClass.border} hover:shadow-md transition-all duration-200 ${colorClass.hover} gap-3`}
                     >
-                        <span className="font-semibold text-gray-800 text-lg group-hover:text-gray-900 transition-colors">
+                        <span className="font-semibold text-gray-800 text-lg group-hover:text-gray-900 transition-colors break-keep">
                             {item.name}
                         </span>
-                        <div className={`flex items-center gap-2 font-bold ${colorClass.text} bg-white px-3 py-1.5 rounded-lg shadow-sm border border-gray-100`}>
+                        <div className={`flex items-center gap-2 font-bold ${colorClass.text} bg-white px-3 py-1.5 rounded-lg shadow-sm border border-gray-100 shrink-0`}>
                             <PhoneIcon className="w-4 h-4" />
                             {item.phone}
                         </div>

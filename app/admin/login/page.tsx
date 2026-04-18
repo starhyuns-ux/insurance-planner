@@ -114,7 +114,7 @@ export default function AdminLoginPage() {
 
         {/* Footer info */}
         <div className="mt-10 text-center text-slate-600 space-y-1">
-          <p className="text-[11px] font-black uppercase tracking-[0.2em]">인터커스텀</p>
+          <p className="text-[11px] font-black uppercase tracking-[0.2em]">인슈닷</p>
           <p className="text-[10px] font-bold opacity-60">사업자 등록번호: 207-30-62021</p>
         </div>
       </div>

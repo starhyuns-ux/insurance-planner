@@ -3,7 +3,8 @@
 import React from 'react'
 import { 
   DocumentCheckIcon,
-  PaperAirplaneIcon
+  PaperAirplaneIcon,
+  MagnifyingGlassCircleIcon
 } from '@heroicons/react/24/outline'
 import DetailedClaimForm from '@/components/DetailedClaimForm'
 
@@ -15,6 +16,7 @@ interface ClaimCenterProps {
   onUpdateClaimStatus: (id: string, status: string) => void
   onDeleteClaim: (id: string) => void
   onCheckStatus: (id: string, getPreview?: boolean) => void
+  onPreviewClaim: (id: string) => void
   checkingStatusId: string | null
 }
 
@@ -28,6 +30,7 @@ export default function ClaimCenter({
   onUpdateClaimStatus,
   onDeleteClaim,
   onCheckStatus,
+  onPreviewClaim,
   checkingStatusId
 }: ClaimCenterProps) {
   
@@ -86,7 +89,15 @@ export default function ClaimCenter({
                         </a>
                       )}
                       <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider bg-gray-50 px-2 py-1 rounded-lg">
-                        {new Date(claim.created_at).toLocaleDateString()}
+                        {new Date(claim.created_at).toLocaleString('ko-KR', {
+                          year: 'numeric', 
+                          month: '2-digit', 
+                          day: '2-digit', 
+                          hour: '2-digit', 
+                          minute: '2-digit',
+                          second: '2-digit',
+                          hour12: false
+                        })}
                       </span>
                       <div className="flex gap-2">
                         <span className={`px-3 py-1 text-[10px] font-black uppercase tracking-[0.1em] rounded-full shadow-sm ${
@@ -141,14 +152,28 @@ export default function ClaimCenter({
                   
                   {/* Actions */}
                   <div className="flex items-center gap-2 md:flex-col md:items-end md:gap-3 pt-4 md:pt-2 shrink-0">
-                    {claim.insurance_company && claim.transmission_status !== 'SENT' && (
+                    <button
+                      onClick={() => {
+                        if (claim.claim_pdf_url) {
+                          window.open(claim.claim_pdf_url, '_blank')
+                        } else {
+                          onPreviewClaim(claim.id)
+                        }
+                      }}
+                      className="px-6 py-2 bg-indigo-600 text-white hover:bg-indigo-700 rounded-xl text-xs font-black transition-all w-full md:w-auto text-center flex items-center gap-2 justify-center shadow-lg shadow-indigo-100"
+                    >
+                      <MagnifyingGlassCircleIcon className="w-4 h-4" />
+                      보상청구신청서 미리보기
+                    </button>
+
+                    {claim.insurance_company && (claim.transmission_status !== 'SENT' || claim.fax_status === 'FAILED') && (
                       <button
                         onClick={() => handleTransmit(claim)}
                         disabled={transmittingClaimId === claim.id}
                         className="px-6 py-3 bg-primary-600 text-white hover:bg-primary-700 rounded-xl text-xs font-black transition-all w-full md:w-auto text-center flex items-center gap-2 justify-center shadow-xl shadow-primary-100 disabled:opacity-50 active:scale-95"
                       >
                         <PaperAirplaneIcon className="w-4 h-4 -rotate-45" />
-                        {transmittingClaimId === claim.id ? '송신 중...' : `${claim.insurance_company} 송신`}
+                        {transmittingClaimId === claim.id ? '송신 중...' : `${claim.insurance_company} 재송신`}
                       </button>
                     )}
                     

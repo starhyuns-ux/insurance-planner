@@ -17,7 +17,8 @@ import {
   ChatBubbleLeftRightIcon,
   DocumentTextIcon,
   GlobeAltIcon,
-  GiftIcon
+  GiftIcon,
+  MagnifyingGlassIcon
 } from '@heroicons/react/24/outline'
 import { motion, AnimatePresence } from 'framer-motion'
 import { usePlanner } from '@/lib/providers/PlannerProvider'
@@ -175,6 +176,16 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 <span className="text-[10px] font-black text-gray-500 uppercase tracking-[0.18em]">업무 지원</span>
               </div>
               <div className="p-2 space-y-0.5">
+                <Link
+                  href="/dashboard/hira-view"
+                  className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-semibold transition-all text-sm ${
+                    isActive('/dashboard/hira-view') ? 'bg-primary-600 text-white shadow-md' : 'text-gray-600 hover:bg-gray-50'
+                  }`}
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  <MagnifyingGlassIcon className="w-4 h-4 shrink-0 text-primary-500" />
+                  진료정보 열람
+                </Link>
                 <Link
                   href="/dashboard/disclosure"
                   className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-semibold transition-all text-sm ${

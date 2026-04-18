@@ -41,80 +41,74 @@ export default function CardSettings({
   onUpdateState,
   onUpdateProfile,
   onFileUpload,
-  onCopyUrl
+  onCopyUrl,
+  onUpdate
 }: CardSettingsProps) {
   return (
     <div className="space-y-8">
-      {/* 1. Main Info Form */}
+      {/* 1. Profile Info Edit */}
       <div className="bg-white rounded-[2rem] shadow-xl p-8 border border-gray-100">
         <div className="flex items-center gap-3 mb-8">
-          <div className="w-12 h-12 bg-primary-100 rounded-2xl flex items-center justify-center text-primary-600 shadow-lg shadow-primary-50">
-            <IdentificationIcon className="w-6 h-6" />
+          <div className="w-10 h-10 bg-primary-50 rounded-xl flex items-center justify-center text-primary-600">
+            <UserCircleIcon className="w-6 h-6" />
           </div>
-          <div>
-            <h3 className="text-2xl font-black text-gray-900 tracking-tight">디지털 명함 프로필 설정</h3>
-            <p className="text-xs font-bold text-gray-400 mt-0.5">고객들에게 보여질 전문적인 정보를 입력하세요.</p>
-          </div>
+          <h4 className="text-2xl font-black text-gray-900 tracking-tight">기본 프로필 정보 수정</h4>
         </div>
 
-        {/* Profile Photo */}
-        <div className="mb-10">
-          <h4 className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
-            <UserCircleIcon className="w-4 h-4 text-primary-500" />
-            Profile Image
-          </h4>
-          <div className="flex items-center gap-8">
-            <div className="relative group">
-              <input type="file" accept="image/*" onChange={(e) => onFileUpload(e, 'profile')} className="hidden" id="card-profile-upload" />
-              <label htmlFor="card-profile-upload" className="w-40 h-48 bg-gray-50 rounded-[2rem] border-2 border-dashed border-gray-200 flex flex-col items-center justify-center text-gray-400 hover:border-primary-300 transition-all cursor-pointer overflow-hidden relative shadow-inner">
-                {planner?.profile_image_url ? (
-                  <img src={planner.profile_image_url} alt="Profile" className="w-full h-full object-cover" />
-                ) : (
-                  <div className="text-center p-4">
-                    <UserCircleIcon className="w-16 h-16 mx-auto opacity-10 mb-3" />
-                    <p className="text-xs font-black text-gray-300">이미지 업로드</p>
-                  </div>
-                )}
-                <div className="absolute inset-0 bg-primary-900/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center text-white backdrop-blur-sm">
-                  <span className="text-xs font-black uppercase tracking-widest bg-white/20 px-3 py-1.5 rounded-lg border border-white/30">Edit</span>
-                </div>
-              </label>
-            </div>
-            <div className="text-sm text-gray-500 max-w-sm">
-              <p className="font-black text-gray-800 text-lg mb-1.5 tracking-tight leading-tight">신뢰감을 주는 전문적인 사진을 추천합니다.</p>
-              <p className="text-xs text-gray-400 leading-relaxed font-medium">깔끔한 배경의 증명사진이나 영업 현장에서의 자연스러운 사진이 좋습니다.<br/><span className="text-primary-500">※ 명함 공유 시 카카오톡 미리보기에 표시됩니다.</span></p>
-            </div>
-          </div>
-        </div>
-
-        {/* Input Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-10">
           <div className="space-y-2">
-            <label className="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] ml-1">Full Name</label>
-            <input type="text" value={editName} onChange={(e) => onUpdateState('editName', e.target.value)} placeholder="성함을 입력하세요" className="w-full px-6 py-4 bg-gray-50 border border-transparent rounded-2xl focus:bg-white focus:border-primary-500 transition-all outline-none text-sm font-black shadow-inner" />
+            <label className="text-xs font-black text-gray-400 uppercase tracking-widest ml-1">이름</label>
+            <input 
+              type="text" 
+              value={editName}
+              onChange={(e) => onUpdateState('editName', e.target.value)}
+              className="w-full bg-gray-50 border-2 border-gray-50 rounded-2xl px-6 py-4 focus:bg-white focus:border-primary-500 transition-all outline-none font-bold"
+            />
           </div>
           <div className="space-y-2">
-            <label className="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] ml-1">Affiliation / Company</label>
-            <input type="text" value={editAffiliation} onChange={(e) => onUpdateState('editAffiliation', e.target.value)} placeholder="회사 또는 소속 지점을 입력하세요" className="w-full px-6 py-4 bg-gray-50 border border-transparent rounded-2xl focus:bg-white focus:border-primary-500 transition-all outline-none text-sm font-black shadow-inner" />
+            <label className="text-xs font-black text-gray-400 uppercase tracking-widest ml-1">소속</label>
+            <input 
+              type="text" 
+              value={editAffiliation}
+              onChange={(e) => onUpdateState('editAffiliation', e.target.value)}
+              className="w-full bg-gray-50 border-2 border-gray-50 rounded-2xl px-6 py-4 focus:bg-white focus:border-primary-500 transition-all outline-none font-bold"
+            />
           </div>
           <div className="space-y-2">
-            <label className="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] ml-1">Region / Location</label>
-            <input type="text" value={editRegion} onChange={(e) => onUpdateState('editRegion', e.target.value)} placeholder="예: 서울 강남 / 전국 상담 가능" className="w-full px-6 py-4 bg-gray-50 border border-transparent rounded-2xl focus:bg-white focus:border-primary-500 transition-all outline-none text-sm font-black shadow-inner" />
+            <label className="text-xs font-black text-gray-400 uppercase tracking-widest ml-1">활동 지역</label>
+            <input 
+              type="text" 
+              value={editRegion}
+              onChange={(e) => onUpdateState('editRegion', e.target.value)}
+              className="w-full bg-gray-50 border-2 border-gray-50 rounded-2xl px-6 py-4 focus:bg-white focus:border-primary-500 transition-all outline-none font-bold"
+            />
           </div>
           <div className="space-y-2">
-            <label className="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] ml-1">Contact Phone</label>
-            <input type="text" value={editPhone} onChange={(e) => onUpdateState('editPhone', e.target.value)} placeholder="010-0000-0000" className="w-full px-6 py-4 bg-gray-50 border border-transparent rounded-2xl focus:bg-white focus:border-primary-500 transition-all outline-none text-sm font-black shadow-inner" />
+            <label className="text-xs font-black text-gray-400 uppercase tracking-widest ml-1">연락처</label>
+            <input 
+              type="text" 
+              value={editPhone}
+              onChange={(e) => onUpdateState('editPhone', e.target.value)}
+              className="w-full bg-gray-50 border-2 border-gray-50 rounded-2xl px-6 py-4 focus:bg-white focus:border-primary-500 transition-all outline-none font-bold"
+            />
           </div>
-        </div>
-
-        <div className="space-y-6 mb-10">
-          <div className="space-y-2">
-            <label className="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] ml-1">One-line Message / Motto</label>
-            <input type="text" value={editMessage} onChange={(e) => onUpdateState('editMessage', e.target.value)} placeholder="상담 철학이나 인사말을 짧게 입력하세요 (예: 가족같은 마음으로 관리해 드립니다.)" className="w-full px-6 py-4 bg-gray-50 border border-transparent rounded-2xl focus:bg-white focus:border-primary-500 transition-all outline-none text-sm font-black shadow-inner" />
+          <div className="space-y-2 md:col-span-2">
+            <label className="text-xs font-black text-gray-400 uppercase tracking-widest ml-1">한줄 인사말</label>
+            <textarea 
+              value={editMessage}
+              onChange={(e) => onUpdateState('editMessage', e.target.value)}
+              className="w-full bg-gray-50 border-2 border-gray-50 rounded-2xl px-6 py-4 focus:bg-white focus:border-primary-500 transition-all outline-none font-bold min-h-[100px]"
+            />
           </div>
-          <div className="space-y-2">
-            <label className="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] ml-1">Kakao OpenChat URL</label>
-            <input type="text" value={editKakaoUrl} onChange={(e) => onUpdateState('editKakaoUrl', e.target.value)} placeholder="https://open.kakao.com/o/..." className="w-full px-6 py-4 bg-gray-50 border border-transparent rounded-2xl focus:bg-white focus:border-primary-500 transition-all outline-none text-sm font-black shadow-inner" />
+          <div className="space-y-2 md:col-span-2">
+            <label className="text-xs font-black text-gray-400 uppercase tracking-widest ml-1">카카오톡 상담 URL</label>
+            <input 
+              type="text" 
+              value={editKakaoUrl}
+              onChange={(e) => onUpdateState('editKakaoUrl', e.target.value)}
+              placeholder="https://open.kakao.com/..."
+              className="w-full bg-gray-50 border-2 border-gray-50 rounded-2xl px-6 py-4 focus:bg-white focus:border-primary-500 transition-all outline-none font-bold"
+            />
           </div>
         </div>
 
@@ -157,52 +151,56 @@ export default function CardSettings({
 
       {/* 3. Personalized URL Section */}
       <div className="rounded-[2.5rem] p-10 text-white shadow-2xl relative overflow-hidden" style={{background: 'linear-gradient(135deg, #1e3a8a 0%, #1d4ed8 40%, #7c3aed 100%)'}}>
-        {/* Glow Decors */}
-        <div className="absolute top-0 right-0 -mr-16 -mt-16 w-72 h-72 bg-blue-400 rounded-full opacity-20 blur-[80px]" />
-        <div className="absolute bottom-0 left-0 -ml-16 -mb-16 w-72 h-72 bg-violet-400 rounded-full opacity-20 blur-[80px]" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-32 bg-indigo-300 rounded-full opacity-10 blur-[60px]" />
+        <div className="absolute top-0 right-0 -mr-16 -mt-16 w-72 h-72 bg-blue-400 rounded-full opacity-20 blur-[80px] pointer-events-none" />
+        <div className="absolute bottom-0 left-0 -ml-16 -mb-16 w-72 h-72 bg-violet-400 rounded-full opacity-20 blur-[80px] pointer-events-none" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-32 bg-indigo-300 rounded-full opacity-10 blur-[60px] pointer-events-none" />
         
-        <h4 className="text-xl font-black mb-1.5 flex items-center gap-3 text-white drop-shadow">
-          <div className="w-2 h-7 bg-yellow-300 rounded-full shadow-lg shadow-yellow-300/50" />
-          나의 공식 디지털 명함 공유 주소
-        </h4>
-        <p className="text-sm text-blue-200 font-bold mb-8 uppercase tracking-[0.2em]">Personalized Digital Card URL</p>
-        
-        <div className="flex flex-col gap-4">
-          <div className="flex flex-col md:flex-row items-center gap-3">
-            <div className="flex-1 w-full bg-white/15 backdrop-blur-2xl rounded-2xl px-6 py-4 border border-white/30 font-mono text-xs md:text-sm truncate text-white flex items-center justify-between shadow-inner">
-              <span className="truncate font-bold">https://stroy.kr/p/{planner?.id}/card</span>
-              <div className="w-2.5 h-2.5 bg-green-400 rounded-full animate-pulse shadow-lg shadow-green-400/70 ml-3 shrink-0" />
+        <div className="relative z-10">
+          <h4 className="text-xl font-black mb-1.5 flex items-center gap-3 text-white drop-shadow">
+            <div className="w-2 h-7 bg-yellow-300 rounded-full shadow-lg shadow-yellow-300/50" />
+            나의 공식 디지털 명함 공유 주소
+          </h4>
+          <p className="text-sm text-blue-200 font-bold mb-8 uppercase tracking-[0.2em]">Personalized Digital Card URL</p>
+          
+          <div className="flex flex-col gap-4">
+            <div className="flex flex-col md:flex-row items-center gap-3">
+              <div className="flex-1 w-full bg-white/15 backdrop-blur-2xl rounded-2xl px-6 py-4 border border-white/30 font-mono text-xs md:text-sm truncate text-white flex items-center justify-between shadow-inner">
+                <span className="truncate font-bold">
+                  {typeof window !== 'undefined' ? window.location.origin : ''}/p/{planner?.id}/card
+                </span>
+                <div className="w-2.5 h-2.5 bg-green-400 rounded-full animate-pulse shadow-lg shadow-green-400/70 ml-3 shrink-0" />
+              </div>
+              <button
+                onClick={() => planner?.id && onCopyUrl(planner.id)}
+                className={`w-full md:w-auto px-8 py-4 rounded-2xl transition-all flex items-center justify-center gap-3 font-black text-sm shadow-xl active:scale-95 ${
+                  urlCopied 
+                    ? 'bg-green-400 text-green-950 shadow-green-400/40' 
+                    : 'bg-yellow-300 text-blue-950 hover:bg-yellow-200 shadow-yellow-300/40'
+                }`}
+              >
+                {urlCopied ? (
+                  <>
+                    <CheckIcon className="w-5 h-5" />
+                    링크 복사완료
+                  </>
+                 ) : (
+                  <>
+                    <ShareIcon className="w-5 h-5" />
+                    주소 복사하기
+                  </>
+                )}
+              </button>
             </div>
-            <button
-              onClick={() => planner?.id && onCopyUrl(planner.id)}
-              className={`w-full md:w-auto px-8 py-4 rounded-2xl transition-all flex items-center justify-center gap-3 font-black text-sm shadow-xl active:scale-95 ${
-                urlCopied 
-                  ? 'bg-green-400 text-green-950 shadow-green-400/40' 
-                  : 'bg-yellow-300 text-blue-950 hover:bg-yellow-200 shadow-yellow-300/40'
-              }`}
+            <a 
+              href={`/p/${planner?.id}/card`} 
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full bg-white/20 backdrop-blur-md text-white py-4 rounded-2xl font-black text-sm text-center hover:bg-white/30 transition-all flex items-center justify-center gap-3 border border-white/40 shadow-lg"
             >
-              {urlCopied ? (
-                <>
-                  <CheckIcon className="w-5 h-5" />
-                  링크 복사완료
-                </>
-               ) : (
-                <>
-                  <ShareIcon className="w-5 h-5" />
-                  주소 복사하기
-                </>
-              )}
-            </button>
+              <GlobeAltIcon className="w-5 h-5 text-yellow-300" />
+              내 명함 페이지 미리보기
+            </a>
           </div>
-          <Link 
-            href={`/p/${planner?.id}/card`} 
-            target="_blank"
-            className="w-full bg-white/20 backdrop-blur-md text-white py-4 rounded-2xl font-black text-sm text-center hover:bg-white/30 transition-all flex items-center justify-center gap-3 border border-white/40 shadow-lg"
-          >
-            <GlobeAltIcon className="w-5 h-5 text-yellow-300" />
-            내 명함 페이지 미리보기
-          </Link>
         </div>
       </div>
 

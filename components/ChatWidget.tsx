@@ -5,6 +5,8 @@ import { usePathname } from 'next/navigation'
 import { supabase } from '@/lib/supabaseClient'
 import { format } from 'date-fns'
 import { ko } from 'date-fns/locale'
+import { WalletIcon } from '@heroicons/react/24/outline'
+import RewardWalletModal from './RewardWalletModal'
 
 type Message = {
   id: string
@@ -28,6 +30,7 @@ export default function ChatWidget() {
   const [sending, setSending] = useState(false)
   const [unread, setUnread] = useState(0)
   const [isPlanner, setIsPlanner] = useState(false)
+  const [walletOpen, setWalletOpen] = useState(false)
   const bottomRef = useRef<HTMLDivElement>(null)
 
   // Restore session from localStorage or Auth
@@ -148,29 +151,43 @@ export default function ChatWidget() {
 
   return (
     <>
-      {/* Floating button */}
-      <button
-        onClick={() => setOpen(o => !o)}
-        className="fixed bottom-32 lg:bottom-28 right-6 z-50 w-14 h-14 bg-primary-600 text-white rounded-full shadow-2xl hover:bg-primary-700 transition-all hover:scale-105 flex items-center justify-center"
-        aria-label="상담 채팅"
-      >
-        {open ? (
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-          </svg>
-        ) : (
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 0 1 .865-.501 48.172 48.172 0 0 0 3.423-.379c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z" />
-          </svg>
-        )}
-        {unread > 0 && !open && (
-          <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-[10px] font-black rounded-full flex items-center justify-center animate-pulse">{unread}</span>
-        )}
-      </button>
+      {/* Floating button group */}
+      <div className="fixed bottom-6 right-6 z-50 flex flex-col items-center gap-3">
+        {/* Wallet button - expands on hover */}
+        <button
+          onClick={() => setWalletOpen(w => !w)}
+          className="group flex items-center gap-2 h-11 bg-white border-2 border-primary-200 text-primary-600 rounded-full shadow-xl hover:bg-primary-600 hover:text-white hover:border-primary-600 transition-all duration-300 overflow-hidden px-3"
+          aria-label="리워드 지갑"
+        >
+          <WalletIcon className="w-5 h-5 shrink-0" />
+          <span className="max-w-0 group-hover:max-w-[6rem] overflow-hidden whitespace-nowrap transition-all duration-300 text-sm font-bold">
+            리워드 지갑열기
+          </span>
+        </button>
+
+        {/* Chat button */}
+        <button
+          onClick={() => setOpen(o => !o)}
+          className="w-14 h-14 bg-primary-600 text-white rounded-full shadow-2xl hover:bg-primary-700 transition-all hover:scale-105 flex items-center justify-center relative"
+          aria-label="상담 채팅"
+        >
+          {open ? (
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          ) : (
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 0 1 .865-.501 48.172 48.172 0 0 0 3.423-.379c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z" />
+            </svg>
+          )}
+          {unread > 0 && !open && (
+            <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-[10px] font-black rounded-full flex items-center justify-center animate-pulse">{unread}</span>
+          )}
+        </button>
+      </div>
  
-      {/* Chat Window */}
       {open && (
-        <div className="fixed bottom-48 lg:bottom-44 right-6 z-50 w-80 sm:w-96 bg-white rounded-3xl shadow-2xl border border-gray-100 flex flex-col overflow-hidden" style={{ height: '520px' }}>
+        <div className="fixed bottom-24 lg:bottom-32 right-6 z-50 w-80 sm:w-96 bg-white rounded-3xl shadow-2xl border border-gray-100 flex flex-col overflow-hidden" style={{ height: '520px' }}>
           {/* Header */}
           <div className="bg-primary-600 px-5 py-4 text-white">
             <div className="flex items-center gap-3">
@@ -258,6 +275,8 @@ export default function ChatWidget() {
           )}
         </div>
       )}
+
+      <RewardWalletModal isOpen={walletOpen} onClose={() => setWalletOpen(false)} />
     </>
   )
 }

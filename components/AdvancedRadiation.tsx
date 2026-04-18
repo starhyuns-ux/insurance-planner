@@ -23,16 +23,16 @@ export default function AdvancedRadiation() {
               {t('radiationBadge')}
             </div>
 
-            <h2 className="text-3xl md:text-4xl lg:text-5xl font-extrabold text-gray-900 tracking-tight leading-[1.3] break-keep">
-              {t('radiationTitle')}<br />
-              <span className="text-primary-600">{t('radiationTitleHighlight')}</span><br className="hidden md:block" />
+            <h2 className="text-2xl md:text-3xl lg:text-5xl font-extrabold text-gray-900 tracking-tight leading-[1.3] break-keep">
+              {t('radiationTitle')}<br className="md:hidden" />
+              <span className="text-primary-600"> {t('radiationTitleHighlight')}</span><br className="hidden md:block" />
               {t('radiationTitleSub')}
             </h2>
 
-            <p className="text-lg text-gray-600 leading-relaxed md:whitespace-pre-line break-keep">
+            <p className="text-base md:text-lg text-gray-600 leading-relaxed md:whitespace-pre-line break-keep">
               {t('radiationDescPart1')}<br className="hidden md:block" />
-              {' '}<strong className="text-gray-900">{t('radiationDescCost')}</strong>{t('radiationDescPart2')}<br />
-              <br />
+              {' '}<strong className="text-gray-900">{t('radiationDescCost')}</strong>{t('radiationDescPart2')}<br className="hidden md:block" />
+              <br className="md:hidden" />
               {t('radiationDescPart3')} <strong>{t('radiationDescExpert')}</strong>{t('radiationDescPart4')}
             </p>
 

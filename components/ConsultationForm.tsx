@@ -136,10 +136,10 @@ export default function ConsultationForm({ id = "consultation", plannerId, plann
           <div className="bg-gray-900 p-10 md:w-5/12 text-white flex flex-col justify-center relative overflow-hidden shrink-0">
             <div className="absolute top-0 right-0 -mr-16 -mt-16 w-64 h-64 bg-primary-600 rounded-full mix-blend-multiply opacity-20 blur-3xl"></div>
 
-            <h3 className="text-3xl font-extrabold mb-4 relative z-10" suppressHydrationWarning>
+            <h3 className="text-2xl md:text-3xl font-extrabold mb-4 relative z-10 break-keep" suppressHydrationWarning>
               {finalPlannerName ? handleTranslation('formTitleWithPlanner', finalPlannerName) : t('formTitle')}
             </h3>
-            <p className="text-gray-400 mb-8 leading-relaxed relative z-10 text-sm" suppressHydrationWarning>
+            <p className="text-gray-400 mb-8 leading-relaxed relative z-10 text-xs md:text-sm break-keep" suppressHydrationWarning>
               {finalPlannerName ? t('formDescWithPlanner') : t('formDesc')}
             </p>
 
@@ -180,57 +180,57 @@ export default function ConsultationForm({ id = "consultation", plannerId, plann
                 </h4>
 
                 <form onSubmit={handleSubmit} className="space-y-4">
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label htmlFor="name" className="block text-[11px] font-black text-gray-400 uppercase tracking-widest pl-1 mb-1">{t('formName')}</label>
+                      <label htmlFor="name" className="block text-[10px] md:text-[11px] font-black text-gray-400 uppercase tracking-widest pl-1 mb-1">{t('formName')}</label>
                       <input
                         type="text"
                         id="name"
                         value={name}
                         onChange={(e) => setName(e.target.value)}
                         placeholder="홍길동"
-                        className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white transition-all font-bold placeholder:text-gray-300"
+                        className="w-full px-4 py-2.5 md:py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white transition-all font-bold placeholder:text-gray-300 text-sm md:text-base"
                         disabled={isSubmitting}
                       />
                     </div>
 
                     <div>
-                      <label htmlFor="phone" className="block text-[11px] font-black text-gray-400 uppercase tracking-widest pl-1 mb-1">{t('formPhone')}</label>
+                      <label htmlFor="phone" className="block text-[10px] md:text-[11px] font-black text-gray-400 uppercase tracking-widest pl-1 mb-1">{t('formPhone')}</label>
                       <input
                         type="tel"
                         id="phone"
                         value={phone}
                         onChange={handlePhoneChange}
                         placeholder="010-0000-0000"
-                        className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white transition-all font-bold placeholder:text-gray-300"
+                        className="w-full px-4 py-2.5 md:py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white transition-all font-bold placeholder:text-gray-300 text-sm md:text-base"
                         disabled={isSubmitting}
                       />
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label htmlFor="birth" className="block text-[11px] font-black text-gray-400 uppercase tracking-widest pl-1 mb-1">{t('formBirthDate')}</label>
+                      <label htmlFor="birth" className="block text-[10px] md:text-[11px] font-black text-gray-400 uppercase tracking-widest pl-1 mb-1">{t('formBirthDate')}</label>
                       <input
                         type="text"
                         id="birth"
                         value={birthDate}
                         onChange={(e) => setBirthDate(e.target.value)}
                         placeholder="800101"
-                        className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white transition-all font-bold placeholder:text-gray-300"
+                        className="w-full px-4 py-2.5 md:py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white transition-all font-bold placeholder:text-gray-300 text-sm md:text-base"
                         disabled={isSubmitting}
                       />
                     </div>
 
                     <div>
-                      <label htmlFor="premium" className="block text-[11px] font-black text-gray-400 uppercase tracking-widest pl-1 mb-1">{t('formMonthlyPremium')}</label>
+                      <label htmlFor="premium" className="block text-[10px] md:text-[11px] font-black text-gray-400 uppercase tracking-widest pl-1 mb-1">{t('formMonthlyPremium')}</label>
                       <input
                         type="text"
                         id="premium"
                         value={monthlyPremium}
                         onChange={(e) => setMonthlyPremium(e.target.value)}
                         placeholder="15만원"
-                        className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white transition-all font-bold placeholder:text-gray-300"
+                        className="w-full px-4 py-2.5 md:py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white transition-all font-bold placeholder:text-gray-300 text-sm md:text-base"
                         disabled={isSubmitting}
                       />
                     </div>

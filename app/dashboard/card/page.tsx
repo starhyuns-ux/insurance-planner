@@ -115,11 +115,36 @@ export default function CardPage() {
         onUpdateProfile={handleUpdateProfile}
         onFileUpload={handleFileUpload}
         onCopyUrl={(id) => {
-          const url = `https://stroy.kr/p/${id}/card?source=copy`
-          navigator.clipboard.writeText(url)
-          setUrlCopied(true)
-          toast.success('공유 URL이 복사되었습니다.')
-          setTimeout(() => setUrlCopied(false), 2000)
+          const url = `${window.location.origin}/p/${id}/card?source=copy`
+          
+          if (navigator.clipboard && window.isSecureContext) {
+            navigator.clipboard.writeText(url).then(() => {
+              setUrlCopied(true)
+              toast.success('공유 URL이 복사되었습니다.')
+              setTimeout(() => setUrlCopied(false), 2000)
+            }).catch(() => {
+              // Fallback to legacy method
+              copyLegacy(url)
+            })
+          } else {
+            copyLegacy(url)
+          }
+
+          function copyLegacy(text: string) {
+            const textArea = document.createElement("textarea")
+            textArea.value = text
+            document.body.appendChild(textArea)
+            textArea.select()
+            try {
+              document.execCommand('copy')
+              setUrlCopied(true)
+              toast.success('공유 URL이 복사되었습니다. (보안 우회)')
+              setTimeout(() => setUrlCopied(false), 2000)
+            } catch (err) {
+              toast.error('복사에 실패했습니다. 주소를 직접 복사해 주세요.')
+            }
+            document.body.removeChild(textArea)
+          }
         }}
         onUpdate={refreshPlanner}
       />

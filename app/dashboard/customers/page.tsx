@@ -114,6 +114,7 @@ export default function CustomersPage() {
     <div className="animate-in fade-in slide-in-from-bottom-2 duration-500">
       <CustomerCRM 
         customers={customers}
+        planner={planner}
         newCustName={newCustName}
         newCustPhone={newCustPhone}
         newCustAddr={newCustAddr}

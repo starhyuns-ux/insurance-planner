@@ -219,10 +219,10 @@ export default function DiseaseCodeSearch() {
                               <ul className="grid grid-cols-1 md:grid-cols-2 gap-3">
                                 {sub.items.map((item, itemIdx) => (
                                   <li key={itemIdx} className="p-4 flex flex-col justify-between rounded-xl border border-gray-100 hover:border-primary-300 hover:shadow-md transition-all gap-4 bg-gray-50/30">
-                                    <div className="flex justify-between items-start w-full gap-3">
+                                    <div className="flex flex-col xs:flex-row justify-between items-start w-full gap-3">
                                       <div className="flex-1 flex flex-col gap-1.5">
                                           <div className="flex items-center gap-2 flex-wrap">
-                                              <span className="font-extrabold text-gray-900 text-base">
+                                              <span className="font-extrabold text-gray-900 text-base break-keep">
                                                 <Highlighter text={item.name} highlight={searchTerm} />
                                               </span>
                                               {item.isImportant && (
