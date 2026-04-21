@@ -1,23 +1,12 @@
-import type { Metadata } from 'next'
+'use client'
+
 import NavBar from '@/components/NavBar'
 import Footer from '@/components/Footer'
 import PlannerBranding from '@/components/PlannerBranding'
-import { PhoneIcon, BuildingOffice2Icon, BuildingLibraryIcon, BriefcaseIcon } from '@heroicons/react/24/outline'
+import { PhoneIcon, BuildingOffice2Icon, BuildingLibraryIcon, BriefcaseIcon, GlobeAltIcon, CursorArrowRaysIcon } from '@heroicons/react/24/outline'
 import ClientAccessGuard from '@/components/ClientAccessGuard'
-
-export const metadata: Metadata = {
-    title: '주요 보험사 및 기관 고객센터 연락처 | 인슈닷',
-    description: '국내 주요 손해보험사, 생명보험사 고객센터 번호와 국민건강보험공단 등 유용한 기관 연락처 모음입니다.',
-    robots: {
-        index: false,
-        follow: false,
-    },
-    openGraph: {
-        title: '보험사 고객센터 연락처 모음 | 인슈닷',
-        description: '급할 때 바로 찾아 전화할 수 있는 보험사 콜센터 연락처 모음',
-        url: 'https://stroy.kr/contacts',
-    }
-}
+import { INSURANCE_COMPANIES } from '@/lib/constants/insurance'
+import { toast } from 'sonner'
 
 type ContactInfo = {
     name: string
@@ -88,6 +77,22 @@ function ContactCard({ data, title, icon: Icon, colorClass }: { data: ContactInf
 }
 
 export default function ContactsPage() {
+    const handleOpenAllWebsites = () => {
+        const allCompanies = [...nonLifeInsurances, ...lifeInsurances]
+        const urls = allCompanies
+            .map(c => INSURANCE_COMPANIES[c.name]?.web)
+            .filter(Boolean) as string[]
+
+        if (confirm(`총 ${urls.length}개의 보험사 홈페이지를 동시에 띄웁니다.\n\n⚠️ 브라우저 설정에서 '팝업 및 리디렉션 허용'이 되어있어야 모든 창이 정상적으로 열립니다. 진행하시겠습니까?`)) {
+            toast.info('보험사 홈페이지를 순차적으로 엽니다...')
+            urls.forEach((url, idx) => {
+                setTimeout(() => {
+                    window.open(url, '_blank')
+                }, idx * 300) // Staggered to reduce browser blocking
+            })
+        }
+    }
+
     return (
         <ClientAccessGuard>
             <main className="min-h-screen bg-gray-50 flex flex-col pt-16">
@@ -101,16 +106,37 @@ export default function ContactsPage() {
                     </div>
 
                     <div className="container max-w-5xl relative z-10 py-16 md:py-20">
-                        <div className="inline-block px-4 py-1.5 rounded-full bg-primary-800/80 backdrop-blur-sm text-primary-200 text-sm font-bold tracking-wide mb-6 border border-primary-700/50">
-                            빠른 연락망
+                        <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
+                            <div className="flex-1">
+                                <div className="inline-block px-4 py-1.5 rounded-full bg-primary-800/80 backdrop-blur-sm text-primary-200 text-sm font-bold tracking-wide mb-6 border border-primary-700/50">
+                                    빠른 연락망
+                                </div>
+                                <h1 className="text-3xl md:text-5xl font-extrabold mb-6 leading-tight break-keep">
+                                    급할 때 바로 찾는<br className="hidden md:block" />
+                                    <span className="text-primary-200">고객센터 연락처</span>
+                                </h1>
+                                <p className="text-lg md:text-xl text-primary-100 opacity-90 max-w-2xl leading-relaxed break-keep">
+                                    스마트폰에서 번호를 터치하시면 즉각 전화 통화로 연결됩니다. 궁금한 점이 있거나 청구가 필요할 때 쉽고 빠르게 연결하세요.
+                                </p>
+                            </div>
+                            
+                            <div className="shrink-0">
+                                <button 
+                                    onClick={handleOpenAllWebsites}
+                                    className="group relative flex items-center gap-3 px-8 py-5 bg-white text-primary-900 rounded-[2rem] font-black hover:bg-primary-50 transition-all shadow-2xl shadow-primary-950/20 active:scale-95"
+                                >
+                                    <div className="w-10 h-10 bg-primary-100 text-primary-600 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                                        <GlobeAltIcon className="w-6 h-6" />
+                                    </div>
+                                    <div className="text-left">
+                                        <p className="text-[10px] text-primary-500 uppercase tracking-widest font-black mb-0.5">One-Stop Open</p>
+                                        <p className="text-lg">보험사 홈페이지 일괄 접속</p>
+                                    </div>
+                                    <CursorArrowRaysIcon className="w-6 h-6 text-primary-300 ml-2 animate-bounce" />
+                                </button>
+                                <p className="text-[10px] text-primary-300 mt-3 text-center font-bold italic">※ 브라우저 팝업 차단 해제 필수</p>
+                            </div>
                         </div>
-                        <h1 className="text-3xl md:text-5xl font-extrabold mb-6 leading-tight break-keep">
-                            급할 때 바로 찾는<br className="hidden md:block" />
-                            <span className="text-primary-200">고객센터 연락처</span>
-                        </h1>
-                        <p className="text-lg md:text-xl text-primary-100 opacity-90 max-w-2xl leading-relaxed break-keep">
-                            스마트폰에서 번호를 터치하시면 즉각 전화 통화로 연결됩니다. 궁금한 점이 있거나 청구가 필요할 때 쉽고 빠르게 연결하세요.
-                        </p>
                     </div>
                 </header>
 

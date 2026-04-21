@@ -241,7 +241,7 @@ function InsurancePopup({ company, info, onClose, claimPdfUrl }: InsurancePopupP
   )
 }
 
-export default function DetailedClaimForm({ onSuccess, plannerId }: { onSuccess?: () => void, plannerId?: string }) {
+export default function DetailedClaimForm({ onSuccess, plannerId, initialData }: { onSuccess?: () => void, plannerId?: string, initialData?: any }) {
   const { planner: attributedPlanner } = useAttribution()
   const planner = plannerId ? { id: plannerId } : attributedPlanner
   const [currentStep, setCurrentStep] = useState(1)
@@ -256,6 +256,25 @@ export default function DetailedClaimForm({ onSuccess, plannerId }: { onSuccess?
   const [residentBack, setResidentBack] = useState('')
   const [phone, setPhone] = useState('')
   const [address, setAddress] = useState('')
+
+  // Pre-fill from initialData (Customer CRM)
+  useEffect(() => {
+    if (initialData) {
+      if (initialData.name) setName(initialData.name)
+      if (initialData.phone) setPhone(initialData.phone)
+      if (initialData.address) setAddress(initialData.address)
+      
+      if (initialData.resident_number) {
+        const parts = initialData.resident_number.split('-')
+        if (parts[0]) setResidentFront(parts[0])
+        if (parts[1]) setResidentBack(parts[1])
+      } else if (initialData.birth_date) {
+        // Fallback to birth_date if resident_number is missing
+        const birth = initialData.birth_date.replace(/\D/g, '')
+        if (birth.length >= 6) setResidentFront(birth.slice(2, 8))
+      }
+    }
+  }, [initialData])
 
   const [sameAsPolicyholder, setSameAsPolicyholder] = useState(true)
   const [policyholderName, setPolicyholderName] = useState('')

@@ -1,50 +1,96 @@
-import { PDFDocument, rgb, StandardFonts } from 'pdf-lib'
+import { PDFDocument, rgb } from 'pdf-lib'
 import fontkit from '@pdf-lib/fontkit'
+
+// Coordinate mappings for specific insurance companies
+// Coordinates are in points (1/72 inch), starting from bottom-left
+const COMPANY_TEMPLATES: Record<string, any> = {
+  '삼성화재': {
+    templatePath: '/templates/samsung_fire.pdf',
+    fields: {
+      customer_name: { x: 100, y: 700, size: 10 },
+      resident_number: { x: 100, y: 680, size: 10 },
+      customer_phone: { x: 100, y: 660, size: 10 },
+      address: { x: 100, y: 640, size: 10 },
+      bank_name: { x: 300, y: 500, size: 10 },
+      bank_account: { x: 300, y: 480, size: 10 },
+      accident_detail: { x: 100, y: 400, size: 10, maxWidth: 400 },
+    }
+  },
+  '현대해상': {
+    templatePath: '/templates/hyundai_marine.pdf',
+    fields: {
+      customer_name: { x: 120, y: 720, size: 10 },
+      // ... more coordinates
+    }
+  }
+}
 
 /**
  * PDF Generator for Insurance Claims
- * Generates a standardized Korean insurance claim form from claim and planner data.
+ * Generates a company-specific PDF if a template exists, 
+ * otherwise falls back to a standardized Korean insurance claim form.
  */
 export async function generateClaimPDF(claim: any, planner: any) {
-  // Load fonts for Korean support from reliable CDNs
+  // Load fonts for Korean support
   const fontUrls = [
-    'https://cdn.jsdelivr.net/gh/google/fonts/ofl/nanumgothic/NanumGothic-Regular.ttf',
-    'https://github.com/google/fonts/raw/main/ofl/nanumgothic/NanumGothic-Regular.ttf',
-    'https://raw.githubusercontent.com/google/fonts/main/ofl/nanumgothic/NanumGothic-Regular.ttf'
+    'https://cdn.jsdelivr.net/gh/google/fonts/ofl/nanumgothic/NanumGothic-Regular.ttf'
   ]
   
   let fontBytes: ArrayBuffer | null = null
-  let lastError = ''
-
   for (const url of fontUrls) {
     try {
-      console.log(`[PDF GENERATOR] Trying font URL: ${url}`)
-      const controller = new AbortController()
-      const timeoutId = setTimeout(() => controller.abort(), 7000) 
-      
-      const response = await fetch(url, { signal: controller.signal })
-      clearTimeout(timeoutId)
-      
-      if (response.ok) {
-        fontBytes = await response.arrayBuffer()
-        console.log(`[PDF GENERATOR] Successfully loaded font from: ${url}`)
+      const res = await fetch(url)
+      if (res.ok) {
+        fontBytes = await res.arrayBuffer()
         break
       }
-      lastError = `Status ${response.status} from ${url}`
-    } catch (err: any) {
-      lastError = err.message
-      console.warn(`[PDF GENERATOR] Failed to load font from ${url}:`, err.message)
+    } catch (err) {}
+  }
+
+  if (!fontBytes) throw new Error('한글 폰트 로드 실패')
+
+  const companyConfig = COMPANY_TEMPLATES[claim.insurance_company]
+  let pdfDoc: PDFDocument
+
+  // 1. Try to load company-specific template
+  if (companyConfig) {
+    try {
+      const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'
+      const templateRes = await fetch(`${baseUrl}${companyConfig.templatePath}`)
+      
+      if (templateRes.ok) {
+        const templateBytes = await templateRes.arrayBuffer()
+        pdfDoc = await PDFDocument.load(templateBytes)
+        pdfDoc.registerFontkit(fontkit)
+        const koreanFont = await pdfDoc.embedFont(fontBytes)
+        const pages = pdfDoc.getPages()
+        const firstPage = pages[0]
+
+        // Fill fields based on mapping
+        for (const [key, coord] of Object.entries(companyConfig.fields) as [string, any][]) {
+          const value = claim[key] || '-'
+          firstPage.drawText(String(value), {
+            x: coord.x,
+            y: coord.y,
+            size: coord.size || 10,
+            font: koreanFont,
+            color: rgb(0, 0, 0),
+          })
+        }
+
+        const pdfBytes = await pdfDoc.save()
+        return Buffer.from(pdfBytes)
+      }
+    } catch (err) {
+      console.warn(`[PDF] Failed to load template for ${claim.insurance_company}, falling back to standard form.`, err)
     }
   }
 
-  if (!fontBytes) {
-    throw new Error(`모든 한글 폰트 서버 접속에 실패했습니다. (네트워크/방화벽 확인 필요): ${lastError}`)
-  }
-
-  const pdfDoc = await PDFDocument.create()
+  // 2. Fallback to Standard Form Generation (Existing Logic)
+  pdfDoc = await PDFDocument.create()
   pdfDoc.registerFontkit(fontkit)
   const koreanFont = await pdfDoc.embedFont(fontBytes)
-  const koreanFontBold = await pdfDoc.embedFont(fontBytes) // Using same for now
+  const koreanFontBold = await pdfDoc.embedFont(fontBytes)
 
   let page = pdfDoc.addPage([595.28, 841.89]) // A4
   const { width, height } = page.getSize()
@@ -62,7 +108,7 @@ export async function generateClaimPDF(claim: any, planner: any) {
     borderWidth: 1,
   })
 
-  page.drawText('보 험 금  청 구  신 청 서', {
+  page.drawText('보 험 금  청 구  신 신청 서', {
     x: width / 2 - 100,
     y: height - 75,
     size: titleSize,

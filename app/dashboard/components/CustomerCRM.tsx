@@ -15,8 +15,11 @@ import {
   ArrowDownTrayIcon,
   ClipboardDocumentListIcon,
   HeartIcon,
-  SparklesIcon
+  SparklesIcon,
+  DocumentMagnifyingGlassIcon,
+  XMarkIcon
 } from '@heroicons/react/24/outline'
+import DetailedClaimForm from '@/components/DetailedClaimForm'
 import { supabase } from '@/lib/supabaseClient'
 import { differenceInDays, parseISO } from 'date-fns'
 
@@ -104,6 +107,8 @@ export default function CustomerCRM({
   const [analyzedHistory, setAnalyzedHistory] = useState<any[]>([])
   const fileInputRef = React.useRef<HTMLInputElement>(null)
   const scanDocRef = React.useRef<HTMLInputElement>(null)
+  const [showClaimModal, setShowClaimModal] = useState(false)
+  const [claimingCustomer, setClaimingCustomer] = useState<any | null>(null)
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -518,6 +523,16 @@ export default function CustomerCRM({
                             >
                               <ClipboardDocumentListIcon className="w-4 h-4" />
                             </button>
+                            <button 
+                              onClick={() => {
+                                setClaimingCustomer(c)
+                                setShowClaimModal(true)
+                              }}
+                              className="text-gray-400 hover:text-primary-600 hover:bg-primary-50 p-1.5 rounded-lg transition-all"
+                              title="보상청구 신청서 작성"
+                            >
+                              <DocumentMagnifyingGlassIcon className="w-4 h-4" />
+                            </button>
                             <div className="flex flex-col items-end gap-1 group/touch">
                               <div className="flex items-center gap-1.5">
                                 <div className="flex items-center bg-gray-50 rounded-lg p-0.5 border border-gray-100 group-hover/touch:border-primary-200 group-hover/touch:bg-white transition-all">
@@ -733,7 +748,35 @@ export default function CustomerCRM({
             </tbody>
           </table>
         </div>
-      </div>
+        </div>
+
+      {/* Claim Request Modal */}
+      {showClaimModal && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-md p-4 sm:p-6 overflow-y-auto">
+          <div className="bg-white w-full max-w-4xl rounded-[2.5rem] shadow-2xl relative overflow-hidden flex flex-col max-h-[90vh]">
+            <div className="absolute top-6 right-8 z-[110]">
+              <button 
+                onClick={() => setShowClaimModal(false)}
+                className="p-3 bg-gray-100 hover:bg-rose-50 hover:text-rose-600 text-gray-400 rounded-2xl transition-all shadow-sm"
+              >
+                <XMarkIcon className="w-6 h-6" />
+              </button>
+            </div>
+            
+            <div className="flex-1 overflow-y-auto custom-scrollbar p-1">
+              <DetailedClaimForm 
+                plannerId={planner?.id} 
+                initialData={claimingCustomer}
+                onSuccess={() => {
+                  setShowClaimModal(false)
+                  onUpdate()
+                }} 
+              />
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
     </div>
   )
 }
