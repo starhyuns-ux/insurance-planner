@@ -777,6 +777,6 @@ export default function CustomerCRM({
         </div>
       )}
     </div>
-    </div>
   )
 }
+
