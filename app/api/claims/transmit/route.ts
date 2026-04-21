@@ -3,27 +3,8 @@ import { supabaseAdmin } from '@/lib/supabaseServer'
 import { generateClaimPDF } from '@/lib/pdf-generator'
 import { faxClient } from '@/lib/fax-client'
 
-// Mapping of insurance companies to their central fax numbers (placeholder values)
-const INSURANCE_FAX_NUMBERS: Record<string, string> = {
-  '삼성화재': '0505-162-0777',
-  '현대해상': '0507-774-6060',
-  'DB손해보험': '0505-181-4861',
-  'KB손해보험': '0505-136-6500',
-  '메리츠화재': '0505-021-3400',
-  '흥국화재': '0504-800-0168',
-  '롯데손해보험': '0507-333-9999',
-  'MG손해보험': '0505-088-1646',
-  '한화손해보험': '0505-181-0005', // 기존 placeholder
-  '교보생명': '02-721-3842',
-  'KB라이프생명': '02-6220-9912',
-  'NH농협생명': '02-3786-8540',
-  '동양생명': '0502-779-1004',
-  '미래에셋생명': '0505-130-0000',
-  '라이나손보': '02-6742-3992',
-  '농협손해보험': '0505-060-7000',
-  'AIG손보': '02-2011-4607',
-  // 삼성생명, 한화생명, 신한라이프 등은 고정 팩스 없음 (UI에서 입력을 유도해야 함)
-}
+import { INSURANCE_COMPANIES } from '@/lib/constants/insurance'
+
 
 export async function POST(req: NextRequest) {
   try {
@@ -117,8 +98,8 @@ export async function POST(req: NextRequest) {
     }
 
     // 5. Transmit via Fax API
-    // 우선순위: overrideFax (사용자 입력) > INSURANCE_FAX_NUMBERS (매핑) > Default
-    const targetFax = overrideFax || INSURANCE_FAX_NUMBERS[claim.insurance_company] || '0505-000-0000'
+    // 우선순위: overrideFax (사용자 입력) > INSURANCE_COMPANIES (매핑) > Default
+    const targetFax = overrideFax || INSURANCE_COMPANIES[claim.insurance_company]?.fax || '0505-000-0000'
     
     if (targetFax === '0505-000-0000' && !overrideFax) {
       return NextResponse.json({ 

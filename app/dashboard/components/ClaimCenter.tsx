@@ -7,6 +7,7 @@ import {
   MagnifyingGlassCircleIcon
 } from '@heroicons/react/24/outline'
 import DetailedClaimForm from '@/components/DetailedClaimForm'
+import { INSURANCE_COMPANIES, COMPANIES_NEEDING_MANUAL_FAX } from '@/lib/constants/insurance'
 
 interface ClaimCenterProps {
   claims: any[]
@@ -20,7 +21,10 @@ interface ClaimCenterProps {
   checkingStatusId: string | null
 }
 
-const COMPANIES_NEEDING_MANUAL_FAX = ['삼성생명', '한화생명', '신한라이프', 'ABL생명', 'AIA생명', '동양생명', '메트라이프생명']
+const isOlderThan24h = (date: string) => {
+  const diff = Date.now() - new Date(date).getTime()
+  return diff > 24 * 60 * 60 * 1000
+}
 
 export default function ClaimCenter({
   claims,
@@ -126,9 +130,14 @@ export default function ClaimCenter({
                       </div>
                     </div>
                     {claim.insurance_company && (
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-3">
                         <div className="w-1.5 h-4 bg-primary-500 rounded-full" />
                         <span className="text-sm font-black text-primary-900">{claim.insurance_company} 화재/생명</span>
+                        {INSURANCE_COMPANIES[claim.insurance_company]?.fax && (
+                          <span className="text-[11px] font-bold text-gray-400 bg-gray-100 px-2 py-0.5 rounded-md border border-gray-200">
+                            FAX: {INSURANCE_COMPANIES[claim.insurance_company].fax}
+                          </span>
+                        )}
                       </div>
                     )}
                     <div className="bg-gray-50/80 p-5 rounded-2xl border border-gray-100 relative shadow-inner">
@@ -206,6 +215,17 @@ export default function ClaimCenter({
                       >
                         지급 완료 처리
                       </button>
+                    )}
+                    {claim.status === 'PENDING' && isOlderThan24h(claim.created_at) && (
+                      <div className="w-full p-2 bg-rose-50 border border-rose-100 rounded-xl text-center">
+                        <p className="text-[10px] font-black text-rose-600 mb-1">접수 대기 24시간 초과</p>
+                        <button 
+                          onClick={() => onDeleteClaim(claim.id)} 
+                          className="text-[11px] font-bold text-white bg-rose-500 hover:bg-rose-600 px-3 py-1 rounded-lg transition-colors shadow-sm"
+                        >
+                          자동 삭제 처리
+                        </button>
+                      </div>
                     )}
                     <button 
                       onClick={() => onDeleteClaim(claim.id)} 

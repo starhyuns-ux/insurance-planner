@@ -1,0 +1,27 @@
+export const INSURANCE_COMPANIES: Record<string, { phone: string; fax?: string; web?: string; callFirst?: boolean }> = {
+  '삼성화재':    { phone: '1588-5114', fax: '0505-162-0777', web: 'https://www.samsungfire.com' },
+  '현대해상':    { phone: '1588-5656', fax: '0507-774-6060', web: 'https://www.hi.co.kr' },
+  'KB손해보험':  { phone: '1544-0114', fax: '0505-136-6500', web: 'https://www.kbinsure.co.kr' },
+  'DB손해보험':  { phone: '1588-0100', fax: '0505-181-4861', web: 'https://www.idbins.com' },
+  '메리츠화재':  { phone: '1566-7711', fax: '0505-021-3400', web: 'https://www.meritzfire.com' },
+  '한화손해보험': { phone: '1566-8000', fax: '0505-181-0005', web: 'https://www.hwgeneralins.com' },
+  '롯데손해보험': { phone: '1588-3344', fax: '0507-333-9999', web: 'https://www.lotteins.co.kr' },
+  'MG손해보험':  { phone: '1588-5959', fax: '0505-088-1646', web: 'https://www.mgfire.co.kr' },
+  '하나손해보험': { phone: '1566-3000', web: 'https://www.hanainsurance.co.kr' },
+  '라이나손보':    { phone: '1588-3374', fax: '02-6742-3992', web: 'https://www.lina.co.kr' },
+  '농협손해보험': { phone: '1644-9000', fax: '0505-060-7000', web: 'https://www.nhfire.co.kr' },
+  'AIG손보':      { phone: '1544-2792', fax: '02-2011-4607', web: 'https://www.aig.co.kr' },
+  '삼성생명':    { phone: '1588-3114', web: 'https://www.samsunglife.com', callFirst: true },
+  '교보생명':    { phone: '1588-1001', fax: '02-721-3842', web: 'https://www.kyobo.co.kr', callFirst: true },
+  '한화생명':    { phone: '1577-6301', web: 'https://www.hanwhalife.com', callFirst: true },
+  'KB라이프생명': { phone: '1588-3374', fax: '02-6220-9912', web: 'https://www.kblife.co.kr' },
+  'NH농협생명':  { phone: '1544-4000', fax: '02-3786-8540', web: 'https://www.nhlife.co.kr' },
+  '신한라이프':  { phone: '1588-5580', web: 'https://www.shinhanlife.co.kr', callFirst: true },
+  'ABL생명':    { phone: '1588-6500', web: 'https://www.abllife.co.kr', callFirst: true },
+  'AIA생명':    { phone: '1588-9898', web: 'https://www.aia.co.kr', callFirst: true },
+  '동양생명':    { phone: '1577-1004', fax: '0502-779-1004', web: 'https://www.myangel.co.kr', callFirst: true },
+  '미래에셋생명': { phone: '1588-5000', fax: '0505-130-0000', web: 'https://life.miraeasset.com' },
+  '메트라이프생명': { phone: '1588-9600', web: 'https://www.metlife.co.kr', callFirst: true },
+}
+
+export const COMPANIES_NEEDING_MANUAL_FAX = ['삼성생명', '한화생명', '신한라이프', 'ABL생명', 'AIA생명', '동양생명', '메트라이프생명']

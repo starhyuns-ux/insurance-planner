@@ -27,30 +27,10 @@ const ConsentItem = ({ label, insured, setInsured, beneficiary, setBeneficiary }
   </div>
 )
 
-const INSURANCE_COMPANIES: Record<string, { phone: string; fax?: string; web?: string; callFirst?: boolean }> = {
-  '삼성화재':    { phone: '1588-5114', web: 'https://www.samsungfire.com' },
-  '현대해상':    { phone: '1588-5656', web: 'https://www.hi.co.kr' },
-  'KB손해보험':  { phone: '1544-0114', web: 'https://www.kbinsure.co.kr' },
-  'DB손해보험':  { phone: '1588-0100', web: 'https://www.idbins.com' },
-  '메리츠화재':  { phone: '1566-7711', web: 'https://www.meritzfire.com' },
-  '한화손해보험': { phone: '1566-8000', web: 'https://www.hwgeneralins.com' },
-  '롯데손해보험': { phone: '1588-3344', web: 'https://www.lotteins.co.kr' },
-  'MG손해보험':  { phone: '1588-5959', web: 'https://www.mgfire.co.kr' },
-  '하나손해보험': { phone: '1566-3000', web: 'https://www.hanainsurance.co.kr' },
-  '라이나손보':    { phone: '1588-3374', web: 'https://www.lina.co.kr' },
-  '농협손해보험': { phone: '1644-9000', web: 'https://www.nhfire.co.kr' },
-  'AIG손보':      { phone: '1544-2792', web: 'https://www.aig.co.kr' },
-  '삼성생명':    { phone: '1588-3114', web: 'https://www.samsunglife.com', callFirst: true },
-  '교보생명':    { phone: '1588-1001', web: 'https://www.kyobo.co.kr', callFirst: true },
-  '한화생명':    { phone: '1577-6301', web: 'https://www.hanwhalife.com', callFirst: true },
-  '신한라이프':  { phone: '1588-5580', web: 'https://www.shinhanlife.co.kr', callFirst: true },
-  'ABL생명':    { phone: '1588-6500', web: 'https://www.abllife.co.kr', callFirst: true },
-  'AIA생명':    { phone: '1588-9898', web: 'https://www.aia.co.kr', callFirst: true },
-  '동양생명':    { phone: '1577-1004', web: 'https://www.myangel.co.kr', callFirst: true },
-  '메트라이프생명': { phone: '1588-9600', web: 'https://www.metlife.co.kr', callFirst: true },
-}
+import { INSURANCE_COMPANIES } from '@/lib/constants/insurance'
 
 const COMPANY_NAMES = Object.keys(INSURANCE_COMPANIES)
+
 const BANKS = [
   'KB국민은행', '신한은행', '하나은행', '우리은행', 'IBK기업은행',
   'NH농협은행', '카카오뱅크', '토스뱅크', '케이뱅크', 'SC제일은행',
