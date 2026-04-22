@@ -84,15 +84,15 @@ export default function ClaimCenter({
             claims.map((claim) => (
               <div key={claim.id} className="p-8 hover:bg-gray-50/50 transition-colors group">
                 <div className="flex flex-col md:flex-row md:items-start justify-between gap-6">
-                  <div className="flex-1 space-y-3">
+                  <div className="flex-1 space-y-3 min-w-0">
                     <div className="flex flex-wrap items-center gap-3">
-                      <span className="font-black text-gray-900 text-xl">{claim.customer_name}</span>
+                      <span className="font-black text-gray-900 text-xl truncate">{claim.customer_name}</span>
                       {claim.customer_phone && (
-                        <a href={`tel:${claim.customer_phone}`} className="text-xs text-primary-600 font-black bg-primary-50 px-3 py-1 rounded-xl hover:bg-primary-100 transition-colors border border-primary-100">
+                        <a href={`tel:${claim.customer_phone}`} className="text-xs text-primary-600 font-black bg-primary-50 px-3 py-1 rounded-xl hover:bg-primary-100 transition-colors border border-primary-100 shrink-0">
                           {claim.customer_phone.replace(/(\d{3})(\d{4})(\d{4})/, '$1-$2-$3')}
                         </a>
                       )}
-                      <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider bg-gray-50 px-2 py-1 rounded-lg">
+                      <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider bg-gray-50 px-2 py-1 rounded-lg shrink-0">
                         {new Date(claim.created_at).toLocaleString('ko-KR', {
                           year: 'numeric', 
                           month: '2-digit', 
@@ -103,8 +103,8 @@ export default function ClaimCenter({
                           hour12: false
                         })}
                       </span>
-                      <div className="flex gap-2">
-                        <span className={`px-3 py-1 text-[10px] font-black uppercase tracking-[0.1em] rounded-full shadow-sm ${
+                      <div className="flex flex-wrap gap-2">
+                        <span className={`px-3 py-1 text-[10px] font-black uppercase tracking-[0.1em] rounded-full shadow-sm whitespace-nowrap ${
                           claim.status === 'PENDING' ? 'bg-amber-50 text-amber-600 border border-amber-100' :
                           claim.status === 'IN_PROGRESS' ? 'bg-blue-50 text-blue-600 border border-blue-100' :
                           'bg-emerald-100 text-emerald-700 border border-emerald-200 shadow-emerald-100'
@@ -112,7 +112,7 @@ export default function ClaimCenter({
                           {claim.status === 'PENDING' ? '접수 대기' : claim.status === 'IN_PROGRESS' ? '처리 중' : '지급 완료'}
                         </span>
                         {claim.transmission_status === 'SENT' && (
-                          <span className={`px-3 py-1 text-[10px] font-black rounded-full shadow-lg ${
+                          <span className={`px-3 py-1 text-[10px] font-black rounded-full shadow-lg whitespace-nowrap ${
                             claim.fax_status === 'COMPLETED' ? 'bg-emerald-600 text-white shadow-emerald-100' :
                             claim.fax_status === 'FAILED' ? 'bg-rose-600 text-white shadow-rose-100' :
                             'bg-teal-600 text-white shadow-teal-100'
@@ -122,19 +122,14 @@ export default function ClaimCenter({
                              '📤 보험사 송신 완료'}
                           </span>
                         )}
-                        {claim.fax_error && (
-                          <span className="px-3 py-1 text-[10px] font-bold rounded-full bg-rose-50 text-rose-500 border border-rose-100 italic">
-                            {claim.fax_error}
-                          </span>
-                        )}
                       </div>
                     </div>
                     {claim.insurance_company && (
                       <div className="flex items-center gap-3">
                         <div className="w-1.5 h-4 bg-primary-500 rounded-full" />
-                        <span className="text-sm font-black text-primary-900">{claim.insurance_company} 화재/생명</span>
+                        <span className="text-sm font-black text-primary-900 truncate">{claim.insurance_company} 화재/생명</span>
                         {INSURANCE_COMPANIES[claim.insurance_company]?.fax && (
-                          <span className="text-[11px] font-bold text-gray-400 bg-gray-100 px-2 py-0.5 rounded-md border border-gray-200">
+                          <span className="text-[11px] font-bold text-gray-400 bg-gray-100 px-2 py-0.5 rounded-md border border-gray-200 shrink-0">
                             FAX: {INSURANCE_COMPANIES[claim.insurance_company].fax}
                           </span>
                         )}
@@ -160,7 +155,7 @@ export default function ClaimCenter({
                   </div>
                   
                   {/* Actions */}
-                  <div className="flex items-center gap-2 md:flex-col md:items-end md:gap-3 pt-4 md:pt-2 shrink-0">
+                  <div className="flex items-center gap-2 md:flex-col md:items-end md:gap-3 pt-4 md:pt-2 shrink-0 w-full md:w-auto">
                     <button
                       onClick={() => {
                         if (claim.claim_pdf_url) {
@@ -175,17 +170,20 @@ export default function ClaimCenter({
                       보상청구신청서 미리보기
                     </button>
 
-                    {claim.insurance_company && (claim.transmission_status !== 'SENT' || claim.fax_status === 'FAILED') && (
+                    {/* 송신 버튼: 보험사가 지정되어 있고, 아직 안 보냈거나 실패했을 때 표시 */}
+                    {(claim.transmission_status !== 'SENT' || claim.fax_status === 'FAILED') && (
                       <button
                         onClick={() => handleTransmit(claim)}
                         disabled={transmittingClaimId === claim.id}
                         className="px-6 py-3 bg-primary-600 text-white hover:bg-primary-700 rounded-xl text-xs font-black transition-all w-full md:w-auto text-center flex items-center gap-2 justify-center shadow-xl shadow-primary-100 disabled:opacity-50 active:scale-95"
                       >
                         <PaperAirplaneIcon className="w-4 h-4 -rotate-45" />
-                        {transmittingClaimId === claim.id ? '송신 중...' : `${claim.insurance_company} 재송신`}
+                        {transmittingClaimId === claim.id ? '송신 중...' : 
+                         (claim.transmission_status === 'SENT' ? `${claim.insurance_company || '보험사'} 재송신` : `${claim.insurance_company || '보험사'}로 팩스 송신`)}
                       </button>
                     )}
                     
+                    {/* 상태 확인 버튼: 팩스 영수증 ID가 있을 때만 표시 */}
                     {claim.fax_receipt_id && (
                       <div className="flex flex-col gap-2 w-full md:w-auto">
                         <button
@@ -196,7 +194,7 @@ export default function ClaimCenter({
                           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className={`w-3.5 h-3.5 ${checkingStatusId === claim.id ? 'animate-spin' : ''}`}>
                             <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
                           </svg>
-                          상태 확인
+                          실시간 수신 상태 확인
                         </button>
                         <button
                           onClick={() => onCheckStatus(claim.id, true)}

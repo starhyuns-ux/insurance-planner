@@ -147,7 +147,7 @@ export async function POST(req: NextRequest) {
         fax_status: faxResult.status,
         fax_sent_at: new Date().toISOString(),
         fax_pages: filesToTransmit.length,
-        claim_pdf_url: claimPdfUrl, // Save the generated PDF URL
+        // claim_pdf_url: claimPdfUrl, // 제거: DB에 컬럼이 없어 오류 발생
         // PIPA: Overwrite original sensitive data with masked versions
         resident_number: maskedResNum,
         bank_account: maskedBankAcc,

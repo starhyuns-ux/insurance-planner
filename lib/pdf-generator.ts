@@ -31,23 +31,42 @@ const COMPANY_TEMPLATES: Record<string, any> = {
  * otherwise falls back to a standardized Korean insurance claim form.
  */
 export async function generateClaimPDF(claim: any, planner: any) {
-  // Load fonts for Korean support
+  // Load fonts for Korean support - using multiple reliable CDNs
   const fontUrls = [
-    'https://cdn.jsdelivr.net/gh/google/fonts/ofl/nanumgothic/NanumGothic-Regular.ttf'
+    'https://fonts.gstatic.com/s/nanumgothic/v21/PN_oTa62_f0p9OAwOTo3fYNfmsS_P6E.ttf',
+    'https://cdn.jsdelivr.net/gh/google/fonts/ofl/nanumgothic/NanumGothic-Regular.ttf',
+    'https://github.com/google/fonts/raw/main/ofl/nanumgothic/NanumGothic-Regular.ttf'
   ]
   
   let fontBytes: ArrayBuffer | null = null
+  let lastError: any = null
+
   for (const url of fontUrls) {
     try {
-      const res = await fetch(url)
+      console.log(`[PDF] Attempting to load font from: ${url}`)
+      const res = await fetch(url, {
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+        },
+        signal: AbortSignal.timeout(10000) // 10 second timeout
+      })
+      
       if (res.ok) {
         fontBytes = await res.arrayBuffer()
+        console.log(`[PDF] Successfully loaded font from: ${url}`)
         break
+      } else {
+        console.warn(`[PDF] Failed to load font from ${url}: ${res.status} ${res.statusText}`)
       }
-    } catch (err) {}
+    } catch (err: any) {
+      console.warn(`[PDF] Error fetching font from ${url}:`, err.message)
+      lastError = err
+    }
   }
 
-  if (!fontBytes) throw new Error('한글 폰트 로드 실패')
+  if (!fontBytes) {
+    throw new Error(`한글 폰트 로드 실패: 외부 폰트 서버(Google/Jsdelivr)에 접속할 수 없습니다. (${lastError?.message || 'Unknown error'})`)
+  }
 
   const companyConfig = COMPANY_TEMPLATES[claim.insurance_company]
   let pdfDoc: PDFDocument
