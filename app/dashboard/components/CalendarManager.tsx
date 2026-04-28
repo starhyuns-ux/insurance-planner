@@ -50,7 +50,8 @@ interface CalendarManagerProps {
   holidays: Record<string, string>
   onUpdateState: (key: string, value: any) => void
   onAddTodo: () => void
-  onToggleTodo: (id: string, isCompleted: boolean) => void
+  onUpdateTodoStatus: (id: string, status: string) => void
+  onUpdateTodoMemo: (id: string, memo: string) => void
   onDeleteTodo: (id: string) => void
   onStartEditingTodo: (todo: any) => void
   onSaveTodoEdit: (id: string) => void
@@ -69,7 +70,8 @@ export default function CalendarManager({
   holidays,
   onUpdateState,
   onAddTodo,
-  onToggleTodo,
+  onUpdateTodoStatus,
+  onUpdateTodoMemo,
   onDeleteTodo,
   onStartEditingTodo,
   onSaveTodoEdit,
@@ -195,11 +197,15 @@ export default function CalendarManager({
                               📈 <span className="hidden md:inline">{cust.name} (상령일)</span>
                             </div>
                           ))}
-                          {dayTodos.map(todo => (
-                            <div key={todo.id} className={`${todo.is_completed ? 'bg-gray-100/50 text-gray-300 line-through' : 'bg-white text-gray-600 border-gray-100'} px-1.5 py-0.5 rounded-lg text-[9px] font-black truncate border shadow-sm`} title={todo.content}>
-                              📌 <span className="hidden md:inline">{todo.content}</span>
-                            </div>
-                          ))}
+                          {dayTodos.map(todo => {
+                            const isDone = todo.status && todo.status !== 'none';
+                            const statusIcon = todo.status === 'circle' ? '🟢' : todo.status === 'triangle' ? '🟡' : todo.status === 'cross' ? '🔴' : '📌';
+                            return (
+                              <div key={todo.id} className={`${isDone ? 'bg-gray-100/50 text-gray-400 line-through' : 'bg-white text-gray-600 border-gray-100'} px-1.5 py-0.5 rounded-lg text-[9px] font-black truncate border shadow-sm`} title={todo.content}>
+                                {statusIcon} <span className="hidden md:inline">{todo.content}</span>
+                              </div>
+                            )
+                          })}
                         </div>
                       </div>
                     )
@@ -316,44 +322,83 @@ export default function CalendarManager({
                     {selectedTodos.map(todo => (
                         <div 
                           key={todo.id} 
-                          className={`flex items-center gap-4 p-5 rounded-[2rem] border transition-all group ${
-                            todo.is_completed ? 'bg-gray-50 border-gray-100 opacity-60' : 'bg-white border-gray-100 hover:shadow-2xl hover:border-primary-100 hover:-translate-y-1'
+                          className={`flex flex-col gap-3 p-4 md:p-5 rounded-[2rem] border transition-all group ${
+                            todo.status !== 'none' ? 'bg-gray-50 border-gray-100 opacity-80' : 'bg-white border-gray-100 hover:shadow-2xl hover:border-primary-100 hover:-translate-y-1'
                           } shadow-sm`}
                         >
-                          <button 
-                            onClick={() => onToggleTodo(todo.id, todo.is_completed)}
-                            className={`w-8 h-8 rounded-xl flex items-center justify-center transition-all ${
-                              todo.is_completed ? 'bg-emerald-500 text-white shadow-emerald-200' : 'bg-gray-100 text-transparent hover:bg-gray-200'
-                            } shadow-lg`}
-                          >
-                            <CheckIcon className="w-5 h-5" />
-                          </button>
-                          
-                          {editingTodoId === todo.id ? (
-                            <div className="flex-1 flex gap-2">
-                              <input 
-                                type="text"
-                                value={editTodoContent}
-                                onChange={(e) => onUpdateState('editTodoContent', e.target.value)}
-                                onKeyDown={(e) => e.key === 'Enter' && onSaveTodoEdit(todo.id)}
-                                className="flex-1 px-4 py-2 bg-gray-50 border-none rounded-xl text-sm font-black focus:ring-4 focus:ring-primary-500/10 transition-all outline-none shadow-inner"
-                                autoFocus
-                              />
-                              <button onClick={() => onSaveTodoEdit(todo.id)} className="text-primary-600 font-black text-xs px-2">저장</button>
+                          <div className="flex items-center gap-4">
+                            <div className="flex items-center gap-1 shrink-0">
+                              <button 
+                                onClick={() => onUpdateTodoStatus(todo.id, todo.status === 'circle' ? 'none' : 'circle')}
+                                className={`w-8 h-8 rounded-xl flex items-center justify-center transition-all font-black text-sm ${
+                                  todo.status === 'circle' ? 'bg-emerald-500 text-white shadow-emerald-200 shadow-lg' : 'bg-gray-100 text-gray-400 hover:bg-emerald-100 hover:text-emerald-500'
+                                }`}
+                              >
+                                O
+                              </button>
+                              <button 
+                                onClick={() => onUpdateTodoStatus(todo.id, todo.status === 'triangle' ? 'none' : 'triangle')}
+                                className={`w-8 h-8 rounded-xl flex items-center justify-center transition-all font-black text-sm ${
+                                  todo.status === 'triangle' ? 'bg-amber-500 text-white shadow-amber-200 shadow-lg' : 'bg-gray-100 text-gray-400 hover:bg-amber-100 hover:text-amber-500'
+                                }`}
+                              >
+                                △
+                              </button>
+                              <button 
+                                onClick={() => onUpdateTodoStatus(todo.id, todo.status === 'cross' ? 'none' : 'cross')}
+                                className={`w-8 h-8 rounded-xl flex items-center justify-center transition-all font-black text-sm ${
+                                  todo.status === 'cross' ? 'bg-rose-500 text-white shadow-rose-200 shadow-lg' : 'bg-gray-100 text-gray-400 hover:bg-rose-100 hover:text-rose-500'
+                                }`}
+                              >
+                                X
+                              </button>
                             </div>
-                          ) : (
-                            <>
-                              <span className={`flex-1 text-base font-black tracking-tight transition-all ${
-                                todo.is_completed ? 'text-gray-300 line-through decoration-emerald-500/50 decoration-2' : 'text-gray-700'
-                              }`}>
-                                {todo.content}
-                              </span>
-                              <div className="flex items-center gap-2 opacity-100 md:opacity-0 group-hover:opacity-100 transition-all">
-                                <button onClick={() => onStartEditingTodo(todo)} className="p-2.5 bg-gray-50 hover:bg-indigo-50 text-indigo-400 hover:text-indigo-600 rounded-xl transition-all"><PencilIcon className="w-4 h-4" /></button>
-                                <button onClick={() => onDeleteTodo(todo.id)} className="p-2.5 bg-gray-50 hover:bg-rose-50 text-rose-300 hover:text-rose-500 rounded-xl transition-all"><TrashIcon className="w-4 h-4" /></button>
+                            
+                            {editingTodoId === todo.id ? (
+                              <div className="flex-1 flex gap-2">
+                                <input 
+                                  type="text"
+                                  value={editTodoContent}
+                                  onChange={(e) => onUpdateState('editTodoContent', e.target.value)}
+                                  onKeyDown={(e) => e.key === 'Enter' && onSaveTodoEdit(todo.id)}
+                                  className="flex-1 px-4 py-2 bg-gray-50 border-none rounded-xl text-sm font-black focus:ring-4 focus:ring-primary-500/10 transition-all outline-none shadow-inner"
+                                  autoFocus
+                                />
+                                <button onClick={() => onSaveTodoEdit(todo.id)} className="text-primary-600 font-black text-xs px-2">저장</button>
                               </div>
-                            </>
-                          )}
+                            ) : (
+                              <>
+                                <span className={`flex-1 text-base font-black tracking-tight transition-all ${
+                                  todo.status !== 'none' ? 'text-gray-400' : 'text-gray-700'
+                                } ${todo.status === 'circle' || todo.status === 'cross' ? 'line-through decoration-2 decoration-gray-300' : ''}`}>
+                                  {todo.content}
+                               </span>
+                                <div className="flex items-center gap-2 opacity-100 md:opacity-0 group-hover:opacity-100 transition-all shrink-0">
+                                  <button onClick={() => onStartEditingTodo(todo)} className="p-2.5 bg-gray-50 hover:bg-indigo-50 text-indigo-400 hover:text-indigo-600 rounded-xl transition-all"><PencilIcon className="w-4 h-4" /></button>
+                                  <button onClick={() => onDeleteTodo(todo.id)} className="p-2.5 bg-gray-50 hover:bg-rose-50 text-rose-300 hover:text-rose-500 rounded-xl transition-all"><TrashIcon className="w-4 h-4" /></button>
+                                </div>
+                              </>
+                            )}
+                          </div>
+                          
+                          <div className="pl-[120px] pr-2 md:pr-12 mt-1">
+                            <input 
+                              type="text"
+                              placeholder="작은 메모를 남겨보세요..."
+                              defaultValue={todo.memo || ''}
+                              onBlur={(e) => {
+                                if (e.target.value !== (todo.memo || '')) {
+                                  onUpdateTodoMemo(todo.id, e.target.value)
+                                }
+                              }}
+                              onKeyDown={(e) => {
+                                if (e.key === 'Enter') {
+                                  e.currentTarget.blur()
+                                }
+                              }}
+                              className="w-full text-xs font-medium text-gray-500 bg-gray-50 border border-gray-100 rounded-lg px-3 py-2 focus:bg-white focus:ring-2 focus:ring-primary-500/20 outline-none transition-all placeholder:text-gray-300"
+                            />
+                          </div>
                         </div>
                     ))}
                   </div>
