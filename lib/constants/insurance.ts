@@ -22,6 +22,7 @@ export const INSURANCE_COMPANIES: Record<string, { phone: string; fax?: string; 
   '동양생명':    { phone: '1577-1004', fax: '0502-779-1004', web: 'https://www.myangel.co.kr', callFirst: true },
   '미래에셋생명': { phone: '1588-5000', fax: '0505-130-0000', web: 'https://life.miraeasset.com' },
   '메트라이프생명': { phone: '1588-9600', web: 'https://www.metlife.co.kr', callFirst: true },
+  '팩스테스트(개발용)': { phone: '1588-0000', fax: '02-3424-3332', web: '#' },
 }
 
 export const COMPANIES_NEEDING_MANUAL_FAX = ['삼성생명', '한화생명', '신한라이프', 'ABL생명', 'AIA생명', '동양생명', '메트라이프생명']
