@@ -1,5 +1,7 @@
 import { PDFDocument, rgb } from 'pdf-lib'
 import fontkit from '@pdf-lib/fontkit'
+import fs from 'fs'
+import path from 'path'
 
 // Coordinate mappings for specific insurance companies
 // Coordinates are in points (1/72 inch), starting from bottom-left
@@ -165,22 +167,12 @@ export async function generateClaimPDF(claim: any, planner: any) {
   // 1. Try to load company-specific template
   if (companyConfig) {
     try {
-      let baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'
-      if (process.env.VERCEL_URL) {
-        baseUrl = `https://${process.env.VERCEL_URL}`
-      }
-      // Vercel deployment URL handling (sometimes VERCEL_PROJECT_PRODUCTION_URL is better)
-      if (process.env.NEXT_PUBLIC_SITE_URL) {
-        baseUrl = process.env.NEXT_PUBLIC_SITE_URL
-      }
+      const filePath = path.join(process.cwd(), 'public', companyConfig.templatePath)
+      console.log(`[PDF] Loading template from: ${filePath}`)
       
-      console.log(`[PDF] Fetching template from: ${baseUrl}${companyConfig.templatePath}`)
-      const templateRes = await fetch(`${baseUrl}${companyConfig.templatePath}`)
-      
-      if (templateRes.ok) {
-        const templateBytes = await templateRes.arrayBuffer()
-        pdfDoc = await PDFDocument.load(templateBytes)
-        pdfDoc.registerFontkit(fontkit)
+      const templateBytes = await fs.promises.readFile(filePath)
+      pdfDoc = await PDFDocument.load(templateBytes)
+      pdfDoc.registerFontkit(fontkit)
         const koreanFont = await pdfDoc.embedFont(fontBytes)
         const pages = pdfDoc.getPages()
         const firstPage = pages[0]
