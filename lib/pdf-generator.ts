@@ -84,6 +84,23 @@ const COMPANY_TEMPLATES: Record<string, any> = {
           console.error('[PDF] Samsung signature embed failed', err)
         }
       }
+      
+      // Page 2: Consent Checkboxes
+      const pages = pdfDoc.getPages()
+      if (pages.length > 1) {
+        const page2 = pages[1]
+        const drawCheck2 = (x: number, y: number) => {
+          page2.drawText('V', { x, y, size: 10, font, color: rgb(0, 0, 0) })
+        }
+        
+        // 동의 (Agree) 기본 체크
+        // 고유식별정보 동의
+        drawCheck2(485, 355)
+        // 민감정보 동의
+        drawCheck2(486, 261)
+        // 개인정보 동의
+        drawCheck2(488, 166)
+      }
     }
   },
   '현대해상': {
