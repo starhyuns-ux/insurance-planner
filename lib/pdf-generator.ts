@@ -195,7 +195,6 @@ export async function generateClaimPDF(claim: any, planner: any) {
 
         const pdfBytes = await pdfDoc.save()
         return Buffer.from(pdfBytes)
-      }
     } catch (err) {
       console.warn(`[PDF] Failed to load template for ${claim.insurance_company}, falling back to standard form.`, err)
     }
