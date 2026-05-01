@@ -165,7 +165,16 @@ export async function generateClaimPDF(claim: any, planner: any) {
   // 1. Try to load company-specific template
   if (companyConfig) {
     try {
-      const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'
+      let baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'
+      if (process.env.VERCEL_URL) {
+        baseUrl = `https://${process.env.VERCEL_URL}`
+      }
+      // Vercel deployment URL handling (sometimes VERCEL_PROJECT_PRODUCTION_URL is better)
+      if (process.env.NEXT_PUBLIC_SITE_URL) {
+        baseUrl = process.env.NEXT_PUBLIC_SITE_URL
+      }
+      
+      console.log(`[PDF] Fetching template from: ${baseUrl}${companyConfig.templatePath}`)
       const templateRes = await fetch(`${baseUrl}${companyConfig.templatePath}`)
       
       if (templateRes.ok) {
