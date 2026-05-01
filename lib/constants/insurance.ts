@@ -11,6 +11,7 @@ export const INSURANCE_COMPANIES: Record<string, { phone: string; fax?: string; 
   '라이나손보':    { phone: '1588-3374', fax: '02-6742-3992', web: 'https://www.lina.co.kr' },
   '농협손해보험': { phone: '1644-9000', fax: '0505-060-7000', web: 'https://www.nhfire.co.kr' },
   'AIG손보':      { phone: '1544-2792', fax: '02-2011-4607', web: 'https://www.aig.co.kr' },
+  '에이스손보(Chubb)': { phone: '1566-5800', fax: '02-2085-7800', web: 'https://www.chubb.com/kr-ko/' },
   '삼성생명':    { phone: '1588-3114', web: 'https://www.samsunglife.com', callFirst: true },
   '교보생명':    { phone: '1588-1001', fax: '02-721-3842', web: 'https://www.kyobo.co.kr', callFirst: true },
   '한화생명':    { phone: '1577-6301', web: 'https://www.hanwhalife.com', callFirst: true },

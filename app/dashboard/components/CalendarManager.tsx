@@ -251,7 +251,11 @@ export default function CalendarManager({
                   placeholder="무엇을 도와드릴까요? 오늘의 할 일을 입력하세요..."
                   value={newTodoContent}
                   onChange={(e) => onUpdateState('newTodoContent', e.target.value)}
-                  onKeyDown={(e) => e.key === 'Enter' && onAddTodo()}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && !e.nativeEvent.isComposing) {
+                      onAddTodo()
+                    }
+                  }}
                   className="flex-1 px-6 py-4 bg-gray-50 border-none rounded-2xl text-sm font-black focus:ring-4 focus:ring-primary-500/10 transition-all outline-none shadow-inner"
                 />
                 <button 
@@ -360,7 +364,11 @@ export default function CalendarManager({
                                   type="text"
                                   value={editTodoContent}
                                   onChange={(e) => onUpdateState('editTodoContent', e.target.value)}
-                                  onKeyDown={(e) => e.key === 'Enter' && onSaveTodoEdit(todo.id)}
+                                  onKeyDown={(e) => {
+                                    if (e.key === 'Enter' && !e.nativeEvent.isComposing) {
+                                      onSaveTodoEdit(todo.id)
+                                    }
+                                  }}
                                   className="flex-1 px-4 py-2 bg-gray-50 border-none rounded-xl text-sm font-black focus:ring-4 focus:ring-primary-500/10 transition-all outline-none shadow-inner"
                                   autoFocus
                                 />
@@ -392,7 +400,7 @@ export default function CalendarManager({
                                 }
                               }}
                               onKeyDown={(e) => {
-                                if (e.key === 'Enter') {
+                                if (e.key === 'Enter' && !e.nativeEvent.isComposing) {
                                   e.currentTarget.blur()
                                 }
                               }}

@@ -5,23 +5,114 @@ import fontkit from '@pdf-lib/fontkit'
 // Coordinates are in points (1/72 inch), starting from bottom-left
 const COMPANY_TEMPLATES: Record<string, any> = {
   '삼성화재': {
-    templatePath: '/templates/samsung_fire.pdf',
-    fields: {
-      customer_name: { x: 100, y: 700, size: 10 },
-      resident_number: { x: 100, y: 680, size: 10 },
-      customer_phone: { x: 100, y: 660, size: 10 },
-      address: { x: 100, y: 640, size: 10 },
-      bank_name: { x: 300, y: 500, size: 10 },
-      bank_account: { x: 300, y: 480, size: 10 },
-      accident_detail: { x: 100, y: 400, size: 10, maxWidth: 400 },
+    templatePath: '/templates/samsungfire.pdf',
+    customRender: async (page: any, claim: any, font: any, pdfDoc: any) => {
+      const drawT = (val: any, x: number, y: number) => {
+        if (val) page.drawText(String(val), { x, y, size: 10, font, color: rgb(0, 0, 0) })
+      }
+      const drawCheck = (x: number, y: number) => {
+        page.drawText('V', { x, y, size: 10, font, color: rgb(0, 0, 0) })
+      }
+      
+      drawT(claim.customer_name, 124, 662)
+      drawT(claim.policyholder_name || claim.customer_name, 125, 642)
+      drawT(claim.resident_number, 271, 659)
+      drawT(claim.policyholder_resident_number || claim.resident_number, 272, 640)
+      drawT(claim.bank_holder || claim.customer_name, 190, 621)
+      drawT(claim.customer_phone, 312, 621)
+      
+      if (claim.consent_third_party) drawCheck(198, 597)
+      
+      if (claim.accident_type === '상해') drawCheck(155, 529)
+      else if (claim.accident_type === '질병') drawCheck(193, 531)
+      else if (claim.accident_type === '교통사고') drawCheck(241, 531)
+      
+      // 최초청구를 기본값으로 설정
+      if (claim.is_first_claim !== false) drawCheck(411, 530)
+      else drawCheck(490, 531)
+      
+      if (claim.accident_date) {
+        const d = new Date(claim.accident_date)
+        drawT(d.getFullYear(), 146, 504)
+        drawT(d.getMonth() + 1, 183, 505)
+        drawT(d.getDate(), 218, 506)
+      }
+      
+      drawT(claim.address, 351, 503)
+      drawT(claim.accident_detail, 124, 480)
+      
+      if (claim.car_plate_number) drawT(claim.car_plate_number, 173, 447)
+      if (claim.car_insurance_claim) drawCheck(246, 429) // 예
+      else if (claim.car_insurance_claim === false) drawCheck(215, 429) // 아니오
+      
+      const ct = claim.claim_types || []
+      if (ct.includes('실손의료비')) drawCheck(97, 397)
+      if (ct.includes('입원일당')) drawCheck(144, 398)
+      if (ct.includes('진단비')) drawCheck(184, 396)
+      if (ct.includes('수술비')) drawCheck(225, 398)
+      if (ct.includes('사망')) drawCheck(259, 395)
+      if (ct.includes('후유장해')) drawCheck(307, 398)
+      if (ct.includes('비용')) drawCheck(342, 396)
+      
+      drawT(claim.bank_name, 187, 332)
+      drawT(claim.bank_account, 307, 332)
+      drawT(claim.bank_holder || claim.customer_name, 472, 333)
+      
+      const created = claim.created_at ? new Date(claim.created_at) : new Date()
+      drawT(created.getFullYear(), 81, 174)
+      drawT(created.getMonth() + 1, 116, 175)
+      drawT(created.getDate(), 143, 176)
+      
+      drawT(claim.customer_name, 446, 174)
+      drawT(claim.policyholder_name || claim.customer_name, 446, 140)
+      
+      // Signature Image Embedding
+      if (claim.image_urls && claim.image_urls.length > 0) {
+        try {
+          const sigRes = await fetch(claim.image_urls[0])
+          if (sigRes.ok) {
+            const sigBytes = await sigRes.arrayBuffer()
+            const sigImage = await pdfDoc.embedPng(sigBytes).catch((e: any) => pdfDoc.embedJpg(sigBytes))
+            // Scale signature to fit the small box
+            const dims = sigImage.scale(0.15)
+            page.drawImage(sigImage, { x: 519, y: 177, width: dims.width, height: dims.height })
+            page.drawImage(sigImage, { x: 524, y: 141, width: dims.width, height: dims.height })
+          }
+        } catch (err) {
+          console.error('[PDF] Samsung signature embed failed', err)
+        }
+      }
     }
   },
   '현대해상': {
-    templatePath: '/templates/hyundai_marine.pdf',
+    templatePath: '/templates/hyundaifire.pdf',
     fields: {
       customer_name: { x: 120, y: 720, size: 10 },
-      // ... more coordinates
     }
+  },
+  'KB손해보험': {
+    templatePath: '/templates/kbfire.pdf',
+    fields: { customer_name: { x: 100, y: 700, size: 10 } }
+  },
+  'DB손해보험': {
+    templatePath: '/templates/dbfire.pdf',
+    fields: { customer_name: { x: 100, y: 700, size: 10 } }
+  },
+  '메리츠화재': {
+    templatePath: '/templates/meritzfirefire.pdf',
+    fields: { customer_name: { x: 100, y: 700, size: 10 } }
+  },
+  '한화손해보험': {
+    templatePath: '/templates/hanhwafire.pdf',
+    fields: { customer_name: { x: 100, y: 700, size: 10 } }
+  },
+  'AIG손보': {
+    templatePath: '/templates/aigfire.PDF',
+    fields: { customer_name: { x: 100, y: 700, size: 10 } }
+  },
+  '에이스손보(Chubb)': {
+    templatePath: '/templates/chubbfire.pdf',
+    fields: { customer_name: { x: 100, y: 700, size: 10 } }
   }
 }
 
@@ -85,16 +176,20 @@ export async function generateClaimPDF(claim: any, planner: any) {
         const pages = pdfDoc.getPages()
         const firstPage = pages[0]
 
-        // Fill fields based on mapping
-        for (const [key, coord] of Object.entries(companyConfig.fields) as [string, any][]) {
-          const value = claim[key] || '-'
-          firstPage.drawText(String(value), {
-            x: coord.x,
-            y: coord.y,
-            size: coord.size || 10,
-            font: koreanFont,
-            color: rgb(0, 0, 0),
-          })
+        // Fill fields based on mapping or custom render
+        if (companyConfig.customRender) {
+          await companyConfig.customRender(firstPage, claim, koreanFont, pdfDoc)
+        } else if (companyConfig.fields) {
+          for (const [key, coord] of Object.entries(companyConfig.fields) as [string, any][]) {
+            const value = claim[key] || '-'
+            firstPage.drawText(String(value), {
+              x: coord.x,
+              y: coord.y,
+              size: coord.size || 10,
+              font: koreanFont,
+              color: rgb(0, 0, 0),
+            })
+          }
         }
 
         const pdfBytes = await pdfDoc.save()
