@@ -64,7 +64,7 @@ export default function AdminPage() {
     receiverName: '',
     senderName: '인슈닷 관리자',
     senderNum: '010-6303-5561',
-    file: null as File | null
+    files: [] as File[]
   })
   const [faxSending, setFaxSending] = useState(false)
   const [faxResult, setFaxResult] = useState<string | null>(null)
@@ -216,8 +216,8 @@ export default function AdminPage() {
 
   const handleSendFax = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!faxForm.receiverNum || !faxForm.file) {
-      alert('팩스 번호와 PDF 파일을 선택해주세요.')
+    if (!faxForm.receiverNum || faxForm.files.length === 0) {
+      alert('팩스 번호와 파일을 하나 이상 선택해주세요.')
       return
     }
 
@@ -231,7 +231,11 @@ export default function AdminPage() {
       formData.append('receiverName', faxForm.receiverName)
       formData.append('senderName', faxForm.senderName)
       formData.append('senderNum', faxForm.senderNum)
-      formData.append('file', faxForm.file)
+      
+      // Append all selected files
+      faxForm.files.forEach(file => {
+        formData.append('files', file)
+      })
 
       const res = await fetch('/api/admin/fax/transmit', {
         method: 'POST',
@@ -243,7 +247,7 @@ export default function AdminPage() {
       if (!res.ok) throw new Error(result.error || '팩스 전송 실패')
       
       setFaxResult(`전송 성공! 접수번호: ${result.receiptId}`)
-      setFaxForm({ ...faxForm, receiverNum: '', receiverName: '', file: null })
+      setFaxForm({ ...faxForm, receiverNum: '', receiverName: '', files: [] })
       alert('팩스 전송 요청이 완료되었습니다.')
       fetchFaxHistory() // Refresh history
     } catch (err: any) {
@@ -650,16 +654,31 @@ export default function AdminPage() {
                 </div>
 
                 <div>
-                  <label className="block text-[11px] font-black text-gray-400 uppercase tracking-widest mb-2 px-1">파일 선택 (PDF, JPG, PNG)</label>
+                  <label className="block text-[11px] font-black text-gray-400 uppercase tracking-widest mb-2 px-1">파일 선택 (중복 선택 가능)</label>
                   <div className="relative group">
                     <input 
                       type="file" 
                       accept=".pdf,image/jpeg,image/png,image/jpg"
+                      multiple
                       required
-                      onChange={(e) => setFaxForm({...faxForm, file: e.target.files?.[0] || null})}
+                      onChange={(e) => {
+                        const selectedFiles = Array.from(e.target.files || [])
+                        setFaxForm({...faxForm, files: selectedFiles})
+                      }}
                       className="w-full px-5 py-10 bg-indigo-50/50 border-2 border-dashed border-indigo-100 rounded-[2rem] text-sm font-bold text-gray-500 cursor-pointer file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-black file:bg-indigo-600 file:text-white hover:border-indigo-300 transition-all"
                     />
                   </div>
+                  {faxForm.files.length > 0 && (
+                    <div className="mt-4 space-y-2 px-2">
+                      <p className="text-[10px] font-black text-indigo-400 uppercase tracking-widest">선택된 파일 ({faxForm.files.length})</p>
+                      {faxForm.files.map((f, i) => (
+                        <div key={i} className="text-xs font-bold text-gray-600 flex items-center justify-between bg-white border border-gray-100 px-3 py-2 rounded-xl">
+                          <span className="truncate max-w-[200px]">{f.name}</span>
+                          <span className="text-[10px] text-gray-300">{(f.size / 1024).toFixed(1)}KB</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
 
                 {faxResult && (
