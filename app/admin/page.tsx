@@ -626,11 +626,11 @@ export default function AdminPage() {
                 </div>
 
                 <div>
-                  <label className="block text-[11px] font-black text-gray-400 uppercase tracking-widest mb-2 px-1">PDF 파일 선택 (필수)</label>
+                  <label className="block text-[11px] font-black text-gray-400 uppercase tracking-widest mb-2 px-1">파일 선택 (PDF, JPG, PNG)</label>
                   <div className="relative group">
                     <input 
                       type="file" 
-                      accept=".pdf"
+                      accept=".pdf,image/jpeg,image/png,image/jpg"
                       required
                       onChange={(e) => setFaxForm({...faxForm, file: e.target.files?.[0] || null})}
                       className="w-full px-5 py-10 bg-indigo-50/50 border-2 border-dashed border-indigo-100 rounded-[2rem] text-sm font-bold text-gray-500 cursor-pointer file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-black file:bg-indigo-600 file:text-white hover:border-indigo-300 transition-all"

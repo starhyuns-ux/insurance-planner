@@ -29,7 +29,7 @@ export class FaxClient {
     senderNum: string
     senderName: string
     title: string
-    files: Buffer[]
+    files: { name: string; data: Buffer }[]
   }): Promise<{ success: boolean; receiptId: string; status: string }> {
     if (this.isMock) {
       console.log('--- [FAX MOCK MODE] ---')
@@ -53,9 +53,9 @@ export class FaxClient {
       },
     ]
 
-    const binaryFiles = params.files.map((data, index) => ({
-      fileName: `claim_doc_${index + 1}.pdf`,
-      fileData: data,
+    const binaryFiles = params.files.map((file) => ({
+      fileName: file.name,
+      fileData: file.data,
     }))
 
     return new Promise((resolve, reject) => {

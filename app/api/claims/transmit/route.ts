@@ -116,7 +116,10 @@ export async function POST(req: NextRequest) {
         senderName: planner?.name || '보상청구지원',
         senderNum: planner?.phone || '010-0000-0000',
         title: `[보상청구] ${claim.customer_name} 고객님 보상 신청 건`,
-        files: filesToTransmit,
+        files: filesToTransmit.map((data, index) => ({ 
+          name: `claim_doc_${index + 1}.pdf`, 
+          data 
+        })),
       })
       console.log(`[CLAIM TRANSMIT] Fax sent successfully. Receipt: ${faxResult.receiptId}`)
     } catch (faxErr: any) {

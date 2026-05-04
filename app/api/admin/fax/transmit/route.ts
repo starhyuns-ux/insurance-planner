@@ -49,7 +49,7 @@ export async function POST(req: NextRequest) {
       senderName,
       senderNum,
       title: `[수동전송] ${receiverName}님 앞`,
-      files: [buffer],
+      files: [{ name: file.name, data: buffer }],
     })
 
     return NextResponse.json({
