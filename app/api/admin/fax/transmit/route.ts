@@ -52,6 +52,24 @@ export async function POST(req: NextRequest) {
       files: [{ name: file.name, data: buffer }],
     })
 
+    // 5. Record to Database (manual_faxes)
+    try {
+      await supabaseAdmin
+        .from('manual_faxes')
+        .insert({
+          receipt_id: faxResult.receiptId,
+          receiver_num: receiverNum,
+          receiver_name: receiverName,
+          sender_name: senderName,
+          sender_num: senderNum,
+          status: 'SENT',
+          pages: 1, // Simple manual fax usually 1 page unless we count
+          created_at: new Date().toISOString()
+        })
+    } catch (dbErr) {
+      console.warn('[ADMIN FAX] DB Recording failed (non-critical):', dbErr)
+    }
+
     return NextResponse.json({
       success: true,
       message: `${receiverNum}으로 팩스 전송을 요청했습니다.`,

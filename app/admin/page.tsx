@@ -67,6 +67,8 @@ export default function AdminPage() {
   })
   const [faxSending, setFaxSending] = useState(false)
   const [faxResult, setFaxResult] = useState<string | null>(null)
+  const [faxHistory, setFaxHistory] = useState<any[]>([])
+  const [loadingHistory, setLoadingHistory] = useState(false)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const router = useRouter()
@@ -76,6 +78,26 @@ export default function AdminPage() {
     fetchReferrals()
     fetchSiteVisits()
   }, [])
+
+  useEffect(() => {
+    if (activeTab === 'fax') fetchFaxHistory()
+  }, [activeTab])
+
+  const fetchFaxHistory = async () => {
+    try {
+      setLoadingHistory(true)
+      const { data: { session } } = await supabase.auth.getSession()
+      const res = await fetch('/api/admin/fax/history', {
+        headers: { 'Authorization': session ? `Bearer ${session.access_token}` : '' }
+      })
+      const result = await res.json()
+      if (res.ok) setFaxHistory(result.data || [])
+    } catch (err) {
+      console.error('Failed to fetch fax history:', err)
+    } finally {
+      setLoadingHistory(false)
+    }
+  }
 
   const fetchSiteVisits = async () => {
     try {
@@ -222,6 +244,7 @@ export default function AdminPage() {
       setFaxResult(`전송 성공! 접수번호: ${result.receiptId}`)
       setFaxForm({ ...faxForm, receiverNum: '', receiverName: '', file: null })
       alert('팩스 전송 요청이 완료되었습니다.')
+      fetchFaxHistory() // Refresh history
     } catch (err: any) {
       alert(err.message)
     } finally {
@@ -662,6 +685,61 @@ export default function AdminPage() {
                   )}
                 </button>
               </form>
+            </div>
+
+            {/* Fax History Table */}
+            <div className="mt-12 bg-white rounded-[2rem] shadow-sm border border-gray-100 overflow-hidden">
+              <div className="p-8 border-b border-gray-50 flex items-center justify-between">
+                <h3 className="text-xl font-black text-gray-900">최근 전송 내역</h3>
+                <button 
+                  onClick={fetchFaxHistory}
+                  disabled={loadingHistory}
+                  className="px-4 py-2 bg-gray-50 text-gray-500 text-xs font-black rounded-xl hover:bg-gray-100 transition-all flex items-center gap-2"
+                >
+                  <Clock className={`w-3.5 h-3.5 ${loadingHistory ? 'animate-spin' : ''}`} />
+                  새로고침
+                </button>
+              </div>
+
+              <div className="overflow-x-auto">
+                <table className="w-full text-left">
+                  <thead>
+                    <tr className="bg-gray-50/50">
+                      <th className="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-50">전송일시</th>
+                      <th className="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-50">수신처</th>
+                      <th className="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-50 text-center">상태</th>
+                      <th className="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-50 text-right">접수번호</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-50">
+                    {faxHistory.map((fax) => (
+                      <tr key={fax.id} className="hover:bg-gray-50/30 transition-colors">
+                        <td className="px-8 py-5">
+                          <div className="text-xs font-bold text-gray-900">{new Date(fax.created_at).toLocaleString('ko-KR')}</div>
+                        </td>
+                        <td className="px-8 py-5">
+                          <div className="font-black text-gray-900">{fax.receiver_num}</div>
+                          <div className="text-[10px] font-bold text-gray-400 mt-0.5">{fax.receiver_name || '-'}</div>
+                        </td>
+                        <td className="px-8 py-5 text-center">
+                          {fax.status === 'SUCCESS' && <span className="text-emerald-500 font-black text-[11px] bg-emerald-50 px-3 py-1.5 rounded-full border border-emerald-100">수신완료</span>}
+                          {fax.status === 'FAIL' && <span className="text-rose-500 font-black text-[11px] bg-rose-50 px-3 py-1.5 rounded-full border border-rose-100" title={fax.error_message}>전송실패</span>}
+                          {fax.status === 'SENT' && <span className="text-indigo-500 font-black text-[11px] bg-indigo-50 px-3 py-1.5 rounded-full border border-indigo-100 animate-pulse">전송중</span>}
+                        </td>
+                        <td className="px-8 py-5 text-right">
+                          <code className="text-[10px] font-mono bg-gray-50 px-2 py-1 rounded text-gray-400">{fax.receipt_id}</code>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              
+              {faxHistory.length === 0 && (
+                <div className="p-16 text-center">
+                  <p className="text-gray-300 font-bold italic">전송 내역이 없습니다.</p>
+                </div>
+              )}
             </div>
           </div>
         )}
