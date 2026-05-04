@@ -95,45 +95,320 @@ const COMPANY_TEMPLATES: Record<string, any> = {
         
         // 동의 (Agree) 기본 체크
         // 고유식별정보 동의
-        drawCheck2(485, 355)
-        // 민감정보 동의
-        drawCheck2(486, 261)
-        // 개인정보 동의
-        drawCheck2(488, 166)
-      }
-    }
-  },
-  '현대해상': {
+        drawCh  '현대해상': {
     templatePath: '/templates/hyundaifire.pdf',
-    fields: {
-      customer_name: { x: 120, y: 720, size: 10 },
+    customRender: async (page: any, claim: any, font: any, pdfDoc: any) => {
+      await renderGenericClaim(page, claim, font, pdfDoc, {
+        customer_name: { x: 130, y: 660 },
+        policyholder_name: { x: 130, y: 640 },
+        resident_number: { x: 280, y: 660 },
+        policyholder_resident_number: { x: 280, y: 640 },
+        bank_holder: { x: 200, y: 620 },
+        customer_phone: { x: 320, y: 620 },
+        accident_date: { x: 150, y: 500 },
+        address: { x: 350, y: 500 },
+        accident_detail: { x: 130, y: 480 },
+        bank_name: { x: 180, y: 330 },
+        bank_account: { x: 310, y: 330 },
+        created_at_year: { x: 90, y: 170 },
+        created_at_month: { x: 120, y: 170 },
+        created_at_day: { x: 150, y: 170 },
+        signature: { x: 520, y: 140, width: 60, height: 20 },
+        consent_checkboxes: [
+          { pageIndex: 1, x: 480, y: 350 },
+          { pageIndex: 1, x: 480, y: 260 },
+          { pageIndex: 1, x: 480, y: 160 }
+        ],
+        consent_signature: { pageIndex: 1, x: 450, y: 120, width: 60, height: 20 },
+        consent_date: { pageIndex: 1, yearX: 90, monthX: 120, dayX: 150, y: 120 }
+      })
+    }
+  },gnature: { pageIndex: 3, x: 500, y: 150, width: 50, height: 20 },
+        consent_date: { pageIndex: 3, yearX: 180, monthX: 300, dayX: 420, y: 200 }
+      })
     }
   },
   'KB손해보험': {
     templatePath: '/templates/kbfire.pdf',
-    fields: { customer_name: { x: 100, y: 700, size: 10 } }
+    customRender: async (page: any, claim: any, font: any, pdfDoc: any) => {
+      await renderGenericClaim(page, claim, font, pdfDoc, {
+        customer_name: { x: 130, y: 660 },
+        policyholder_name: { x: 130, y: 640 },
+        resident_number: { x: 280, y: 660 },
+        policyholder_resident_number: { x: 280, y: 640 },
+        bank_holder: { x: 200, y: 620 },
+        customer_phone: { x: 320, y: 620 },
+        accident_date: { x: 150, y: 500 },
+        address: { x: 350, y: 500 },
+        accident_detail: { x: 130, y: 480 },
+        bank_name: { x: 180, y: 330 },
+        bank_account: { x: 310, y: 330 },
+        created_at_year: { x: 90, y: 170 },
+        created_at_month: { x: 120, y: 170 },
+        created_at_day: { x: 150, y: 170 },
+        signature: { x: 520, y: 140, width: 60, height: 20 },
+        consent_checkboxes: [
+          { pageIndex: 1, x: 480, y: 350 },
+          { pageIndex: 1, x: 480, y: 260 },
+          { pageIndex: 1, x: 480, y: 160 }
+        ],
+        consent_signature: { pageIndex: 1, x: 450, y: 120, width: 60, height: 20 },
+        consent_date: { pageIndex: 1, yearX: 90, monthX: 120, dayX: 150, y: 120 }
+      })
+    }
   },
   'DB손해보험': {
     templatePath: '/templates/dbfire.pdf',
-    fields: { customer_name: { x: 100, y: 700, size: 10 } }
+    customRender: async (page: any, claim: any, font: any, pdfDoc: any) => {
+      await renderGenericClaim(page, claim, font, pdfDoc, {
+        customer_name: { x: 130, y: 660 },
+        policyholder_name: { x: 130, y: 640 },
+        resident_number: { x: 280, y: 660 },
+        policyholder_resident_number: { x: 280, y: 640 },
+        bank_holder: { x: 200, y: 620 },
+        customer_phone: { x: 320, y: 620 },
+        accident_date: { x: 150, y: 500 },
+        address: { x: 350, y: 500 },
+        accident_detail: { x: 130, y: 480 },
+        bank_name: { x: 180, y: 330 },
+        bank_account: { x: 310, y: 330 },
+        created_at_year: { x: 90, y: 170 },
+        created_at_month: { x: 120, y: 170 },
+        created_at_day: { x: 150, y: 170 },
+        signature: { x: 520, y: 140, width: 60, height: 20 },
+        consent_checkboxes: [
+          { pageIndex: 1, x: 480, y: 350 },
+          { pageIndex: 1, x: 480, y: 260 },
+          { pageIndex: 1, x: 480, y: 160 }
+        ],
+        consent_signature: { pageIndex: 1, x: 450, y: 120, width: 60, height: 20 },
+        consent_date: { pageIndex: 1, yearX: 90, monthX: 120, dayX: 150, y: 120 }
+      })
+    }
   },
   '메리츠화재': {
     templatePath: '/templates/meritzfirefire.pdf',
-    fields: { customer_name: { x: 100, y: 700, size: 10 } }
+    customRender: async (page: any, claim: any, font: any, pdfDoc: any) => {
+      await renderGenericClaim(page, claim, font, pdfDoc, {
+        customer_name: { x: 130, y: 660 },
+        policyholder_name: { x: 130, y: 640 },
+        resident_number: { x: 280, y: 660 },
+        policyholder_resident_number: { x: 280, y: 640 },
+        bank_holder: { x: 200, y: 620 },
+        customer_phone: { x: 320, y: 620 },
+        accident_date: { x: 150, y: 500 },
+        address: { x: 350, y: 500 },
+        accident_detail: { x: 130, y: 480 },
+        bank_name: { x: 180, y: 330 },
+        bank_account: { x: 310, y: 330 },
+        created_at_year: { x: 90, y: 170 },
+        created_at_month: { x: 120, y: 170 },
+        created_at_day: { x: 150, y: 170 },
+        signature: { x: 520, y: 140, width: 60, height: 20 },
+        consent_checkboxes: [
+          { pageIndex: 1, x: 480, y: 350 },
+          { pageIndex: 1, x: 480, y: 260 },
+          { pageIndex: 1, x: 480, y: 160 }
+        ],
+        consent_signature: { pageIndex: 1, x: 450, y: 120, width: 60, height: 20 },
+        consent_date: { pageIndex: 1, yearX: 90, monthX: 120, dayX: 150, y: 120 }
+      })
+    }
   },
   '한화손해보험': {
     templatePath: '/templates/hanhwafire.pdf',
-    fields: { customer_name: { x: 100, y: 700, size: 10 } }
+    customRender: async (page: any, claim: any, font: any, pdfDoc: any) => {
+      await renderGenericClaim(page, claim, font, pdfDoc, {
+        customer_name: { x: 130, y: 660 },
+        policyholder_name: { x: 130, y: 640 },
+        resident_number: { x: 280, y: 660 },
+        policyholder_resident_number: { x: 280, y: 640 },
+        bank_holder: { x: 200, y: 620 },
+        customer_phone: { x: 320, y: 620 },
+        accident_date: { x: 150, y: 500 },
+        address: { x: 350, y: 500 },
+        accident_detail: { x: 130, y: 480 },
+        bank_name: { x: 180, y: 330 },
+        bank_account: { x: 310, y: 330 },
+        created_at_year: { x: 90, y: 170 },
+        created_at_month: { x: 120, y: 170 },
+        created_at_day: { x: 150, y: 170 },
+        signature: { x: 520, y: 140, width: 60, height: 20 },
+        consent_checkboxes: [
+          { pageIndex: 1, x: 480, y: 350 },
+          { pageIndex: 1, x: 480, y: 260 },
+          { pageIndex: 1, x: 480, y: 160 }
+        ],
+        consent_signature: { pageIndex: 1, x: 450, y: 120, width: 60, height: 20 },
+        consent_date: { pageIndex: 1, yearX: 90, monthX: 120, dayX: 150, y: 120 }
+      })
+    }
   },
   'AIG손보': {
     templatePath: '/templates/aigfire.PDF',
-    fields: { customer_name: { x: 100, y: 700, size: 10 } }
+    customRender: async (page: any, claim: any, font: any, pdfDoc: any) => {
+      await renderGenericClaim(page, claim, font, pdfDoc, {
+        customer_name: { x: 130, y: 660 },
+        policyholder_name: { x: 130, y: 640 },
+        resident_number: { x: 280, y: 660 },
+        policyholder_resident_number: { x: 280, y: 640 },
+        bank_holder: { x: 200, y: 620 },
+        customer_phone: { x: 320, y: 620 },
+        accident_date: { x: 150, y: 500 },
+        address: { x: 350, y: 500 },
+        accident_detail: { x: 130, y: 480 },
+        bank_name: { x: 180, y: 330 },
+        bank_account: { x: 310, y: 330 },
+        created_at_year: { x: 90, y: 170 },
+        created_at_month: { x: 120, y: 170 },
+        created_at_day: { x: 150, y: 170 },
+        signature: { x: 520, y: 140, width: 60, height: 20 },
+        consent_checkboxes: [
+          { pageIndex: 1, x: 480, y: 350 },
+          { pageIndex: 1, x: 480, y: 260 },
+          { pageIndex: 1, x: 480, y: 160 }
+        ],
+        consent_signature: { pageIndex: 1, x: 450, y: 120, width: 60, height: 20 },
+        consent_date: { pageIndex: 1, yearX: 90, monthX: 120, dayX: 150, y: 120 }
+      })
+    }
   },
   '에이스손보(Chubb)': {
     templatePath: '/templates/chubbfire.pdf',
-    fields: { customer_name: { x: 100, y: 700, size: 10 } }
+    customRender: async (page: any, claim: any, font: any, pdfDoc: any) => {
+      await renderGenericClaim(page, claim, font, pdfDoc, {
+        customer_name: { x: 130, y: 660 },
+        policyholder_name: { x: 130, y: 640 },
+        resident_number: { x: 280, y: 660 },
+        policyholder_resident_number: { x: 280, y: 640 },
+        bank_holder: { x: 200, y: 620 },
+        customer_phone: { x: 320, y: 620 },
+        accident_date: { x: 150, y: 500 },
+        address: { x: 350, y: 500 },
+        accident_detail: { x: 130, y: 480 },
+        bank_name: { x: 180, y: 330 },
+        bank_account: { x: 310, y: 330 },
+        created_at_year: { x: 90, y: 170 },
+        created_at_month: { x: 120, y: 170 },
+        created_at_day: { x: 150, y: 170 },
+        signature: { x: 520, y: 140, width: 60, height: 20 },
+        consent_checkboxes: [
+          { pageIndex: 1, x: 480, y: 350 },
+          { pageIndex: 1, x: 480, y: 260 },
+          { pageIndex: 1, x: 480, y: 160 }
+        ],
+        consent_signature: { pageIndex: 1, x: 450, y: 120, width: 60, height: 20 },
+        consent_date: { pageIndex: 1, yearX: 90, monthX: 120, dayX: 150, y: 120 }
+      })
+    }
   }
 }
+
+/**
+ * Generic renderer for insurance companies with simple coordinate mapping
+ */
+async function renderGenericClaim(page: any, claim: any, font: any, pdfDoc: any, coords: any) {
+  const pages = pdfDoc.getPages()
+  
+  const drawT = (val: any, coord: any) => {
+    if (val && coord && (coord.x !== 0 || coord.y !== 0)) {
+      const targetPageIndex = coord.pageIndex || 0
+      if (pages.length > targetPageIndex) {
+        pages[targetPageIndex].drawText(String(val), { 
+          x: coord.x, 
+          y: coord.y, 
+          size: coord.size || 10, 
+          font, 
+          color: rgb(0, 0, 0) 
+        })
+      }
+    }
+  }
+
+  // 1페이지 (또는 지정된 메인 페이지) 기본 정보 작성
+  drawT(claim.customer_name, coords.customer_name)
+  drawT(claim.policyholder_name || claim.customer_name, coords.policyholder_name)
+  drawT(claim.resident_number, coords.resident_number)
+  drawT(claim.policyholder_resident_number || claim.resident_number, coords.policyholder_resident_number)
+  drawT(claim.bank_holder || claim.customer_name, coords.bank_holder)
+  drawT(claim.customer_phone, coords.customer_phone)
+  
+  if (claim.accident_date && coords.accident_date) {
+    const d = new Date(claim.accident_date)
+    const targetPage = pages[coords.accident_date.pageIndex || 0]
+    if (targetPage) {
+      targetPage.drawText(String(d.getFullYear()), { x: coords.accident_date.x, y: coords.accident_date.y, size: 10, font, color: rgb(0, 0, 0) })
+      targetPage.drawText(String(d.getMonth() + 1), { x: coords.accident_date.x + 30, y: coords.accident_date.y, size: 10, font, color: rgb(0, 0, 0) })
+      targetPage.drawText(String(d.getDate()), { x: coords.accident_date.x + 60, y: coords.accident_date.y, size: 10, font, color: rgb(0, 0, 0) })
+    }
+  }
+  
+  drawT(claim.address, coords.address)
+  drawT(claim.accident_detail, coords.accident_detail)
+  drawT(claim.bank_name, coords.bank_name)
+  drawT(claim.bank_account, coords.bank_account)
+
+
+
+  const created = claim.created_at ? new Date(claim.created_at) : new Date()
+  drawT(created.getFullYear(), coords.created_at_year)
+  drawT(created.getMonth() + 1, coords.created_at_month)
+  drawT(created.getDate(), coords.created_at_day)
+
+  let sigImagePdf: any = null;
+
+  // 서명 이미지 삽입
+  if (claim.image_urls && claim.image_urls.length > 0 && coords.signature && coords.signature.x !== 0) {
+    try {
+      const sigRes = await fetch(claim.image_urls[0])
+      if (sigRes.ok) {
+        const sigImageBytes = await sigRes.arrayBuffer()
+        sigImagePdf = await pdfDoc.embedPng(sigImageBytes).catch((e: any) => pdfDoc.embedJpg(sigImageBytes))
+        
+        const targetPageIndex = coords.signature.pageIndex || 0
+        if (pages.length > targetPageIndex) {
+          pages[targetPageIndex].drawImage(sigImagePdf, { 
+            x: coords.signature.x, 
+            y: coords.signature.y, 
+            width: coords.signature.width || 60, 
+            height: coords.signature.height || 20 
+          })
+        }
+      }
+    } catch (err) {
+      console.error('[PDF] Generic signature embed failed', err)
+    }
+  }
+
+  // 동의서 체크박스 처리
+  if (coords.consent_checkboxes && coords.consent_checkboxes.length > 0) {
+    for (const box of coords.consent_checkboxes) {
+      if (pages.length > box.pageIndex) {
+        pages[box.pageIndex].drawText('V', { x: box.x, y: box.y, size: 10, font, color: rgb(0, 0, 0) })
+      }
+    }
+  }
+
+  // 동의서 날짜 작성
+  if (coords.consent_date && pages.length > coords.consent_date.pageIndex) {
+    const targetPage = pages[coords.consent_date.pageIndex]
+    targetPage.drawText(String(created.getFullYear()), { x: coords.consent_date.yearX, y: coords.consent_date.y, size: 10, font, color: rgb(0, 0, 0) })
+    targetPage.drawText(String(created.getMonth() + 1), { x: coords.consent_date.monthX, y: coords.consent_date.y, size: 10, font, color: rgb(0, 0, 0) })
+    targetPage.drawText(String(created.getDate()), { x: coords.consent_date.dayX, y: coords.consent_date.y, size: 10, font, color: rgb(0, 0, 0) })
+  }
+
+  // 동의서 서명 이미지 삽입
+  if (sigImagePdf && coords.consent_signature && pages.length > coords.consent_signature.pageIndex) {
+    const targetPage = pages[coords.consent_signature.pageIndex]
+    targetPage.drawImage(sigImagePdf, { 
+      x: coords.consent_signature.x, 
+      y: coords.consent_signature.y, 
+      width: coords.consent_signature.width || 60, 
+      height: coords.consent_signature.height || 20 
+    })
+  }
+}
+
 
 /**
  * PDF Generator for Insurance Claims
@@ -209,6 +484,24 @@ export async function generateClaimPDF(claim: any, planner: any) {
             })
           }
         }
+        
+        // --- 폰트/인코딩 에러 방지 처리 ---
+        // 기존 템플릿에 들어있는 한글 메타데이터나 폼 필드 이름 때문에 ByteString 변환 에러가 발생할 수 있습니다.
+        try {
+          pdfDoc.setTitle('')
+          pdfDoc.setAuthor('')
+          pdfDoc.setSubject('')
+          pdfDoc.setProducer('')
+          pdfDoc.setCreator('')
+          
+          const form = pdfDoc.getForm()
+          if (form) {
+            form.flatten()
+          }
+        } catch (e) {
+          console.warn('[PDF] Warning during metadata/form cleanup:', e)
+        }
+        // ---------------------------------
 
         const pdfBytes = await pdfDoc.save()
         return Buffer.from(pdfBytes)

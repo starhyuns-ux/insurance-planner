@@ -4,15 +4,10 @@ import Hero from '@/components/Hero'
 import TrustStrip from '@/components/TrustStrip'
 import Concerns from '@/components/Concerns'
 import Services from '@/components/Services'
-import Reviews from '@/components/Reviews'
 import About from '@/components/About'
 import AdvisorProfile from '@/components/AdvisorProfile'
-import CommunityLinks from '@/components/CommunityLinks'
 import ConsultationForm from '@/components/ConsultationForm'
 import Footer from '@/components/Footer'
-import CaseCollection from '@/components/CaseCollection'
-import AdvancedRadiation from '@/components/AdvancedRadiation'
-import InsurancePremiumCalculator from '@/components/InsurancePremiumCalculator'
 import { notFound } from 'next/navigation'
 import { Metadata } from 'next'
 import AttributionSetter from '@/components/AttributionSetter'
@@ -99,9 +94,6 @@ export default async function PlannerLandingPage({ params }: { params: { planner
         />
         <Concerns />
         <Services />
-        <AdvancedRadiation />
-        <Reviews />
-        <CaseCollection />
       </div>
 
       <div className="bg-gray-50">
@@ -123,14 +115,6 @@ export default async function PlannerLandingPage({ params }: { params: { planner
             plannerInfo={{ name: planner.name, phone: planner.phone }}
           />
         </div>
-      </div>
-
-      <div className="bg-white">
-        <CommunityLinks />
-        <ConsultationForm 
-          plannerId={planner.id} 
-          plannerInfo={{ name: planner.name, phone: planner.phone }}
-        />
       </div>
 
       <Footer key={`footer-${planner_id}`} />

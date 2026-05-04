@@ -52,10 +52,21 @@ interface Referral {
 }
 
 export default function AdminPage() {
-  const [activeTab, setActiveTab] = useState<'planners' | 'referrals'>('planners')
+  const [activeTab, setActiveTab] = useState<'planners' | 'referrals' | 'fax'>('planners')
   const [planners, setPlanners] = useState<Planner[]>([])
   const [referrals, setReferrals] = useState<Referral[]>([])
   const [siteVisits, setSiteVisits] = useState({ today: 0, total: 0 })
+
+  // Fax Form State
+  const [faxForm, setFaxForm] = useState({
+    receiverNum: '',
+    receiverName: '',
+    senderName: '인슈닷 관리자',
+    senderNum: '010-6303-5561',
+    file: null as File | null
+  })
+  const [faxSending, setFaxSending] = useState(false)
+  const [faxResult, setFaxResult] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const router = useRouter()
@@ -177,6 +188,44 @@ export default function AdminPage() {
       fetchPlanners() // Refresh list
     } catch (err: any) {
       alert(err.message)
+    }
+  }
+
+  const handleSendFax = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!faxForm.receiverNum || !faxForm.file) {
+      alert('팩스 번호와 PDF 파일을 선택해주세요.')
+      return
+    }
+
+    try {
+      setFaxSending(true)
+      setFaxResult(null)
+      const { data: { session } } = await supabase.auth.getSession()
+      
+      const formData = new FormData()
+      formData.append('receiverNum', faxForm.receiverNum)
+      formData.append('receiverName', faxForm.receiverName)
+      formData.append('senderName', faxForm.senderName)
+      formData.append('senderNum', faxForm.senderNum)
+      formData.append('file', faxForm.file)
+
+      const res = await fetch('/api/admin/fax/transmit', {
+        method: 'POST',
+        headers: { 'Authorization': session ? `Bearer ${session.access_token}` : '' },
+        body: formData
+      })
+      const result = await res.json()
+      
+      if (!res.ok) throw new Error(result.error || '팩스 전송 실패')
+      
+      setFaxResult(`전송 성공! 접수번호: ${result.receiptId}`)
+      setFaxForm({ ...faxForm, receiverNum: '', receiverName: '', file: null })
+      alert('팩스 전송 요청이 완료되었습니다.')
+    } catch (err: any) {
+      alert(err.message)
+    } finally {
+      setFaxSending(false)
     }
   }
 
@@ -329,6 +378,17 @@ export default function AdminPage() {
                 {referrals.filter(r => r.status === 'PENDING').length}건 대기
               </span>
             )}
+          </button>
+          <button
+            onClick={() => setActiveTab('fax')}
+            className={`px-6 py-3 rounded-2xl font-black text-sm flex items-center gap-2 transition-all ${
+              activeTab === 'fax' 
+                ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-200' 
+                : 'bg-white text-gray-500 hover:bg-gray-50 border border-gray-100'
+            }`}
+          >
+            <ArrowTopRightOnSquareIcon className="w-5 h-5" />
+            수동 팩스 전송
           </button>
         </div>
 
@@ -504,6 +564,105 @@ export default function AdminPage() {
                 <p className="text-gray-300 font-bold italic">추천 이력이 없습니다.</p>
               </div>
             )}
+          </div>
+        )}
+
+        {/* Manual Fax Tab */}
+        {activeTab === 'fax' && (
+          <div className="max-w-2xl mx-auto">
+            <div className="bg-white rounded-[2rem] shadow-xl border border-gray-100 overflow-hidden">
+              <div className="p-10 border-b border-gray-50 bg-indigo-50/30">
+                <h3 className="text-2xl font-black text-gray-900 mb-2">수동 팩스 전송</h3>
+                <p className="text-sm text-gray-500 font-medium leading-relaxed">
+                  임의의 수신번호로 PDF 문서를 전송할 수 있습니다.<br />
+                  전송된 결과는 팝빌 관리자 페이지에서 확인 가능합니다.
+                </p>
+              </div>
+
+              <form onSubmit={handleSendFax} className="p-10 space-y-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <label className="block text-[11px] font-black text-gray-400 uppercase tracking-widest mb-2 px-1">수신 번호 (필수)</label>
+                    <input 
+                      type="tel"
+                      placeholder="02-1234-5678"
+                      required
+                      value={faxForm.receiverNum}
+                      onChange={(e) => setFaxForm({...faxForm, receiverNum: e.target.value})}
+                      className="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:outline-none focus:ring-4 focus:ring-indigo-100 focus:bg-white transition-all font-bold placeholder:text-gray-300"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[11px] font-black text-gray-400 uppercase tracking-widest mb-2 px-1">수신자 성함</label>
+                    <input 
+                      type="text"
+                      placeholder="보상팀 담당자"
+                      value={faxForm.receiverName}
+                      onChange={(e) => setFaxForm({...faxForm, receiverName: e.target.value})}
+                      className="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:outline-none focus:ring-4 focus:ring-indigo-100 focus:bg-white transition-all font-bold placeholder:text-gray-300"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <label className="block text-[11px] font-black text-gray-400 uppercase tracking-widest mb-2 px-1">발신자 명칭</label>
+                    <input 
+                      type="text"
+                      value={faxForm.senderName}
+                      onChange={(e) => setFaxForm({...faxForm, senderName: e.target.value})}
+                      className="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:outline-none focus:ring-4 focus:ring-indigo-100 focus:bg-white transition-all font-bold"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[11px] font-black text-gray-400 uppercase tracking-widest mb-2 px-1">발신 번호</label>
+                    <input 
+                      type="tel"
+                      value={faxForm.senderNum}
+                      onChange={(e) => setFaxForm({...faxForm, senderNum: e.target.value})}
+                      className="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:outline-none focus:ring-4 focus:ring-indigo-100 focus:bg-white transition-all font-bold"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-[11px] font-black text-gray-400 uppercase tracking-widest mb-2 px-1">PDF 파일 선택 (필수)</label>
+                  <div className="relative group">
+                    <input 
+                      type="file" 
+                      accept=".pdf"
+                      required
+                      onChange={(e) => setFaxForm({...faxForm, file: e.target.files?.[0] || null})}
+                      className="w-full px-5 py-10 bg-indigo-50/50 border-2 border-dashed border-indigo-100 rounded-[2rem] text-sm font-bold text-gray-500 cursor-pointer file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-black file:bg-indigo-600 file:text-white hover:border-indigo-300 transition-all"
+                    />
+                  </div>
+                </div>
+
+                {faxResult && (
+                  <div className="p-4 bg-emerald-50 text-emerald-600 rounded-2xl text-center text-sm font-black border border-emerald-100">
+                    {faxResult}
+                  </div>
+                )}
+
+                <button 
+                  type="submit"
+                  disabled={faxSending}
+                  className="w-full py-6 bg-indigo-600 text-white rounded-[2rem] font-black text-lg shadow-xl shadow-indigo-100 hover:bg-indigo-700 hover:shadow-indigo-200 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3"
+                >
+                  {faxSending ? (
+                    <>
+                      <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      전송 중...
+                    </>
+                  ) : (
+                    <>
+                      <ArrowTopRightOnSquareIcon className="w-6 h-6" />
+                      팩스 전송하기
+                    </>
+                  )}
+                </button>
+              </form>
+            </div>
           </div>
         )}
       </main>

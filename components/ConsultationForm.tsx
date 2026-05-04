@@ -130,7 +130,7 @@ export default function ConsultationForm({ id = "consultation", plannerId, plann
 
   return (
     <section id={id} className="py-20 bg-gray-50 scroll-mt-10">
-      <div className="container max-w-4xl">
+      <div className="container mx-auto px-4 max-w-4xl">
         <div className="bg-white rounded-3xl shadow-xl overflow-hidden flex flex-col md:flex-row border border-gray-100">
           {/* Left info side */}
           <div className="bg-gray-900 p-10 md:w-5/12 text-white flex flex-col justify-center relative overflow-hidden shrink-0">

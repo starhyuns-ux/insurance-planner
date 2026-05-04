@@ -14,7 +14,7 @@ export default function Services() {
 
   return (
     <section className="py-24 bg-gray-50" id="services">
-      <div className="container">
+      <div className="container mx-auto px-4">
         <div className="text-center mb-16">
           <span className="text-primary-600 font-extrabold tracking-widest text-sm uppercase">{t('servicesTag')}</span>
           <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900 mt-3 mb-4 tracking-tight">

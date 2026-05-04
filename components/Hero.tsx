@@ -12,7 +12,7 @@ export default function Hero() {
     <section className="relative pt-20 pb-16 md:pt-32 md:pb-24 overflow-hidden">
       <div className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary-50 via-white to-white"></div>
 
-      <div className="container flex items-center justify-center">
+      <div className="container mx-auto flex items-center justify-center">
         {/* Center Content */}
         <div className="max-w-3xl px-4 md:px-0 text-center">
           {planner ? (

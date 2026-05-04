@@ -29,9 +29,8 @@ async function generateGridPDFs() {
     const pdfDoc = await PDFDocument.load(pdfBytes)
     const pages = pdfDoc.getPages()
     
-    // 첫 번째 페이지에만 격자 그리기
-    if (pages.length > 0) {
-      const page = pages[0]
+    // 모든 페이지에 격자 그리기
+    for (const page of pages) {
       const { width, height } = page.getSize()
 
       // 50 단위로 가로선, 세로선 그리기

@@ -8,7 +8,7 @@ export default function Concerns() {
 
   return (
     <section className="py-24 bg-white" id="about">
-      <div className="container max-w-4xl">
+      <div className="container mx-auto px-4 max-w-4xl">
         {/* Top CTA Banner */}
         <div className="bg-gradient-to-r from-primary-50 to-primary-100 rounded-2xl p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6 border border-primary-200 shadow-sm mb-20 group">
           <div className="text-center md:text-left">

@@ -7,11 +7,8 @@ import Services from '@/components/Services'
 import Reviews from '@/components/Reviews'
 import About from '@/components/About'
 import AdvisorProfile from '@/components/AdvisorProfile'
-import CommunityLinks from '@/components/CommunityLinks'
 import ConsultationForm from '@/components/ConsultationForm'
 import Footer from '@/components/Footer'
-import CaseCollection from '@/components/CaseCollection'
-import AdvancedRadiation from '@/components/AdvancedRadiation'
 import PlannerBranding from '@/components/PlannerBranding'
 import PageTracker from '@/components/PageTracker'
 import { useAttribution } from '@/lib/attribution'
@@ -36,40 +33,13 @@ export default function Home() {
 
       <div className="bg-white">
         <ConsultationForm id="consultation-top" />
-        <Concerns />
-        <Services />
-        
-        {/* Professional Sections: Only shown if attributed or logged-in planner */}
-        {showProfessionalContent && !isLoading && (
-          <>
-            <AdvancedRadiation />
-            <Reviews />
-            <CaseCollection />
-          </>
-        )}
-        
-        {!showProfessionalContent && !isLoading && (
-           <Reviews />
-        )}
       </div>
 
-      <div className="bg-gray-50">
-        <About />
-        {showProfessionalContent && !isLoading && (
-          <AdvisorProfile />
-        )}
-      </div>
-
-      <div className="bg-white">
-        {showProfessionalContent && !isLoading && (
-          <CommunityLinks />
-        )}
-        <PlannerBranding />
-      </div>
+      <Concerns />
+      <Services />
+      <About />
 
       <Footer key={`footer-${pathname}`} />
-      
-      
     </main>
   )
 }

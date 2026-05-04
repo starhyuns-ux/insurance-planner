@@ -15,7 +15,7 @@ export default function Footer() {
 
   return (
     <footer className="bg-gray-50 border-t border-gray-200 pt-16 pb-8 text-sm">
-      <div className="container max-w-6xl">
+      <div className="container mx-auto px-4 max-w-6xl">
         <div className="flex flex-col md:flex-row justify-between mb-12 gap-12">
           <div className="max-w-md">
             <Link href="/" className="inline-block font-black text-3xl tracking-tighter text-gray-900 mb-4 flex items-baseline">

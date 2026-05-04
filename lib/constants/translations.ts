@@ -205,7 +205,7 @@ export const translations = {
     navAttributedTo: 'Attributed to',
 
     // Hero
-    heroBadge: '4월 한정 리모델링 상담 접수 중',
+    heroBadge: '신규 리모델링 상담 접수 중',
     heroTitlePrefix: '보험료는 절약하고',
     heroTitleHighlight: '보장은 제대로',
     heroDesc: '전문가의 1:1 맞춤 분석으로 부담스러운 보험료는 낮추고,\n가장 어려운 순간에 든든한 혜택을 채워드립니다.',
@@ -558,7 +558,7 @@ export const translations = {
     navAttributedTo: 'Attributed to',
 
     // Hero
-    heroBadge: 'April limited remodeling consultation',
+    heroBadge: 'New remodeling consultation in progress',
     heroTitlePrefix: 'Save on Premiums',
     heroTitleHighlight: 'Ensure Coverage',
     heroDesc: 'Through expert 1:1 analysis, your burdensome premiums are reduced,\nbringing you strong benefits when you need them most.',
