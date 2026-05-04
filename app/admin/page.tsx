@@ -13,7 +13,8 @@ import {
   CurrencyDollarIcon,
   GiftIcon,
   GlobeAltIcon,
-  CursorArrowRaysIcon
+  CursorArrowRaysIcon,
+  ClockIcon
 } from '@heroicons/react/24/outline'
 
 interface Planner {
@@ -696,7 +697,7 @@ export default function AdminPage() {
                   disabled={loadingHistory}
                   className="px-4 py-2 bg-gray-50 text-gray-500 text-xs font-black rounded-xl hover:bg-gray-100 transition-all flex items-center gap-2"
                 >
-                  <Clock className={`w-3.5 h-3.5 ${loadingHistory ? 'animate-spin' : ''}`} />
+                  <ClockIcon className={`w-3.5 h-3.5 ${loadingHistory ? 'animate-spin' : ''}`} />
                   새로고침
                 </button>
               </div>
