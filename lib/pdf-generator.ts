@@ -94,8 +94,14 @@ const COMPANY_TEMPLATES: Record<string, any> = {
         }
         
         // 동의 (Agree) 기본 체크
-        // 고유식별정보 동의
-        drawCh  '현대해상': {
+        drawCheck2(513, 560)
+        drawCheck2(513, 442)
+        drawCheck2(513, 318)
+        drawCheck2(513, 205)
+      }
+    }
+  },
+  '현대해상': {
     templatePath: '/templates/hyundaifire.pdf',
     customRender: async (page: any, claim: any, font: any, pdfDoc: any) => {
       await renderGenericClaim(page, claim, font, pdfDoc, {
@@ -115,16 +121,12 @@ const COMPANY_TEMPLATES: Record<string, any> = {
         created_at_day: { x: 150, y: 170 },
         signature: { x: 520, y: 140, width: 60, height: 20 },
         consent_checkboxes: [
-          { pageIndex: 1, x: 480, y: 350 },
-          { pageIndex: 1, x: 480, y: 260 },
-          { pageIndex: 1, x: 480, y: 160 }
+          { pageIndex: 3, x: 480, y: 350 }, // 4페이지 동의
+          { pageIndex: 3, x: 480, y: 260 },
+          { pageIndex: 4, x: 480, y: 160 }  // 5페이지 동의
         ],
-        consent_signature: { pageIndex: 1, x: 450, y: 120, width: 60, height: 20 },
-        consent_date: { pageIndex: 1, yearX: 90, monthX: 120, dayX: 150, y: 120 }
-      })
-    }
-  },gnature: { pageIndex: 3, x: 500, y: 150, width: 50, height: 20 },
-        consent_date: { pageIndex: 3, yearX: 180, monthX: 300, dayX: 420, y: 200 }
+        consent_signature: { pageIndex: 4, x: 450, y: 120, width: 60, height: 20 },
+        consent_date: { pageIndex: 4, yearX: 90, monthX: 120, dayX: 150, y: 120 }
       })
     }
   },
