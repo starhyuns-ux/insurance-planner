@@ -35,6 +35,7 @@ export default function SilbiCalculator() {
             '2세대': t('gen2'),
             '3세대': t('gen3'),
             '4세대': t('gen4'),
+            '5세대': t('gen5'),
         };
 
         const descriptions = {
@@ -43,12 +44,14 @@ export default function SilbiCalculator() {
                 gen2: t('silbiHospitalGen2'),
                 gen3: t('silbiHospitalGen3'),
                 gen4: t('silbiHospitalGen4'),
+                gen5: t('silbiHospitalGen5'),
             },
             outpatient: {
                 gen1: t('silbiOutpatientGen1'),
                 gen2: t('silbiOutpatientGen2'),
                 gen3: t('silbiOutpatientGen3'),
                 gen4: t('silbiOutpatientGen4'),
+                gen5: t('silbiOutpatientGen5'),
             },
             zero: t('alertBirthDate')
         };
@@ -59,7 +62,8 @@ export default function SilbiCalculator() {
                 { gen: genLabels['1세대'], title: '2009.09 ~', reimbursement: 0, selfPay: total, description: descriptions.zero },
                 { gen: genLabels['2세대'], title: '2009.10 ~', reimbursement: 0, selfPay: total, description: descriptions.zero },
                 { gen: genLabels['3세대'], title: '2017.04 ~', reimbursement: 0, selfPay: total, description: descriptions.zero },
-                { gen: genLabels['4세대'], title: '2021.07 ~', reimbursement: 0, selfPay: total, description: descriptions.zero, highlight: true }
+                { gen: genLabels['4세대'], title: '2021.07 ~', reimbursement: 0, selfPay: total, description: descriptions.zero },
+                { gen: genLabels['5세대'], title: '2026.05 ~', reimbursement: 0, selfPay: total, description: descriptions.zero, highlight: true }
             ]
         }
 
@@ -93,6 +97,18 @@ export default function SilbiCalculator() {
                 reimbursement: (covered * 0.8) + (uncovered * 0.7) + (threeMajor * 0.7),
                 selfPay: total - ((covered * 0.8) + (uncovered * 0.7) + (threeMajor * 0.7)),
                 description: descriptions.hospital.gen4,
+            })
+            
+            // 5th Gen Hospitalization
+            const selfPayCovered = Math.min(covered * 0.2, 2000000)
+            const selfPaySevere = Math.min((uncovered + threeMajor) * 0.3, 5000000)
+            const gen5TotalSelfPay = selfPayCovered + selfPaySevere
+            results.push({
+                gen: genLabels['5세대'],
+                title: '2026.05 ~',
+                reimbursement: total - gen5TotalSelfPay,
+                selfPay: gen5TotalSelfPay,
+                description: descriptions.hospital.gen5,
                 highlight: true
             })
         } else {
@@ -125,9 +141,22 @@ export default function SilbiCalculator() {
                 reimbursement: Math.min(Math.max(0, total - 20000), gen4Ratio),
                 selfPay: total - Math.min(Math.max(0, total - 20000), gen4Ratio),
                 description: descriptions.outpatient.gen4,
+            })
+
+            // 5th Gen Outpatient
+            const selfPayCoveredOut = Math.max(covered * 0.2, covered > 0 ? 20000 : 0)
+            const selfPaySevereOut = Math.max((uncovered + threeMajor) * 0.3, (uncovered + threeMajor) > 0 ? 30000 : 0)
+            const gen5TotalSelfPayOut = selfPayCoveredOut + selfPaySevereOut
+            results.push({
+                gen: genLabels['5세대'],
+                title: '2026.05 ~',
+                reimbursement: Math.max(0, total - gen5TotalSelfPayOut),
+                selfPay: gen5TotalSelfPayOut,
+                description: descriptions.outpatient.gen5,
                 highlight: true
             })
         }
+
 
         return results
     }, [coveredAmount, uncoveredAmount, threeMajorAmount, treatmentType, t])

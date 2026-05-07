@@ -69,12 +69,12 @@ export const translations = {
     silbiHospitalGen2: '급여/비급여 통합 10% 본인 부담',
     silbiHospitalGen3: '급여 10%, 비급여 20%, 3대비급여 30% 부담',
     silbiHospitalGen4: '급여 20%, 비급여 30% 본인 부담',
-    silbiHospitalGen5: '급여 20%, 중증비급여 30%, 비중증비급여 50% 본인부담',
+    silbiHospitalGen5: '급여 20%(한도 200만), 중증비급여 30%(한도 500만), 비중증 50%',
     silbiOutpatientGen1: '1일당 5,000원 정액 공제',
     silbiOutpatientGen2: '보통 1~2만원 정액 공제',
     silbiOutpatientGen3: '정액(1.5만) 또는 정률 중 큰 금액 공제',
     silbiOutpatientGen4: '급여 20%, 비급여 30% 중 큰 금액 공제',
-    silbiOutpatientGen5: '급여 20%, 중증 30%, 비중증 50%, 공제 2만원',
+    silbiOutpatientGen5: '급여 MAX(20%, 1~2만), 중증 MAX(30%, 3만), 비중증 MAX(50%, 5만)',
 
     // Units
     ageUnit: '세',
