@@ -21,6 +21,7 @@ export default function CustomersPage() {
   const [newCustRiders, setNewCustRiders] = useState('')
   const [newCustAppt, setNewCustAppt] = useState('')
   const [newCustIsContracted, setNewCustIsContracted] = useState(false)
+  const [newCustPremium, setNewCustPremium] = useState('0')
   const [activeTab, setActiveTab] = useState<'all' | 'contracted' | 'prospect'>('all')
 
   // Edit State
@@ -35,6 +36,7 @@ export default function CustomersPage() {
   const [editCustRiders, setEditCustRiders] = useState('')
   const [editCustAppt, setEditCustAppt] = useState('')
   const [editCustIsContracted, setEditCustIsContracted] = useState(false)
+  const [editCustPremium, setEditCustPremium] = useState('0')
 
   const fetchCustomers = async () => {
     if (!planner) return
@@ -65,7 +67,8 @@ export default function CustomersPage() {
         family_count: parseInt(newCustFamily) || 1,
         riders: newCustRiders.split(',').map(r => r.trim()).filter(r => r !== ''),
         appointment_at: newCustAppt || null,
-        is_contracted: newCustIsContracted
+        is_contracted: newCustIsContracted,
+        monthly_premium: parseInt(newCustPremium) || 0
       })
 
     if (!error) {
@@ -78,6 +81,7 @@ export default function CustomersPage() {
       setNewCustRiders('')
       setNewCustAppt('')
       setNewCustIsContracted(false)
+      setNewCustPremium('0')
       fetchCustomers()
     } else {
       toast.error('등록 중 오류가 발생했습니다.')
@@ -154,6 +158,8 @@ export default function CustomersPage() {
           if (key === 'editCustAppt') setEditCustAppt(value)
           if (key === 'editCustIsContracted') setEditCustIsContracted(value)
           if (key === 'newCustIsContracted') setNewCustIsContracted(value)
+          if (key === 'newCustPremium') setNewCustPremium(value)
+          if (key === 'editCustPremium') setEditCustPremium(value)
         }}
         onAddCustomer={addCustomer}
         onAddCustomersBulk={onAddCustomersBulk}
@@ -194,6 +200,7 @@ export default function CustomersPage() {
           setEditCustRiders(c.riders.join(', '))
           setEditCustAppt(c.appointment_at ? c.appointment_at.slice(0, 10) : '')
           setEditCustIsContracted(c.is_contracted || false)
+          setEditCustPremium(c.monthly_premium?.toString() || '0')
         }}
         onSaveEdit={async () => {
           if (!editingId) return
@@ -207,7 +214,8 @@ export default function CustomersPage() {
               family_count: parseInt(editCustFamily) || 1,
               riders: editCustRiders.split(',').map(r => r.trim()).filter(r => r !== ''),
               appointment_at: editCustAppt || null,
-              is_contracted: editCustIsContracted
+              is_contracted: editCustIsContracted,
+              monthly_premium: parseInt(editCustPremium) || 0
             })
             .eq('id', editingId)
           if (!error) {

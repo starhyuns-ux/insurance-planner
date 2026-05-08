@@ -43,6 +43,8 @@ interface CustomerCRMProps {
   editCustAppt: string
   editCustIsContracted: boolean
   newCustIsContracted: boolean
+  newCustPremium: string
+  editCustPremium: string
   activeTab: 'all' | 'contracted' | 'prospect'
   setActiveTab: (tab: 'all' | 'contracted' | 'prospect') => void
   onUpdateState: (key: string, value: any) => void
@@ -82,6 +84,8 @@ export default function CustomerCRM({
   editCustAppt,
   editCustIsContracted,
   newCustIsContracted,
+  newCustPremium,
+  editCustPremium,
   activeTab,
   setActiveTab,
   onUpdateState,
@@ -354,6 +358,16 @@ export default function CustomerCRM({
               </button>
             </div>
           </div>
+          <div className="md:col-span-1">
+            <label className="block text-xs font-black text-gray-400 uppercase mb-2 ml-1 tracking-widest">월 보험료 (원)</label>
+            <input
+              type="number"
+              value={newCustPremium}
+              onChange={(e) => onUpdateState('newCustPremium', e.target.value)}
+              placeholder="0"
+              className="w-full px-5 py-4 bg-gray-50 border border-transparent rounded-2xl focus:bg-white focus:border-primary-500 transition-all outline-none text-sm font-bold shadow-inner"
+            />
+          </div>
         </form>
       </div>
 
@@ -387,6 +401,7 @@ export default function CustomerCRM({
                 <th className="px-4 py-3 text-xs font-black text-gray-400 uppercase tracking-[0.2em] whitespace-nowrap">연락처/주소</th>
                 <th className="px-4 py-3 text-xs font-black text-gray-400 uppercase tracking-[0.2em] text-center whitespace-nowrap">상령일 (D-Day)</th>
                 <th className="px-4 py-3 text-xs font-black text-gray-400 uppercase tracking-[0.2em] whitespace-nowrap">주요 담보</th>
+                <th className="px-4 py-3 text-xs font-black text-gray-400 uppercase tracking-[0.2em] whitespace-nowrap">월 보험료</th>
                 <th className="px-4 py-3 text-xs font-black text-gray-400 uppercase tracking-[0.2em] text-right whitespace-nowrap">터치 / 관리</th>
               </tr>
             </thead>
@@ -438,6 +453,7 @@ export default function CustomerCRM({
                                 계약고객
                               </button>
                             </div>
+                            <input type="number" value={editCustPremium} onChange={e => onUpdateState('editCustPremium', e.target.value)} placeholder="보험료" className="w-full px-3 py-2 border rounded-xl" />
                           </div>
                         </td>
                         <td className="px-4 py-3 text-right">
@@ -508,6 +524,9 @@ export default function CustomerCRM({
                           <div className="max-w-[130px] truncate bg-gray-50 px-2 py-1 rounded-lg border border-gray-100">
                             {(c.riders || []).join(', ') || '특약 없음'}
                           </div>
+                        </td>
+                        <td className="px-4 py-4 text-gray-900 font-black text-xs whitespace-nowrap border-b border-gray-50">
+                          {c.monthly_premium ? `${c.monthly_premium.toLocaleString()}원` : '-'}
                         </td>
                         <td className="px-4 py-4 text-right whitespace-nowrap border-b border-gray-50">
                           <div className="flex items-center justify-end gap-3">
