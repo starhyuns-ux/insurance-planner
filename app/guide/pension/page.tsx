@@ -16,7 +16,7 @@ export const metadata: Metadata = {
 export default function PensionGuidePage() {
   return (
     <div className="bg-gray-50 min-h-screen py-20">
-      <div className="container max-w-5xl px-4 mb-24">
+      <div className="container max-w-5xl mx-auto px-4 mb-24">
         <div className="bg-white rounded-[3rem] shadow-xl overflow-hidden border border-gray-100 p-6 md:p-12">
           <PensionGuide />
 

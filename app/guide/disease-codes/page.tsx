@@ -29,7 +29,7 @@ export default function DiseaseCodesPage() {
                     <div className="absolute bottom-0 left-0 w-64 h-64 bg-primary-700 rounded-full blur-3xl opacity-30"></div>
                 </div>
 
-                <div className="container max-w-5xl relative z-10 py-16">
+                <div className="container max-w-5xl mx-auto relative z-10 py-16">
                     <div className="inline-block px-4 py-1.5 rounded-full bg-primary-800/80 backdrop-blur-sm text-primary-200 text-sm font-bold tracking-wide mb-6 border border-primary-700/50">
                         질병코드 검색
                     </div>
@@ -44,7 +44,7 @@ export default function DiseaseCodesPage() {
             </header>
 
             {/* Content Section */}
-            <div className="container max-w-5xl -mt-10 px-4 mb-24 relative z-20">
+            <div className="container max-w-5xl mx-auto -mt-10 px-4 mb-24 relative z-20">
                 <div className="bg-white rounded-3xl shadow-xl border border-gray-100 p-6 md:p-10 lg:p-12 mb-12">
                     <DiseaseCodeSearch />
                 </div>
