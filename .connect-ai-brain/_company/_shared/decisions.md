@@ -29,3 +29,7 @@ _세션: 2026-05-10T15-27_
 - Migrate to smaller models in LM Studio
 - Distribute tasks among agents based on current capacity and memory usage
 _세션: 2026-05-10T16-01_
+
+## [2026-05-10] [자율 사이클 — 2026-05-10] 1인 기업 24시간 운영 중. 회사 목표·각 에이전트의 개인 목표(_
+- Migrate LLM to cloud-based services
+_세션: 2026-05-10T16-01_
