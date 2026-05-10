@@ -796,8 +796,6 @@ export default function ICDMindMap() {
     </div>
   );
 }
-  );
-}
 
 function InformationCircleIcon({ className, style }: { className?: string, style?: any }) {
   return (
