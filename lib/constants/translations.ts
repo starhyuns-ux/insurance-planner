@@ -134,6 +134,11 @@ export const translations = {
     tryAgain: '다른 검색어로 다시 시도해 보세요.',
     freqHigh: '실무빈도 높음',
     relatedRiders: '연관특약',
+    popularSearches: '인기 검색어',
+    recentSearches: '최근 검색어',
+    copyCode: '코드 복사',
+    expertConsult: '전문가에게 코드 문의하기',
+    searchAll: '전체 보기',
 
     // Rider Labels
     cancerDiag: '암 진단비',
@@ -497,6 +502,11 @@ export const translations = {
     tryAgain: 'Please try searching with another term.',
     freqHigh: 'High Frequency',
     relatedRiders: 'Related Riders',
+    popularSearches: 'Popular',
+    recentSearches: 'Recent',
+    copyCode: 'Copy Code',
+    expertConsult: 'Consult an Expert',
+    searchAll: 'Show All',
 
     // Rider Labels
     cancerDiag: 'Cancer Diagnosis',

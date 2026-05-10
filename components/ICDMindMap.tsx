@@ -630,7 +630,7 @@ export default function ICDMindMap() {
     return selectedNodeId ? searchIn(displayRoots) : null;
   }, [displayRoots, selectedNodeId]);
 
-  const quickKeywords = ["C16", "I63", "S72", "M51", "K35", "갑상선암", "뇌경색", "골절"];
+  const quickKeywords = ["C16", "I63", "S72", "M51", "K35", "D12", "D25", "갑상선암", "뇌경색", "골절", "대장용종", "자궁근종"];
 
   const handleRootClick = (id: string) => {
     if (effectiveQuery) return;
@@ -651,21 +651,27 @@ export default function ICDMindMap() {
   return (
     <div className="w-full space-y-6">
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-        <div className="bg-white rounded-[2rem] shadow-lg border border-gray-100 p-6 md:p-8 space-y-6">
-          <div className="space-y-2">
-            <h2 className="text-2xl font-black text-gray-900 flex items-center gap-3">
-              <Brain className="h-7 w-7 text-primary-600" />
+        <div className="bg-white rounded-[2.5rem] shadow-xl border border-gray-100 p-8 md:p-10 space-y-8 relative overflow-hidden">
+          <div className="absolute top-0 right-0 p-4 opacity-5 pointer-events-none">
+            <Brain className="w-32 h-32 text-primary-500" />
+          </div>
+          <div className="space-y-3 relative z-10">
+            <h2 className="text-2xl md:text-3xl font-black text-gray-900 flex items-center gap-4">
+              <div className="p-3 bg-primary-500 text-white rounded-2xl shadow-lg shadow-primary-200">
+                <Brain className="h-7 w-7" />
+              </div>
               질병코드 시각적 탐색
             </h2>
-            <p className="text-gray-500 text-sm leading-relaxed">
-              분류 체계를 시각적으로 탐색해보세요. 각 분류를 클릭하면 세포가 분열하듯 상세 항목이 펼쳐집니다.
+            <p className="text-gray-500 text-base leading-relaxed max-w-2xl font-medium">
+              국제질병분류(ICD) 체계를 마인드맵으로 자유롭게 탐색해보세요. <br className="hidden md:block" />
+              각 분류를 클릭하면 세포가 분열하듯 상세 항목이 펼쳐집니다.
             </p>
           </div>
           
-          <div className="space-y-4">
-            <div className="flex flex-col gap-3 lg:flex-row">
-              <div className="relative flex-1">
-                <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400" />
+          <div className="space-y-6 relative z-10">
+            <div className="flex flex-col gap-4 lg:flex-row">
+              <div className="relative flex-1 group">
+                <Search className="absolute left-5 top-1/2 h-6 w-6 -translate-y-1/2 text-gray-400 group-focus-within:text-primary-500 transition-colors" />
                 <input
                   value={query}
                   onChange={(e) => {
@@ -673,11 +679,11 @@ export default function ICDMindMap() {
                     setSelectedQuick("");
                   }}
                   placeholder="예: C16, I63, S72, M51, K35, 갑상선암, 뇌경색"
-                  className="w-full h-12 bg-gray-50 border-2 border-gray-100 rounded-2xl pl-12 pr-4 text-base focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all"
+                  className="w-full h-14 bg-gray-50 border-2 border-gray-100 rounded-2xl pl-14 pr-6 text-lg focus:ring-4 focus:ring-primary-500/10 focus:border-primary-500 outline-none transition-all font-bold"
                 />
               </div>
               <button
-                className="h-12 px-6 rounded-2xl bg-gray-900 text-white font-bold hover:bg-gray-800 transition-all"
+                className="h-14 px-8 rounded-2xl bg-gray-900 text-white font-black hover:bg-primary-600 transition-all shadow-lg active:scale-95 flex items-center justify-center gap-2"
                 onClick={() => {
                   setQuery("");
                   setSelectedQuick("");
@@ -687,6 +693,7 @@ export default function ICDMindMap() {
                   setSelectedNodeId(null);
                 }}
               >
+                <ArrowPathIcon className="w-5 h-5" />
                 초기화
               </button>
             </div>
@@ -694,7 +701,7 @@ export default function ICDMindMap() {
               {quickKeywords.map((item) => (
                 <button
                   key={item}
-                  className={`cursor-pointer rounded-full px-4 py-1.5 text-xs font-black transition-all ${selectedQuick === item ? "bg-primary-600 text-white shadow-md scale-105" : "bg-gray-100 text-gray-600 hover:bg-gray-200"}`}
+                  className={`cursor-pointer rounded-full px-5 py-2 text-xs font-black transition-all shadow-sm ${selectedQuick === item ? "bg-primary-600 text-white shadow-primary-200 scale-105" : "bg-white border border-gray-100 text-gray-500 hover:border-primary-300 hover:text-primary-600 hover:bg-primary-50"}`}
                   onClick={() => {
                     setSelectedQuick(item);
                     setQuery("");
@@ -708,31 +715,39 @@ export default function ICDMindMap() {
         </div>
       </motion.div>
 
-      <div className="grid gap-6 xl:grid-cols-[1.5fr_0.8fr]">
-        <div className="bg-white rounded-[2rem] shadow-xl border border-gray-100 overflow-hidden">
-          <div className="p-6 border-b border-gray-100 flex items-center justify-between">
-            <h3 className="font-black text-gray-900">시각적 마인드맵</h3>
-            <div className="text-[10px] text-gray-400 font-bold uppercase tracking-widest bg-gray-50 px-3 py-1 rounded-full">
-              {effectiveQuery ? `검색: ${effectiveQuery}` : '탐색 모드'}
+      <div className="grid gap-8 xl:grid-cols-[1.6fr_0.8fr]">
+        <div className="bg-white rounded-[2.5rem] shadow-2xl border border-gray-100 overflow-hidden group/map">
+          <div className="p-8 border-b border-gray-50 flex items-center justify-between bg-gradient-to-r from-gray-50 to-white">
+            <div className="flex items-center gap-3">
+              <div className="w-2 h-2 bg-primary-500 rounded-full animate-ping" />
+              <h3 className="font-black text-gray-900 text-lg">시각적 마인드맵</h3>
+            </div>
+            <div className="text-[10px] text-primary-500 font-black uppercase tracking-widest bg-primary-50 px-4 py-1.5 rounded-full ring-1 ring-primary-100">
+              {effectiveQuery ? `검색: ${effectiveQuery}` : '탐색 모드 ACTIVE'}
             </div>
           </div>
-          <CellDivisionMindMap
-            roots={displayRoots}
-            openRootIds={effectiveQuery && derivedRootId ? [derivedRootId] : openRootIds}
-            openMiddleIds={effectiveQuery && derivedRootId && derivedMiddleId ? { [derivedRootId]: [derivedMiddleId] } : openMiddleIds}
-            hoveredId={hoveredId}
-            selectedNodeId={selectedNodeId || matchedPath[2]?.id || matchedPath[1]?.id || matchedPath[0]?.id || null}
-            setHoveredId={setHoveredId}
-            onRootClick={handleRootClick}
-            onMiddleClick={handleMiddleClick}
-            onSelectNode={(node) => setSelectedNodeId(node.id)}
-          />
+          <div className="p-2">
+            <CellDivisionMindMap
+              roots={displayRoots}
+              openRootIds={effectiveQuery && derivedRootId ? [derivedRootId] : openRootIds}
+              openMiddleIds={effectiveQuery && derivedRootId && derivedMiddleId ? { [derivedRootId]: [derivedMiddleId] } : openMiddleIds}
+              hoveredId={hoveredId}
+              selectedNodeId={selectedNodeId || matchedPath[2]?.id || matchedPath[1]?.id || matchedPath[0]?.id || null}
+              setHoveredId={setHoveredId}
+              onRootClick={handleRootClick}
+              onMiddleClick={handleMiddleClick}
+              onSelectNode={(node) => setSelectedNodeId(node.id)}
+            />
+          </div>
         </div>
 
-        <div className="space-y-6">
-          <div className="bg-white rounded-[2rem] shadow-lg border border-gray-100 p-6 space-y-4">
-            <h3 className="text-lg font-black text-gray-900">색상 범례</h3>
-            <div className="grid grid-cols-2 gap-3 text-xs">
+        <div className="space-y-8">
+          <div className="bg-white rounded-[2.5rem] shadow-xl border border-gray-100 p-8 space-y-6">
+            <h3 className="text-xl font-black text-gray-900 flex items-center gap-3">
+               <div className="w-1.5 h-6 bg-primary-500 rounded-full" />
+               색상 범례
+            </h3>
+            <div className="grid grid-cols-2 gap-4 text-xs">
               {[
                 ["C코드", groupStyles.C],
                 ["I코드", groupStyles.I],
@@ -743,10 +758,15 @@ export default function ICDMindMap() {
               ].map(([name, style]) => {
                 const s = style as { line: string, fill: string, accent: string, text: string };
                 return (
-                  <div key={name as string} className="flex items-center gap-2 rounded-xl border p-3" style={{ borderColor: `${s.accent}33`, backgroundColor: `${s.fill}CC` }}>
-                    <span className="h-3 w-3 rounded-full" style={{ backgroundColor: s.accent }} />
-                    <span className="font-bold" style={{ color: s.text }}>{name as string}</span>
-                  </div>
+                  <motion.div 
+                    whileHover={{ scale: 1.05 }}
+                    key={name as string} 
+                    className="flex items-center gap-3 rounded-2xl border p-4 transition-shadow hover:shadow-md" 
+                    style={{ borderColor: `${s.accent}33`, backgroundColor: `${s.fill}CC` }}
+                  >
+                    <span className="h-4 w-4 rounded-full shadow-inner" style={{ backgroundColor: s.accent }} />
+                    <span className="font-extrabold text-sm" style={{ color: s.text }}>{name as string}</span>
+                  </motion.div>
                 )
               })}
             </div>
@@ -754,21 +774,28 @@ export default function ICDMindMap() {
 
           <DetailCard root={activeRoot} middle={activeMiddle} selectedNode={selectedNode || matchedPath[2] || matchedPath[1] || matchedPath[0] || null} hoveredId={hoveredId} />
 
-          <div className="bg-gradient-to-br from-gray-900 to-gray-800 rounded-[2rem] shadow-lg p-6 text-white space-y-4">
-            <h3 className="text-lg font-black flex items-center gap-2">
-              <InformationCircleIcon className="w-5 h-5 text-primary-400" />
+          <div className="bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 rounded-[2.5rem] shadow-2xl p-8 text-white space-y-6 relative overflow-hidden">
+            <div className="absolute top-0 right-0 p-4 opacity-10 pointer-events-none">
+              <InformationCircleIcon className="w-32 h-32 text-primary-400" />
+            </div>
+            <h3 className="text-xl font-black flex items-center gap-3 relative z-10">
+              <div className="p-2 bg-primary-500 rounded-xl">
+                <InformationCircleIcon className="w-6 h-6 text-white" />
+              </div>
               활용 가이드
             </h3>
-            <div className="space-y-3 text-xs leading-relaxed text-gray-300 font-medium">
-              <p className="flex gap-2"><span className="text-primary-400 font-black">•</span> 처음에는 대분류만 보입니다. 원하시는 코드를 클릭하세요.</p>
-              <p className="flex gap-2"><span className="text-primary-400 font-black">•</span> 분류를 클릭하면 세포가 분열하듯 상세 가지가 펼쳐집니다.</p>
-              <p className="flex gap-2"><span className="text-primary-400 font-black">•</span> 구외곽으로 퍼지는 레이아웃으로 여러 개를 동시에 열어볼 수 있습니다.</p>
-              <p className="flex gap-2"><span className="text-primary-400 font-black">•</span> 특정 코드를 검색하면 해당 경로가 자동으로 강조됩니다.</p>
+            <div className="space-y-4 text-sm leading-relaxed text-gray-300 font-bold relative z-10">
+              <p className="flex gap-3 items-start"><span className="text-primary-400 text-lg">•</span> 처음에는 대분류만 보입니다. 원하시는 코드를 클릭하세요.</p>
+              <p className="flex gap-3 items-start"><span className="text-primary-400 text-lg">•</span> 분류를 클릭하면 세포가 분열하듯 상세 가지가 펼쳐집니다.</p>
+              <p className="flex gap-3 items-start"><span className="text-primary-400 text-lg">•</span> 구외곽으로 퍼지는 레이아웃으로 여러 개를 동시에 열어볼 수 있습니다.</p>
+              <p className="flex gap-3 items-start"><span className="text-primary-400 text-lg">•</span> 특정 코드를 검색하면 해당 경로가 자동으로 강조됩니다.</p>
             </div>
           </div>
         </div>
       </div>
     </div>
+  );
+}
   );
 }
 
