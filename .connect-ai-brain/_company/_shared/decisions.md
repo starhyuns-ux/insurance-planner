@@ -20,3 +20,7 @@ _세션: 2026-05-10T14-57_
 - Allocate task 'YouTube 채널 영상 분석' to 📺 레오 and Trend Sniper agent
 - Design planning sheets to be engaging, informative, and thought-provoking
 _세션: 2026-05-10T15-12_
+
+## [2026-05-10] [자율 사이클 — 2026-05-10] 1인 기업 24시간 운영 중. 회사 목표·각 에이전트의 개인 목표(_
+- Transition to smaller LLM models in LM Studio to overcome memory limitations.
+_세션: 2026-05-10T15-27_
