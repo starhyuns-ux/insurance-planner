@@ -41,3 +41,8 @@ _세션: 2026-05-10T16-55_
 ## [2026-05-10] [자율 사이클 — 2026-05-10] 1인 기업 24시간 운영 중. 회사 목표·각 에이전트의 개인 목표(_
 - LLMServer migration to a smaller model
 _세션: 2026-05-10T18-18_
+
+## [2026-05-10] [자율 사이클 — 2026-05-10] 1인 기업 24시간 운영 중. 회사 목표·각 에이전트의 개인 목표(_
+- Move to smaller LLaMA model for LM Studio and re-run
+- Re-check Ollama/LM Studio server status before re-attempting
+_세션: 2026-05-10T18-18_
