@@ -24,3 +24,8 @@ _세션: 2026-05-10T15-12_
 ## [2026-05-10] [자율 사이클 — 2026-05-10] 1인 기업 24시간 운영 중. 회사 목표·각 에이전트의 개인 목표(_
 - Transition to smaller LLM models in LM Studio to overcome memory limitations.
 _세션: 2026-05-10T15-27_
+
+## [2026-05-10] [자율 사이클 — 2026-05-10] 1인 기업 24시간 운영 중. 회사 목표·각 에이전트의 개인 목표(_
+- Migrate to smaller models in LM Studio
+- Distribute tasks among agents based on current capacity and memory usage
+_세션: 2026-05-10T16-01_
