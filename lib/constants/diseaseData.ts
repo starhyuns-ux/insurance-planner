@@ -1253,6 +1253,76 @@ export const getGroupedDiseaseData = (t: any, locale: string): TopCategory[] => 
                     ]
                 }
             ]
+        },
+        {
+            id: 'Strategic_Focus',
+            title: isKo ? '[손해사정 전략] 분쟁 다발 및 중점 관리' : '[Strategic Focus] High Dispute Cases',
+            shortTitle: isKo ? '손사 중점 관리' : 'Strategic Focus',
+            desc: isKo ? '보험사와 보상 규모를 두고 가장 치열하게 다투는 핵심 질환들입니다. 중복 노출을 통해 보상 누락을 방지합니다.' : 'Core diseases with intense payout disputes. Duplicated here to ensure no compensation is missed.',
+            subCategories: [
+                {
+                    name: isKo ? '암/유사암 상향 조정 및 전이암 분쟁' : 'Cancer Upgrade & Metastasis',
+                    items: [
+                        { 
+                            name: isKo ? '갑상선암의 전이 (C73 -> C77)' : 'Thyroid Metastasis (C73 to C77)', 
+                            code: 'C73/C77', 
+                            riders: ['일반암진단비', '소액암진단비'], 
+                            isImportant: true,
+                            deepAnalysis: isKo ? '원발암(갑상선암)이 소액암이라도 림프절 전이(C77)가 있다면 일반암 진단비를 수령할 수 있는 "원발암 기준 전" 약관인지 확인하십시오. 대법원 판례에 따라 설명 의무 위반으로 100% 수령 가능한 핵심 분쟁 건입니다.' : 'Check if pre-2011 "Primary Cancer Rule" applies. Supreme Court allows 100% payout for C77 metastasis if the insurer failed their duty to explain exclusions.'
+                        },
+                        { 
+                            name: isKo ? '직장 유암종 (D37.5 -> 일반암 전환)' : 'Rectal NET (D37.5 to Malignant)', 
+                            code: 'D37.5', 
+                            riders: ['일반암진단비', '유사암진단비'], 
+                            isImportant: true,
+                            deepAnalysis: isKo ? '코드는 D이지만, 형태학적 분류(M9249/3)를 근거로 일반암 100% 수령을 목표로 해야 합니다. 보험사의 유사암 10~20% 안내에 절대 서명하지 말고 손해사정사의 전문 검토를 받으십시오.' : 'Aim for 100% malignant payout based on morphology M9249/3. Do not accept 10-20% minor payouts; insist on pathological malignancy standards.'
+                        },
+                        { 
+                            name: isKo ? '유방의 상피내암 (D05 -> 미세침윤 C50)' : 'Breast CIS to Micro-invasive', 
+                            code: 'D05/C50', 
+                            riders: ['일반암진단비', '유사암진단비'], 
+                            deepAnalysis: isKo ? '단순 상피내암(D05) 진단을 받았더라도 수술 후 병리 결과지상 "Microinvasion" 문구가 있다면 반드시 C50 일반암으로 청구하여 수천만 원의 차이를 사수해야 합니다.' : 'If post-op pathology shows "Microinvasion", upgrade D05 to C50 immediately for full malignant benefits.'
+                        }
+                    ]
+                },
+                {
+                    name: isKo ? '심뇌혈관 삭감 방어 및 진단비 수령' : 'Vascular Claim Defense',
+                    items: [
+                        { 
+                            name: isKo ? '열공성 뇌경색 (I63 -> I67 삭감 방어)' : 'Lacunar Infarct Defense', 
+                            code: 'I63/I67', 
+                            riders: ['뇌졸중진단비', '뇌혈관질환진단비'], 
+                            isImportant: true,
+                            deepAnalysis: isKo ? '보험사는 "무증상 열공성 뇌경색"이라며 I67로 코드를 변경하여 진단비를 거절하려 합니다. 급성기 MRI 확산 강조 영상(DWI)의 병변을 근거로 I63을 고수하여 뇌졸중 진단비를 확보해야 합니다.' : 'Insurers push I67 for "asymptomatic" lacunar infarcts. Use acute DWI lesions to defend I63 and secure full stroke diagnosis benefits.'
+                        },
+                        { 
+                            name: isKo ? '변이형 협심증 (I20.1)' : 'Prinzmetal\'s Angina', 
+                            code: 'I20.1', 
+                            riders: ['허혈성심장질환진단비'], 
+                            deepAnalysis: isKo ? '일반적인 운동 시 통증이 아닌 안정 시 경련에 의해 발생합니다. 조영술상 협착이 없어도 에르고노빈 유발 검사상 양성이라면 허혈성 진단비 수령이 가능하므로 검사 결과지를 필히 분석하십시오.' : 'Occurs during rest. Even with zero stenosis on angiography, a positive Ergonovine test qualifies for ischemic heart disease benefits.'
+                        }
+                    ]
+                },
+                {
+                    name: isKo ? '정형/상해 기왕증 감액 및 후유장해' : 'Ortho/Injury Disability',
+                    items: [
+                        { 
+                            name: isKo ? '추간판 탈출증 (M51 -> 상해 기여도 분쟁)' : 'Disc Herniation Contribution', 
+                            code: 'M51/S33', 
+                            riders: ['상해후유장해', '상해수술비'], 
+                            isImportant: true,
+                            deepAnalysis: isKo ? '보험사는 MRI상 검게 변한 디스크를 근거로 기왕증 100%를 주장합니다. 하지만 사고 전 치료 이력이 없고 급성 외상 소견(부종 등)이 있다면 기여도 30~50%를 인정받아 상해 보험금을 수령해야 합니다.' : 'Insurers push 100% degenerative reduction for black discs on MRI. Prove acute trauma (edema) and no prior history to secure 30-50% injury contribution.'
+                        },
+                        { 
+                            name: isKo ? '척추 압박골절 (S32 -> 골다공증 감액 방어)' : 'Compression Fracture vs Osteoporosis', 
+                            code: 'S32/M81', 
+                            riders: ['상해후유장해(고액)'], 
+                            isImportant: true,
+                            deepAnalysis: isKo ? '골다공증(T-score -2.5 이하)이 있다는 이유로 보험금의 50%를 삭감하려 합니다. 사고의 강도가 충분히 컸음을 입증(추락 높이 등)하여 감액 비율을 20~30% 이내로 방어하는 것이 핵심입니다.' : 'Insurers cut 50% for osteoporosis (T < -2.5). Defend by proving significant accident impact (fall height) to limit reductions to 20-30%.'
+                        }
+                    ]
+                }
+            ]
         }
     ]
 }
