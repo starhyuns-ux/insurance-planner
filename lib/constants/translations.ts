@@ -137,6 +137,7 @@ export const translations = {
     popularSearches: '인기 검색어',
     recentSearches: '최근 검색어',
     copyCode: '코드 복사',
+    copied: '복사되었습니다',
     expertConsult: '전문가에게 코드 문의하기',
     searchAll: '전체 보기',
 
@@ -505,6 +506,7 @@ export const translations = {
     popularSearches: 'Popular',
     recentSearches: 'Recent',
     copyCode: 'Copy Code',
+    copied: 'Copied to clipboard',
     expertConsult: 'Consult an Expert',
     searchAll: 'Show All',
 
@@ -857,6 +859,7 @@ export const translations = {
     navVascularStudyDesc: '缺血性心脏病的理解与应对方案',
     diseaseCode: '疾病代码查询',
     diseaseCodeDesc: '根据诊断书代码查询保险理赔及实务细节',
+    copied: '已复制',
 
     // Alerts & Notices
     alertBirthDate: '请输入出生日期或诊疗费。',

@@ -203,417 +203,218 @@ export default function DiseaseCodeSearch() {
     addToRecent(word)
   }
 
+  // New State for active Tab and selected Detail
+  const [activeTab, setActiveTab] = useState<string>('ALL')
+  const [selectedItem, setSelectedItem] = useState<DiseaseItem | null>(null)
+
+  const codeTabs = useMemo(() => {
+    const letters = ['ALL', ...groupedDiseaseData.map(g => g.id)]
+    return letters
+  }, [groupedDiseaseData])
+
+  const displayList = useMemo(() => {
+    let base = filteredData
+    if (activeTab !== 'ALL') {
+      base = base.filter(g => g.id === activeTab)
+    }
+    
+    // Flatten the nested structure for easier listing
+    const flatList: Array<{ group: string, sub: string, item: DiseaseItem }> = []
+    base.forEach(group => {
+      group.subCategories.forEach(sub => {
+        sub.items.forEach(item => {
+          flatList.push({ group: group.title, sub: sub.name, item })
+        })
+      })
+    })
+    return flatList
+  }, [filteredData, activeTab])
+
   return (
     <div className="w-full">
-      {/* View Toggle */}
+      {/* View Toggle (List vs Map) */}
       <div className="flex justify-center mb-10">
         <div className="bg-gray-100 p-1.5 rounded-2xl flex items-center gap-1 shadow-inner border border-gray-200/50">
           <button
             onClick={() => setViewMode('list')}
             className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-black transition-all ${
-              viewMode === 'list'
-                ? 'bg-white text-primary-700 shadow-md scale-105 ring-1 ring-black/5'
-                : 'text-gray-500 hover:text-gray-700'
+              viewMode === 'list' ? 'bg-white text-primary-700 shadow-md scale-105' : 'text-gray-500 hover:text-gray-700'
             }`}
           >
             <ListBulletIcon className="w-5 h-5" />
-            {locale === 'ko' ? '목록으로 보기' : 'List View'}
+            {locale === 'ko' ? '코드별 목록' : 'List'}
           </button>
           <button
             onClick={() => setViewMode('map')}
             className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-black transition-all ${
-              viewMode === 'map'
-                ? 'bg-white text-primary-700 shadow-md scale-105 ring-1 ring-black/5'
-                : 'text-gray-500 hover:text-gray-700'
+              viewMode === 'map' ? 'bg-white text-primary-700 shadow-md scale-105' : 'text-gray-500 hover:text-gray-700'
             }`}
           >
             <ChartBarIcon className="w-5 h-5" />
-            {locale === 'ko' ? '마인드맵 탐색' : 'Mind Map'}
+            {locale === 'ko' ? '마인드맵' : 'Map'}
           </button>
         </div>
       </div>
 
       {viewMode === 'map' ? (
-        <motion.div 
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.5, ease: 'easeOut' }}
-        >
+        <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}>
           <ICDMindMap />
         </motion.div>
       ) : (
-        <div className="max-w-4xl mx-auto">
-          {/* Search Section */}
-          <div className="mb-12">
+        <div className="max-w-5xl mx-auto px-4">
+          {/* Search Header */}
+          <div className="bg-white rounded-[2.5rem] shadow-xl border border-gray-100 p-8 mb-8">
             <div className="relative mb-6">
               <div className="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none">
-                <MagnifyingGlassIcon className={`h-6 w-6 transition-colors ${searchTerm ? 'text-primary-500' : 'text-gray-400'}`} />
+                <MagnifyingGlassIcon className={`h-6 w-6 ${searchTerm ? 'text-primary-500' : 'text-gray-400'}`} />
               </div>
               <input
                 type="text"
-                className="block w-full pl-14 pr-14 py-5 text-lg border-2 border-primary-100 rounded-3xl focus:ring-4 focus:ring-primary-500/10 focus:border-primary-500 bg-white shadow-sm transition-all focus:shadow-xl outline-none font-bold placeholder:text-gray-300"
-                placeholder={t('searchPlaceholder')}
+                className="block w-full pl-14 pr-14 py-4 text-lg border-2 border-gray-100 rounded-2xl focus:ring-4 focus:ring-primary-500/10 focus:border-primary-500 bg-gray-50 transition-all outline-none font-bold"
+                placeholder="코드번호나 질병명을 입력하세요 (예: C16, 위암)"
                 value={searchTerm}
                 onChange={(e) => handleSearchChange(e.target.value)}
-                onBlur={() => addToRecent(searchTerm)}
               />
-              <AnimatePresence>
-                {searchTerm && (
-                  <motion.button 
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.8 }}
-                    className="absolute inset-y-0 right-0 pr-5 flex items-center text-gray-400 hover:text-gray-600"
-                    onClick={() => setSearchTerm('')}
-                  >
-                    <XMarkIcon className="h-6 w-6 bg-gray-100 rounded-full p-1" />
-                  </motion.button>
-                )}
-              </AnimatePresence>
             </div>
-
-            {/* Quick Keywords */}
-            <div className="flex flex-wrap items-center gap-2 mb-4">
-              <span className="text-xs font-black text-gray-400 uppercase tracking-widest mr-2">{t('popularSearches')}</span>
-              {POPULAR_KEYWORDS.map(word => (
+            
+            {/* Quick Code Tabs */}
+            <div className="flex flex-wrap gap-2 items-center">
+              <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest mr-2">CODE GROUPS</span>
+              {codeTabs.map(tab => (
                 <button
-                  key={word}
-                  onClick={() => handleKeywordClick(word)}
-                  className="px-3 py-1.5 rounded-full bg-white border border-gray-200 text-xs font-bold text-gray-600 hover:border-primary-300 hover:text-primary-600 hover:bg-primary-50 transition-all shadow-sm"
+                  key={tab}
+                  onClick={() => { setActiveTab(tab); setSearchTerm(''); }}
+                  className={`px-5 py-2 rounded-xl text-sm font-black transition-all ${
+                    activeTab === tab 
+                      ? 'bg-primary-600 text-white shadow-lg shadow-primary-100 scale-105' 
+                      : 'bg-white border border-gray-200 text-gray-500 hover:border-primary-300 hover:text-primary-600'
+                  }`}
                 >
-                  {word}
+                  {tab === 'ALL' ? '전체' : `${tab}코드`}
                 </button>
               ))}
             </div>
-
-            {/* Recent Searches */}
-            {recentSearches.length > 0 && (
-              <div className="flex flex-wrap items-center gap-2">
-                <span className="text-xs font-black text-gray-400 uppercase tracking-widest mr-2">{t('recentSearches')}</span>
-                {recentSearches.map(word => (
-                  <div key={word} className="flex items-center gap-1 group">
-                    <button
-                      onClick={() => handleKeywordClick(word)}
-                      className="px-3 py-1.5 rounded-full bg-gray-50 border border-gray-100 text-xs font-bold text-gray-500 hover:bg-gray-100 transition-all"
-                    >
-                      {word}
-                    </button>
-                    <button 
-                      onClick={() => removeRecent(word)}
-                      className="opacity-0 group-hover:opacity-100 text-gray-300 hover:text-rose-500 transition-opacity"
-                    >
-                      <XMarkIcon className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
-                ))}
-                <button 
-                  onClick={() => { setRecentSearches([]); localStorage.removeItem('insudot-recent-disease-searches'); }}
-                  className="text-[10px] font-bold text-gray-300 hover:text-gray-500 underline ml-2"
-                >
-                  {locale === 'ko' ? '기록 삭제' : 'Clear'}
-                </button>
-              </div>
-            )}
           </div>
 
-          {/* Disclaimer UI */}
-          <motion.div 
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="mb-12 bg-amber-50/50 p-6 rounded-3xl border border-amber-100 shadow-sm relative overflow-hidden"
-          >
-            <div className="absolute top-0 right-0 p-4 opacity-10">
-              <InformationCircleIcon className="w-24 h-24 text-amber-500" />
+          {/* Simple List View */}
+          <div className="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden">
+            <div className="hidden md:grid grid-cols-[120px_1fr_150px] gap-4 p-6 bg-gray-50 border-b border-gray-100 text-xs font-black text-gray-400 uppercase tracking-widest">
+              <div>코드</div>
+              <div>질병명</div>
+              <div className="text-right">상세 정보</div>
             </div>
-            <div className="flex items-start gap-4 relative z-10">
-              <div className="bg-amber-100 p-2.5 rounded-2xl">
-                 <InformationCircleIcon className="w-6 h-6 text-amber-600 shrink-0" />
-              </div>
-              <div>
-                <h4 className="font-black text-amber-900 mb-2">{t('disclaimerTitle')}</h4>
-                <ul className="text-sm text-amber-800/80 space-y-1.5 mt-2 font-medium leading-relaxed">
-                  <li className="flex gap-2"><span className="text-amber-400">•</span>{t('disclaimerItem1')}</li>
-                  <li className="flex gap-2"><span className="text-amber-400">•</span>{t('disclaimerItem2')}</li>
-                  <li className="flex gap-2"><span className="text-amber-400">•</span>{t('disclaimerItem3')}</li>
-                </ul>
-              </div>
-            </div>
-          </motion.div>
 
-          {/* Folders (Accordion) */}
-          {filteredData.length === 0 ? (
-            <motion.div 
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="text-center py-24 bg-white rounded-[3rem] border-2 border-dashed border-gray-100"
-            >
-              <div className="text-gray-200 mb-6 inline-flex items-center justify-center p-6 bg-gray-50 rounded-full">
-                <MagnifyingGlassIcon className="h-16 w-16" />
-              </div>
-              <h3 className="text-xl font-black text-gray-900 mb-3">{t('noResults')}</h3>
-              <p className="text-gray-500 mb-8">{t('tryAgain')}</p>
-              <button 
-                onClick={() => setSearchTerm('')}
-                className="inline-flex items-center gap-2 px-6 py-3 bg-gray-900 text-white rounded-2xl font-bold hover:bg-primary-600 transition-all shadow-lg active:scale-95"
-              >
-                <ArrowPathIcon className="w-5 h-5" />
-                {t('searchAll')}
-              </button>
-            </motion.div>
-          ) : (
-            <div className="space-y-6 pb-20">
-              <AnimatePresence mode="popLayout">
-                {filteredData.map((group) => {
-                  const isExpanded = activeFolders.includes(group.id)
-                  const categoryStyle = getCategoryStyle(group.id)
+            <div className="divide-y divide-gray-50">
+              {displayList.length === 0 ? (
+                <div className="py-20 text-center text-gray-300 font-bold">검색 결과가 없습니다.</div>
+              ) : (
+                displayList.map(({ group, sub, item }, idx) => (
+                  <div key={idx} className="group hover:bg-primary-50/30 transition-colors">
+                    <div className="grid grid-cols-1 md:grid-cols-[120px_1fr_150px] gap-4 p-5 md:p-6 items-center">
+                      <div className="flex items-center gap-2">
+                        <span className="px-3 py-1 bg-gray-100 text-gray-600 rounded-lg text-xs font-black group-hover:bg-primary-100 group-hover:text-primary-700 transition-colors">
+                          {item.code}
+                        </span>
+                        {item.isImportant && <span className="w-1.5 h-1.5 bg-rose-500 rounded-full animate-pulse" />}
+                      </div>
+                      <div className="flex flex-col">
+                        <span className="text-gray-900 font-black text-base md:text-lg">{item.name}</span>
+                        <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">{group} · {sub}</span>
+                      </div>
+                      <div className="flex justify-end">
+                        <button 
+                          onClick={() => setSelectedItem(selectedItem?.code === item.code ? null : item)}
+                          className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-black transition-all ${
+                            selectedItem?.code === item.code
+                              ? 'bg-primary-600 text-white shadow-md'
+                              : 'bg-white border border-gray-200 text-primary-600 hover:border-primary-500'
+                          }`}
+                        >
+                          {selectedItem?.code === item.code ? '닫기' : '설명 보기'}
+                          <ChevronDownIcon className={`w-4 h-4 transition-transform ${selectedItem?.code === item.code ? 'rotate-180' : ''}`} />
+                        </button>
+                      </div>
+                    </div>
 
-                  return (
-                    <motion.div 
-                      layout
-                      key={group.id} 
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, scale: 0.95 }}
-                      className={`bg-white rounded-[2.5rem] shadow-sm border transition-all duration-500 overflow-hidden ${isExpanded ? `shadow-xl ${categoryStyle.border}` : 'border-gray-100 hover:border-primary-100 hover:shadow-md'}`}
-                    >
-                      
-                      {/* Accordion Folder Header */}
-                      <button
-                        onClick={() => toggleFolder(group.id)}
-                        className={`w-full flex items-center justify-between p-6 md:p-8 transition-all duration-300
-                          ${isExpanded 
-                            ? `${categoryStyle.bg}/80` 
-                            : 'bg-white hover:bg-gray-50/50'
-                          }
-                        `}
-                      >
-                        <div className="flex items-center gap-5 text-left">
-                           <div className={`p-4 rounded-2xl transition-all duration-300 shadow-lg shrink-0 ${isExpanded ? `${categoryStyle.iconBg} text-white rotate-6 scale-110 shadow-current/20` : 'bg-gray-50 text-gray-400'}`}>
-                              <div className="w-7 h-7 md:w-9 md:h-9">
-                                {getCategoryIcon(group.id)}
-                              </div>
-                           </div>
-                           <div>
-                             <div className="flex items-center gap-2">
-                               <span className={`text-[10px] font-black uppercase tracking-[0.2em] mb-1 block ${isExpanded ? categoryStyle.text : 'text-gray-400'}`}>{group.id} CODE SECTION</span>
-                             </div>
-                             <h3 className="text-xl md:text-2xl font-black text-gray-900 leading-none">
-                                <Highlighter text={group.title} highlight={searchTerm} />
-                             </h3>
-                             <p className={`text-sm mt-2 transition-colors ${isExpanded ? categoryStyle.text : 'text-gray-400'}`}>
-                                <Highlighter text={group.desc} highlight={searchTerm} />
-                             </p>
-                           </div>
-                        </div>
-                        <div className={`shrink-0 ml-4 p-2.5 rounded-full transition-all duration-500 ${isExpanded ? `rotate-180 ${categoryStyle.bg} ${categoryStyle.text} scale-110` : 'bg-gray-50 text-gray-300'}`}>
-                          <ChevronDownIcon className="w-6 h-6" />
-                        </div>
-                      </button>
-
-                      {/* Accordion Content */}
-                      <motion.div 
-                        initial={false}
-                        animate={{ height: isExpanded ? 'auto' : 0, opacity: isExpanded ? 1 : 0 }}
-                        transition={{ duration: 0.4, ease: [0.04, 0.62, 0.23, 0.98] }}
-                        className="overflow-hidden"
-                      >
-                        <div className="p-6 md:p-10 md:pt-4 bg-white border-t border-gray-50">
-                          <div className="space-y-12">
-                            {group.subCategories.map((sub, sIdx) => (
-                                <div key={sIdx}>
-                                  <div className="flex items-center gap-3 mb-6">
-                                    <h4 className="font-black text-gray-900 text-lg">
-                                      {sub.name}
-                                    </h4>
-                                    <div className={`h-px flex-1 bg-gradient-to-r to-transparent ${isExpanded ? categoryStyle.bg : 'from-primary-100'}`} />
-                                  </div>
-                                  <ul className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    {sub.items.map((item, itemIdx) => (
-                                      <li key={itemIdx} className="group/item p-6 flex flex-col justify-between rounded-[2rem] border border-gray-100 hover:border-primary-400 hover:shadow-2xl hover:-translate-y-1 transition-all duration-500 gap-6 bg-gray-50/30 relative">
-                                        <div className="flex flex-col xs:flex-row justify-between items-start w-full gap-4">
-                                          <div className="flex-1 flex flex-col gap-2">
-                                              <div className="flex items-center gap-2 flex-wrap">
-                                                  <span className="font-black text-gray-900 text-lg break-keep leading-tight">
-                                                    <Highlighter text={item.name} highlight={searchTerm} />
-                                                  </span>
-                                                  {item.isImportant && (
-                                                  <span className="inline-flex items-center gap-1 bg-rose-50 text-rose-600 font-black px-2 py-0.5 rounded-lg text-[10px] shrink-0 border border-rose-100 shadow-sm animate-pulse">
-                                                      <ExclamationTriangleIcon className="w-3.5 h-3.5" />
-                                                      {t('freqHigh')}
-                                                  </span>
-                                                  )}
-                                              </div>
-                                              {item.desc && (
-                                                  <span className="text-xs text-gray-500 block break-keep leading-relaxed font-medium">
-                                                    <Highlighter text={item.desc} highlight={searchTerm} />
-                                                  </span>
-                                              )}
-                                            </div>
-                                            <div className="flex items-center gap-2 shrink-0">
-                                              <button 
-                                                onClick={() => shareCode(item.code, item.name)}
-                                                className="p-2.5 bg-white text-gray-400 border border-gray-100 rounded-2xl hover:text-primary-600 hover:border-primary-200 hover:bg-primary-50 transition-all shadow-sm active:scale-95"
-                                                title="공유하기"
-                                              >
-                                                <ShareIcon className="w-5 h-5" />
-                                              </button>
-                                              <div className="flex flex-col items-end gap-1">
-                                                <button 
-                                                  onClick={() => copyCode(item.code, item.name)}
-                                                  className={`group/copy flex items-center gap-1.5 font-black px-4 py-2.5 rounded-2xl text-sm whitespace-nowrap border transition-all shadow-sm tracking-wider ${
-                                                    copiedCode === item.code 
-                                                      ? 'bg-green-500 text-white border-green-500 scale-105' 
-                                                      : 'bg-white text-primary-700 border-primary-100 hover:border-primary-500 hover:bg-primary-50 active:scale-95'
-                                                  }`}
-                                                >
-                                                  {copiedCode === item.code ? <CheckIcon className="w-4 h-4" /> : <ClipboardDocumentIcon className="w-4 h-4 text-primary-400 group-hover/copy:text-primary-600" />}
-                                                  <Highlighter text={item.code} highlight={searchTerm} />
-                                                </button>
-                                              </div>
-                                            </div>
-                                        </div>
-
-                                        {/* Mapped Riders */}
-                                        {item.riders && item.riders.length > 0 && (
-                                          <div className="pt-4 border-t border-gray-100/80">
-                                            <div className="flex flex-wrap gap-2 items-center">
-                                              <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest mr-1">{t('relatedRiders')}</span>
-                                              {item.riders.map((rider, rIdx) => (
-                                                  <span key={rIdx} className="bg-white border border-gray-100 text-gray-600 text-[11px] px-3 py-1.5 rounded-xl font-bold shadow-sm transition-all hover:bg-primary-50 hover:border-primary-200 hover:text-primary-600 cursor-default">
-                                                    <Highlighter text={rider} highlight={searchTerm} />
-                                                  </span>
-                                              ))}
-                                            </div>
-                                          </div>
-                                        )}
-
-                                        {/* Loss Adjuster Tips */}
-                                        {item.claimTips && (
-                                          <div className="bg-primary-50/50 rounded-2xl p-5 border border-primary-100/50 group/tip relative overflow-hidden shadow-inner">
-                                            <div className="flex items-start gap-3 relative z-10">
-                                              <div className="p-1.5 bg-primary-500 rounded-lg text-white shadow-sm shrink-0">
-                                                <ShieldCheck className="w-4 h-4" />
-                                              </div>
-                                              <div className="flex-1">
-                                                <div className="text-[10px] font-black text-primary-600 uppercase tracking-widest mb-1 flex items-center justify-between">
-                                                  <span>Loss Adjuster&apos;s Insight</span>
-                                                  <div className="flex items-center gap-2 opacity-0 group-hover/tip:opacity-100 transition-opacity">
-                                                    <button onClick={() => handleFeedback(item.code, 'up')} className={`hover:text-green-500 transition-colors ${feedbackGiven[item.code] === 'up' ? 'text-green-500 scale-125' : ''}`}><HandThumbUpIcon className="w-3.5 h-3.5" /></button>
-                                                    <button onClick={() => handleFeedback(item.code, 'down')} className={`hover:text-rose-500 transition-colors ${feedbackGiven[item.code] === 'down' ? 'text-rose-500 scale-125' : ''}`}><HandThumbDownIcon className="w-3.5 h-3.5" /></button>
-                                                  </div>
-                                                </div>
-                                                <p className="text-xs text-primary-900/80 font-bold leading-relaxed break-keep">
-                                                  <Highlighter text={item.claimTips} highlight={searchTerm} />
-                                                </p>
-                                              </div>
-                                            </div>
-                                            <div className="absolute top-0 right-0 p-2 opacity-[0.03] pointer-events-none group-hover/tip:opacity-[0.08] transition-opacity">
-                                               <ShieldCheck className="w-16 h-16 text-primary-900" />
-                                            </div>
-                                          </div>
-                                        )}
-
-                                        {/* Professor's Deep Analysis (Collapsible for Readability) */}
-                                        {item.deepAnalysis && (
-                                          <div className="space-y-3">
-                                            <button 
-                                              onClick={(e) => {
-                                                e.stopPropagation();
-                                                const id = `analysis-${item.code}`;
-                                                setActiveFolders(prev => prev.includes(id) ? prev.filter(f => f !== id) : [...prev, id]);
-                                              }}
-                                              className="flex items-center gap-2 text-[11px] font-black text-indigo-500 hover:text-indigo-700 transition-colors bg-indigo-50 px-3 py-1.5 rounded-lg group/btn"
-                                            >
-                                              <Microscope className="w-3.5 h-3.5 group-hover/btn:rotate-12 transition-transform" />
-                                              {activeFolders.includes(`analysis-${item.code}`) ? '심화 분석 닫기' : '교수급 심화 분석 보기'}
-                                              <ChevronDownIcon className={`w-3 h-3 transition-transform duration-300 ${activeFolders.includes(`analysis-${item.code}`) ? 'rotate-180' : ''}`} />
-                                            </button>
-
-                                            <AnimatePresence>
-                                              {activeFolders.includes(`analysis-${item.code}`) && (
-                                                <motion.div 
-                                                  initial={{ height: 0, opacity: 0 }}
-                                                  animate={{ height: 'auto', opacity: 1 }}
-                                                  exit={{ height: 0, opacity: 0 }}
-                                                  transition={{ duration: 0.3, ease: 'easeOut' }}
-                                                  className="overflow-hidden"
-                                                >
-                                                  <div className="bg-slate-900 rounded-2xl p-6 text-slate-100 relative overflow-hidden group/analysis shadow-2xl border border-indigo-500/20">
-                                                    <div className="absolute top-0 right-0 p-4 opacity-10 rotate-12 transition-transform group-hover/analysis:scale-110">
-                                                      <Microscope className="w-16 h-16 text-white" />
-                                                    </div>
-                                                    <div className="relative z-10">
-                                                      <div className="flex items-center gap-2 mb-3">
-                                                        <div className="px-2 py-0.5 bg-indigo-500 text-[9px] font-black rounded uppercase tracking-widest">Expert Research</div>
-                                                        <div className="h-px flex-1 bg-slate-700" />
-                                                      </div>
-                                                      <h6 className="text-sm font-black text-indigo-300 mb-2 flex items-center gap-2">
-                                                        <span className="w-1 h-3.5 bg-indigo-500 rounded-full" />
-                                                        실무 쟁점 및 판례 분석
-                                                      </h6>
-                                                      <p className="text-xs text-slate-300 leading-relaxed break-keep font-medium opacity-90">
-                                                        <Highlighter text={item.deepAnalysis} highlight={searchTerm} />
-                                                      </p>
-                                                    </div>
-                                                    <div className="mt-4 flex justify-end">
-                                                      <span className="text-[9px] text-slate-500 font-bold italic">Latest Update: 2026.05.10</span>
-                                                    </div>
-                                                  </div>
-                                                </motion.div>
-                                              )}
-                                            </AnimatePresence>
-                                          </div>
-                                        )}
-
-                                        {/* Required Documents */}
-                                        {item.requiredDocs && item.requiredDocs.length > 0 && (
-                                          <div className="bg-gray-100/50 rounded-2xl p-5 border border-gray-200/50">
-                                            <div className="flex items-center gap-2 mb-3">
-                                              <ClipboardDocumentListIcon className="w-4 h-4 text-gray-500" />
-                                              <span className="text-[10px] font-black text-gray-500 uppercase tracking-[0.15em]">청구 필요 서류</span>
-                                            </div>
-                                            <div className="flex flex-wrap gap-x-4 gap-y-2">
-                                              {item.requiredDocs.map((doc, dIdx) => (
-                                                <div key={dIdx} className="flex items-center gap-1.5">
-                                                  <div className="w-1 h-1 bg-primary-400 rounded-full" />
-                                                  <span className="text-[11px] font-bold text-gray-700">{doc}</span>
-                                                </div>
-                                              ))}
-                                            </div>
-                                          </div>
-                                        )}
-                                      </li>
-                                    ))}
-                                  </ul>
+                    {/* Expandable Detail Section */}
+                    <AnimatePresence>
+                      {selectedItem?.code === item.code && (
+                        <motion.div
+                          initial={{ height: 0, opacity: 0 }}
+                          animate={{ height: 'auto', opacity: 1 }}
+                          exit={{ height: 0, opacity: 0 }}
+                          className="bg-gray-50 overflow-hidden"
+                        >
+                          <div className="p-6 md:p-8 space-y-6">
+                            <div className="grid md:grid-cols-2 gap-6">
+                              {/* Strategy Card */}
+                              <div className="bg-white p-6 rounded-3xl border border-primary-100 shadow-sm space-y-4">
+                                <div className="flex items-center gap-3 text-primary-600">
+                                  <ShieldCheck className="w-5 h-5" />
+                                  <span className="text-xs font-black uppercase tracking-widest">Loss Adjuster Tips</span>
                                 </div>
-                            ))}
-                          </div>
-                          
-                          {/* Section Footer Expert CTA */}
-                          <div className="mt-12 bg-primary-900 rounded-[2rem] p-8 text-white flex flex-col md:flex-row items-center justify-between gap-6 relative overflow-hidden shadow-2xl">
-                             <div className="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none">
-                               <div className="absolute -top-10 -left-10 w-40 h-40 bg-white rounded-full blur-3xl" />
-                               <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-primary-400 rounded-full blur-3xl" />
-                             </div>
-                             <div className="relative z-10 text-center md:text-left">
-                               <h5 className="text-xl font-black mb-2">{t('expertConsult')}</h5>
-                               <p className="text-primary-200 text-sm opacity-80 break-keep">{t('disclaimerItem3')}</p>
-                             </div>
-                             <button className="relative z-10 px-8 py-4 bg-white text-primary-900 rounded-2xl font-black text-sm hover:bg-primary-50 hover:scale-105 active:scale-95 transition-all shadow-xl">
-                               {locale === 'ko' ? '보험 전문가에게 무료 점검 받기' : 'Free Expert Checkup'}
-                             </button>
-                          </div>
-                        </div>
-                      </motion.div>
+                                <p className="text-sm text-gray-700 leading-relaxed font-bold">{item.claimTips || '현재 준비된 실무 팁이 없습니다.'}</p>
+                                
+                                {item.riders && (
+                                  <div className="pt-4 border-t border-gray-50 flex flex-wrap gap-2">
+                                    {item.riders.map(r => (
+                                      <span key={r} className="px-2.5 py-1 bg-primary-50 text-primary-700 text-[10px] font-black rounded-lg">#{r}</span>
+                                    ))}
+                                  </div>
+                                )}
+                              </div>
 
-                    </motion.div>
-                  )
-                })}
-              </AnimatePresence>
+                              {/* Academic Card */}
+                              <div className="bg-slate-900 p-6 rounded-3xl text-white shadow-xl space-y-4 relative overflow-hidden">
+                                <div className="absolute top-0 right-0 p-4 opacity-10">
+                                  <Microscope className="w-16 h-16" />
+                                </div>
+                                <div className="flex items-center gap-3 text-indigo-400">
+                                  <Microscope className="w-5 h-5" />
+                                  <span className="text-xs font-black uppercase tracking-widest">Professor&apos;s Deep Analysis</span>
+                                </div>
+                                <p className="text-sm text-slate-300 leading-relaxed font-medium relative z-10">{item.deepAnalysis || '심화 연구 데이터를 불러오는 중입니다.'}</p>
+                              </div>
+                            </div>
+
+                            {/* Required Docs */}
+                            {item.requiredDocs && (
+                              <div className="bg-white p-6 rounded-3xl border border-gray-100 flex flex-col md:flex-row items-center justify-between gap-4">
+                                <div className="flex items-center gap-3">
+                                  <ClipboardDocumentListIcon className="w-5 h-5 text-gray-400" />
+                                  <span className="text-xs font-black text-gray-500">필요 서류</span>
+                                  <div className="flex flex-wrap gap-3">
+                                    {item.requiredDocs.map(doc => (
+                                      <span key={doc} className="text-xs font-bold text-gray-700">✓ {doc}</span>
+                                    ))}
+                                  </div>
+                                </div>
+                                <button className="px-6 py-2.5 bg-gray-900 text-white rounded-xl text-xs font-black hover:bg-primary-600 transition-all">
+                                  상담 신청
+                                </button>
+                              </div>
+                            )}
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+                ))
+              )}
             </div>
-          )}
+          </div>
         </div>
       )}
+      
+      {/* Disclaimer */}
+      <div className="max-w-5xl mx-auto px-4 mt-12 pb-20">
+        <div className="flex items-start gap-4 p-6 bg-amber-50/50 rounded-3xl border border-amber-100">
+          <InformationCircleIcon className="w-6 h-6 text-amber-500 shrink-0" />
+          <div className="text-xs text-amber-900/60 leading-relaxed font-medium">
+            인슈닷에서 제공하는 정보는 학술적 참고용이며 법적 증빙 자료로 사용할 수 없습니다. 정확한 보상 여부는 개별 보험 약관과 손해사정사의 검토를 거쳐야 합니다.
+          </div>
+        </div>
+      </div>
     </div>
   )
 }
