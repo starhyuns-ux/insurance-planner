@@ -47,60 +47,116 @@ export const getGroupedDiseaseData = (t: any, locale: string): TopCategory[] => 
     return [
         {
             id: 'C',
-            title: isKo ? '[C코드] 주요 암 및 고액암' : '[C-Code] Major Cancers',
+            title: isKo ? '[C코드] 악성 신생물 (암 전문관)' : '[C-Code] Malignant Neoplasms',
             shortTitle: isKo ? 'C코드 (암)' : 'C-Code (Cancer)',
-            desc: isKo ? '악성 신생물 분류입니다. 병기에 따라 일반/고액암으로 구분됩니다.' : 'Malignant neoplasms. Classified as general or high-amount cancer.',
+            desc: isKo ? '암 진단비의 핵심인 C코드 전 영역입니다. 일반암, 고액암, 소액암 분류와 실무 쟁점을 다룹니다.' : 'Full range of C-codes for cancer claims. Covers general, high-amount, and minor cancer disputes.',
             subCategories: [
                 {
-                    name: isKo ? '소화기계 및 복부 암' : 'Digestive & Abdominal',
+                    name: isKo ? '소화기계 악성 신생물 (식도/위/간/췌장)' : 'Digestive Cancers',
                     items: [
+                        { 
+                            name: isKo ? '식도암' : 'Esophageal Cancer', 
+                            code: 'C15', 
+                            riders: [...riders.CANCER, '5대고액암진단비'], 
+                            requiredDocs: commonDocs.CANCER,
+                            claimTips: isKo ? '고액암 진단비 대상이며, 식도 스텐트 삽입술 시 수술비 청구 가능합니다.' : 'High-amount cancer; stent insertion counts as surgery.',
+                            deepAnalysis: isKo ? '식도암은 연하곤란으로 인한 영양 장애가 동반되므로 입원 치료의 정당성이 높습니다. 수술이 불가능한 경우 항암방사선 병용 요법이 일반암 진단의 확정적 근거가 됩니다.' : 'High justification for inpatient care due to dysphagia. Concurrent chemo-radiation is definitive for malignant claims.'
+                        },
                         { 
                             name: isKo ? '위암' : 'Stomach Cancer', 
                             code: 'C16', 
                             riders: riders.CANCER, 
                             isImportant: true,
                             requiredDocs: commonDocs.CANCER,
-                            claimTips: isKo ? '조직검사결과지상 Adenocarcinoma(선암) 여부가 핵심입니다.' : 'Biopsy report is key.',
-                            deepAnalysis: isKo ? '위점막내암(Early Gastric Cancer)은 병리학적으로 C코드이지만 보험사는 D코드를 주장하곤 합니다. 침윤 깊이가 Muscularis Mucosa를 넘었는지 확인이 필수적입니다. 대법원 판례상 작성자 불이익 원칙을 적용받을 수 있는 대표적 부위입니다.' : 'EGC is pathologically C-code, but insurers push D-code. Check if invasion passed the Muscularis Mucosa. Use the "Contra Proferentem" rule.'
+                            claimTips: isKo ? '조직검사상 Adenocarcinoma 여부와 침윤 깊이가 핵심입니다.' : 'Check for Adenocarcinoma and invasion depth.',
+                            deepAnalysis: isKo ? '위점막내암(EGC)의 경우 보험사는 D코드를 유도하지만, TNM 병기상 T1a 이상이면 반드시 C코드로 보상받아야 합니다. 특히 헬리코박터균 제균 치료와의 인과관계는 보험사에서 면책 근거로 삼을 수 없음을 명심하십시오.' : 'Insurers push D-code for EGC. If TNM stage is T1a+, insist on C-code. H.pylori treatment is not a ground for denial.'
                         },
                         { 
-                            name: isKo ? '대장암' : 'Colon Cancer', 
-                            code: 'C18', 
-                            riders: riders.CANCER, 
+                            name: isKo ? '간암' : 'Liver Cancer', 
+                            code: 'C22', 
+                            riders: [...riders.CANCER, '고액암진단비'], 
                             isImportant: true,
-                            requiredDocs: commonDocs.CANCER,
-                            claimTips: isKo ? '결장암(C18)과 점막내암(D01)의 경계가 핵심입니다.' : 'Dispute between C18 and D01.',
-                            deepAnalysis: isKo ? '대법원 판례는 대장 점막내암을 악성암으로 인정합니다. 보험사의 소액 지급 안내에 속지 말고, 병리 보고서상 Tis(제자리암)가 아닌 T1(악성) 임을 입증하여 일반암 진단비 100%를 수령해야 합니다.' : 'Precedents recognize colon intramucosal carcinoma as malignant. Prove T1 stage over Tis in pathology reports for 100% payout.'
+                            requiredDocs: [...commonDocs.CANCER, 'AFP 수치 결과지'],
+                            claimTips: isKo ? '간색전술(TACE)은 약관상 수술로 인정받기 위해 강력한 의학적 소견이 필요합니다.' : 'TACE needs medical backup to be counted as surgery.',
+                            deepAnalysis: isKo ? '간암은 조직검사 없이 영상의학적 소견(CT/MRI)과 종양표지자(AFP) 상승만으로도 암 진단 확정이 가능합니다. 보험사가 조직검사 미비를 이유로 부지급 시, 암 확정 진단 기준(KCD)을 근거로 대응해야 합니다.' : 'Liver cancer can be diagnosed via CT/MRI and AFP without biopsy. Counter denials based on missing biopsy using KCD diagnostic standards.'
                         },
                         { 
                             name: isKo ? '췌장암' : 'Pancreatic Cancer', 
                             code: 'C25', 
-                            riders: [...riders.CANCER, '5대고액암진단비'], 
+                            riders: [...riders.CANCER, '10대고액암진단비'], 
                             isImportant: true,
-                            requiredDocs: commonDocs.CANCER,
-                            claimTips: isKo ? '고액암 진단비 대상인지 반드시 확인하세요.' : 'Check for high-amount cancer eligibility.',
-                            deepAnalysis: isKo ? '췌장암은 진행이 매우 빨라 진단 즉시 고액암 청구가 가능합니다. 특히 신경내분비종양(NET) G3 등급은 병리학적 분류가 모호할 수 있으나 악성 암으로 분류되어야 함을 강력히 주장해야 합니다.' : 'Pancreatic cancer allows for immediate high-amount claims. NET G3 must be medically argued as malignant for full benefits.'
+                            deepAnalysis: isKo ? '췌장 미부/두부 절제술 시 발생하는 합병증(당뇨 등)은 별도의 질병후유장해로 청구 가능합니다. 진단 즉시 고액암 보상 대상임을 확인하십시오.' : 'Post-op complications like diabetes qualify for separate disability claims. Always check high-amount cancer eligibility.'
                         }
                     ]
                 },
                 {
-                    name: isKo ? '여성암 및 비뇨생식기' : 'Female & Urogenital',
+                    name: isKo ? '호흡기 및 흉곽 (폐/후두/비강)' : 'Respiratory Cancers',
                     items: [
                         { 
-                            name: isKo ? '방광암' : 'Bladder Cancer', 
-                            code: 'C67', 
-                            riders: riders.CANCER, 
-                            requiredDocs: commonDocs.CANCER,
-                            claimTips: isKo ? 'High-grade 침윤성 여부를 확인하세요.' : 'Check for High-grade invasion.',
-                            deepAnalysis: isKo ? '비침윤성이라도 High-grade papillary urothelial carcinoma는 일반암으로 승인받을 확률이 높습니다. 병리 보고서의 미세한 문구 하나가 수천만 원의 차이를 만듭니다.' : 'High-grade non-invasive bladder cancer has a high chance of being approved as malignant. A single phrase in pathology can change everything.'
+                            name: isKo ? '폐암 (소세포/비소세포)' : 'Lung Cancer', 
+                            code: 'C34', 
+                            riders: [...riders.CANCER, '고액암진단비(특약)'], 
+                            isImportant: true,
+                            claimTips: isKo ? '흉강경 수술(VATS) 시 질병수술비와 암수술비 중복 수령 확인하세요.' : 'Check for both disease and cancer surgery benefits for VATS.',
+                            deepAnalysis: isKo ? '폐암은 표적항암제(타그리소 등) 사용 빈도가 높습니다. 비급여 항암제 비용이 실손보험 한도를 초과할 수 있으므로, 암 주요 치료비 특약의 가입 유무가 경제적 보상의 핵심입니다.' : 'Lung cancer often involves expensive targeted therapies. Cancer treatment riders are crucial to cover costs exceeding Silbi limits.'
                         },
                         { 
-                            name: isKo ? '자궁경부암' : 'Cervical Cancer', 
-                            code: 'C53', 
+                            name: isKo ? '후두암' : 'Laryngeal Cancer', 
+                            code: 'C32', 
                             riders: riders.CANCER, 
-                            requiredDocs: commonDocs.CANCER,
-                            claimTips: isKo ? '제자리암(D06)과의 종별 차이가 큽니다.' : 'Huge difference between C53 and D06.',
-                            deepAnalysis: isKo ? '상피내 신생물(D06) 단계에서 발견되는 경우가 많으나, 원뿔절제술 후 미세 침윤(Microinvasion)이 발견되면 반드시 C53으로 코드를 변경하여 일반암을 수령해야 합니다.' : 'If micro-invasion is found after conization, the code must be changed to C53 for full malignant benefits.'
+                            deepAnalysis: isKo ? '후두 전절제술 시 언어 장애가 남게 됩니다. 이는 암 진단비와 별개로 80% 이상의 고도 후유장해에 해당하여 보험료 납입 면제 및 고액의 장해 보험금 청구 대상입니다.' : 'Total laryngectomy causes permanent speech loss. This triggers 80%+ disability, premium waivers, and major lump sum claims.'
+                        }
+                    ]
+                },
+                {
+                    name: isKo ? '여성암 및 비뇨생식기 (유방/난소/자궁/방광)' : 'Female & Uro Cancers',
+                    items: [
+                        { 
+                            name: isKo ? '유방암' : 'Breast Cancer', 
+                            code: 'C50', 
+                            riders: riders.CANCER, 
+                            isImportant: true,
+                            claimTips: isKo ? '유방재건술의 실손의료비 보상 여부는 치료 목적 입증이 관건입니다.' : 'Breast reconstruction Silbi depends on proving medical necessity.',
+                            deepAnalysis: isKo ? '유방암은 상피내암(D05)과 악성암(C50)의 경계 분쟁이 많습니다. 미세 침윤(Microinvasion) 소견이 1mm만 있어도 일반암으로 인정받아야 하며, 호르몬 치료제(타목시펜 등) 처방 기록도 암 치료비 산정 기준에 포함됩니다.' : 'Dispute between D05 and C50 is common. Even 1mm micro-invasion qualifies for malignant benefits. Hormone therapy counts as cancer treatment.'
+                        },
+                        { 
+                            name: isKo ? '난소암' : 'Ovarian Cancer', 
+                            code: 'C56', 
+                            riders: [...riders.CANCER, '여성특정암진단비'], 
+                            deepAnalysis: isKo ? '난소의 경계성 종양(D39)이 나중에 악성으로 밝혀지는 경우가 많습니다. 초기 진단과 상관없이 최종 병리 결과에 따라 C코드를 소급 적용받을 수 있습니다.' : 'Borderline ovarian tumors (D39) often turn out to be malignant. C-code can be applied retroactively based on final pathology.'
+                        },
+                        { 
+                            name: isKo ? '전립선암' : 'Prostate Cancer', 
+                            code: 'C61', 
+                            riders: [t('pseudoCancerDiag'), '전립선암진단비'], 
+                            claimTips: isKo ? 'Gleason Score 7점 이상이면 일반암 승인이 수월합니다.' : 'Gleason Score 7+ makes malignant approval easier.',
+                            deepAnalysis: isKo ? '최근 보험사는 전립선암을 소액암으로 분류하는 추세입니다. 하지만 과거 가입 상품의 경우 일반암으로 분류되어 있다면 고액의 진단비를 청구할 수 있으며, 로봇수술(다빈치) 비용의 실비 보존이 중요합니다.' : 'Newer policies classify prostate cancer as minor, but older ones pay 100%. Robot-assisted surgery costs are a key Silbi dispute point.'
+                        }
+                    ]
+                },
+                {
+                    name: isKo ? '림프/혈액 및 내분비 (백혈병/림프종/갑상선)' : 'Hema & Lymph Cancers',
+                    items: [
+                        { 
+                            name: isKo ? '갑상선암 (유두암/여포암)' : 'Thyroid Cancer', 
+                            code: 'C73', 
+                            riders: [t('pseudoCancerDiag'), '갑상선암진단비'], 
+                            isImportant: true,
+                            claimTips: isKo ? '림프절 전이(C77) 동반 시 일반암 수령 가능성을 검토하세요.' : 'Check for 100% payout if lymph node metastasis (C77) exists.',
+                            deepAnalysis: isKo ? '갑상선암 자체는 소액암이지만, 전이암(C77) 코드를 받은 경우 "원발암 기준" 약관이 없다면 일반암 진단비를 청구할 수 있다는 대법원 판례가 있습니다. 2011년 이전 가입자는 필히 확인하십시오.' : 'Thyroid cancer is minor, but C77 metastasis may trigger 100% payout for pre-2011 policies due to "Primary Cancer Rule" disputes.'
+                        },
+                        { 
+                            name: isKo ? '악성 림프종' : 'Malignant Lymphoma', 
+                            code: 'C81-C85', 
+                            riders: [...riders.CANCER, '고액암진단비'], 
+                            deepAnalysis: isKo ? '호지킨 및 비호지킨 림프종 모두 고액암에 해당합니다. 전신 질환 특성상 입원 항암 치료가 필수적이므로 일당 청구를 누락하지 마십시오.' : 'Both Hodgkin and Non-Hodgkin count as high-amount cancer. Ensure inpatient daily benefits are claimed for systemic chemo.'
+                        },
+                        { 
+                            name: isKo ? '골수성 백혈병' : 'Myeloid Leukemia', 
+                            code: 'C92', 
+                            riders: [...riders.CANCER, '조혈모세포이식수술비'], 
+                            isImportant: true,
+                            deepAnalysis: isKo ? '백혈병 진단 시 조혈모세포 이식은 가장 고가의 수술 중 하나입니다. 공여자와의 일치 여부 검사비 등 부대 비용의 실비 청구 범위를 전문가와 상의하십시오.' : 'BMT is one of the costliest procedures. Consult an expert on Silbi limits for ancillary costs like donor matching tests.'
                         }
                     ]
                 }
@@ -108,26 +164,50 @@ export const getGroupedDiseaseData = (t: any, locale: string): TopCategory[] => 
         },
         {
             id: 'D',
-            title: isKo ? '[D코드] 유사암 및 혈액종양' : '[D-Code] Pseudo & Blood',
+            title: isKo ? '[D코드] 경계성 종양 및 유사암' : '[D-Code] Borderline & Pseudo Cancers',
             shortTitle: isKo ? 'D코드 (유사암)' : 'D-Code (Pseudo)',
-            desc: isKo ? '유사암(경계성) 및 혈액 관련 악성 신생물입니다.' : 'Pseudo-cancers and blood-related malignancies.',
+            desc: isKo ? '암으로 진행될 가능성이 있거나, 악성 여부가 모호한 종양입니다. 일반암 전환 가능성을 분석합니다.' : 'Tumors with malignant potential or ambiguous status. Analyzes general cancer upgrade possibilities.',
             subCategories: [
                 {
-                    name: isKo ? '고난도 암 분쟁 질환' : 'High-level Disputes',
+                    name: isKo ? '소화기 및 혈액 경계성 종양' : 'Digestive & Blood Borderline',
                     items: [
                         { 
-                            name: isKo ? '직장 유암종' : 'Rectal Carcinoid', 
+                            name: isKo ? '직장 유암종 (신경내분비종양)' : 'Rectal NET', 
                             code: 'D37.5', 
                             riders: ['유사암진단비', '일반암진단비(조정필요)'], 
                             isImportant: true,
-                            claimTips: isKo ? '코드는 D이지만 일반암 승인이 가능한 대표적 질환입니다.' : 'D-code but highly adjustable to malignant claims.',
-                            deepAnalysis: isKo ? '크기가 작아도 전이 가능성이 있는 신경내분비종양입니다. 보험사의 경계성 종양 주장에 맞서 대법원 판례(2018다242724)를 인용하여 일반암 진단비 전액 수령을 목표로 해야 합니다.' : 'NETs have metastatic potential. Cite Supreme Court 2018da242724 against insurer denials for full payouts.'
+                            claimTips: isKo ? '크기가 1cm 미만이라도 일반암으로 청구할 의학적 근거가 충분합니다.' : 'Under 1cm can still be claimed as malignant with proper evidence.',
+                            deepAnalysis: isKo ? '보험사는 L-cell type임을 근거로 유사암을 고집하지만, 대법원 판례(2018다242724)는 직장 유암종의 악성 잠재력을 인정합니다. 병리 보고서의 WHO 분류 기준을 인용하여 대응하십시오.' : 'Insurers use L-cell type to deny. Cite Supreme Court 2018da242724 regarding malignant potential based on WHO standards.'
                         },
                         { 
-                            name: isKo ? '진성적혈구과다증' : 'Polycythemia Vera', 
+                            name: isKo ? '진성 적혈구 과다증' : 'Polycythemia Vera', 
                             code: 'D45', 
                             riders: ['일반암진단비'], 
-                            deepAnalysis: isKo ? '2021년 KCD-8차 개정 이후 악성 암으로 명확히 분류됩니다. 과거 가입한 보험이라 하더라도 현재 진단 시점의 기준을 적용받을 수 있습니다.' : 'Clearly malignant since KCD-8. Current standards apply even to older policies.'
+                            isImportant: true,
+                            deepAnalysis: isKo ? 'KCD-8차 개정 이후 명확한 악성 신생물로 분류됩니다. 과거 가입 상품의 약관에 D코드가 유사암으로 되어 있더라도, 진단 시점의 기준을 적용하여 일반암을 수령해야 합니다.' : 'Clearly malignant since KCD-8. Apply current standards for full payouts even on older policies.'
+                        },
+                        { 
+                            name: isKo ? '갑상선의 경계성 종양 (NIFTP)' : 'NIFTP (Thyroid)', 
+                            code: 'D34', 
+                            riders: ['유사암진단비'], 
+                            deepAnalysis: isKo ? '과거 갑상선암(C73)으로 분류되던 비침습 여포성 종양이 D코드로 변경되었습니다. 하지만 여포 변이형의 경우 여전히 일반암 분쟁의 여지가 있으므로 세포진 검사 결과를 재검토해야 합니다.' : 'Non-invasive follicular neoplasms are now D-code. However, follicular variants still trigger malignant disputes; re-examine cytology.'
+                        }
+                    ]
+                },
+                {
+                    name: isKo ? '제자리암 (제자리 신생물)' : 'Carcinoma in situ',
+                    items: [
+                        { 
+                            name: isKo ? '대장 제자리암' : 'Colon CIS', 
+                            code: 'D01', 
+                            riders: [t('pseudoCancerDiag')], 
+                            deepAnalysis: isKo ? '점막내암(Intramucosal Carcinoma)은 D01로 부여되는 경우가 많으나, 침윤 깊이가 점막하층(Submucosa) 직전까지 도달했다면 일반암(C18)으로 인정받을 여지가 큽니다.' : 'Often assigned D01, but if invasion reaches just before the submucosa, argue for C18 malignant benefits.'
+                        },
+                        { 
+                            name: isKo ? '유방 제자리암 (상피내암)' : 'Breast CIS', 
+                            code: 'D05', 
+                            riders: [t('pseudoCancerDiag')], 
+                            claimTips: isKo ? '0기 암이라고 안심하지 말고, 미세 침윤 여부를 끝까지 확인하세요.' : 'Stage 0 cancer; check for micro-invasion until the end.'
                         }
                     ]
                 }
@@ -135,37 +215,55 @@ export const getGroupedDiseaseData = (t: any, locale: string): TopCategory[] => 
         },
         {
             id: 'I',
-            title: isKo ? '[I코드] 뇌혈관 및 심장' : '[I-Code] Brain & Heart',
+            title: isKo ? '[I코드] 뇌혈관 및 심장 질환' : '[I-Code] Cerebro & Cardiovascular',
             shortTitle: isKo ? 'I코드 (심뇌)' : 'I-Code (Brain/Heart)',
-            desc: isKo ? '생명과 직결되는 2대 질환 분류입니다.' : 'Major 2-disease classification linked to life safety.',
+            desc: isKo ? '급성기 질환 및 만성 혈관 장애를 다룹니다. 진단비 지급의 가장 큰 분쟁 지역입니다.' : 'Covers acute and chronic vascular disorders. The biggest dispute area for diagnosis benefits.',
             subCategories: [
                 {
-                    name: isKo ? '뇌혈관 질환' : 'Brain Disease',
+                    name: isKo ? '뇌혈관 질환 (중풍/경색/출혈)' : 'Cerebrovascular Disease',
                     items: [
                         { 
                             name: isKo ? '뇌경색증' : 'Cerebral Infarction', 
                             code: 'I63', 
                             riders: ['뇌졸중진단비', '뇌혈관질환진단비'], 
                             isImportant: true,
-                            deepAnalysis: isKo ? '열공성 뇌경색(Lacunar)은 보험사가 I67로 변경하려 시도합니다. MRI 자료상 명확한 경색 부위와 신경학적 결손을 근거로 I63을 사수하여 뇌졸중 진단비를 수령해야 합니다.' : 'Insurers try to downgrade Lacunar infarcts to I67. Defend I63 via MRI evidence and neurological deficits.'
+                            requiredDocs: commonDocs.VASCULAR,
+                            claimTips: isKo ? 'MRI상 고신호 강도(High Signal) 부위와 임상적 신경학적 결손이 일치해야 합니다.' : 'MRI high signal must match clinical neurological deficits.',
+                            deepAnalysis: isKo ? '열공성 뇌경색(Lacunar Infarct)은 보험사가 I67(기타 뇌혈관)로 하향 조정을 시도합니다. 진단서상 I63이 부여되었더라도 판독지상 "Old" 또는 "Chronic" 문구가 있으면 지급을 거절하므로 주의가 필요합니다.' : 'Insurers try to downgrade Lacunar infarcts to I67. Watch for "Old" or "Chronic" phrases in MRI reports that trigger denials.'
                         },
                         { 
-                            name: isKo ? '뇌혈관 질환 후유증' : 'Sequelae of Stroke', 
-                            code: 'I69', 
-                            riders: ['질병후유장해'], 
-                            deepAnalysis: isKo ? '이미 발생한 질환의 잔존 효과를 의미합니다. 장해 상태에 따라 ADLs 지급률 3~100%를 산정하여 매월 또는 일시금으로 청구 가능합니다.' : 'Refers to residual effects. Disability rates of 3-100% can be claimed as lump sums or pensions.'
+                            name: isKo ? '뇌동맥류 (비파열)' : 'Cerebral Aneurysm', 
+                            code: 'I67.1', 
+                            riders: ['뇌혈관질환진단비', '뇌혈관질환수술비'], 
+                            isImportant: true,
+                            claimTips: isKo ? '코일색전술 시 수술비 담보에서 고액 수령 가능합니다.' : 'Coil embolization triggers high surgical benefits.',
+                            deepAnalysis: isKo ? '터지기 전의 뇌동맥류는 뇌졸중 진단비에는 해당하지 않으나 "뇌혈관질환 진단비"에는 해당합니다. 수술 대신 코일색전술을 시행해도 약관상 수술로 인정되므로 반드시 수술비를 청구하십시오.' : 'Unruptured aneurysms only count for "Cerebrovascular" (not Stroke) riders. Coil embolization is recognized as surgery.'
+                        },
+                        { 
+                            name: isKo ? '뇌혈관의 죽상경화증 (경동맥 협착)' : 'Carotid Stenosis', 
+                            code: 'I67.2', 
+                            riders: ['뇌혈관질환진단비'], 
+                            deepAnalysis: isKo ? '경동맥 초음파상 협착률이 50% 이상이거나 플라크가 불안정한 경우 I67.2 진단비를 수령할 수 있습니다. 건강검진 결과지에 "경동맥 협착" 문구가 있다면 즉시 전문가와 상담하십시오.' : 'Stenosis > 50% or unstable plaques trigger I67.2 benefits. Consult if "Carotid Stenosis" appears in checkup results.'
                         }
                     ]
                 },
                 {
-                    name: isKo ? '심장 질환' : 'Heart Disease',
+                    name: isKo ? '심장 질환 (협심증/심근경색/부정맥)' : 'Heart Disease',
                     items: [
                         { 
                             name: isKo ? '급성 심근경색' : 'Acute MI', 
                             code: 'I21', 
                             riders: ['급성심근경색진단비', '허혈성심장질환진단비'], 
                             isImportant: true,
-                            deepAnalysis: isKo ? 'EKG상 변화가 없는 NSTEMI 환자도 심근효소 수치 상승 시 I21로 인정받아야 합니다. "협심증"으로 축소 지급되는 사례가 빈번하니 혈액검사 결과지를 필히 확인하십시오.' : 'NSTEMI patients with elevated cardiac enzymes must be recognized as I21. Check blood results to avoid "Angina-only" payouts.'
+                            deepAnalysis: isKo ? '심근효소(Troponin) 수치 변화가 핵심입니다. 전형적인 흉통이 없더라도 효소 상승이 확인되면 I21로 인정받아야 하며, 보험사의 협심증(I20) 축소 안내에 주의하십시오.' : 'Cardiac enzyme (Troponin) changes are key. Even without chest pain, elevated enzymes qualify for I21 over I20.'
+                        },
+                        { 
+                            name: isKo ? '심방세동 및 조동 (부정맥)' : 'AFib / AFlutter', 
+                            code: 'I48', 
+                            riders: ['심혈관질환진단비', '심장질환수술비'], 
+                            isImportant: true,
+                            claimTips: isKo ? '최신 "심혈관 1-5종" 담보가 있다면 고액 수령이 가능합니다.' : 'New "Cardiovascular 1-5" riders pay high amounts.',
+                            deepAnalysis: isKo ? '부정맥은 진단 자체가 어렵습니다. 24시간 홀터 검사상 명확한 파형이 기록되어야 하며, 전극도자 절제술(Ablation) 시 수술비 지급을 두고 "절단/절제" 문구 논쟁이 발생하므로 판례를 준비해야 합니다.' : 'AFib diagnosis needs 24h Holter evidence. Ablation triggers "cutting/excision" disputes in surgery riders; prepare precedents.'
                         }
                     ]
                 }
@@ -173,25 +271,43 @@ export const getGroupedDiseaseData = (t: any, locale: string): TopCategory[] => 
         },
         {
             id: 'M/S',
-            title: isKo ? '[M/S코드] 근골격계 및 상해' : '[M/S-Code] Bone & Injury',
+            title: isKo ? '[M/S코드] 근골격계 및 상해' : '[M/S-Code] Musculoskeletal & Injury',
             shortTitle: isKo ? 'M/S코드 (정형)' : 'M/S-Code (Ortho)',
-            desc: isKo ? '디스크, 골절 및 외상 관련 코드입니다.' : 'Disc, fracture, and trauma-related codes.',
+            desc: isKo ? '디스크, 골절, 인대 파열 등 외상 및 퇴행성 질환입니다. 기왕증 감액이 주된 쟁점입니다.' : 'Disc, fractures, and ligament tears. Degenerative vs. trauma contribution is the main dispute.',
             subCategories: [
                 {
-                    name: isKo ? '척추 및 관절' : 'Spine & Joints',
+                    name: isKo ? '척추 및 관절 질환' : 'Spine & Joint',
                     items: [
                         { 
-                            name: isKo ? '추간판탈출증' : 'Disc Herniation', 
-                            code: 'M50-M51', 
+                            name: isKo ? '추간판 탈출증 (디스크)' : 'Disc Herniation', 
+                            code: 'M50, M51', 
                             riders: ['질병수술비', '상해후유장해'], 
-                            deepAnalysis: isKo ? '상해로 인한 디스크는 기왕증 감액이 가장 큽니다. 사고 기여도를 높이기 위해 초진차트상 외상 기전이 명확히 기록되어야 하며, 보험사의 퇴행성 주장에 맞설 의학적 소견이 필요합니다.' : 'Injury-based disc claims face heavy reductions. Trauma mechanics must be clear in the first chart to counter degenerative claims.'
+                            isImportant: true,
+                            deepAnalysis: isKo ? '디스크는 사고 기여도(Contribution) 산정이 보상의 핵심입니다. 보험사는 100% 퇴행성(M)을 주장하지만, 외상 기전이 명확하다면 상해후유장해에서 기왕증을 제외한 나머지 금액을 수령해야 합니다.' : 'Claiming disc injury requires proving accident contribution. Insurers push 100% degenerative (M); fight for partial injury disability benefits.'
                         },
                         { 
-                            name: isKo ? '척추 압박골절' : 'Spine Fracture', 
-                            code: 'S32', 
+                            name: isKo ? '무릎 반월상 연골 파열' : 'Meniscus Tear', 
+                            code: 'M23, S83', 
+                            riders: ['상해수술비', '질병수술비'], 
+                            claimTips: isKo ? '수술 기록지상 "Degenerative" 문구가 있으면 상해 수술비가 거절될 수 있습니다.' : '"Degenerative" phrases in surgical reports can trigger injury benefit denials.'
+                        }
+                    ]
+                },
+                {
+                    name: isKo ? '골절 및 외상성 손상' : 'Fractures & Trauma',
+                    items: [
+                        { 
+                            name: isKo ? '척추 압박골절' : 'Compression Fracture', 
+                            code: 'S22, S32', 
                             riders: ['상해후유장해', '골절진단비'], 
                             isImportant: true,
-                            deepAnalysis: isKo ? '수술 여부보다 척추의 기형(휜 각도)이나 압박률이 중요합니다. 골다공증 수치(T-score)에 따른 감액 방어가 고액 보상의 핵심입니다.' : 'Deformity and compression rate matter more than surgery. Defending against T-score based reductions is key for major claims.'
+                            deepAnalysis: isKo ? '수술을 하지 않아도 척추의 기형(각도 변화)이 남으면 고액의 후유장해 보험금을 수령할 수 있습니다. 골밀도 검사(T-score) 수치에 따라 감액 비율이 결정되므로 주의하십시오.' : 'Deformity (spinal angle change) triggers high disability payouts even without surgery. Payouts depend on T-score based reductions.'
+                        },
+                        { 
+                            name: isKo ? '대퇴경부 골절' : 'Femur Neck Fracture', 
+                            code: 'S72.0', 
+                            riders: ['상해수술비', '상해후유장해'], 
+                            deepAnalysis: isKo ? '노인성 낙상 사고의 대표적 골절입니다. 인공관절 치환술을 시행하는 경우 장해 분류표상 "한 다리의 기능을 완전히 잃었을 때" 등에 해당하여 고액 보상이 가능합니다.' : 'Typical geriatric fall injury. Artificial joint replacement qualifies for "Total loss of limb function" under disability tables.'
                         }
                     ]
                 }

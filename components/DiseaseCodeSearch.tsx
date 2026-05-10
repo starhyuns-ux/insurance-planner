@@ -152,30 +152,59 @@ export default function DiseaseCodeSearch() {
     toast.success(type === 'up' ? '도움이 되었다니 기쁩니다!' : '피드백 감사합니다. 더 발전하겠습니다.')
   }
 
-  // Derived state for filtering
+  // Derived state for filtering - ENHANCED for precise code matching
   const filteredData = useMemo(() => {
     if (!searchTerm.trim()) {
       return groupedDiseaseData
     }
 
-    const lowerSearch = searchTerm.toLowerCase()
+    const lowerSearch = searchTerm.toLowerCase().replace(/\s+/g, '') // Remove spaces for code matching
     
-    return groupedDiseaseData.map(group => {
+    // Step 1: Filter and assign "relevance scores"
+    const results = groupedDiseaseData.map(group => {
       const matchedSubs = group.subCategories.map(sub => {
-         const matchedItems = sub.items.filter(item => 
-            item.name.toLowerCase().includes(lowerSearch) || 
-            item.code.toLowerCase().includes(lowerSearch) ||
-            (item.desc && item.desc.toLowerCase().includes(lowerSearch)) ||
-            (item.riders && item.riders.some(rider => rider.toLowerCase().includes(lowerSearch)))
-         )
-         return { ...sub, items: matchedItems }
+         const matchedItems = sub.items.map(item => {
+            const itemCode = item.code.toLowerCase()
+            const itemName = item.name.toLowerCase()
+            
+            let score = 0
+            
+            // Exact code match (Highest priority)
+            if (itemCode === lowerSearch) score += 100
+            // Code starts with search term
+            else if (itemCode.startsWith(lowerSearch)) score += 80
+            // Code contains search term
+            else if (itemCode.includes(lowerSearch)) score += 50
+            
+            // Name exact match
+            if (itemName === lowerSearch) score += 90
+            // Name contains search term
+            else if (itemName.includes(lowerSearch)) score += 40
+            
+            // Description/Riders match (Lower priority)
+            if (item.desc?.toLowerCase().includes(lowerSearch)) score += 20
+            if (item.riders?.some(r => r.toLowerCase().includes(lowerSearch))) score += 20
+
+            return { item, score }
+         }).filter(res => res.score > 0)
+         
+         // Sort items within subcategory by score
+         const sortedItems = matchedItems
+            .sort((a, b) => b.score - a.score)
+            .map(res => res.item)
+
+         return { ...sub, items: sortedItems }
       }).filter(sub => sub.items.length > 0)
 
       if (matchedSubs.length > 0) {
-        return { ...group, subCategories: matchedSubs }
+        // Calculate group-level score for sorting groups later
+        const maxScore = Math.max(...matchedSubs.flatMap(s => s.items.length > 0 ? [10] : [0])) // placeholder
+        return { ...group, subCategories: matchedSubs, _maxScore: maxScore }
       }
       return null
     }).filter(Boolean) as TopCategory[]
+
+    return results
   }, [searchTerm, groupedDiseaseData])
 
   // Automatically expand folders when searching
