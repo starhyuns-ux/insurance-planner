@@ -97,3 +97,8 @@ _세션: 2026-05-11T02-37_
 - Focus on trending topics
 - Use attention-grabbing captions
 _세션: 2026-05-11T02-52_
+
+## [2026-05-11] [자율 사이클 — 2026-05-11] 1인 기업 24시간 운영 중. 회사 목표·각 에이전트의 개인 목표(_
+- LM Studio에 모델 로드 실패로 인한 LLM 호출 실패
+- Ollama/LM Studio 서버 미실행으로 인한 LLM 호출 실패
+_세션: 2026-05-11T04-38_
