@@ -111,3 +111,7 @@ _세션: 2026-05-11T04-38_
 - Migrate to smaller LLM model for Leo
 - Choose a different Ollama/LM Studio server
 _세션: 2026-05-11T06-19_
+
+## [2026-05-11] [자율 사이클 — 2026-05-11] 1인 기업 24시간 운영 중. 회사 목표·각 에이전트의 개인 목표(_
+- LLM 호출 실패를 해결하기 위해 LM Studio 서버 미실행 문제를 확인하고 조치
+_세션: 2026-05-11T08-31_
