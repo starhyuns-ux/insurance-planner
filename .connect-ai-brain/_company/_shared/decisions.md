@@ -74,3 +74,8 @@ _세션: 2026-05-10T22-21_
 - Avoid LM Studio for the time being and focus on other agents
 - Reorganize model orchestration modal to use smaller models
 _세션: 2026-05-11T00-20_
+
+## [2026-05-11] [자율 사이클 — 2026-05-11] 1인 기업 24시간 운영 중. 회사 목표·각 에이전트의 개인 목표(_
+- Migrate to a smaller LM model
+- Diversify Ollama/LM Studio servers for redundancy
+_세션: 2026-05-11T00-20_
