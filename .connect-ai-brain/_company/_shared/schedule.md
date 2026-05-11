@@ -1,11 +1,11 @@
 # 📋 통합 스케줄
-_업데이트: 2026. 5. 11. 오전 7:50:22_
+_업데이트: 2026. 5. 11. 오전 9:36:12_
 
 ## 🤖 에이전트 최근 활동
 ### 📺 레오
-- [2026-05-10] 구체적이고 실행 가능한 한국어 지시 → 산출물 sessions/2026-05-10T19-22/youtube.md
-- [2026-05-10] 구체적이고 실행 가능한 한국어 지시를 생성하세요. → 산출물 sessions/2026-05-10T21-04/youtube.md
 - [2026-05-10] 구체적이고 실행 가능한 한국어 지시 → 자격증명 부족으로 차단됨
+- [2026-05-11] 구체적이고 실행 가능한 한국어 지시 → 자격증명 부족으로 차단됨
+- [2026-05-11] Create a strong video planning sheet with engaging thumbnails and captions for our next three videos. This will help us increase our viewership and attract more subscribers. → 자격증명 부족으로 차단됨
 ### 🎨 Designer
 - [2026-05-10] 전문가 설계 및 디자인 작업 5개 → 산출물 sessions/2026-05-10T14-47/designer.md
 ### ✍️ Writer
