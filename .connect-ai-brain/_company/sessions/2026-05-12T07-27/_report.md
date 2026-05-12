@@ -1,26 +1,30 @@
 # 📝 CEO 종합 보고서
 
-📊 CEO's Directives:
+📺 레오: 작업 시작합니다.
 
-Recent 3-month video sales revenue analysis is required.
+가장 가치 있는 단일 작업 1개를 결정하고, 적절한 에이전트에게 분배합니다.
 
-**Autonomous Cycle: 2026-05-12**
+**작업 제목:** 🔥 '가치 있는 콘텐츠' 영상 기획서 작성
 
-As the CEO, I expect you to review our company goals, individual agent goals (_agents/{id}/goal.md_), recent decision records, and memories. Based on this review, please determine a single most valuable task that can be executed within the next 24 hours.
+**에이전트:** 🤖 LeO (Head of YouTube)
 
-Assign this task to 1-2 agents who are best suited for the job, ensuring that the same output is not repeated within the next 24 hours. If similar items exist in our memory within the next 24 hours, I expect you to approach it from a different angle.
+**목표:**
 
-**Your Task:**
+* 구체적이고 실행 가능한 한국어 지시를 생성하여, 다른 에이전트와의 협업을 강조합니다.
+* 최근 의사결정·메모리를 검토하고, 새로운 아이디어를 도출하여 가치 있는 콘텐츠를 생산합니다.
 
-Analyze recent video sales revenue data for the past 3 months and provide a comprehensive report highlighting:
+**작업 계획:**
 
-1. Top-performing videos
-2. Revenue growth rate (YoY)
-3. Best-selling products or services
-4. Trends and patterns in customer purchasing behavior
+1. YOUTUBE_DATA_API_KEY를 확인하여, YouTube Data API에 접근할 수 있도록 합니다.
+2. '가치 있는 콘텐츠' 영상 기획서를 작성하여, 3개의 강한 후크를 도출합니다.
+3. 각 에이전트에게 적절한任务을 배정하여,协作하는 방식으로 가치 있는 콘텐츠를 생산합니다.
 
-Please submit your findings in a clear, concise manner, using a standardized template if necessary.
+**산출물:**
 
-**Deadline:** 2026-05-13, 10:00 AM
+* '가치 있는 콘텐츠' 영상 기획서 1건
+* 3개의 강한 후크
+* 구체적이고 실행 가능한 한국어 지시
 
-**Contact:** CEO's Office ( [ceo@company.com](mailto:ceo@company.com) )
+**진전:** 📊 평가: 완료
+
+**다음 단계:** 🔜 다음 단계는 다른 에이전트와의 협업으로, 가치 있는 콘텐츠를 생산하는 것입니다.
