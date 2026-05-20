@@ -1,28 +1,61 @@
 # 📝 CEO 종합 보고서
 
-**📊 Analysis and Instruction**
+## 🗂 작업 라운드 — 누가 뭐 했나
 
-Based on the company goals, agent goals, recent decisions, and memories, I have identified a single task that is most valuable to execute at this moment.
+### 📺 레오 _(Head of YouTube)_
+> 📋 **지시**: 최신 유튜브 튜토리얼 제작
+> 🔧 **도구 실행**: `my_videos_check.py (prefetch)`
+> 📊 **수집 데이터**: YouTube 채널 영상 분석 (실제 API 데이터) _(exit 1)_
+> 💡 **핵심 산출**: As the CEO, I'm assigning a task to produce the latest YouTube tutorial. After reviewing our company goals and each agent's personal objectives (_agents/{id}/goal.md), as well as recent decisions and 
+> 📝 산출물 길이: 1548자
 
-**Task:** Create a strong video planning sheet with engaging thumbnails and captions for our next three videos. This will help us increase our viewership and attract more subscribers.
+### 📷 Instagram _(Head of Instagram)_
+> 📋 **지시**: 최근 3일간의 피드 뷰 수집 및 분석
+> 🔧 **도구 실행**: _(없음 — LLM 추론만)_
+> 💡 **핵심 산출**: Based on the CEO's directive and reviewing our company goals, each agent's personal objectives, recent decisions, and memory, I've decided on a single task that will provide the most value.
+> 📝 산출물 길이: 1547자
 
-**Instruction:**
+### 🎨 Designer _(Lead Designer)_
+> 📋 **지시**: 새로운 디자인 방안 제안
+> 🔧 **도구 실행**: _(없음 — LLM 추론만)_
+> 💡 **핵심 산출**: As the CEO, I've reviewed our company goals and each agent's personal objectives (_agents/{id}/goal.md), as well as recent decisions and memory, to determine a single task that will provide the most v
+> 📝 산출물 길이: 1681자
 
-1. **Trend Sniper**: Run the `trend_sniper` tool to analyze recent trends on YouTube and identify popular keywords and hashtags.
-2. **Video Planning Sheet**: Create a video planning sheet with the following details:
-	* Video title
-	* Thumbnail image
-	* Caption
-	* Keywords and hashtags
-	* Description (150-200 words)
-3. **Engaging Thumbnails**: Design three engaging thumbnails for each of the next three videos, using a combination of bright colors, eye-catching graphics, and relevant images.
-4. **Captions and Tags**: Write three captions for each video, including a brief summary, interesting facts or statistics, and a call-to-action to encourage viewers to engage with the content.
+### 💻 코다리 _(시니어 풀스택 엔지니어)_
+> 📋 **지시**: API 통합 및 웹사이트 구축
+> 🔧 **도구 실행**: _(없음 — LLM 추론만)_
+> 💡 **핵심 산출**: CEO's instruction: Integrate API and build a website.
+> 📝 산출물 길이: 1227자
 
-**Goal:** By completing this task, we aim to increase our viewership by 10% within the next two weeks and attract more subscribers to our channel.
+### 💼 현빈 _(비즈니스 전략가 · Head of Business)_
+> 📋 **지시**: 수익화 전략 수립
+> 🔧 **도구 실행**: _(없음 — LLM 추론만)_
+> 📊 **수집 데이터**: PayPal 매출 분석 (게임·프로젝트별, 실제 거래 데이터) _(exit 1)_
+> 💡 **핵심 산출**: As the CEO, I have reviewed our company goals and each agent's personal objectives (_agents/{id}/goal.md), as well as recent decisions and memory. Based on this review, I have decided to assign a sing
+> 📝 산출물 길이: 1587자
 
-**Assignments:**
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-1. **Reo (Head of YouTube)**: Assign Reo to create the video planning sheet, design the thumbnails, and write the captions.
-2. **Designer**: Assign the Designer agent to assist with creating the thumbnails and designing a visually appealing video planning sheet.
+## 👔 CEO 종합
 
-**Timeline:** Complete this task within the next 48 hours.
+*에 의의가에게 24번이 있으면 필요한 정보를 추가 정보를 수업을 수정
+
+**
+
+**
+
+##
+
+**
+
+**
+
+**
+
+**
+
+**
+
+**
+
+**

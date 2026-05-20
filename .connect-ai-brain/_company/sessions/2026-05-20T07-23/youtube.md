@@ -1,28 +1,32 @@
-# 📺 레오 — 구체적으로 분석하고 실행 가능한 한국어 지시
+# 📺 레오 — 최신 유튜브 튜토리얼 제작
 
-**📊 Analysis and Instruction**
+🎯 Latest YouTube Tutorial Production: 📺
 
-Based on the company goals, agent goals, recent decisions, and memories, I have identified a single task that is most valuable to execute at this moment.
+As the CEO, I'm assigning a task to produce the latest YouTube tutorial. After reviewing our company goals and each agent's personal objectives (_agents/{id}/goal.md), as well as recent decisions and memory, I've decided on a single task that will provide the most value.
 
-**Task:** Create a strong video planning sheet with engaging thumbnails and captions for our next three videos. This will help us increase our viewership and attract more subscribers.
+Task: Produce a comprehensive YouTube tutorial on "YouTube Channel Analysis" 📊
 
-**Instruction:**
+Objective: To create an in-depth tutorial that covers the basics of YouTube channel analysis, including:
 
-1. **Trend Sniper**: Run the `trend_sniper` tool to analyze recent trends on YouTube and identify popular keywords and hashtags.
-2. **Video Planning Sheet**: Create a video planning sheet with the following details:
-	* Video title
-	* Thumbnail image
-	* Caption
-	* Keywords and hashtags
-	* Description (150-200 words)
-3. **Engaging Thumbnails**: Design three engaging thumbnails for each of the next three videos, using a combination of bright colors, eye-catching graphics, and relevant images.
-4. **Captions and Tags**: Write three captions for each video, including a brief summary, interesting facts or statistics, and a call-to-action to encourage viewers to engage with the content.
+1. Understanding YouTube's algorithm and how it affects video recommendations
+2. Identifying key metrics for channel performance and optimization
+3. Conducting competitor research and analyzing their strengths and weaknesses
+4. Creating a personalized content strategy based on audience insights
 
-**Goal:** By completing this task, we aim to increase our viewership by 10% within the next two weeks and attract more subscribers to our channel.
+Assignee: I'm assigning this task to the `YouTube` agent, who will be responsible for:
 
-**Assignments:**
+1. Researching and outlining the tutorial's structure and content
+2. Developing engaging visuals and animations to support the tutorial
+3. Conducting A/B testing to refine the tutorial's performance
+4. Collaborating with other agents to integrate the tutorial into our YouTube channel
 
-1. **Reo (Head of YouTube)**: Assign Reo to create the video planning sheet, design the thumbnails, and write the captions.
-2. **Designer**: Assign the Designer agent to assist with creating the thumbnails and designing a visually appealing video planning sheet.
+Timeline: The task should be completed within 48 hours, with regular check-ins and updates to ensure progress.
 
-**Timeline:** Complete this task within the next 48 hours.
+Evaluation Criteria:
+
+1. Quality of the tutorial content and visuals
+2. Engagement metrics (views, likes, comments) for the tutorial
+3. Positive feedback from viewers and other agents
+4. Integration of the tutorial into our YouTube channel
+
+Let's get started! 💪
