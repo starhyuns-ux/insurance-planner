@@ -21,6 +21,7 @@ export default function CustomersPage() {
   const [newCustRiders, setNewCustRiders] = useState('')
   const [newCustAppt, setNewCustAppt] = useState('')
   const [newCustIsContracted, setNewCustIsContracted] = useState(false)
+  const [newCustPremium, setNewCustPremium] = useState('0')
   const [activeTab, setActiveTab] = useState<'all' | 'contracted' | 'prospect'>('all')
 
   // Edit State
@@ -35,6 +36,7 @@ export default function CustomersPage() {
   const [editCustRiders, setEditCustRiders] = useState('')
   const [editCustAppt, setEditCustAppt] = useState('')
   const [editCustIsContracted, setEditCustIsContracted] = useState(false)
+  const [editCustPremium, setEditCustPremium] = useState('0')
 
   const fetchCustomers = async () => {
     if (!planner) return
@@ -54,19 +56,38 @@ export default function CustomersPage() {
   const addCustomer = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!planner) return
-    const { error } = await supabase
+    const monthlyPremium = Number.parseInt(newCustPremium, 10) || 0
+    const customerPayload = {
+      planner_id: planner.id,
+      name: newCustName.trim(),
+      phone: newCustPhone.trim(),
+      address: newCustAddr.trim(),
+      birth_date: newCustBirth || null,
+      family_count: parseInt(newCustFamily) || 1,
+      riders: newCustRiders.split(',').map(r => r.trim()).filter(r => r !== ''),
+      appointment_at: newCustAppt || null,
+      is_contracted: newCustIsContracted
+    }
+    const { error: initialError } = await supabase
       .from('customers')
       .insert({
-        planner_id: planner.id,
-        name: newCustName,
-        phone: newCustPhone,
-        address: newCustAddr,
-        birth_date: newCustBirth || null,
-        family_count: parseInt(newCustFamily) || 1,
-        riders: newCustRiders.split(',').map(r => r.trim()).filter(r => r !== ''),
-        appointment_at: newCustAppt || null,
-        is_contracted: newCustIsContracted
+        ...customerPayload,
+        monthly_premium: monthlyPremium
       })
+    let error = initialError
+
+    if (
+      initialError &&
+      (initialError.code === 'PGRST204' ||
+        initialError.code === '42703' ||
+        initialError.message.includes('monthly_premium'))
+    ) {
+      const retry = await supabase.from('customers').insert(customerPayload)
+      error = retry.error
+      if (!error) {
+        console.warn('customers.monthly_premium column is missing. Applied registration without premium.')
+      }
+    }
 
     if (!error) {
       toast.success('고객 정보가 등록되었습니다.')
@@ -78,9 +99,11 @@ export default function CustomersPage() {
       setNewCustRiders('')
       setNewCustAppt('')
       setNewCustIsContracted(false)
+      setNewCustPremium('0')
       fetchCustomers()
     } else {
-      toast.error('등록 중 오류가 발생했습니다.')
+      console.error('Customer insert error:', error)
+      toast.error(`등록 중 오류가 발생했습니다: ${error.message}`)
     }
   }
 
@@ -121,6 +144,7 @@ export default function CustomersPage() {
         newCustBirth={newCustBirth}
         newCustFamily={newCustFamily}
         newCustRiders={newCustRiders}
+        newCustPremium={newCustPremium}
         editingId={editingId}
         expandedMemoId={expandedMemoId}
         memoValue={memoValue}
@@ -133,6 +157,7 @@ export default function CustomersPage() {
         editCustAppt={editCustAppt}
         editCustIsContracted={editCustIsContracted}
         newCustIsContracted={newCustIsContracted}
+        editCustPremium={editCustPremium}
         activeTab={activeTab}
         setActiveTab={setActiveTab}
         onUpdateState={(key, value) => {
@@ -154,6 +179,8 @@ export default function CustomersPage() {
           if (key === 'editCustAppt') setEditCustAppt(value)
           if (key === 'editCustIsContracted') setEditCustIsContracted(value)
           if (key === 'newCustIsContracted') setNewCustIsContracted(value)
+          if (key === 'newCustPremium') setNewCustPremium(value)
+          if (key === 'editCustPremium') setEditCustPremium(value)
         }}
         onAddCustomer={addCustomer}
         onAddCustomersBulk={onAddCustomersBulk}
@@ -194,6 +221,7 @@ export default function CustomersPage() {
           setEditCustRiders(c.riders.join(', '))
           setEditCustAppt(c.appointment_at ? c.appointment_at.slice(0, 10) : '')
           setEditCustIsContracted(c.is_contracted || false)
+          setEditCustPremium(c.monthly_premium?.toString() || '0')
         }}
         onSaveEdit={async () => {
           if (!editingId) return
@@ -207,7 +235,8 @@ export default function CustomersPage() {
               family_count: parseInt(editCustFamily) || 1,
               riders: editCustRiders.split(',').map(r => r.trim()).filter(r => r !== ''),
               appointment_at: editCustAppt || null,
-              is_contracted: editCustIsContracted
+              is_contracted: editCustIsContracted,
+              monthly_premium: parseInt(editCustPremium) || 0
             })
             .eq('id', editingId)
           if (!error) {
