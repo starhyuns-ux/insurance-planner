@@ -41,6 +41,7 @@ create table if not exists public.customers (
   last_touch_at timestamptz,
   appointment_at timestamptz,
   riders jsonb not null default '[]'::jsonb,
+  monthly_premium bigint default 0,
   memo text,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
