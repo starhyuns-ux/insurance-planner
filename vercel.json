@@ -5,5 +5,11 @@
       "src": "insurance-plan/insurance-planner/package.json",
       "use": "@vercel/next"
     }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "insurance-plan/insurance-planner/$1"
+    }
   ]
 }
