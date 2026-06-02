@@ -1,4 +1,9 @@
 {
   "version": 2,
-  "rootDirectory": "insurance-planner"
+  "builds": [
+    {
+      "src": "insurance-plan/insurance-planner/package.json",
+      "use": "@vercel/next"
+    }
+  ]
 }
