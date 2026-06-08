@@ -288,7 +288,7 @@ Error generating stack: `+e.message+`
       .p-list { list-style: none; margin-bottom: 40px; text-align: left; display: flex; flex-direction: column; gap: 16px; }
       .p-list li { display: flex; align-items: center; gap: 12px; font-size: 14px; color: var(--text-muted); }
       .p-list li svg { color: var(--primary); }
-    `})]}),bd=({showToast:e})=>{let[t,n]=(0,S.useState)([]),[r,i]=(0,S.useState)({}),[a,o]=(0,S.useState)({}),[s,c]=(0,S.useState)({});(0,S.useEffect)(()=>{let e=localStorage.getItem(`portal_favorites`),t=localStorage.getItem(`portal_ids`),r=localStorage.getItem(`portal_pws`);e&&n(JSON.parse(e)),t&&i(JSON.parse(t)),r&&o(JSON.parse(r))},[]);let l=(e,r)=>{e.preventDefault(),e.stopPropagation();let i=t.includes(r)?t.filter(e=>e!==r):[...t,r];n(i),localStorage.setItem(`portal_favorites`,JSON.stringify(i))},u=(e,t)=>{let n={...r,[e]:t};i(n),localStorage.setItem(`portal_ids`,JSON.stringify(n))},d=(e,t)=>{let n={...a,[e]:t};o(n),localStorage.setItem(`portal_pws`,JSON.stringify(n))},f=e=>{c(t=>({...t,[e]:!t[e]}))},p=(t,n,r)=>{t.preventDefault(),t.stopPropagation(),n&&(navigator.clipboard.writeText(n),e(`${r}가 복사되었습니다! 로그인 창에 붙여넣기(Ctrl+V) 하세요.`))},m=n=>{let r=n===`all`?[...pd.life,...pd.nonLife]:[...pd.life,...pd.nonLife].filter(e=>t.includes(e.name));if(r.length===0){e(`열 대상이 없습니다. 즐겨찾기를 등록해 주세요.`);return}window.confirm(`${n===`all`?`전체`:`즐겨찾기`} ${r.length}개의 포탈을 엽니다. 브라우저 팝업 허용이 필요합니다. 계속하시겠습니까?`)&&(r.forEach((e,t)=>{setTimeout(()=>window.open(e.url,`_blank`),t*250)}),e(`${r.length}개의 포탈 사이트를 열고 있습니다.`))},h=({portal:e,isNonLife:n})=>{let i=t.includes(e.name),o=r[e.name]||``,c=a[e.name]||``,m=s[e.name]||!1;return(0,V.jsxs)(`div`,{className:`portal-card card glass ${i?`favorite`:``}`,children:[(0,V.jsx)(`button`,{onClick:t=>l(t,e.name),className:`favorite-btn`,children:(0,V.jsx)(rd,{size:16,fill:i?`var(--accent)`:`none`,color:i?`var(--accent)`:`var(--text-muted)`})}),(0,V.jsxs)(`div`,{className:`portal-info`,children:[(0,V.jsx)(`span`,{className:`portal-name`,children:e.name}),(0,V.jsxs)(`a`,{href:e.url,target:`_blank`,rel:`noopener noreferrer`,className:`portal-link`,children:[`포탈 바로가기 `,(0,V.jsx)(Gu,{size:12})]})]}),(0,V.jsxs)(`div`,{className:`credentials-inputs`,children:[(0,V.jsxs)(`div`,{className:`input-wrapper`,children:[(0,V.jsx)(id,{size:14,className:`input-icon`}),(0,V.jsx)(`input`,{type:`text`,placeholder:`아이디(ID)`,value:o,onChange:t=>u(e.name,t.target.value),className:`portal-input`}),o&&(0,V.jsx)(`button`,{onClick:e=>p(e,o,`아이디`),className:`copy-btn`,title:`아이디 복사`,children:(0,V.jsx)(Wu,{size:14})})]}),(0,V.jsxs)(`div`,{className:`input-wrapper`,children:[(0,V.jsx)(Xu,{size:14,className:`input-icon`}),(0,V.jsx)(`input`,{type:m?`text`:`password`,placeholder:`비밀번호(PW)`,value:c,onChange:t=>d(e.name,t.target.value),className:`portal-input`}),(0,V.jsxs)(`div`,{className:`input-actions`,children:[(0,V.jsx)(`button`,{onClick:()=>f(e.name),className:`view-btn`,title:`비밀번호 표시/숨김`,children:m?(0,V.jsx)(Ku,{size:14}):(0,V.jsx)(qu,{size:14})}),c&&(0,V.jsx)(`button`,{onClick:e=>p(e,c,`비밀번호`),className:`copy-btn`,title:`비밀번호 복사`,children:(0,V.jsx)(Wu,{size:14})})]})]})]})]})};return(0,V.jsxs)(Su.div,{initial:{opacity:0,y:20},animate:{opacity:1,y:0},className:`portal-hub`,children:[(0,V.jsxs)(`div`,{className:`hub-header card glass`,children:[(0,V.jsxs)(`div`,{className:`info`,children:[(0,V.jsx)(`h3`,{children:`보험사 포탈 매니저`}),(0,V.jsx)(`p`,{children:`보험사별 계정 정보를 안전하게 관리하고 편리하게 로그인하세요.`})]}),(0,V.jsxs)(`div`,{className:`hub-actions`,children:[(0,V.jsxs)(`button`,{className:`btn ${t.length>0?`btn-primary`:`btn-outline`}`,onClick:()=>m(`favorites`),style:{display:`flex`,alignItems:`center`,gap:`8px`},children:[(0,V.jsx)(rd,{size:16,fill:t.length>0?`white`:`none`}),` 즐겨찾기 열기 (`,t.length,`)`]}),(0,V.jsxs)(`button`,{className:`btn btn-outline`,onClick:()=>m(`all`),style:{display:`flex`,alignItems:`center`,gap:`8px`},children:[(0,V.jsx)(Gu,{size:16}),` 전체 포탈 열기`]})]})]}),(0,V.jsxs)(`div`,{className:`warning-box glass`,children:[(0,V.jsx)(Bu,{size:18}),(0,V.jsxs)(`span`,{children:[`입력하신 계정 정보는 외부 서버로 전송되지 않고 `,(0,V.jsx)(`strong`,{children:`본인의 브라우저(로컬 스토리지)에만 안전하게 저장`}),`됩니다.`]})]}),(0,V.jsxs)(`div`,{className:`portal-grid`,children:[(0,V.jsxs)(`div`,{className:`portal-section`,children:[(0,V.jsxs)(`div`,{className:`section-title`,children:[(0,V.jsx)(`div`,{className:`dot life`}),(0,V.jsxs)(`h4`,{children:[`생명보험사 (`,pd.life.length,`)`]})]}),(0,V.jsx)(`div`,{className:`grid`,children:pd.life.map(e=>(0,V.jsx)(h,{portal:e},e.name))})]}),(0,V.jsxs)(`div`,{className:`portal-section`,children:[(0,V.jsxs)(`div`,{className:`section-title`,children:[(0,V.jsx)(`div`,{className:`dot nonlife`}),(0,V.jsxs)(`h4`,{children:[`손해보험사 (`,pd.nonLife.length,`)`]})]}),(0,V.jsx)(`div`,{className:`grid`,children:pd.nonLife.map(e=>(0,V.jsx)(h,{portal:e,isNonLife:!0},e.name))})]})]}),(0,V.jsx)(`style`,{children:`
+    `})]}),bd=({showToast:e})=>{let[t,n]=(0,S.useState)([]),[r,i]=(0,S.useState)({}),[a,o]=(0,S.useState)({}),[s,c]=(0,S.useState)({});(0,S.useEffect)(()=>{let e=localStorage.getItem(`portal_favorites`),t=localStorage.getItem(`portal_ids`),r=localStorage.getItem(`portal_pws`);e&&n(JSON.parse(e)),t&&i(JSON.parse(t)),r&&o(JSON.parse(r))},[]);let l=(e,r)=>{e.preventDefault(),e.stopPropagation();let i=t.includes(r)?t.filter(e=>e!==r):[...t,r];n(i),localStorage.setItem(`portal_favorites`,JSON.stringify(i))},u=(e,t)=>{let n={...r,[e]:t};i(n),localStorage.setItem(`portal_ids`,JSON.stringify(n))},d=(e,t)=>{let n={...a,[e]:t};o(n),localStorage.setItem(`portal_pws`,JSON.stringify(n))},f=e=>{c(t=>({...t,[e]:!t[e]}))},p=(t,n,r)=>{t.preventDefault(),t.stopPropagation(),n&&(navigator.clipboard.writeText(n),e(`${r}가 복사되었습니다! 로그인 창에 붙여넣기(Ctrl+V) 하세요.`))},m=n=>{let r=n===`all`?[...pd.life,...pd.nonLife]:[...pd.life,...pd.nonLife].filter(e=>t.includes(e.name));if(r.length===0){e(`열 대상이 없습니다. 즐겨찾기를 등록해 주세요.`);return}window.confirm(`${n===`all`?`전체`:`즐겨찾기`} ${r.length}개의 포탈을 엽니다. 브라우저 팝업 허용이 필요합니다. 계속하시겠습니까?`)&&(r.forEach((e,t)=>{setTimeout(()=>window.open(e.url,`_blank`),t*250)}),e(`${r.length}개의 포탈 사이트를 열고 있습니다.`))},h=({portal:e,isNonLife:n})=>{let i=t.includes(e.name),o=r[e.name]||``,c=a[e.name]||``,m=s[e.name]||!1;return(0,V.jsxs)(`div`,{className:`portal-card card glass ${i?`favorite`:``}`,children:[(0,V.jsx)(`button`,{onClick:t=>l(t,e.name),className:`favorite-btn`,children:(0,V.jsx)(rd,{size:16,fill:i?`var(--accent)`:`none`,color:i?`var(--accent)`:`var(--text-muted)`})}),(0,V.jsxs)(`a`,{href:e.url,target:`_blank`,rel:`noopener noreferrer`,className:`portal-header-link`,children:[(0,V.jsx)(`span`,{className:`portal-name`,children:e.name}),(0,V.jsxs)(`div`,{className:`portal-link-badge`,children:[`바로가기 `,(0,V.jsx)(Gu,{size:10})]})]}),(0,V.jsxs)(`div`,{className:`credentials-inputs`,children:[(0,V.jsxs)(`div`,{className:`input-wrapper`,children:[(0,V.jsx)(id,{size:14,className:`input-icon`}),(0,V.jsx)(`input`,{type:`text`,placeholder:`아이디(ID)`,value:o,onChange:t=>u(e.name,t.target.value),className:`portal-input`}),o&&(0,V.jsx)(`button`,{onClick:e=>p(e,o,`아이디`),className:`copy-btn`,title:`아이디 복사`,children:(0,V.jsx)(Wu,{size:14})})]}),(0,V.jsxs)(`div`,{className:`input-wrapper`,children:[(0,V.jsx)(Xu,{size:14,className:`input-icon`}),(0,V.jsx)(`input`,{type:m?`text`:`password`,placeholder:`비밀번호(PW)`,value:c,onChange:t=>d(e.name,t.target.value),className:`portal-input`}),(0,V.jsxs)(`div`,{className:`input-actions`,children:[(0,V.jsx)(`button`,{onClick:()=>f(e.name),className:`view-btn`,title:`비밀번호 표시/숨김`,children:m?(0,V.jsx)(Ku,{size:14}):(0,V.jsx)(qu,{size:14})}),c&&(0,V.jsx)(`button`,{onClick:e=>p(e,c,`비밀번호`),className:`copy-btn`,title:`비밀번호 복사`,children:(0,V.jsx)(Wu,{size:14})})]})]})]})]})};return(0,V.jsxs)(Su.div,{initial:{opacity:0,y:20},animate:{opacity:1,y:0},className:`portal-hub`,children:[(0,V.jsxs)(`div`,{className:`hub-header card glass`,children:[(0,V.jsxs)(`div`,{className:`info`,children:[(0,V.jsx)(`h3`,{children:`보험사 포탈 매니저`}),(0,V.jsx)(`p`,{children:`보험사별 계정 정보를 안전하게 관리하고 편리하게 로그인하세요.`})]}),(0,V.jsxs)(`div`,{className:`hub-actions`,children:[(0,V.jsxs)(`button`,{className:`btn ${t.length>0?`btn-primary`:`btn-outline`}`,onClick:()=>m(`favorites`),style:{display:`flex`,alignItems:`center`,gap:`8px`},children:[(0,V.jsx)(rd,{size:16,fill:t.length>0?`white`:`none`}),` 즐겨찾기 열기 (`,t.length,`)`]}),(0,V.jsxs)(`button`,{className:`btn btn-outline`,onClick:()=>m(`all`),style:{display:`flex`,alignItems:`center`,gap:`8px`},children:[(0,V.jsx)(Gu,{size:16}),` 전체 포탈 열기`]})]})]}),(0,V.jsxs)(`div`,{className:`warning-box glass`,children:[(0,V.jsx)(Bu,{size:18}),(0,V.jsxs)(`span`,{children:[`입력하신 계정 정보는 외부 서버로 전송되지 않고 `,(0,V.jsx)(`strong`,{children:`본인의 브라우저(로컬 스토리지)에만 안전하게 저장`}),`됩니다.`]})]}),(0,V.jsxs)(`div`,{className:`portal-grid`,children:[(0,V.jsxs)(`div`,{className:`portal-section`,children:[(0,V.jsxs)(`div`,{className:`section-title`,children:[(0,V.jsx)(`div`,{className:`dot life`}),(0,V.jsxs)(`h4`,{children:[`생명보험사 (`,pd.life.length,`)`]})]}),(0,V.jsx)(`div`,{className:`grid`,children:pd.life.map(e=>(0,V.jsx)(h,{portal:e},e.name))})]}),(0,V.jsxs)(`div`,{className:`portal-section`,children:[(0,V.jsxs)(`div`,{className:`section-title`,children:[(0,V.jsx)(`div`,{className:`dot nonlife`}),(0,V.jsxs)(`h4`,{children:[`손해보험사 (`,pd.nonLife.length,`)`]})]}),(0,V.jsx)(`div`,{className:`grid`,children:pd.nonLife.map(e=>(0,V.jsx)(h,{portal:e,isNonLife:!0},e.name))})]})]}),(0,V.jsx)(`style`,{children:`
         .portal-hub { display: flex; flex-direction: column; gap: 24px; }
         .hub-header { display: flex; justify-content: space-between; align-items: center; padding: 32px 40px; }
         .hub-header h3 { font-size: 24px; margin-bottom: 4px; }
@@ -346,28 +346,41 @@ Error generating stack: `+e.message+`
           background: rgba(255, 255, 255, 0.05);
         }
         
-        .portal-info {
+        .portal-header-link {
           display: flex;
-          flex-direction: column;
-          gap: 4px;
+          align-items: center;
+          justify-content: space-between;
+          text-decoration: none;
+          gap: 8px;
+          transition: var(--transition-smooth);
         }
         .portal-name { 
           font-size: 15px; 
           font-weight: 700; 
           color: var(--text-main);
+          transition: var(--transition-smooth);
         }
-        .portal-link { 
-          font-size: 12px; 
+        .portal-header-link:hover .portal-name {
+          color: var(--primary);
+        }
+        .portal-link-badge { 
+          font-size: 11px; 
           color: var(--text-muted); 
-          text-decoration: none;
           display: inline-flex;
           align-items: center;
           gap: 4px;
-          font-weight: 500;
+          font-weight: 600;
+          background: rgba(255, 255, 255, 0.04);
+          padding: 4px 8px;
+          border-radius: 20px;
+          border: 1px solid var(--border);
           transition: var(--transition-smooth);
         }
-        .portal-link:hover { 
-          color: var(--primary); 
+        .portal-header-link:hover .portal-link-badge { 
+          color: white;
+          background: var(--primary);
+          border-color: var(--primary);
+          box-shadow: 0 0 10px var(--primary-glow);
         }
         
         .credentials-inputs {

@@ -625,12 +625,12 @@ const PortalHub: React.FC<any> = ({ showToast }) => {
           <Star size={16} fill={isFav ? "var(--accent)" : "none"} color={isFav ? "var(--accent)" : "var(--text-muted)"} />
         </button>
 
-        <div className="portal-info">
+        <a href={portal.url} target="_blank" rel="noopener noreferrer" className="portal-header-link">
           <span className="portal-name">{portal.name}</span>
-          <a href={portal.url} target="_blank" rel="noopener noreferrer" className="portal-link">
-            포탈 바로가기 <ExternalLink size={12} />
-          </a>
-        </div>
+          <div className="portal-link-badge">
+            바로가기 <ExternalLink size={10} />
+          </div>
+        </a>
 
         <div className="credentials-inputs">
           <div className="input-wrapper">
@@ -780,28 +780,41 @@ const PortalHub: React.FC<any> = ({ showToast }) => {
           background: rgba(255, 255, 255, 0.05);
         }
         
-        .portal-info {
+        .portal-header-link {
           display: flex;
-          flex-direction: column;
-          gap: 4px;
+          align-items: center;
+          justify-content: space-between;
+          text-decoration: none;
+          gap: 8px;
+          transition: var(--transition-smooth);
         }
         .portal-name { 
           font-size: 15px; 
           font-weight: 700; 
           color: var(--text-main);
+          transition: var(--transition-smooth);
         }
-        .portal-link { 
-          font-size: 12px; 
+        .portal-header-link:hover .portal-name {
+          color: var(--primary);
+        }
+        .portal-link-badge { 
+          font-size: 11px; 
           color: var(--text-muted); 
-          text-decoration: none;
           display: inline-flex;
           align-items: center;
           gap: 4px;
-          font-weight: 500;
+          font-weight: 600;
+          background: rgba(255, 255, 255, 0.04);
+          padding: 4px 8px;
+          border-radius: 20px;
+          border: 1px solid var(--border);
           transition: var(--transition-smooth);
         }
-        .portal-link:hover { 
-          color: var(--primary); 
+        .portal-header-link:hover .portal-link-badge { 
+          color: white;
+          background: var(--primary);
+          border-color: var(--primary);
+          box-shadow: 0 0 10px var(--primary-glow);
         }
         
         .credentials-inputs {
