@@ -30,7 +30,9 @@ import {
   Clock,
   Plus,
   Star,
-  MapPin
+  MapPin,
+  Eye,
+  EyeOff
 } from "lucide-react";
 import { analyzeCoverage, PRICING, PolicyData, AnalysisResult } from "./services/AnalysisEngine.js";
 import { sendTelegramMessage } from "./services/messaging.js";
@@ -544,38 +546,154 @@ const MembershipTab: React.FC = () => (
 );
 
 const PortalHub: React.FC<any> = ({ showToast }) => {
-  const openAll = () => {
-    const allUrls = [...INSURANCE_PORTALS.life, ...INSURANCE_PORTALS.nonLife].map(p => p.url);
+  const [favorites, setFavorites] = useState<string[]>([]);
+  const [portalIds, setPortalIds] = useState<Record<string, string>>({});
+  const [portalPws, setPortalPws] = useState<Record<string, string>>({});
+  const [showPws, setShowPws] = useState<Record<string, boolean>>({});
+
+  useEffect(() => {
+    const savedFavs = localStorage.getItem('portal_favorites');
+    const savedIds = localStorage.getItem('portal_ids');
+    const savedPws = localStorage.getItem('portal_pws');
+    if (savedFavs) setFavorites(JSON.parse(savedFavs));
+    if (savedIds) setPortalIds(JSON.parse(savedIds));
+    if (savedPws) setPortalPws(JSON.parse(savedPws));
+  }, []);
+
+  const toggleFavorite = (e: React.MouseEvent, portalName: string) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const newFavorites = favorites.includes(portalName)
+      ? favorites.filter(f => f !== portalName)
+      : [...favorites, portalName];
+    setFavorites(newFavorites);
+    localStorage.setItem('portal_favorites', JSON.stringify(newFavorites));
+  };
+
+  const handleIdChange = (portalName: string, id: string) => {
+    const newIds = { ...portalIds, [portalName]: id };
+    setPortalIds(newIds);
+    localStorage.setItem('portal_ids', JSON.stringify(newIds));
+  };
+
+  const handlePwChange = (portalName: string, pw: string) => {
+    const newPws = { ...portalPws, [portalName]: pw };
+    setPortalPws(newPws);
+    localStorage.setItem('portal_pws', JSON.stringify(newPws));
+  };
+
+  const toggleShowPw = (portalName: string) => {
+    setShowPws(prev => ({ ...prev, [portalName]: !prev[portalName] }));
+  };
+
+  const copyToClipboard = (e: React.MouseEvent, text: string, label: string) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!text) return;
+    navigator.clipboard.writeText(text);
+    showToast(`${label}가 복사되었습니다! 로그인 창에 붙여넣기(Ctrl+V) 하세요.`);
+  };
+
+  const openAll = (mode: 'all' | 'favorites') => {
+    const list = mode === 'all' 
+      ? [...INSURANCE_PORTALS.life, ...INSURANCE_PORTALS.nonLife]
+      : [...INSURANCE_PORTALS.life, ...INSURANCE_PORTALS.nonLife].filter(p => favorites.includes(p.name));
     
-    // Safety check: Opening too many tabs can be blocked or crash the browser
-    const confirm = window.confirm(`총 ${allUrls.length}개의 포탈 사이트를 한 번에 엽니다.\n브라우저 팝업 차단 설정이 해제되어 있어야 합니다. 계속하시겠습니까?`);
-    
-    if (confirm) {
-      allUrls.forEach((url, index) => {
-        // Slight delay to avoid some browser blocks
-        setTimeout(() => {
-          window.open(url, '_blank');
-        }, index * 100);
-      });
-      showToast("모든 포탈 사이트를 열고 있습니다.");
+    if (list.length === 0) {
+      showToast("열 대상이 없습니다. 즐겨찾기를 등록해 주세요.");
+      return;
     }
+
+    const confirm = window.confirm(`${mode === 'all' ? '전체' : '즐겨찾기'} ${list.length}개의 포탈을 엽니다. 브라우저 팝업 허용이 필요합니다. 계속하시겠습니까?`);
+    if (confirm) {
+      list.forEach((portal, index) => {
+        setTimeout(() => window.open(portal.url, '_blank'), index * 250);
+      });
+      showToast(`${list.length}개의 포탈 사이트를 열고 있습니다.`);
+    }
+  };
+
+  const PortalCard = ({ portal, isNonLife }: { portal: any, isNonLife?: boolean }) => {
+    const isFav = favorites.includes(portal.name);
+    const savedId = portalIds[portal.name] || '';
+    const savedPw = portalPws[portal.name] || '';
+    const isShowingPw = showPws[portal.name] || false;
+
+    return (
+      <div className={`portal-card card glass ${isFav ? 'favorite' : ''}`}>
+        <button onClick={(e) => toggleFavorite(e, portal.name)} className="favorite-btn">
+          <Star size={16} fill={isFav ? "var(--accent)" : "none"} color={isFav ? "var(--accent)" : "var(--text-muted)"} />
+        </button>
+
+        <div className="portal-info">
+          <span className="portal-name">{portal.name}</span>
+          <a href={portal.url} target="_blank" rel="noopener noreferrer" className="portal-link">
+            포탈 바로가기 <ExternalLink size={12} />
+          </a>
+        </div>
+
+        <div className="credentials-inputs">
+          <div className="input-wrapper">
+            <User size={14} className="input-icon" />
+            <input 
+              type="text" 
+              placeholder="아이디(ID)" 
+              value={savedId} 
+              onChange={(e) => handleIdChange(portal.name, e.target.value)} 
+              className="portal-input"
+            />
+            {savedId && (
+              <button onClick={(e) => copyToClipboard(e, savedId, '아이디')} className="copy-btn" title="아이디 복사">
+                <Copy size={14} />
+              </button>
+            )}
+          </div>
+          
+          <div className="input-wrapper">
+            <Lock size={14} className="input-icon" />
+            <input 
+              type={isShowingPw ? "text" : "password"} 
+              placeholder="비밀번호(PW)" 
+              value={savedPw} 
+              onChange={(e) => handlePwChange(portal.name, e.target.value)} 
+              className="portal-input"
+            />
+            <div className="input-actions">
+              <button onClick={() => toggleShowPw(portal.name)} className="view-btn" title="비밀번호 표시/숨김">
+                {isShowingPw ? <EyeOff size={14} /> : <Eye size={14} />}
+              </button>
+              {savedPw && (
+                <button onClick={(e) => copyToClipboard(e, savedPw, '비밀번호')} className="copy-btn" title="비밀번호 복사">
+                  <Copy size={14} />
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
   };
 
   return (
     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="portal-hub">
       <div className="hub-header card glass">
         <div className="info">
-          <h3>보험사 포탈 허브</h3>
-          <p>모든 보험사 설계 지원 시스템에 한 번에 접속할 수 있습니다.</p>
+          <h3>보험사 포탈 매니저</h3>
+          <p>보험사별 계정 정보를 안전하게 관리하고 편리하게 로그인하세요.</p>
         </div>
-        <button className="btn btn-primary" onClick={openAll}>
-          <ExternalLink size={18} /> 전체 포탈 열기
-        </button>
+        <div className="hub-actions">
+          <button className={`btn ${favorites.length > 0 ? 'btn-primary' : 'btn-outline'}`} onClick={() => openAll('favorites')} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <Star size={16} fill={favorites.length > 0 ? "white" : "none"} /> 즐겨찾기 열기 ({favorites.length})
+          </button>
+          <button className="btn btn-outline" onClick={() => openAll('all')} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <ExternalLink size={16} /> 전체 포탈 열기
+          </button>
+        </div>
       </div>
 
       <div className="warning-box glass">
         <AlertCircle size={18} />
-        <span>브라우저의 <strong>'팝업 및 리디렉션 허용'</strong> 설정이 필요합니다.</span>
+        <span>입력하신 계정 정보는 외부 서버로 전송되지 않고 <strong>본인의 브라우저(로컬 스토리지)에만 안전하게 저장</strong>됩니다.</span>
       </div>
 
       <div className="portal-grid">
@@ -586,10 +704,7 @@ const PortalHub: React.FC<any> = ({ showToast }) => {
           </div>
           <div className="grid">
             {INSURANCE_PORTALS.life.map(p => (
-              <a key={p.name} href={p.url} target="_blank" rel="noreferrer" className="portal-card glass">
-                <span className="name">{p.name}</span>
-                <ExternalLink size={14} className="icon" />
-              </a>
+              <PortalCard key={p.name} portal={p} />
             ))}
           </div>
         </div>
@@ -601,10 +716,7 @@ const PortalHub: React.FC<any> = ({ showToast }) => {
           </div>
           <div className="grid">
             {INSURANCE_PORTALS.nonLife.map(p => (
-              <a key={p.name} href={p.url} target="_blank" rel="noreferrer" className="portal-card glass">
-                <span className="name">{p.name}</span>
-                <ExternalLink size={14} className="icon" />
-              </a>
+              <PortalCard key={p.name} portal={p} isNonLife />
             ))}
           </div>
         </div>
@@ -615,8 +727,9 @@ const PortalHub: React.FC<any> = ({ showToast }) => {
         .hub-header { display: flex; justify-content: space-between; align-items: center; padding: 32px 40px; }
         .hub-header h3 { font-size: 24px; margin-bottom: 4px; }
         .hub-header p { color: var(--text-muted); font-size: 14px; }
+        .hub-actions { display: flex; gap: 12px; }
         
-        .warning-box { display: flex; align-items: center; gap: 12px; padding: 12px 20px; border-radius: 12px; background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.3); color: #F59E0B; font-size: 13px; }
+        .warning-box { display: flex; align-items: center; gap: 12px; padding: 12px 20px; border-radius: 12px; background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.3); color: #60A5FA; font-size: 13px; }
         
         .portal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; }
         .portal-section { display: flex; flex-direction: column; gap: 20px; }
@@ -625,15 +738,145 @@ const PortalHub: React.FC<any> = ({ showToast }) => {
         .section-title .dot.life { background: #3B82F6; box-shadow: 0 0 8px #3B82F6; }
         .section-title .dot.nonlife { background: #EC4899; box-shadow: 0 0 8px #EC4899; }
         
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; }
-        .portal-card { display: flex; align-items: center; justify-content: space-between; padding: 16px; border-radius: 12px; text-decoration: none; color: white; transition: all 0.3s ease; }
-        .portal-card:hover { transform: translateY(-2px); background: rgba(255,255,255,0.1); border-color: var(--primary); }
-        .portal-card .name { font-size: 13px; font-weight: 600; }
-        .portal-card .icon { color: var(--text-muted); opacity: 0.5; }
-        .portal-card:hover .icon { opacity: 1; color: var(--primary); }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; }
+        
+        .portal-card { 
+          position: relative;
+          display: flex; 
+          flex-direction: column;
+          gap: 16px; 
+          padding: 24px 20px 20px; 
+          border-radius: 20px; 
+          border: 1px solid var(--border);
+          background: rgba(255, 255, 255, 0.02);
+          transition: var(--transition-smooth); 
+        }
+        .portal-card:hover { 
+          transform: translateY(-2px); 
+          background: rgba(255, 255, 255, 0.05); 
+          border-color: var(--border-bright); 
+        }
+        .portal-card.favorite {
+          border-color: var(--accent);
+          background: rgba(245, 158, 11, 0.03);
+          box-shadow: 0 0 15px rgba(245, 158, 11, 0.08);
+        }
+        
+        .favorite-btn {
+          position: absolute;
+          top: 12px;
+          right: 12px;
+          background: none;
+          border: none;
+          cursor: pointer;
+          padding: 4px;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transition: var(--transition-smooth);
+        }
+        .favorite-btn:hover {
+          background: rgba(255, 255, 255, 0.05);
+        }
+        
+        .portal-info {
+          display: flex;
+          flex-direction: column;
+          gap: 4px;
+        }
+        .portal-name { 
+          font-size: 15px; 
+          font-weight: 700; 
+          color: var(--text-main);
+        }
+        .portal-link { 
+          font-size: 12px; 
+          color: var(--text-muted); 
+          text-decoration: none;
+          display: inline-flex;
+          align-items: center;
+          gap: 4px;
+          font-weight: 500;
+          transition: var(--transition-smooth);
+        }
+        .portal-link:hover { 
+          color: var(--primary); 
+        }
+        
+        .credentials-inputs {
+          display: flex;
+          flex-direction: column;
+          gap: 8px;
+        }
+        
+        .input-wrapper {
+          position: relative;
+          display: flex;
+          align-items: center;
+          background: rgba(0, 0, 0, 0.2);
+          border: 1px solid var(--border);
+          border-radius: 10px;
+          padding: 0 10px;
+          transition: var(--transition-smooth);
+        }
+        .input-wrapper:focus-within {
+          border-color: var(--primary);
+          box-shadow: 0 0 0 2px var(--primary-glow);
+        }
+        
+        .input-icon {
+          color: var(--text-dim);
+          flex-shrink: 0;
+        }
+        
+        .portal-input {
+          width: 100%;
+          background: transparent;
+          border: none;
+          color: var(--text-main);
+          font-size: 12px;
+          padding: 10px 8px;
+          font-weight: 600;
+        }
+        .portal-input:focus {
+          outline: none;
+        }
+        .portal-input::placeholder {
+          color: var(--text-dim);
+          font-weight: 500;
+        }
+        
+        .input-actions {
+          display: flex;
+          align-items: center;
+          gap: 4px;
+        }
+        
+        .copy-btn, .view-btn {
+          background: none;
+          border: none;
+          color: var(--text-dim);
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 4px;
+          border-radius: 4px;
+          transition: var(--transition-smooth);
+        }
+        .copy-btn:hover, .view-btn:hover {
+          color: var(--text-main);
+          background: rgba(255, 255, 255, 0.05);
+        }
 
         @media (max-width: 1200px) {
           .portal-grid { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 768px) {
+          .hub-header { flex-direction: column; align-items: flex-start; gap: 16px; padding: 24px; }
+          .hub-actions { width: 100%; }
+          .hub-actions button { flex: 1; }
         }
       `}</style>
     </motion.div>
