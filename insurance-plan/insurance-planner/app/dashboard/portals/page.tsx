@@ -179,18 +179,30 @@ export default function PortalsPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 bg-blue-50/50 border border-blue-100 rounded-[2rem] p-6 lg:p-8">
-        <div className="flex items-center gap-4">
-          <div className="bg-blue-100 p-3 rounded-2xl text-blue-600"><UserIcon className="w-6 h-6" /></div>
-          <div><p className="text-sm font-black text-blue-900">아이디/비번 저장</p><p className="text-xs text-blue-700 mt-0.5">내 브라우저에만 안전하게 저장됩니다.</p></div>
+      <div className="bg-blue-50/30 border border-blue-100 rounded-[2rem] p-6 lg:p-8 space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="flex items-center gap-4">
+            <div className="bg-blue-100 p-3 rounded-2xl text-blue-600"><UserIcon className="w-6 h-6" /></div>
+            <div><p className="text-sm font-black text-blue-900">아이디/비번 저장</p><p className="text-xs text-blue-700 mt-0.5">내 브라우저에만 안전하게 저장됩니다.</p></div>
+          </div>
+          <div className="flex items-center gap-4">
+            <div className="bg-amber-100 p-3 rounded-2xl text-amber-600"><StarSolid className="w-6 h-6" /></div>
+            <div><p className="text-sm font-black text-amber-900">즐겨찾기 배치 실행</p><p className="text-xs text-amber-700 mt-0.5">자주 쓰는 보험사만 골라서 한 번에!</p></div>
+          </div>
+          <div className="flex items-center gap-4">
+            <div className="bg-emerald-100 p-3 rounded-2xl text-emerald-600"><ClipboardDocumentIcon className="w-6 h-6" /></div>
+            <div><p className="text-sm font-black text-emerald-900">간편 복사 & 붙여넣기</p><p className="text-xs text-emerald-700 mt-0.5">복사 후 로그인 창에서 Ctrl+V 하세요.</p></div>
+          </div>
         </div>
-        <div className="flex items-center gap-4">
-          <div className="bg-amber-100 p-3 rounded-2xl text-amber-600"><StarSolid className="w-6 h-6" /></div>
-          <div><p className="text-sm font-black text-amber-900">즐겨찾기 배치 실행</p><p className="text-xs text-amber-700 mt-0.5">자주 쓰는 보험사만 골라서 한 번에!</p></div>
-        </div>
-        <div className="flex items-center gap-4">
-          <div className="bg-emerald-100 p-3 rounded-2xl text-emerald-600"><ClipboardDocumentIcon className="w-6 h-6" /></div>
-          <div><p className="text-sm font-black text-emerald-900">간편 복사 & 붙여넣기</p><p className="text-xs text-emerald-700 mt-0.5">복사 후 로그인 창에서 Ctrl+V 하세요.</p></div>
+        <div className="border-t border-blue-100/50 pt-4 text-xs font-bold text-blue-700 space-y-1.5 pl-2">
+          <p className="flex items-center gap-2">
+            <span className="w-1.5 h-1.5 rounded-full bg-blue-400" />
+            각 보험사 카드 내의 &apos;포탈 바로가기&apos; 링크를 클릭하여 개별 이동할 수 있습니다.
+          </p>
+          <p className="flex items-center gap-2">
+            <span className="w-1.5 h-1.5 rounded-full bg-blue-400" />
+            상단의 &apos;즐겨찾기 열기&apos; 및 &apos;전체 포탈 열기&apos; 버튼을 클릭하여 선택한 사이트들을 일괄적으로 새 창으로 열 수 있습니다.
+          </p>
         </div>
       </div>
 

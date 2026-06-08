@@ -692,8 +692,14 @@ const PortalHub: React.FC<any> = ({ showToast }) => {
       </div>
 
       <div className="warning-box glass">
-        <AlertCircle size={18} />
-        <span>입력하신 계정 정보는 외부 서버로 전송되지 않고 <strong>본인의 브라우저(로컬 스토리지)에만 안전하게 저장</strong>됩니다.</span>
+        <div className="warning-box-header">
+          <AlertCircle size={18} />
+          <span>입력하신 계정 정보는 외부 서버로 전송되지 않고 <strong>본인의 브라우저(로컬 스토리지)에만 안전하게 저장</strong>됩니다.</span>
+        </div>
+        <div className="warning-box-desc">
+          <div>• 각 보험사 카드 내의 &apos;포탈 바로가기&apos; 링크를 클릭하여 개별 이동할 수 있습니다.</div>
+          <div>• 상단의 &apos;즐겨찾기 열기&apos; 및 &apos;전체 포탈 열기&apos; 버튼을 클릭하여 선택한 사이트들을 일괄적으로 새 창으로 열 수 있습니다.</div>
+        </div>
       </div>
 
       <div className="portal-grid">
@@ -729,7 +735,9 @@ const PortalHub: React.FC<any> = ({ showToast }) => {
         .hub-header p { color: var(--text-muted); font-size: 14px; }
         .hub-actions { display: flex; gap: 12px; }
         
-        .warning-box { display: flex; align-items: center; gap: 12px; padding: 12px 20px; border-radius: 12px; background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.3); color: #60A5FA; font-size: 13px; }
+        .warning-box { display: flex; flex-direction: column; gap: 8px; padding: 16px 20px; border-radius: 12px; background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.3); color: #60A5FA; font-size: 13px; }
+        .warning-box-header { display: flex; align-items: center; gap: 12px; }
+        .warning-box-desc { font-size: 12px; color: #93C5FD; padding-left: 30px; display: flex; flex-direction: column; gap: 4px; line-height: 1.5; }
         
         .portal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; }
         .portal-section { display: flex; flex-direction: column; gap: 20px; }
