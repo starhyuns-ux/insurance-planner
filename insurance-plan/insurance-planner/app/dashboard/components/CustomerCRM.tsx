@@ -15,8 +15,11 @@ import {
   ArrowDownTrayIcon,
   ClipboardDocumentListIcon,
   HeartIcon,
-  SparklesIcon
+  SparklesIcon,
+  DocumentMagnifyingGlassIcon,
+  XMarkIcon
 } from '@heroicons/react/24/outline'
+import DetailedClaimForm from '@/components/DetailedClaimForm'
 import { supabase } from '@/lib/supabaseClient'
 import { differenceInDays, parseISO } from 'date-fns'
 
@@ -40,6 +43,8 @@ interface CustomerCRMProps {
   editCustAppt: string
   editCustIsContracted: boolean
   newCustIsContracted: boolean
+  newCustPremium: string
+  editCustPremium: string
   activeTab: 'all' | 'contracted' | 'prospect'
   setActiveTab: (tab: 'all' | 'contracted' | 'prospect') => void
   onUpdateState: (key: string, value: any) => void
@@ -79,6 +84,8 @@ export default function CustomerCRM({
   editCustAppt,
   editCustIsContracted,
   newCustIsContracted,
+  newCustPremium,
+  editCustPremium,
   activeTab,
   setActiveTab,
   onUpdateState,
@@ -104,6 +111,8 @@ export default function CustomerCRM({
   const [analyzedHistory, setAnalyzedHistory] = useState<any[]>([])
   const fileInputRef = React.useRef<HTMLInputElement>(null)
   const scanDocRef = React.useRef<HTMLInputElement>(null)
+  const [showClaimModal, setShowClaimModal] = useState(false)
+  const [claimingCustomer, setClaimingCustomer] = useState<any | null>(null)
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -349,6 +358,16 @@ export default function CustomerCRM({
               </button>
             </div>
           </div>
+          <div className="md:col-span-1">
+            <label className="block text-xs font-black text-gray-400 uppercase mb-2 ml-1 tracking-widest">월 보험료 (원)</label>
+            <input
+              type="number"
+              value={newCustPremium}
+              onChange={(e) => onUpdateState('newCustPremium', e.target.value)}
+              placeholder="0"
+              className="w-full px-5 py-4 bg-gray-50 border border-transparent rounded-2xl focus:bg-white focus:border-primary-500 transition-all outline-none text-sm font-bold shadow-inner"
+            />
+          </div>
         </form>
       </div>
 
@@ -382,6 +401,7 @@ export default function CustomerCRM({
                 <th className="px-4 py-3 text-xs font-black text-gray-400 uppercase tracking-[0.2em] whitespace-nowrap">연락처/주소</th>
                 <th className="px-4 py-3 text-xs font-black text-gray-400 uppercase tracking-[0.2em] text-center whitespace-nowrap">상령일 (D-Day)</th>
                 <th className="px-4 py-3 text-xs font-black text-gray-400 uppercase tracking-[0.2em] whitespace-nowrap">주요 담보</th>
+                <th className="px-4 py-3 text-xs font-black text-gray-400 uppercase tracking-[0.2em] whitespace-nowrap">월 보험료</th>
                 <th className="px-4 py-3 text-xs font-black text-gray-400 uppercase tracking-[0.2em] text-right whitespace-nowrap">터치 / 관리</th>
               </tr>
             </thead>
@@ -433,6 +453,7 @@ export default function CustomerCRM({
                                 계약고객
                               </button>
                             </div>
+                            <input type="number" value={editCustPremium} onChange={e => onUpdateState('editCustPremium', e.target.value)} placeholder="보험료" className="w-full px-3 py-2 border rounded-xl" />
                           </div>
                         </td>
                         <td className="px-4 py-3 text-right">
@@ -504,6 +525,9 @@ export default function CustomerCRM({
                             {(c.riders || []).join(', ') || '특약 없음'}
                           </div>
                         </td>
+                        <td className="px-4 py-4 text-gray-900 font-black text-xs whitespace-nowrap border-b border-gray-50">
+                          {c.monthly_premium ? `${c.monthly_premium.toLocaleString()}원` : '-'}
+                        </td>
                         <td className="px-4 py-4 text-right whitespace-nowrap border-b border-gray-50">
                           <div className="flex items-center justify-end gap-3">
                             <button 
@@ -517,6 +541,16 @@ export default function CustomerCRM({
                               title="질병고지 요청 링크 복사"
                             >
                               <ClipboardDocumentListIcon className="w-4 h-4" />
+                            </button>
+                            <button 
+                              onClick={() => {
+                                setClaimingCustomer(c)
+                                setShowClaimModal(true)
+                              }}
+                              className="text-gray-400 hover:text-primary-600 hover:bg-primary-50 p-1.5 rounded-lg transition-all"
+                              title="보상청구 신청서 작성"
+                            >
+                              <DocumentMagnifyingGlassIcon className="w-4 h-4" />
                             </button>
                             <div className="flex flex-col items-end gap-1 group/touch">
                               <div className="flex items-center gap-1.5">
@@ -733,7 +767,35 @@ export default function CustomerCRM({
             </tbody>
           </table>
         </div>
-      </div>
+        </div>
+
+      {/* Claim Request Modal */}
+      {showClaimModal && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-md p-4 sm:p-6 overflow-y-auto">
+          <div className="bg-white w-full max-w-4xl rounded-[2.5rem] shadow-2xl relative overflow-hidden flex flex-col max-h-[90vh]">
+            <div className="absolute top-6 right-8 z-[110]">
+              <button 
+                onClick={() => setShowClaimModal(false)}
+                className="p-3 bg-gray-100 hover:bg-rose-50 hover:text-rose-600 text-gray-400 rounded-2xl transition-all shadow-sm"
+              >
+                <XMarkIcon className="w-6 h-6" />
+              </button>
+            </div>
+            
+            <div className="flex-1 overflow-y-auto custom-scrollbar p-1">
+              <DetailedClaimForm 
+                plannerId={planner?.id} 
+                initialData={claimingCustomer}
+                onSuccess={() => {
+                  setShowClaimModal(false)
+                  onUpdate()
+                }} 
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
+

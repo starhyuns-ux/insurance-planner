@@ -7,7 +7,7 @@ export default function About() {
 
   return (
     <section className="py-24 bg-white">
-      <div className="container max-w-5xl">
+      <div className="container mx-auto px-4 max-w-5xl">
         <div className="text-center mb-16">
           <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900 mb-4 tracking-tight">
             {t('aboutTitle')}

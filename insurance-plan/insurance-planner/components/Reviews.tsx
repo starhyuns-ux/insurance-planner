@@ -56,14 +56,14 @@ export default function Reviews() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M14 5l7 7m0 0l-7 7m7-7H3" />
                   </svg>
                 </div>
-                <div className="flex justify-between items-center relative z-10">
-                  <div className="text-center w-5/12 bg-white/50 py-2 rounded-xl backdrop-blur-sm">
-                    <div className="text-xs text-gray-500 font-bold mb-1">{t('reviewsBefore')}</div>
-                    <div className="text-gray-400 font-bold line-through decoration-gray-400/50 decoration-2">{r.before}원</div>
+                <div className="flex justify-between items-center relative z-10 gap-2">
+                  <div className="text-center w-1/2 bg-white/50 py-2 rounded-xl backdrop-blur-sm">
+                    <div className="text-[10px] md:text-xs text-gray-500 font-bold mb-1">{t('reviewsBefore')}</div>
+                    <div className="text-sm md:text-base text-gray-400 font-bold line-through decoration-gray-400/50 decoration-2">{r.before}원</div>
                   </div>
-                  <div className="text-center w-5/12 bg-primary-50 py-2 rounded-xl border border-primary-100/50">
-                    <div className="text-xs text-primary-700 font-bold mb-1">{t('reviewsAfter')}</div>
-                    <div className="text-primary-600 font-extrabold text-xl">{r.after}원</div>
+                  <div className="text-center w-1/2 bg-primary-50 py-2 rounded-xl border border-primary-100/50">
+                    <div className="text-[10px] md:text-xs text-primary-700 font-bold mb-1">{t('reviewsAfter')}</div>
+                    <div className="text-primary-600 font-extrabold text-base md:text-xl">{r.after}원</div>
                   </div>
                 </div>
               </div>

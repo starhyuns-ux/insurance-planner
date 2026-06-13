@@ -76,7 +76,18 @@ export default function NavBar() {
                 인슈<span className="text-primary-600">닷</span>
               </span>
               {planner && (
-                <span className="text-[9px] font-bold text-gray-400 -mt-0.5 tracking-tighter">by {planner.name}</span>
+                <div className="flex items-center gap-1.5 -mt-0.5">
+                  <div className="w-3.5 h-3.5 rounded-full overflow-hidden border border-primary-200">
+                    {planner.profile_image_url ? (
+                      <img src={planner.profile_image_url} alt={planner.name} className="w-full h-full object-cover" />
+                    ) : (
+                      <div className="w-full h-full bg-primary-600 flex items-center justify-center text-[6px] text-white font-black">
+                        {planner.name[0]}
+                      </div>
+                    )}
+                  </div>
+                  <span className="text-[9px] font-black text-primary-600 tracking-tighter truncate max-w-[60px] xs:max-w-[80px]">{planner.name} 설계사</span>
+                </div>
               )}
             </div>
           </Link>
@@ -97,16 +108,16 @@ export default function NavBar() {
             </div>
 
             {/* Mobile Actions */}
-            <div className="flex items-center lg:hidden gap-1">
+            <div className="flex items-center lg:hidden gap-0.5 sm:gap-1">
               <LanguageSwitcher />
-              <Link href={user ? "/dashboard" : "/login"} className={`p-2 ml-1 ${user ? 'text-gray-600 hover:text-primary-600' : 'text-primary-600 hover:text-primary-700'}`}>
-                <UserCircleIcon className="w-6 h-6" />
+              <Link href={user ? "/dashboard" : "/login"} className={`p-1.5 sm:p-2 ${user ? 'text-gray-600 hover:text-primary-600' : 'text-primary-600 hover:text-primary-700'}`}>
+                <UserCircleIcon className="w-5 h-5 sm:w-6 sm:h-6" />
               </Link>
               <button
                 onClick={() => setIsOpen(!isOpen)}
-                className="p-2 -mr-2 text-gray-600 hover:text-gray-900 focus:outline-none"
+                className="p-1.5 sm:p-2 -mr-1 text-gray-600 hover:text-gray-900 focus:outline-none"
               >
-                {isOpen ? <XMarkIcon className="w-7 h-7" /> : <Bars3Icon className="w-7 h-7" />}
+                {isOpen ? <XMarkIcon className="w-6 h-6 sm:w-7 sm:h-7" /> : <Bars3Icon className="w-6 h-6 sm:w-7 sm:h-7" />}
               </button>
             </div>
           </div>

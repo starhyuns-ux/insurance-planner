@@ -84,7 +84,8 @@ export default function CalendarPage() {
         planner_id: planner.id,
         content: newTodoContent.trim(),
         target_date: todoDate,
-        is_completed: false
+        status: 'none',
+        memo: ''
       }])
       .select()
     if (!error && data) {
@@ -93,13 +94,23 @@ export default function CalendarPage() {
     }
   }
 
-  const toggleTodo = async (id: string, isCompleted: boolean) => {
+  const updateTodoStatus = async (id: string, status: string) => {
     const { error } = await supabase
       .from('todos')
-      .update({ is_completed: !isCompleted })
+      .update({ status })
       .eq('id', id)
     if (!error) {
-      setTodos(todos.map(t => t.id === id ? { ...t, is_completed: !isCompleted } : t))
+      setTodos(todos.map(t => t.id === id ? { ...t, status } : t))
+    }
+  }
+
+  const updateTodoMemo = async (id: string, memo: string) => {
+    const { error } = await supabase
+      .from('todos')
+      .update({ memo })
+      .eq('id', id)
+    if (!error) {
+      setTodos(todos.map(t => t.id === id ? { ...t, memo } : t))
     }
   }
 
@@ -140,7 +151,8 @@ export default function CalendarPage() {
           if (key === 'editingTodoId') setEditingTodoId(value)
         }}
         onAddTodo={addTodo}
-        onToggleTodo={toggleTodo}
+        onUpdateTodoStatus={updateTodoStatus}
+        onUpdateTodoMemo={updateTodoMemo}
         onDeleteTodo={deleteTodo}
         onStartEditingTodo={(todo) => {
           setEditingTodoId(todo.id)

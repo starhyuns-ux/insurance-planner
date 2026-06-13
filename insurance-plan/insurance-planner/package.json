@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "generate-grid": "npx tsx scripts/generate-pdf-grid.ts"
   },
   "dependencies": {
     "@heroicons/react": "^2.2.0",

@@ -9,9 +9,13 @@ import {
   SparklesIcon, 
   MagnifyingGlassIcon,
   BanknotesIcon,
-  GlobeAltIcon
+  GlobeAltIcon,
+  ShareIcon,
+  CheckIcon
 } from '@heroicons/react/24/outline'
 import { useLanguage } from '@/lib/contexts/LanguageContext'
+import { useState } from 'react'
+import { toast } from 'sonner'
 
 interface ToolkitMenuProps {
   id: string
@@ -20,6 +24,31 @@ interface ToolkitMenuProps {
 
 export default function ToolkitMenu({ id, plannerName }: ToolkitMenuProps) {
   const { t } = useLanguage();
+  const [copied, setCopied] = useState(false);
+
+  const handleShare = async () => {
+    const shareUrl = `${window.location.origin}/p/${id}/card`
+    const shareData = {
+      title: `${plannerName} 설계사의 스마트 툴키트`,
+      text: `보험 전문가 ${plannerName}님이 제공하는 보장분석 및 보험료 계산 도구 모음입니다.`,
+      url: shareUrl,
+    }
+
+    if (navigator.share && navigator.canShare && navigator.canShare(shareData)) {
+      try {
+        await navigator.share(shareData)
+        return
+      } catch (err) {
+        console.log('Share failed:', err)
+      }
+    }
+
+    // Fallback: Copy to clipboard
+    navigator.clipboard.writeText(shareUrl)
+    setCopied(true)
+    toast.success('툴키트 공유 링크가 복사되었습니다.')
+    setTimeout(() => setCopied(false), 2000)
+  }
 
   return (
     <div className="bg-white border-t border-gray-100 py-24">
@@ -34,7 +63,8 @@ export default function ToolkitMenu({ id, plannerName }: ToolkitMenuProps) {
           </p>
         </div>
 
-        <div className="grid grid-cols-3 gap-3 md:gap-8">
+        <div className="grid grid-cols-3 gap-3 md:gap-8 mb-16">
+          {/* ... existing tools ... */}
           <Link 
             href={`/p/${id}/card/tools/premium`}
             className="group relative bg-white p-4 md:p-8 rounded-2xl md:rounded-[2.5rem] shadow-md md:shadow-xl border border-gray-100 hover:border-primary-500 hover:-translate-y-1 md:hover:-translate-y-2 transition-all duration-300 flex flex-col items-center text-center"
@@ -169,6 +199,39 @@ export default function ToolkitMenu({ id, plannerName }: ToolkitMenuProps) {
               {t('execute')} →
             </div>
           </Link>
+        </div>
+
+        {/* Share Section */}
+        <div className="mt-20 p-8 md:p-12 rounded-[2.5rem] bg-gradient-to-br from-gray-900 via-gray-800 to-primary-950 text-white shadow-2xl relative overflow-hidden text-center">
+          <div className="absolute top-0 right-0 -mr-20 -mt-20 w-80 h-80 bg-primary-600 rounded-full opacity-20 blur-[100px] pointer-events-none" />
+          <div className="absolute bottom-0 left-0 -ml-20 -mb-20 w-80 h-80 bg-blue-500 rounded-full opacity-20 blur-[100px] pointer-events-none" />
+          
+          <div className="relative z-10">
+            <h3 className="text-2xl font-black mb-4 tracking-tight">이 전문 툴키트를 고객에게 발급하세요</h3>
+            <p className="text-gray-400 font-bold mb-10 leading-relaxed max-w-lg mx-auto">
+              상담 중인 고객에게 이 링크를 보내면, 설계사님의 정보가 담긴<br className="hidden md:block" />
+              전문가 페이지로 고객이 바로 접속할 수 있습니다.
+            </p>
+            <button
+              onClick={handleShare}
+              className="inline-flex items-center gap-4 bg-primary-600 text-white px-10 py-5 rounded-2xl font-black text-lg hover:bg-primary-500 hover:-translate-y-1 transition-all shadow-xl shadow-primary-900/40 active:scale-95 group"
+            >
+              {copied ? (
+                <>
+                  <CheckIcon className="w-6 h-6" />
+                  링크 복사 완료
+                </>
+              ) : (
+                <>
+                  <ShareIcon className="w-6 h-6 group-hover:rotate-12 transition-transform" />
+                  전문 툴키트 고객에게 전송하기
+                </>
+              )}
+            </button>
+            <p className="mt-6 text-[10px] text-gray-500 font-black tracking-widest uppercase">
+              ※ 카카오톡, 문자 메시지로 즉시 전달 가능합니다.
+            </p>
+          </div>
         </div>
       </div>
     </div>

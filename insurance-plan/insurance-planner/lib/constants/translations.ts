@@ -69,12 +69,12 @@ export const translations = {
     silbiHospitalGen2: '급여/비급여 통합 10% 본인 부담',
     silbiHospitalGen3: '급여 10%, 비급여 20%, 3대비급여 30% 부담',
     silbiHospitalGen4: '급여 20%, 비급여 30% 본인 부담',
-    silbiHospitalGen5: '급여 20%, 중증비급여 30%, 비중증비급여 50% 본인부담',
+    silbiHospitalGen5: '급여 20%(한도 200만), 중증비급여 30%(한도 500만), 비중증 50%',
     silbiOutpatientGen1: '1일당 5,000원 정액 공제',
     silbiOutpatientGen2: '보통 1~2만원 정액 공제',
     silbiOutpatientGen3: '정액(1.5만) 또는 정률 중 큰 금액 공제',
     silbiOutpatientGen4: '급여 20%, 비급여 30% 중 큰 금액 공제',
-    silbiOutpatientGen5: '급여 20%, 중증 30%, 비중증 50%, 공제 2만원',
+    silbiOutpatientGen5: '급여 MAX(20%, 1~2만), 중증 MAX(30%, 3만), 비중증 MAX(50%, 5만)',
 
     // Units
     ageUnit: '세',
@@ -134,6 +134,12 @@ export const translations = {
     tryAgain: '다른 검색어로 다시 시도해 보세요.',
     freqHigh: '실무빈도 높음',
     relatedRiders: '연관특약',
+    popularSearches: '인기 검색어',
+    recentSearches: '최근 검색어',
+    copyCode: '코드 복사',
+    copied: '복사되었습니다',
+    expertConsult: '전문가에게 코드 문의하기',
+    searchAll: '전체 보기',
 
     // Rider Labels
     cancerDiag: '암 진단비',
@@ -174,6 +180,16 @@ export const translations = {
     gen3: '3세대',
     gen4: '4세대',
     gen5: '5세대',
+    gen1Date: '2009년 9월 이전 가입',
+    gen2Date: '2009년 10월 ~ 2017년 3월',
+    gen3Date: '2017년 4월 ~ 2021년 6월',
+    gen4Date: '2021년 7월 ~ 2026년 4월',
+    gen5Date: '2026년 5월 이후 가입',
+    gen1Feature: '전액 보상형 (자기부담 0%)',
+    gen2Feature: '자기부담 10~20% 도입',
+    gen3Feature: '3대 비급여 특약 분리',
+    gen4Feature: '비급여 이용량에 따른 할증',
+    gen5Feature: '급여 80%, 중증비급여 70% 보장',
 
     // Brand
     brandName: '인슈닷',
@@ -205,7 +221,7 @@ export const translations = {
     navAttributedTo: 'Attributed to',
 
     // Hero
-    heroBadge: '4월 한정 리모델링 상담 접수 중',
+    heroBadge: '신규 리모델링 상담 접수 중',
     heroTitlePrefix: '보험료는 절약하고',
     heroTitleHighlight: '보장은 제대로',
     heroDesc: '전문가의 1:1 맞춤 분석으로 부담스러운 보험료는 낮추고,\n가장 어려운 순간에 든든한 혜택을 채워드립니다.',
@@ -232,12 +248,12 @@ export const translations = {
     footerCustomerCenter: '고객 센터',
     footerHours: '평일 09:00 - 18:00 (주말 휴무)',
     footerKakaoConsult: '카카오톡 1:1 문의',
-    footerCompany: '인터커스텀',
-    footerCEO: '인터커스텀',
+    footerCompany: '인슈닷',
+    footerCEO: '인슈닷',
     footerBusinessNum: '207-30-62021',
     footerAddress: '주소: 서울시 광진구 광나루로56길 85, 17층 17호',
-    footerPrivacyOfficer: '인터커스텀',
-    footerCopyright: (year: number) => `© ${year} 인터커스텀. All rights reserved.`,
+    footerPrivacyOfficer: '인슈닷',
+    footerCopyright: (year: number) => `© ${year} 인슈닷. All rights reserved.`,
     footerCopyrightNotice: '본 사이트의 모든 컨텐츠는 저작권법의 보호를 받습니다.',
     footerTerms: '이용약관',
     footerPrivacy: '개인정보처리방침',
@@ -487,6 +503,12 @@ export const translations = {
     tryAgain: 'Please try searching with another term.',
     freqHigh: 'High Frequency',
     relatedRiders: 'Related Riders',
+    popularSearches: 'Popular',
+    recentSearches: 'Recent',
+    copyCode: 'Copy Code',
+    copied: 'Copied to clipboard',
+    expertConsult: 'Consult an Expert',
+    searchAll: 'Show All',
 
     // Rider Labels
     cancerDiag: 'Cancer Diagnosis',
@@ -527,6 +549,16 @@ export const translations = {
     gen3: 'Gen 3',
     gen4: 'Gen 4',
     gen5: 'Gen 5',
+    gen1Date: 'Before Sep 2009',
+    gen2Date: 'Oct 2009 - Mar 2017',
+    gen3Date: 'Apr 2017 - Jun 2021',
+    gen4Date: 'Jul 2021 - Apr 2026',
+    gen5Date: 'After May 2026',
+    gen1Feature: '100% Reimb. (0% Self-pay)',
+    gen2Feature: '10-20% Self-pay introduced',
+    gen3Feature: '3 Major Non-covered split',
+    gen4Feature: 'Differential premiums',
+    gen5Feature: '80% Covered, 70% Severe',
 
     // Brand
     brandName: 'InsuDot',
@@ -558,7 +590,7 @@ export const translations = {
     navAttributedTo: 'Attributed to',
 
     // Hero
-    heroBadge: 'April limited remodeling consultation',
+    heroBadge: 'New remodeling consultation in progress',
     heroTitlePrefix: 'Save on Premiums',
     heroTitleHighlight: 'Ensure Coverage',
     heroDesc: 'Through expert 1:1 analysis, your burdensome premiums are reduced,\nbringing you strong benefits when you need them most.',
@@ -827,6 +859,7 @@ export const translations = {
     navVascularStudyDesc: '缺血性心脏病的理解与应对方案',
     diseaseCode: '疾病代码查询',
     diseaseCodeDesc: '根据诊断书代码查询保险理赔及实务细节',
+    copied: '已复制',
 
     // Alerts & Notices
     alertBirthDate: '请输入出生日期或诊疗费。',
@@ -885,6 +918,16 @@ export const translations = {
     gen3: '第3代',
     gen4: '第4代',
     gen5: '第5代',
+    gen1Date: '2009年9월以前投保',
+    gen2Date: '2009年10월 ~ 2017年3월',
+    gen3Date: '2017年4월 ~ 2021年6월',
+    gen4Date: '2021年7월 ~ 2026年4월',
+    gen5Date: '2026年5월以后投保',
+    gen1Feature: '全额赔付 (0%自付)',
+    gen2Feature: '开始引入10-20%自付',
+    gen3Feature: '三大类非医保分离',
+    gen4Feature: '非医保使用差异化费率',
+    gen5Feature: '医保80%, 重症70%保障',
 
     // Brand
     brandName: 'InsuDot',

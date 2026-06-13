@@ -4,6 +4,7 @@ import React from 'react'
 import { format, differenceInDays, parseISO } from 'date-fns'
 import { getInsuranceAge } from '@/lib/time'
 import { SparklesIcon, CalendarIcon, UserGroupIcon, ExclamationCircleIcon } from '@heroicons/react/24/outline'
+import Link from 'next/link'
 
 interface DashboardGreetingProps {
   planner: any
@@ -73,32 +74,34 @@ export default function DashboardGreeting({ planner, todos, customers }: Dashboa
           </div>
 
           {/* 연락 고객 요약 */}
-          <div className="bg-white border-2 border-primary-500 rounded-2xl p-5 w-full sm:w-64 shadow-2xl transition-transform hover:-translate-y-1">
-            <div className="flex items-center gap-2 mb-3">
-              <UserGroupIcon className="w-5 h-5 text-rose-500" />
-              <h3 className="font-bold text-sm text-gray-900 tracking-widest uppercase flex-1">연락해볼 고객</h3>
-              <span className="bg-rose-100 text-rose-600 text-[10px] font-black px-2 py-0.5 rounded-full">{contactTargets.length}명</span>
+          <Link href="/dashboard/customers" className="block w-full sm:w-64">
+            <div className="bg-white border-2 border-primary-500 rounded-2xl p-5 w-full h-full shadow-2xl transition-transform hover:-translate-y-1 cursor-pointer">
+              <div className="flex items-center gap-2 mb-3">
+                <UserGroupIcon className="w-5 h-5 text-rose-500" />
+                <h3 className="font-bold text-sm text-gray-900 tracking-widest uppercase flex-1">연락해볼 고객</h3>
+                <span className="bg-rose-100 text-rose-600 text-[10px] font-black px-2 py-0.5 rounded-full">{contactTargets.length}명</span>
+              </div>
+              {topTargets.length > 0 ? (
+                <div className="flex flex-wrap gap-1.5">
+                  {topTargets.map((c, i) => (
+                    <span key={i} className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-gray-50 text-gray-700 border border-gray-200 rounded-lg text-xs font-bold hover:bg-white hover:border-gray-300 transition-colors shadow-sm cursor-pointer" title={c.last_touch_at ? `마지막 연락: ${differenceInDays(new Date(), parseISO(c.last_touch_at))}일 전` : '연락처 없음'}>
+                      <span className="text-rose-500 shrink-0"><ExclamationCircleIcon className="w-3 h-3" /></span>
+                      <span className="truncate max-w-[80px]">{c.name}</span>
+                    </span>
+                  ))}
+                  {contactTargets.length > 5 && (
+                    <span className="inline-flex items-center px-2 py-1 text-[10px] font-black text-gray-400">
+                      +{contactTargets.length - 5}명 더보기
+                    </span>
+                  )}
+                </div>
+              ) : (
+                <div className="flex flex-col justify-center h-full pb-2">
+                  <span className="text-sm font-bold text-gray-500">모든 고객과 최근에<br/>연락을 주고받았습니다! 🎉</span>
+                </div>
+              )}
             </div>
-            {topTargets.length > 0 ? (
-              <div className="flex flex-wrap gap-1.5">
-                {topTargets.map((c, i) => (
-                  <span key={i} className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-gray-50 text-gray-700 border border-gray-200 rounded-lg text-xs font-bold hover:bg-white hover:border-gray-300 transition-colors shadow-sm cursor-default" title={c.last_touch_at ? `마지막 연락: ${differenceInDays(new Date(), parseISO(c.last_touch_at))}일 전` : '연락처 없음'}>
-                    <span className="text-rose-500 shrink-0"><ExclamationCircleIcon className="w-3 h-3" /></span>
-                    <span className="truncate max-w-[80px]">{c.name}</span>
-                  </span>
-                ))}
-                {contactTargets.length > 5 && (
-                  <span className="inline-flex items-center px-2 py-1 text-[10px] font-black text-gray-400">
-                    +{contactTargets.length - 5}명 더보기
-                  </span>
-                )}
-              </div>
-            ) : (
-              <div className="flex flex-col justify-center h-full pb-2">
-                <span className="text-sm font-bold text-gray-500">모든 고객과 최근에<br/>연락을 주고받았습니다! 🎉</span>
-              </div>
-            )}
-          </div>
+          </Link>
         </div>
       </div>
     </div>

@@ -3,6 +3,7 @@ import NavBar from '@/components/NavBar'
 import Footer from '@/components/Footer'
 import DetailedClaimForm from '@/components/DetailedClaimForm'
 import ClientAccessGuard from '@/components/ClientAccessGuard'
+import ClaimFaxList from '@/components/ClaimFaxList'
 
 export const metadata: Metadata = {
     title: '보험 보상청구 신청 | 인슈닷',
@@ -20,6 +21,7 @@ export default function ClaimPage() {
                 <NavBar />
                 <div className="flex-1 container mx-auto px-4 py-8 lg:py-12">
                     <DetailedClaimForm />
+                    <ClaimFaxList />
                 </div>
                 <Footer />
             </main>

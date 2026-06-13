@@ -5,6 +5,9 @@ export type DiseaseItem = {
     desc?: string
     isImportant?: boolean
     riders?: string[]
+    claimTips?: string
+    deepAnalysis?: string
+    requiredDocs?: string[]
 }
 
 export type SubCategory = {
@@ -22,348 +25,334 @@ export type TopCategory = {
 
 export const getLocalizedRiders = (t: any) => {
     return {
-        CANCER: [t('cancerDiag'), t('cancerSurgery'), t('chemo')],
-        BRAIN: [t('brainDiag'), t('brainSurgery')],
-        HEART: [t('heartDiag'), t('heartSurgery')],
-        INJURY: [t('injurySurgery'), t('fractureDiag'), t('injuryAftermath')],
-        DISEASE: [t('diseaseSurgery'), t('nDiseaseSurgery')]
+        CANCER: [t('cancerDiag'), t('cancerSurgery'), t('chemo'), '항암방사선약물치료', '표적항암약물허가치료'],
+        PSEUDO: ['유사암진단비', '제자리암진단비', '경계성종양진단비', '소액암진단비'],
+        BRAIN: [t('brainDiag'), t('brainSurgery'), '뇌혈관질환수술', '특정뇌혈관질환진단', '뇌졸중진단'],
+        HEART: [t('heartDiag'), t('heartSurgery'), '허혈성심장질환수술', '심혈관질환진단(부정맥포함)', '급성심근경색진단'],
+        INJURY: [t('injurySurgery'), t('fractureDiag'), t('injuryAftermath'), '골절수술비', '5대골절진단', '상해후유장해'],
+        DISEASE: [t('diseaseSurgery'), t('nDiseaseSurgery'), '1-5종수술비', '질병수술비', '질병후유장해', '희귀난치성질환진단']
     }
 }
 
 export const getGroupedDiseaseData = (t: any, locale: string): TopCategory[] => {
     const riders = getLocalizedRiders(t)
+    const isKo = locale === 'ko'
     
-    // Helper to get translated string for disease-specific content if needed
-    // In a real app we might have separate large JSON files for each language.
-    // For now, we'll provide translations for the current data.
-
     return [
         {
             id: 'C',
-            title: locale === 'ko' ? '[C코드] 암 (악성신생물)' : (locale === 'en' ? '[C-Code] Cancer (Malignant)' : '[C代码] 癌症 (恶性肿瘤)'),
-            shortTitle: locale === 'ko' ? 'C코드 (암)' : (locale === 'en' ? 'C-Code (Cancer)' : 'C代码 (癌症)'),
-            desc: locale === 'ko' ? '악성 종양(일반암) 분류 코드입니다.' : (locale === 'en' ? 'Classification codes for malignant tumors.' : '恶性肿瘤(一般癌症)分类代码。'),
+            title: isKo ? '[C코드] 악성 신생물 (세부 암)' : '[C-Code] Malignancies (Detailed)',
+            shortTitle: 'C코드',
+            desc: isKo ? '소수점 단위 세부 암 코드까지 하나하나 분류했습니다.' : 'Detailed cancer codes including decimal sub-codes.',
             subCategories: [
                 {
-                    name: locale === 'ko' ? '소화기계 암' : (locale === 'en' ? 'Digestive System Cancer' : '消化系统癌症'),
+                    name: isKo ? '위의 악성 신생물 (C16)' : 'Stomach Cancer (C16)',
                     items: [
-                        { name: locale === 'ko' ? '입술암' : (locale === 'en' ? 'Lip Cancer' : '唇癌'), code: 'C00', riders: riders.CANCER },
-                        { name: locale === 'ko' ? '구강암' : (locale === 'en' ? 'Oral Cancer' : '口腔癌'), code: 'C02–C06', riders: riders.CANCER },
-                        { name: locale === 'ko' ? '식도암' : (locale === 'en' ? 'Esophageal Cancer' : '食道癌'), code: 'C15', riders: riders.CANCER },
-                        { name: locale === 'ko' ? '위암' : (locale === 'en' ? 'Stomach Cancer' : '胃癌'), code: 'C16', riders: riders.CANCER },
-                        { name: locale === 'ko' ? '소장암' : (locale === 'en' ? 'Small Intestine Cancer' : '小肠癌'), code: 'C17', riders: riders.CANCER },
-                        { name: locale === 'ko' ? '대장암' : (locale === 'en' ? 'Colon Cancer' : '结肠癌'), code: 'C18', riders: riders.CANCER },
-                        { name: locale === 'ko' ? '직장암' : (locale === 'en' ? 'Rectal Cancer' : '直肠癌'), code: 'C19–C20', riders: riders.CANCER },
-                        { name: locale === 'ko' ? '간암' : (locale === 'en' ? 'Liver Cancer' : '肝癌'), code: 'C22', riders: riders.CANCER },
-                        { name: locale === 'ko' ? '담낭·담도암' : (locale === 'en' ? 'Gallbladder/Bile Duct Cancer' : '胆囊·胆道癌'), code: 'C23–C24', riders: riders.CANCER },
-                        { name: locale === 'ko' ? '췌장암' : (locale === 'en' ? 'Pancreatic Cancer' : '胰腺癌'), code: 'C25', riders: riders.CANCER },
+                        { name: isKo ? '위의 분문' : 'Cardia', code: 'C16.0', riders: riders.CANCER, deepAnalysis: isKo ? '분문부 암은 식도 역류 질환과 혼동될 수 있으나, 내시경 소견상 Z-line 침범 여부가 일반암 판정의 핵심입니다.' : 'Z-line invasion is key for malignant diagnosis.' },
+                        { name: isKo ? '위의 위저' : 'Fundus of stomach', code: 'C16.1', riders: riders.CANCER, deepAnalysis: isKo ? '위저부 종양은 조직검사 시 점막하종양(SMT)으로 오인될 수 있으나, EUS(내시경 초음파)를 통해 침윤 깊이를 확정해야 합니다.' : 'EUS is essential for confirming invasion depth.' },
+                        { name: isKo ? '위의 위체' : 'Body of stomach', code: 'C16.2', riders: riders.CANCER, deepAnalysis: isKo ? '가장 흔한 부위이며, 위점막내암(EGC)의 경우 병리 보고서상 "Lamina Propria" 침윤 여부에 따라 소액암과 일반암이 갈립니다.' : 'Invasion of Lamina Propria determines malignant vs minor payout.' },
+                        { name: isKo ? '위의 전정부' : 'Pyloric antrum', code: 'C16.3', riders: riders.CANCER, deepAnalysis: isKo ? '전정부 암은 림프절 전이가 빠른 특성이 있어, 수술 기록지상 전이 여부를 확인하여 전이암 진단비를 추가 검토하십시오.' : 'Check lymph node metastasis for additional benefits.' },
+                        { name: isKo ? '위의 유문' : 'Pylorus', code: 'C16.4', riders: riders.CANCER, claimTips: isKo ? '유문 협착으로 인한 영양 결핍 시 TPN(총정맥영양) 투여 기록을 확보하여 암 입원일당 및 수술 후 관리 비용 실비를 꼼꼼히 챙기십시오.' : 'Check TPN records for malnutrition due to pyloric stenosis.', deepAnalysis: isKo ? '유문부 암은 위 배출 지연을 유발하며, 이는 병리 보고서상 림프절 전이 비율(LNR)이 높게 나타나는 경향이 있어 항암 방사선 치료 담보를 우선 검토해야 합니다.' : 'Pyloric cancer often shows high LNR; prioritize radiotherapy coverage.' },
+                        { name: isKo ? '위의 소만' : 'Lesser curvature', code: 'C16.5', riders: riders.CANCER, claimTips: isKo ? '소만 부위는 혈관이 풍부하여 수술 중 출혈 위험이 큽니다. 수술 기록지의 Blood loss 양을 확인하여 수혈 보험금 청구 가능성을 점검하십시오.' : 'Check surgery records for blood loss and transfusion benefits.', deepAnalysis: isKo ? '소만은 림프절 전이 경로의 핵심 통로입니다. No.1, No.3 림프절 절제 범위를 확인하여 병기 판정의 적정성을 재검토하십시오.' : 'Verify No.1/No.3 lymph node dissection for accurate staging.' },
+                        { name: isKo ? '위의 대만' : 'Greater curvature', code: 'C16.6', riders: riders.CANCER, deepAnalysis: isKo ? '대만부 종양은 위장관 기질종양(GIST)과 혼동될 수 있습니다. 조직검사상 Mitosis(세포분열) 수치를 확인하여 악성 여부를 재판독하십시오.' : 'Check Mitosis count to distinguish from GIST.' },
+                        { name: isKo ? '위의 상세불명' : 'Unspecified stomach', code: 'C16.9', riders: riders.CANCER, claimTips: isKo ? '검진 단계에서 발견 시 C16.9로 시작하나, 최종 병리 보고서에서 세부 부위가 확정되면 코드를 정정하여 부위별 암 진단비 누락을 방지하십시오.' : 'Correct code after pathology to avoid missing site-specific benefits.' }
                     ]
                 },
                 {
-                    name: locale === 'ko' ? '호흡기계 암' : (locale === 'en' ? 'Respiratory System Cancer' : '呼吸系统癌症'),
+                    name: isKo ? '결장(대장)의 악성 신생물 (C18)' : 'Colon Cancer (C18)',
                     items: [
-                        { name: locale === 'ko' ? '비강·부비동암' : (locale === 'en' ? 'Nasal/Paranasal Sinus Cancer' : '鼻腔·副鼻窦癌'), code: 'C30–C31', riders: riders.CANCER },
-                        { name: locale === 'ko' ? '후두암' : (locale === 'en' ? 'Laryngeal Cancer' : '喉癌'), code: 'C32', riders: riders.CANCER },
-                        { name: locale === 'ko' ? '기관·기관지·폐암' : (locale === 'en' ? 'Trachea/Bronchus/Lung Cancer' : '气管·支气管·肺癌'), code: 'C33–C34', riders: riders.CANCER },
+                        { name: isKo ? '맹장' : 'Cecum', code: 'C18.0', riders: riders.CANCER, deepAnalysis: isKo ? '맹장 부위 암은 증상이 늦게 나타나 고기기암(Advanced)으로 발견되는 경우가 많아 사망 보험금 연계 검토가 필요합니다.' : 'Often discovered at advanced stage; consider death benefit links.' },
+                        { name: isKo ? '충수' : 'Appendix', code: 'C18.1', riders: riders.CANCER, deepAnalysis: isKo ? '충수암은 희귀암에 해당할 수 있으며, 복막 가성점액종 동반 시 암 치료비 한도가 크게 상승할 수 있습니다.' : 'Rare cancer; consider Pseudomyxoma Peritonei for higher limits.' },
+                        { name: isKo ? '상행결장' : 'Ascending colon', code: 'C18.2', riders: riders.CANCER, claimTips: isKo ? '상행결장은 분변이 액체 상태인 구간이라 폐쇄 증상이 늦습니다. 빈혈로 처음 발견된 경우 건강검진 결과지의 빈혈 소견을 증거로 활용하십시오.' : 'Anemia is often the first sign; use health check records as evidence.', deepAnalysis: isKo ? '우측 대장암은 유전성 비폴립성 대장암(HNPCC)과 연관될 확률이 높으므로, 가족력이 있다면 유전자 검사비 실손 보상을 안내하십시오.' : 'High link with HNPCC; advise on genetic test reimbursement.' },
+                        { name: isKo ? '횡행결장' : 'Transverse colon', code: 'C18.4', riders: riders.CANCER, claimTips: isKo ? '횡행결장은 인접 장기(위, 췌장)로의 침윤이 쉽습니다. 주변 장기 동시 절제 시 다중 수술비 지급 대상인지 확인하십시오.' : 'Check for multiple surgical benefits if adjacent organs were resected.', deepAnalysis: isKo ? '장간막 림프절 전이가 쉬운 부위입니다. CEA 수치 추이를 분석하여 재발 가능성에 따른 암 치료비 한도 증액을 제안하십시오.' : 'Monitor CEA levels for recurrence risk and coverage expansion.' },
+                        { name: isKo ? '하행결장' : 'Descending colon', code: 'C18.6', riders: riders.CANCER, deepAnalysis: isKo ? '좌측 대장암은 폐 전이 위험이 상대적으로 높습니다. 흉부 CT 결과를 병행 검토하여 전이암 진단비 수령 가능성을 타진하십시오.' : 'Higher lung metastasis risk; review chest CT for secondary malignancy benefits.' },
+                        { name: isKo ? 'S상결장' : 'Sigmoid colon', code: 'C18.7', riders: riders.CANCER, isImportant: true, deepAnalysis: isKo ? 'S상결장암은 대장 점막내암 분쟁의 중심입니다. 대법원 판례상 "Tis"가 아닌 "C18"로 코딩되면 100% 지급 대상입니다.' : 'Core of intramucosal disputes. C18 coding ensures 100% payout per precedents.' },
+                        { name: isKo ? '직장S상결장 이행부' : 'Rectosigmoid junction', code: 'C19', riders: riders.CANCER },
+                        { name: isKo ? '직장' : 'Rectum', code: 'C20', riders: riders.CANCER, deepAnalysis: isKo ? '직장암은 수술 후 인공항문(장루) 조성 시 고액 후유장해(보험금의 50% 이상) 청구가 가능합니다.' : 'Post-op stoma qualifies for high-amount disability claims (50%+).' }
                     ]
                 },
                 {
-                    name: locale === 'ko' ? '여성 생식기 암' : (locale === 'en' ? 'Female Genital Cancer' : '女性生殖器癌症'),
+                    name: isKo ? '간 및 담도 (C22-C24)' : 'Liver & Biliary (C22-C24)',
                     items: [
-                        { name: locale === 'ko' ? '자궁경부암' : (locale === 'en' ? 'Cervical Cancer' : '子宫颈癌'), code: 'C53', riders: riders.CANCER },
-                        { name: locale === 'ko' ? '자궁체부암' : (locale === 'en' ? 'Endometrial Cancer' : '子宫体癌'), code: 'C54', riders: riders.CANCER },
-                        { name: locale === 'ko' ? '난소암' : (locale === 'en' ? 'Ovarian Cancer' : '卵巢癌'), code: 'C56', riders: riders.CANCER },
-                        { name: locale === 'ko' ? '기타 여성 생식기암' : (locale === 'en' ? 'Other Female Genital Cancer' : '其他女性生殖器癌'), code: 'C51–C57', riders: riders.CANCER },
+                        { name: isKo ? '간세포암종' : 'Hepatocellular carcinoma', code: 'C22.0', riders: riders.CANCER, deepAnalysis: isKo ? '간암은 조직검사 없이 MRI/CT 결과만으로도 암 진단 확정이 가능한 부위이므로, 영상 판독지 소견이 가장 중요합니다.' : 'Imaging (MRI/CT) can confirm diagnosis without biopsy.' },
+                        { name: isKo ? '간내 담관암' : 'Intrahepatic bile duct carcinoma', code: 'C22.1', riders: riders.CANCER, deepAnalysis: isKo ? '담관암은 예후가 매우 불량하여 암 사망 및 말기 질환 담보 수령 가능성을 즉시 검토해야 합니다.' : 'Poor prognosis; review terminal illness benefits immediately.' },
+                        { name: isKo ? '담낭' : 'Gallbladder', code: 'C23', riders: riders.CANCER },
+                        { name: isKo ? '담도의 기타 부분' : 'Other parts of biliary tract', code: 'C24', riders: riders.CANCER }
                     ]
                 },
                 {
-                    name: locale === 'ko' ? '남성 생식기 암' : (locale === 'en' ? 'Male Genital Cancer' : '男性生殖器癌症'),
+                    name: isKo ? '기타 주요 소화기 암 (C25-C26)' : 'Other Digestive Cancers (C25-C26)',
                     items: [
-                        { name: locale === 'ko' ? '전립선암' : (locale === 'en' ? 'Prostate Cancer' : '前列腺癌'), code: 'C61', riders: riders.CANCER },
-                        { name: locale === 'ko' ? '고환암' : (locale === 'en' ? 'Testicular Cancer' : '睾丸癌'), code: 'C62', riders: riders.CANCER },
-                        { name: locale === 'ko' ? '음경암' : (locale === 'en' ? 'Penile Cancer' : '阴茎癌'), code: 'C60', riders: riders.CANCER },
+                        { name: isKo ? '췌장의 머리' : 'Head of pancreas', code: 'C25.0', riders: riders.CANCER, deepAnalysis: isKo ? '췌장 머리 부분 암은 담관 폐쇄를 유발하여 황달이 조기에 나타나며, 수술(휘플 수술) 시 합병증 발생률이 높아 고액 수술비 청구가 빈번합니다.' : 'Pancreatic head cancer often causes jaundice; Whipple surgery has high complication rates and high surgical benefits.' },
+                        { name: isKo ? '췌장의 몸통' : 'Body of pancreas', code: 'C25.1', riders: riders.CANCER },
+                        { name: isKo ? '췌장의 꼬리' : 'Tail of pancreas', code: 'C25.2', riders: riders.CANCER },
+                        { name: isKo ? '췌장관' : 'Pancreatic duct', code: 'C25.3', riders: riders.CANCER },
+                        { name: isKo ? '췌장의 상세불명' : 'Unspecified pancreas', code: 'C25.9', riders: riders.CANCER, isImportant: true, deepAnalysis: isKo ? '췌장암은 5대 고액암 및 10대 고액암 진단비의 핵심 질환입니다. 진단서상 C25 코드를 반드시 확보하십시오.' : 'Pancreatic cancer is a core 5/10 high-amount malignancy. Ensure C25 code on the certificate.' }
                     ]
                 },
                 {
-                    name: locale === 'ko' ? '비뇨기계 암' : (locale === 'en' ? 'Urinary System Cancer' : '泌尿系统癌症'),
+                    name: isKo ? '유방의 악성 신생물 (C50)' : 'Breast Cancer (C50)',
                     items: [
-                        { name: locale === 'ko' ? '신장암' : (locale === 'en' ? 'Kidney Cancer' : '肾癌'), code: 'C64', riders: riders.CANCER },
-                        { name: locale === 'ko' ? '신우암' : (locale === 'en' ? 'Renal Pelvis Cancer' : '肾盂癌'), code: 'C65', riders: riders.CANCER },
-                        { name: locale === 'ko' ? '요관암' : (locale === 'en' ? 'Ureter Cancer' : '输尿管癌'), code: 'C66', riders: riders.CANCER },
-                        { name: locale === 'ko' ? '방광암' : (locale === 'en' ? 'Bladder Cancer' : '膀胱癌'), code: 'C67', riders: riders.CANCER },
+                        { name: isKo ? '유방의 유두 및 유륜' : 'Nipple & areola', code: 'C50.0', riders: riders.CANCER },
+                        { name: isKo ? '유방의 중앙부' : 'Central portion', code: 'C50.1', riders: riders.CANCER },
+                        { name: isKo ? '유방의 내상사분기' : 'Upper-inner quadrant', code: 'C50.2', riders: riders.CANCER },
+                        { name: isKo ? '유방의 하내사분기' : 'Lower-inner quadrant', code: 'C50.3', riders: riders.CANCER },
+                        { name: isKo ? '유방의 외상사분기' : 'Upper-outer quadrant', code: 'C50.4', riders: riders.CANCER, isImportant: true, deepAnalysis: isKo ? '침윤성 유관암(IDC) 진단 시 병리 보고서의 Nottingham score를 통해 예후 및 암 입원일당 필요성을 분석하십시오.' : 'IDC diagnosis: analyze Nottingham score for prognosis and inpatient days.' },
+                        { name: isKo ? '유방의 하외사분기' : 'Lower-outer quadrant', code: 'C50.5', riders: riders.CANCER },
+                        { name: isKo ? '유방의 상세불명' : 'Unspecified breast', code: 'C50.9', riders: riders.CANCER }
                     ]
                 },
                 {
-                    name: locale === 'ko' ? '기타 주요 암' : (locale === 'en' ? 'Other Major Cancers' : '其他主要癌症'),
+                    name: isKo ? '비뇨기관의 악성 신생물 (C64-C68)' : 'Urinary Tract Cancers (C64-C68)',
                     items: [
-                        { name: locale === 'ko' ? '갑상선암' : (locale === 'en' ? 'Thyroid Cancer' : '甲状腺癌'), code: 'C73', riders: [t('pseudoCancerDiag'), t('cancerSurgery')] },
-                        { name: locale === 'ko' ? '뇌암' : (locale === 'en' ? 'Brain Cancer' : '脑癌'), code: 'C71', riders: riders.CANCER },
-                        { name: locale === 'ko' ? '림프종' : (locale === 'en' ? 'Lymphoma' : '淋巴瘤'), code: 'C81–C85', riders: riders.CANCER },
-                        { name: locale === 'ko' ? '다발성 골수종' : (locale === 'en' ? 'Multiple Myeloma' : '多发性骨髓瘤'), code: 'C90', riders: riders.CANCER },
-                        { name: locale === 'ko' ? '백혈병' : (locale === 'en' ? 'Leukemia' : '白血病'), code: 'C91–C95', riders: riders.CANCER },
-                        { name: locale === 'ko' ? '피부암' : (locale === 'en' ? 'Skin Cancer' : '皮肤癌'), code: 'C43–C44', riders: [t('otherSkinCancerDiag'), t('cancerSurgery')] },
-                        { name: locale === 'ko' ? '유방암' : (locale === 'en' ? 'Breast Cancer' : '乳腺癌'), code: 'C50', riders: riders.CANCER },
+                        { name: isKo ? '신우를 제외한 신장암' : 'Kidney, except renal pelvis', code: 'C64', riders: riders.CANCER, isImportant: true, deepAnalysis: isKo ? '신장암(RCC)은 수술 후 한쪽 신장을 적출할 경우 질병후유장해 30% 확정 수령 가능합니다.' : 'Post-nephrectomy qualifies for 30% disease disability benefits.' },
+                        { name: isKo ? '신우' : 'Renal pelvis', code: 'C65', riders: riders.CANCER },
+                        { name: isKo ? '요관' : 'Ureter', code: 'C66', riders: riders.CANCER },
+                        { name: isKo ? '방광의 삼각부' : 'Trigone of bladder', code: 'C67.0', riders: riders.CANCER },
+                        { name: isKo ? '방광의 측벽' : 'Lateral wall of bladder', code: 'C67.2', riders: riders.CANCER, isImportant: true, deepAnalysis: isKo ? '비침윤성 방광암은 D09.0으로 청구되기 쉬우나, 종양의 재발률과 악성도가 높은 경우 일반암 주장이 가능합니다.' : 'Non-invasive bladder cancer may be D09.0; argue C67 for high recurrence/grade.' },
+                        { name: isKo ? '요도' : 'Urethra', code: 'C68.0', riders: riders.CANCER }
                     ]
                 },
                 {
-                    name: locale === 'ko' ? '전이암 및 기타 악성신생물 (ICD-10)' : (locale === 'en' ? 'Metastatic & Other Cancers' : '转移癌及其他恶性肿瘤'),
+                    name: isKo ? '뇌 및 중추신경계의 악성 신생물 (C71-C72)' : 'Brain & CNS Cancers (C71-C72)',
                     items: [
-                        { name: locale === 'ko' ? '림프절 전이' : (locale === 'en' ? 'Lymph Node Metastasis' : '淋巴结转移'), code: 'C77', desc: locale === 'ko' ? '림프절의 이차성 악성신생물' : (locale === 'en' ? 'Secondary malignant neoplasm of lymph nodes' : '淋巴结的继发性恶性肿瘤'), riders: riders.CANCER },
-                        { name: locale === 'ko' ? '폐 전이' : (locale === 'en' ? 'Lung Metastasis' : '肺转移'), code: 'C78.0', desc: locale === 'ko' ? '폐의 이차성 악성신생물' : (locale === 'en' ? 'Secondary malignant neoplasm of lung' : '肺的继发性恶性肿瘤'), riders: riders.CANCER },
-                        { name: locale === 'ko' ? '흉막 전이' : (locale === 'en' ? 'Pleural Metastasis' : '胸膜转移'), code: 'C78.2', desc: locale === 'ko' ? '흉막 전이' : (locale === 'en' ? 'Pleural metastasis' : '胸膜转移'), riders: riders.CANCER },
-                        { name: locale === 'ko' ? '기타 호흡기·소화기관 전이' : (locale === 'en' ? 'Other Respiratory/Digestive Metastasis' : '其他呼吸·消化器官转移'), code: 'C78', desc: locale === 'ko' ? '폐·흉막 등 포함' : (locale === 'en' ? 'Includes lung, pleura, etc.' : '包括肺、胸膜等'), riders: riders.CANCER },
-                        { name: locale === 'ko' ? '뼈 전이' : (locale === 'en' ? 'Bone Metastasis' : '骨转移'), code: 'C79.5', desc: locale === 'ko' ? '뼈 및 골수 전이' : (locale === 'en' ? 'Secondary malignant neoplasm of bone' : '骨及骨髓转移'), riders: riders.CANCER },
-                        { name: locale === 'ko' ? '뇌 전이' : (locale === 'en' ? 'Brain Metastasis' : '脑转移'), code: 'C79.3', desc: locale === 'ko' ? '뇌 전이' : (locale === 'en' ? 'Brain metastasis' : '脑转移'), riders: riders.CANCER },
-                        { name: locale === 'ko' ? '간 전이' : (locale === 'en' ? 'Liver Metastasis' : '肝转移'), code: 'C78.7', desc: locale === 'ko' ? '간 전이' : (locale === 'en' ? 'Liver metastasis' : '肝转移'), riders: riders.CANCER },
-                        { name: locale === 'ko' ? '부신 전이' : (locale === 'en' ? 'Adrenal Gland Metastasis' : '肾上腺转移'), code: 'C79.7', desc: locale === 'ko' ? '부신 전이' : (locale === 'en' ? 'Adrenal gland metastasis' : '肾上腺转移'), riders: riders.CANCER },
-                        { name: locale === 'ko' ? '기타 부위 전이' : (locale === 'en' ? 'Other Site Metastasis' : '其他部位转移'), code: 'C79', desc: locale === 'ko' ? '기타 이차성 악성신생물' : (locale === 'en' ? 'Other secondary malignant neoplasms' : '其他继发性恶性肿瘤'), riders: riders.CANCER },
-                        { name: locale === 'ko' ? '원발부위 불명의 악성신생물' : (locale === 'en' ? 'Malignancy of Unknown Origin' : '原发部位不明的恶性肿瘤'), code: 'C80', desc: locale === 'ko' ? '암이 존재하지만 최초 발생 부위를 확인할 수 없는 경우' : (locale === 'en' ? 'Cancer present but primary site unknown' : '存在癌症但无法确认最初发生部位的情况'), riders: riders.CANCER },
+                        { name: isKo ? '대뇌' : 'Cerebrum', code: 'C71.0', riders: [...riders.CANCER, '고액암'], deepAnalysis: isKo ? '뇌종양은 조직검사가 불가능한 경우 "임상적 암"으로 인정받아야 합니다. 주치의의 소견서 문구가 보상의 전부입니다.' : 'If biopsy is impossible, claim "Clinical Malignancy" via physician statement.' },
+                        { name: isKo ? '전두엽' : 'Frontal lobe', code: 'C71.1', riders: [...riders.CANCER, '고액암'] },
+                        { name: isKo ? '측두엽' : 'Temporal lobe', code: 'C71.2', riders: [...riders.CANCER, '고액암'] },
+                        { name: isKo ? '뇌실' : 'Cerebral ventricle', code: 'C71.5', riders: [...riders.CANCER, '고액암'] },
+                        { name: isKo ? '뇌간' : 'Brain stem', code: 'C71.6', riders: [...riders.CANCER, '고액암'] },
+                        { name: isKo ? '척수' : 'Spinal cord', code: 'C72.0', riders: [...riders.CANCER, '고액암'], deepAnalysis: isKo ? '척수 암은 수술 후 신경학적 마비가 남는 경우가 많아 장해 보험금과 암 진단비를 동시 수령하는 고액 보상 건입니다.' : 'Spinal cancer often results in paralysis; claim both disability and malignancy benefits.' }
+                    ]
+                },
+                {
+                    name: isKo ? '다발성 골수종 및 악성 혈액질환 (C90)' : 'Multiple Myeloma & Blood (C90)',
+                    items: [
+                        { name: isKo ? '다발성 골수종' : 'Multiple myeloma', code: 'C90.0', riders: [...riders.CANCER, '고액암'], deepAnalysis: isKo ? '뼈의 골절이 동반된 경우 골밀도 검사 결과와 상관없이 암으로 인한 골파괴 소견을 상해로 주장할 수 있는지 검토해야 합니다.' : 'If fractures occur, review if bone destruction can be linked to cancer vs trauma.' },
+                        { name: isKo ? '혈장세포 백혈병' : 'Plasma cell leukemia', code: 'C90.1', riders: [...riders.CANCER, '고액암'] },
+                        { name: isKo ? '골수외 혈장세포종' : 'Extramedullary plasmacytoma', code: 'C90.2', riders: [...riders.CANCER, '고액암'] }
+                    ]
+                },
+                {
+                    name: isKo ? '기관지 및 폐 (C34)' : 'Bronchus & Lung (C34)',
+                    items: [
+                        { name: isKo ? '주기관지' : 'Main bronchus', code: 'C34.0', riders: riders.CANCER, deepAnalysis: isKo ? '기관지 분기점(Carina) 침범 시 수술이 불가능한 경우가 많습니다. 이 경우 방사선 치료비와 항암 약물 치료비 담보의 집중도가 중요합니다.' : 'Carina involvement often means inoperable; focus on chemo/radio benefits.' },
+                        { name: isKo ? '상엽' : 'Upper lobe', code: 'C34.1', riders: riders.CANCER, claimTips: isKo ? '상엽 암은 어깨 통증(Pancoast tumor)으로 오인되기 쉽습니다. 어깨 치료 이력이 암 진단과 인과관계가 있다면 통증 관리 실비를 소급 청구하십시오.' : 'Pancoast tumors mimic shoulder pain; retroactively claim pain management expenses.' },
+                        { name: isKo ? '중엽' : 'Middle lobe', code: 'C34.2', riders: riders.CANCER },
+                        { name: isKo ? '하엽' : 'Lower lobe', code: 'C34.3', riders: riders.CANCER, deepAnalysis: isKo ? '하엽 암은 횡격막 침윤 위험이 있습니다. 수술 기록지상 횡격막 절제 및 재건술 여부를 확인하여 1-5종 수술비를 극대화하십시오.' : 'Check for diaphragm resection/reconstruction to maximize Class 1-5 surgical benefits.' },
+                        { name: isKo ? '상세불명' : 'Unspecified bronchus/lung', code: 'C34.9', riders: riders.CANCER, isImportant: true, claimTips: isKo ? '폐암은 표적항암제(타그리소 등) 사용 빈도가 가장 높은 암입니다. "표적항암약물허가치료비" 특약 가입 여부를 반드시 확인하십시오.' : 'High use of targeted therapy; verify "Targeted Chemo" rider.' }
+                    ]
+                },
+                {
+                    name: isKo ? '여성 생식기관의 악성 신생물 (C51-C58)' : 'Female Genital Cancers (C51-C58)',
+                    items: [
+                        { name: isKo ? '외음' : 'Vulva', code: 'C51', riders: riders.CANCER },
+                        { name: isKo ? '질' : 'Vagina', code: 'C52', riders: riders.CANCER, deepAnalysis: isKo ? '질암은 DES 노출 등 희귀 원인이 많습니다. 암 치료비 중 "희귀암" 가산 지급 대상인지 약관을 재해석하십시오.' : 'Check if eligible for "Rare Cancer" bonus benefits.' },
+                        { name: isKo ? '자궁경부' : 'Cervix uteri', code: 'C53.9', riders: riders.CANCER, isImportant: true, claimTips: isKo ? '자궁경부암은 CIS(D06)와의 경계가 모호합니다. Stromal invasion 깊이가 3mm 이상이면 일반암 100% 지급을 강력히 요구하십시오.' : 'If stromal invasion >= 3mm, demand 100% malignant payout.', deepAnalysis: isKo ? '선암(Adenocarcinoma) 세포형은 편평세포암보다 예후가 나쁩니다. 암 입원비 및 재진단암 보장 기간 연장을 반드시 제안하십시오.' : 'Adenocarcinoma has worse prognosis; suggest extended inpatient/re-diagnosis coverage.' },
+                        { name: isKo ? '자궁체부' : 'Corpus uteri', code: 'C54.1', riders: riders.CANCER, claimTips: isKo ? '자궁내막암 수술 시 림프절 곽청술이 동반되었다면, 향후 발생할 림프부종 예방용 압박 스타킹 실비 보상을 안내하십시오.' : 'Advise on compression stocking reimbursement for lymphedema prevention.' },
+                        { name: isKo ? '자궁의 상세불명 부분' : 'Uterus, unspecified', code: 'C55', riders: riders.CANCER },
+                        { name: isKo ? '난소' : 'Ovary', code: 'C56', riders: riders.CANCER, isImportant: true, deepAnalysis: isKo ? '난소암은 BRCA 유전자 변이 여부에 따라 표적항암제(올라파립 등) 사용이 결정됩니다. 유전자 검사 결과지를 보상 근거로 활용하십시오.' : 'BRCA mutation determines targeted therapy; use genetic test results as claim evidence.' },
+                        { name: isKo ? '태반' : 'Placenta', code: 'C58', riders: riders.CANCER }
+                    ]
+                },
+                {
+                    name: isKo ? '남성 생식기관의 악성 신생물 (C60-C63)' : 'Male Genital Cancers (C60-C63)',
+                    items: [
+                        { name: isKo ? '음경' : 'Penis', code: 'C60', riders: riders.CANCER },
+                        { name: isKo ? '전립선' : 'Prostate', code: 'C61', riders: riders.CANCER, isImportant: true },
+                        { name: isKo ? '고환' : 'Testis', code: 'C62', riders: riders.CANCER }
+                    ]
+                },
+                {
+                    name: isKo ? '이차성(전이성) 악성 신생물 (C77-C79)' : 'Secondary Malignancies (C77-C79)',
+                    items: [
+                        { name: isKo ? '머리/얼굴/목 림프절 전이' : 'Lymph nodes of head/neck', code: 'C77.0', riders: ['일반암진단비'] },
+                        { name: isKo ? '흉내 림프절 전이' : 'Intrathoracic lymph nodes', code: 'C77.1', riders: ['일반암진단비'] },
+                        { name: isKo ? '복내 림프절 전이' : 'Intra-abdominal lymph nodes', code: 'C77.2', riders: ['일반암진단비'] },
+                        { name: isKo ? '액와/팔 림프절 전이' : 'Axilla/upper limb lymph nodes', code: 'C77.3', riders: ['일반암진단비'] },
+                        { name: isKo ? '서혜부/다리 림프절 전이' : 'Inguinal/lower limb lymph nodes', code: 'C77.4', riders: ['일반암진단비'] },
+                        { name: isKo ? '폐의 이차성 악성 신생물' : 'Secondary cancer of lung', code: 'C78.0', riders: ['일반암진단비'] },
+                        { name: isKo ? '간의 이차성 악성 신생물' : 'Secondary cancer of liver', code: 'C78.7', riders: ['일반암진단비'] },
+                        { name: isKo ? '뼈의 이차성 악성 신생물' : 'Secondary cancer of bone', code: 'C79.5', riders: ['일반암진단비'] }
                     ]
                 }
             ]
         },
         {
             id: 'D',
-            title: locale === 'ko' ? '[D코드] 양성종양 및 제자리암' : (locale === 'en' ? '[D-Code] Benign Tumor & CIS' : '[D代码] 良性肿瘤及原位癌'),
-            shortTitle: locale === 'ko' ? 'D코드 (용종/제자리암)' : (locale === 'en' ? 'D-Code (Polyp/CIS)' : 'D代码 (息肉/原位癌)'),
-            desc: locale === 'ko' ? '수술비 청구가 가장 빈번한 용종, 근종 및 초기암(유사암) 코드입니다.' : (locale === 'en' ? 'Frequent codes for polyps, fibroids, and early cancers.' : '理赔最频繁的息肉、肌瘤及早期癌(类似癌)代码。'),
+            title: isKo ? '[D코드] 제자리암 및 경계성 종양 (상세)' : '[D-Code] CIS & Borderline (Detailed)',
+            shortTitle: 'D코드',
+            desc: isKo ? '부위별 제자리암 및 모든 행동양식 불명 종양입니다.' : 'Detailed CIS and borderline tumors.',
             subCategories: [
                 {
-                    name: locale === 'ko' ? '제자리암 및 흔한 양성종양' : (locale === 'en' ? 'CIS & Common Benign Tumors' : '原位癌及常见良性肿瘤'),
+                    name: isKo ? '제자리 신생물 (상피내암) (D00-D09)' : 'Carcinoma in situ (D00-D09)',
                     items: [
-                        { name: locale === 'ko' ? '위의 제자리암' : (locale === 'en' ? 'CIS of Stomach' : '胃原位癌'), code: 'D00.2', desc: locale === 'ko' ? '위 점막에 국한된 초기암' : (locale === 'en' ? 'Early cancer limited to stomach mucosa' : '局限于胃粘膜的早期癌'), riders: [t('pseudoCancerDiag'), ...riders.DISEASE], isImportant: true },
-                        { name: locale === 'ko' ? '대장의 제자리암' : (locale === 'en' ? 'CIS of Colon' : '大肠原位癌'), code: 'D01.0', desc: locale === 'ko' ? '대장 제자리암' : (locale === 'en' ? 'Carcinoma in situ of colon' : '大肠原位癌'), riders: [t('pseudoCancerDiag'), ...riders.DISEASE], isImportant: true },
-                        { name: locale === 'ko' ? '피부의 제자리암' : (locale === 'en' ? 'CIS of Skin' : '皮肤原位癌'), code: 'D04', riders: [t('pseudoCancerDiag'), ...riders.DISEASE] },
-                        { name: locale === 'ko' ? '유방의 제자리암' : (locale === 'en' ? 'CIS of Breast' : '乳腺原位癌'), code: 'D05', riders: [t('pseudoCancerDiag'), ...riders.DISEASE] },
-                        { name: locale === 'ko' ? '자궁경부의 제자리암' : (locale === 'en' ? 'CIS of Cervix' : '子宫颈原位癌'), code: 'D06', riders: [t('pseudoCancerDiag'), ...riders.DISEASE] },
-                        { name: locale === 'ko' ? '위의 양성신생물' : (locale === 'en' ? 'Benign Neoplasm of Stomach' : '胃良性肿瘤'), code: 'D13.1', desc: locale === 'ko' ? '위 용종(폴립) 등' : (locale === 'en' ? 'Stomach polyps, etc.' : '胃息肉等'), riders: riders.DISEASE },
-                        { name: locale === 'ko' ? '결장, 직장, 항문의 양성신생물' : (locale === 'en' ? 'Benign Neoplasm of Colon/Rectum/Anus' : '结肠、直肠、肛门良性肿瘤'), code: 'D12', desc: locale === 'ko' ? '대장 용종(폴립). 수술비 보상 빈도 1위' : (locale === 'en' ? 'Colon polyps. #1 in surgery claims' : '大肠息肉。手术费赔付频率第1位'), riders: riders.DISEASE, isImportant: true },
-                        { name: locale === 'ko' ? '자궁의 평활근종' : (locale === 'en' ? 'Leiomyoma of Uterus' : '子宫平滑肌瘤'), code: 'D25', desc: locale === 'ko' ? '자궁근종. 여성 다빈도 수술' : (locale === 'en' ? 'Uterine fibroids. Frequent female surgery' : '子宫肌瘤。女性高频手术'), riders: riders.DISEASE, isImportant: true },
-                        { name: locale === 'ko' ? '난소의 양성신생물' : (locale === 'en' ? 'Benign Neoplasm of Ovary' : '卵巢良性肿瘤'), code: 'D27', riders: riders.DISEASE },
-                        { name: locale === 'ko' ? '갑상선의 양성신생물' : (locale === 'en' ? 'Benign Neoplasm of Thyroid' : '甲状腺良性肿瘤'), code: 'D34', riders: riders.DISEASE },
-                        { name: locale === 'ko' ? '방광의 양성신생물' : (locale === 'en' ? 'Benign Neoplasm of Bladder' : '膀胱良性肿瘤'), code: 'D30.3', riders: riders.DISEASE },
+                        { name: isKo ? '입술, 구강 및 인두' : 'Lip, oral cavity & pharynx', code: 'D00.0', riders: riders.PSEUDO, deepAnalysis: isKo ? '구강 내 백반증(Leukoplakia)이 상피내암으로 진단된 경우, 향후 설암(C02)으로의 발전 가능성이 매우 높으므로 고액암 담보 증액이 시급합니다.' : 'Leukoplakia-driven CIS has high progression risk to tongue cancer; increase coverage.' },
+                        { name: isKo ? '식도 제자리암' : 'Esophagus CIS', code: 'D00.1', riders: riders.PSEUDO, claimTips: isKo ? '식도 점막하 절제술(ESD) 시행 시 수술비 청구는 물론, 협착 예방을 위한 풍선 확장술 비용의 실비 인정 여부를 확인하십시오.' : 'Check for balloon dilation reimbursement post-ESD.' },
+                        { name: isKo ? '위 제자리암' : 'Stomach CIS', code: 'D00.2', riders: riders.PSEUDO, deepAnalysis: isKo ? '점막하층(SM)까지 침윤된 경우 D00.2에서 C16으로 상향 조정하여 일반암 100% 수령을 시도해야 합니다.' : 'Upgrade to C16 if SM layer invasion is present for 100% payout.' },
+                        { name: isKo ? '결장(대장) 제자리암' : 'Colon CIS', code: 'D01.0', riders: riders.PSEUDO, deepAnalysis: isKo ? 'Tis(상피내암) 판정을 받았더라도 대장 점막내암은 대법원 판례상 일반암 보상이 가능합니다.' : 'Precedents allow malignant payout for colon intramucosal Tis.' },
+                        { name: isKo ? '직장 제자리암' : 'Rectum CIS', code: 'D01.2', riders: riders.PSEUDO, deepAnalysis: isKo ? '직장의 제자리암은 유암종(NET)과 혼동될 수 있으나, 조직검사상 "In situ" 명기 시 제자리암 진단비 지급 대상입니다.' : 'Ensure "In situ" is noted in biopsy for rectum CIS benefits.' },
+                        { name: isKo ? '후두 제자리암' : 'Larynx CIS', code: 'D02.0', riders: riders.PSEUDO, claimTips: isKo ? '흡연력과 연관된 후두 상피내암은 음성 변화가 전조 증상입니다. 후두경 검사 비용의 실손 보상을 통해 조기 발견을 유도하십시오.' : 'Laryngeal CIS is linked to smoking; use laryngoscopy for early detection.' },
+                        { name: isKo ? '기관/기관지 및 폐' : 'Trachea, bronchus & lung', code: 'D02.2', riders: riders.PSEUDO, deepAnalysis: isKo ? '폐의 ' : 'Ground-glass opacity (GGO) showing CIS features requires close monitoring; check for "Clinical CIS" possibilities.' },
+                        { name: isKo ? '유방 제자리암' : 'Breast CIS', code: 'D05', riders: riders.PSEUDO, isImportant: true, deepAnalysis: isKo ? '수술 결과지상 "Microinvasion" 문구가 발견되면 즉시 C50으로 코드를 변경하여 보험금 차액을 청구하십시오.' : 'If "Microinvasion" is found, upgrade D05 to C50 immediately.' },
+                        { name: isKo ? '자궁경부 제자리암' : 'Cervix CIS', code: 'D06', riders: riders.PSEUDO, isImportant: true, deepAnalysis: isKo ? 'CIN3 등급은 제자리암 지급 대상입니다. CIN1, 2와 명확히 구분하여 청구하십시오.' : 'CIN3 is eligible for CIS benefits; distinguish clearly from CIN1/2.' },
+                        { name: isKo ? '방광의 제자리암' : 'Bladder CIS', code: 'D09.0', riders: riders.PSEUDO, deepAnalysis: isKo ? '방광암은 병기(Stage)와 상관없이 재발이 잦아 일반암 수준의 관리가 필요하며, 분쟁 시 C67로의 전환 가능성을 검토하십시오.' : 'High recurrence justifies close management; consider upgrading to C67 in disputes.' }
+                    ]
+                },
+                {
+                    name: isKo ? '양성 신생물 (D10-D36)' : 'Benign Neoplasms (D10-D36)',
+                    items: [
+                        { name: isKo ? '위의 양성 신생물 (위용종)' : 'Stomach benign', code: 'D13.1', riders: ['질병수술비'], deepAnalysis: isKo ? '선종성 용종(Adenoma)인 경우 향후 암 발생 위험이 높아 추적 관찰 비용 실비 보상이 중요합니다.' : 'Adenomas have high cancer risk; ensure follow-up cost coverage.' },
+                        { name: isKo ? '대장 용종' : 'Colon polyp', code: 'D12.6', riders: ['질병수술비'], deepAnalysis: isKo ? '용종 제거 시 1-5종 수술비 중 2종(대장) 또는 3종(위) 여부를 수술 기록지에서 확인하십시오.' : 'Check surgery record for Class 2 (colon) or Class 3 (stomach) benefits.' },
+                        { name: isKo ? '자궁의 평활근종 (자궁근종)' : 'Leiomyoma of uterus', code: 'D25', riders: ['하이푸/자궁근종수술비'], isImportant: true, deepAnalysis: isKo ? '하이푸(HIFU) 시술 시 치료 목적성 소견서가 없으면 실비 지급이 거절될 수 있으니 미리 준비하십시오.' : 'HIFU requires "treatment necessity" statement for expense reimbursement.' },
+                        { name: isKo ? '뇌수막의 양성 신생물' : 'Meninges benign', code: 'D32.0', riders: ['뇌질환수술비'], deepAnalysis: isKo ? '위치에 따라 수술이 불가능하여 크기 증가만으로도 암 진단비에 준하는 "임상적 암" 주장이 가능합니다.' : 'Inoperable benign brain tumors can be claimed as "Clinical Malignancy" due to growth.' },
+                        { name: isKo ? '갑상선의 양성 신생물 (갑상선결절)' : 'Thyroid nodule', code: 'D34', riders: ['질병수술비'], isImportant: true, claimTips: isKo ? '결절의 크기가 2cm 이상이거나 세포검사상 "Atypia(비정형)" 소견이 보이면 소액암(갑상선암) 전단계로 간주하고 관리하십시오.' : 'Monitor 2cm+ or Atypia nodules as pre-malignant stages.', deepAnalysis: isKo ? 'Bethesda system 등급에 따라 수술 여부가 결정됩니다. Category 4 이상 시 수술비 담보 활용 가능성을 즉시 검토하십시오.' : 'Check surgical benefits for Bethesda Category 4+.' }
+                    ]
+                },
+                {
+                    name: isKo ? '행동양식 불명/미상 종양 (D37-D48)' : 'Borderline Tumors (D37-D48)',
+                    items: [
+                        { name: isKo ? '직장 유암종(NET)' : 'Rectal NET', code: 'D37.5', riders: riders.PSEUDO, isImportant: true, deepAnalysis: isKo ? 'L-cell 타입 여부와 상관없이 1cm 미만이라도 악성 암으로 보아야 한다는 최신 판례를 적극 활용하십시오.' : 'Use latest precedents to claim malignancy even for <1cm L-cell NETs.' },
+                        { name: isKo ? '난소 경계성 종양' : 'Ovary borderline', code: 'D39.1', riders: riders.PSEUDO, deepAnalysis: isKo ? '조직검사상 "Low malignant potential" 문구가 있다면 경계성 종양 보험금 100% 수령 대상입니다.' : '"Low malignant potential" qualifies for 100% borderline benefits.' },
+                        { name: isKo ? '진성 적혈구 과다증' : 'Polycythemia vera', code: 'D45', riders: ['일반암진단비'], deepAnalysis: isKo ? '과거 경계성 종양이었으나, 현재 KCD상 혈액 암으로 분류되어 일반암 100% 지급이 당연합니다.' : 'Formerly borderline, now KCD classifies D45 as malignant; claim 100%.' },
+                        { name: isKo ? '본태성 고혈소판증' : 'Essential thrombocythemia', code: 'D47.3', riders: ['일반암진단비'], deepAnalysis: isKo ? 'D47.3 코드는 보험사와의 분쟁이 가장 잦은 혈액암 중 하나로, 전문 손해사정사의 의견서가 필수입니다.' : 'D47.3 is a high-dispute blood cancer; expert adjuster statement is essential.' }
                     ]
                 }
             ]
         },
         {
             id: 'I',
-            title: locale === 'ko' ? '[I코드] 뇌·심혈관 질환' : (locale === 'en' ? '[I-Code] Cerebrovascular & Cardiovascular' : '[I代码] 脑·心血管疾病'),
-            shortTitle: locale === 'ko' ? 'I코드 (뇌·심장)' : (locale === 'en' ? 'I-Code (Brain/Heart)' : 'I代码 (脑·心脏)'),
-            desc: locale === 'ko' ? '3대 주요 질환인 뇌혈관 질환 및 허혈성 심장 질환 코드입니다.' : (locale === 'en' ? 'Major codes for brain and heart diseases.' : '三大主要疾病：脑血管疾病及缺血性心脏病代码。'),
+            title: isKo ? '[I코드] 순환기계 상세 (심뇌혈관)' : '[I-Code] Circulatory (Detailed)',
+            shortTitle: 'I코드',
+            desc: isKo ? '모든 뇌경색, 협심증 및 혈관 관련 세부 코드입니다.' : 'Detailed vascular and heart codes.',
             subCategories: [
                 {
-                    name: locale === 'ko' ? '허혈성 및 급성 심장 질환' : (locale === 'en' ? 'Ischemic & Acute Heart Disease' : '缺血性及急性心脏病'),
+                    name: isKo ? '고혈압 및 심장 질환 (I10-I52)' : 'Heart Diseases (I10-I52)',
                     items: [
-                        { name: locale === 'ko' ? '협심증' : (locale === 'en' ? 'Angina Pectoris' : '心绞痛'), code: 'I20', isImportant: true, riders: riders.HEART },
-                        { name: locale === 'ko' ? '급성 심근경색' : (locale === 'en' ? 'Acute Myocardial Infarction' : '急性心肌梗死'), code: 'I21', isImportant: true, riders: riders.HEART },
-                        { name: locale === 'ko' ? '재발된 심근경색' : (locale === 'en' ? 'Subsequent Myocardial Infarction' : '复发性心肌梗死'), code: 'I22', riders: riders.HEART },
-                        { name: locale === 'ko' ? '심근경색 후 합병증' : (locale === 'en' ? 'Complications following Myocardial Infarction' : '心肌梗死后并发症'), code: 'I23', riders: riders.HEART },
-                        { name: locale === 'ko' ? '기타 급성 허혈성 심장질환 (협심증 등)' : (locale === 'en' ? 'Other Acute Ischemic Heart Disease' : '其他急性缺血性心脏病'), code: 'I24', riders: riders.HEART },
-                        { name: locale === 'ko' ? '만성 허혈성 심질환' : (locale === 'en' ? 'Chronic Ischemic Heart Disease' : '慢性缺血性心脏病'), code: 'I25', isImportant: true, riders: riders.HEART },
-                        { name: locale === 'ko' ? '폐색전증' : (locale === 'en' ? 'Pulmonary Embolism' : '肺栓塞'), code: 'I26', riders: riders.DISEASE },
-                        { name: locale === 'ko' ? '급성 심낭염' : (locale === 'en' ? 'Acute Pericarditis' : '急性心包炎'), code: 'I30', riders: riders.DISEASE },
-                        { name: locale === 'ko' ? '비류마티스 승모판 질환' : (locale === 'en' ? 'Non-rheumatic Mitral Valve Disease' : '非风湿性二尖瓣疾病'), code: 'I34', riders: riders.DISEASE },
+                        { name: isKo ? '본태성 고혈압' : 'Essential hypertension', code: 'I10', riders: ['고혈압약제비'] },
+                        { name: isKo ? '안정형 협심증' : 'Stable angina', code: 'I20.8', riders: riders.HEART, deepAnalysis: isKo ? '운동부하검사 또는 심장초음파상 허혈성 소견이 명확해야 하며, 약물 복용 기록이 진단 확정의 근거가 됩니다.' : 'Ischemic findings on stress test or echo, along with medication history, confirm diagnosis.' },
+                        { name: isKo ? '전벽의 급성 심근경색' : 'Acute MI, anterior', code: 'I21.0', riders: riders.HEART, deepAnalysis: isKo ? '심전도(ST분절 상승)와 트로포닌 수치 변화가 핵심입니다. 골든타임 내 시술 여부를 확인하십시오.' : 'ECG (ST elevation) and troponin levels are key. Verify timely intervention.' },
+                        { name: isKo ? '비ST분절상승 심근경색(NSTEMI)' : 'NSTEMI', code: 'I21.4', riders: riders.HEART, deepAnalysis: isKo ? 'STEMI보다 발견이 늦어 예후가 나쁠 수 있습니다. 심초음파상 "Wall motion abnormality(벽운동 이상)" 소견을 핵심 보상 근거로 삼으십시오.' : 'Wall motion abnormality on echo is the key claim evidence for NSTEMI.' },
+                        { name: isKo ? '심방세동 및 조동' : 'Atrial fibrillation', code: 'I48', riders: riders.HEART, isImportant: true, deepAnalysis: isKo ? '심방세동은 뇌졸중 위험을 5배 높입니다. 항응고제(NOAC) 처방 시 뇌혈관 질환 예방 담보를 추가 점검하십시오.' : 'AFib increases stroke risk 5x. Check cerebrovascular prevention benefits if NOAC is prescribed.' },
+                        { name: isKo ? '심부전' : 'Heart failure', code: 'I50', riders: ['심혈관질환진단비'], claimTips: isKo ? '심부전은 증상(호흡곤란, 부종)과 NT-proBNP 수치로 진단합니다. 말기 심부전 시 질병후유장해 75% 이상 수령 가능성을 확인하십시오.' : 'Check for 75%+ disease disability for terminal heart failure.' }
                     ]
                 },
                 {
-                    name: locale === 'ko' ? '심근 및 부정맥, 심부전' : (locale === 'en' ? 'Myocardium, Arrhythmia, Heart Failure' : '心肌及心律失常、心力衰竭'),
+                    name: isKo ? '뇌혈관 질환 (I60-I69)' : 'Cerebrovascular (I60-I69)',
                     items: [
-                        { name: locale === 'ko' ? '방실 및 좌각 차단' : (locale === 'en' ? 'AV & Left Bundle Branch Block' : '房室及左束支传导阻滞'), code: 'I44', riders: [t('specificHeartDiag'), ...riders.DISEASE] },
-                        { name: locale === 'ko' ? '심정지' : (locale === 'en' ? 'Cardiac Arrest' : '心脏骤停'), code: 'I46' },
-                        { name: locale === 'ko' ? '발작성 빈맥' : (locale === 'en' ? 'Paroxysmal Tachycardia' : '阵发性心动过速'), code: 'I47', riders: [t('specificHeartDiag'), ...riders.DISEASE] },
-                        { name: locale === 'ko' ? '심방세동' : (locale === 'en' ? 'Atrial Fibrillation' : '心房颤动'), code: 'I48', riders: [t('specificHeartDiag'), ...riders.DISEASE] },
-                        { name: locale === 'ko' ? '기타 부정맥' : (locale === 'en' ? 'Other Arrhythmias' : '其他心律失常'), code: 'I49', riders: [t('arrhythmiaDiag'), ...riders.DISEASE] },
-                        { name: locale === 'ko' ? '심부전' : (locale === 'en' ? 'Heart Failure' : '心力衰竭'), code: 'I50', isImportant: true, riders: [t('heartFailureDiag'), ...riders.DISEASE] },
+                        { name: isKo ? '지주막하 출혈' : 'SAH', code: 'I60', riders: riders.BRAIN, claimTips: isKo ? '뇌동맥류 파열로 인한 SAH는 외상성(S코드)인지 자발성(I코드)인지가 쟁점입니다. 사고 경위가 불분명하다면 I60 코드를 우선 확보하십시오.' : 'Dispute between S-code vs I-code; secure I60 if cause is unclear.' },
+                        { name: isKo ? '뇌내 출혈' : 'ICH', code: 'I61', riders: riders.BRAIN, deepAnalysis: isKo ? '혈종 제거술(Hemicraniectomy) 시행 시 수술비는 물론, 두개골 결손으로 인한 장해 평가(외모의 추상장해 15% 이상)를 병행하십시오.' : 'Evaluate skull defect disability (15%+) along with surgical benefits post-hemicraniectomy.' },
+                        { name: isKo ? '뇌경색 (혈전증/색전증)' : 'Infarction, cerebral', code: 'I63.0-5', riders: riders.BRAIN, deepAnalysis: isKo ? 'I63.0(전뇌혈관), I63.3(대뇌동맥) 등 세부 번호에 따라 증상 발현 부위가 다르며, 급성기 치료 여부가 보상의 핵심입니다.' : 'Specific I63 codes denote different sites; acute treatment history is key for benefits.' },
+                        { name: isKo ? '열공성 뇌경색' : 'Lacunar infarction', code: 'I63.8', riders: riders.BRAIN, isImportant: true, deepAnalysis: isKo ? '영상 판독지상 "Old lacunar"는 보상 제외될 수 있으나, 급성 마비 증상이 동반된 경우 적극 청구하십시오.' : '"Old lacunar" on imaging may be excluded; claim actively if acute paralysis symptoms are present.' },
+                        { name: isKo ? '뇌전동맥의 폐쇄 및 협착' : 'Occlusion of precerebral', code: 'I65', riders: ['뇌혈관질환진단비'], deepAnalysis: isKo ? '뇌경색(I63)으로 진행되지 않은 단계(I65/I66)에서도 뇌혈관질환 진단비는 지급 대상입니다. 협착률 50% 이상 소견을 확인하십시오.' : 'Diagnosis benefits are payable for I65/I66 before progression to infarction. Check for 50%+ stenosis.' },
+                        { name: isKo ? '비파열 뇌동맥류' : 'Cerebral aneurysm', code: 'I67.1', riders: ['뇌혈관질환진단비'], isImportant: true, deepAnalysis: isKo ? '코일색전술이나 클립결찰술 없이 추적 관찰만 하는 경우에도 "뇌혈관질환 진단비"는 100% 지급 대상입니다.' : 'Diagnosis benefits are 100% payable even if only follow-up (no surgery) is performed.' },
+                        { name: isKo ? '뇌혈관 질환의 후유증' : 'Sequelae of stroke', code: 'I69', riders: ['질병후유장해'], deepAnalysis: isKo ? '뇌경색 발병 6개월 후 일상생활동작(ADLs) 제한 정도에 따라 장해 보험금 수령 규모가 결정됩니다.' : 'Disability benefits depend on ADL limitations 6 months post-stroke.' }
                     ]
                 },
                 {
-                    name: locale === 'ko' ? '뇌혈관 질환' : (locale === 'en' ? 'Cerebrovascular Disease' : '脑血管疾病'),
+                    name: isKo ? '동맥 및 정맥 질환 (I70-I89)' : 'Arteries & Veins (I70-I89)',
                     items: [
-                        { name: locale === 'ko' ? '지주막하출혈' : (locale === 'en' ? 'Subarachnoid Hemorrhage' : '蛛网膜下腔出血'), code: 'I60', isImportant: true, riders: riders.BRAIN },
-                        { name: locale === 'ko' ? '뇌내출혈' : (locale === 'en' ? 'Intracerebral Hemorrhage' : '脑内出血'), code: 'I61', isImportant: true, riders: riders.BRAIN },
-                        { name: locale === 'ko' ? '기타 두개내출혈' : (locale === 'en' ? 'Other Intracranial Hemorrhage' : '其他颅内出血'), code: 'I62', riders: riders.BRAIN },
-                        { name: locale === 'ko' ? '뇌경색' : (locale === 'en' ? 'Cerebral Infarction' : '脑梗死'), code: 'I63', isImportant: true, riders: riders.BRAIN },
-                        { name: locale === 'ko' ? '상세불명 뇌졸중' : (locale === 'en' ? 'Stroke, Not Specified' : '未详述的中风'), code: 'I64', riders: [t('strokeDiag'), t('brainDiag')] },
-                        { name: locale === 'ko' ? '뇌혈관 협착' : (locale === 'en' ? 'Cerebrovascular Stenosis' : '脑血管狭窄'), code: 'I65', riders: riders.BRAIN },
-                        { name: locale === 'ko' ? '뇌동맥 폐색' : (locale === 'en' ? 'Cerebral Artery Occlusion' : '脑动脉闭塞'), code: 'I66', riders: riders.BRAIN },
-                        { name: locale === 'ko' ? '기타 뇌혈관 질환' : (locale === 'en' ? 'Other Cerebrovascular Diseases' : '其他脑血管疾病'), code: 'I67', riders: riders.BRAIN },
-                        { name: locale === 'ko' ? '기타 질환에서의 뇌혈관 장애' : (locale === 'en' ? 'Cerebrovascular Disorders in Other Diseases' : '其他疾病引起的脑血管障碍'), code: 'I68', riders: riders.BRAIN },
-                        { name: locale === 'ko' ? '뇌혈관질환 후유증' : (locale === 'en' ? 'Sequelae of Cerebrovascular Disease' : '脑血管疾病后遗症'), code: 'I69', riders: riders.BRAIN },
-                    ]
-                },
-                {
-                    name: locale === 'ko' ? '동맥, 정맥 및 기타 순환계' : (locale === 'en' ? 'Arteries, Veins & Other Circulation' : '动脉、静脉及其他循环系统'),
-                    items: [
-                        { name: locale === 'ko' ? '고혈압성 심질환' : (locale === 'en' ? 'Hypertensive Heart Disease' : '高血压性心脏病'), code: 'I11', riders: riders.DISEASE },
-                        { name: locale === 'ko' ? '고혈압성 신질환' : (locale === 'en' ? 'Hypertensive Renal Disease' : '高血压性肾病'), code: 'I12', riders: riders.DISEASE },
-                        { name: locale === 'ko' ? '동맥경화증' : (locale === 'en' ? 'Atherosclerosis' : '动脉硬化'), code: 'I70', riders: riders.DISEASE },
-                        { name: locale === 'ko' ? '대동맥류' : (locale === 'en' ? 'Aortic Aneurysm' : '大动脉瘤'), code: 'I71', riders: riders.DISEASE },
-                        { name: locale === 'ko' ? '하지 정맥류' : (locale === 'en' ? 'Varicose Veins' : '下肢静脉曲张'), code: 'I83', riders: [t('varicoseSurgery'), t('diseaseSurgery')] },
-                        { name: locale === 'ko' ? '치핵' : (locale === 'en' ? 'Hemorrhoids' : '痔疮'), code: 'I84', riders: [t('hemorrhoidSurgery'), t('nDiseaseSurgery')] },
-                        { name: locale === 'ko' ? '저혈압' : (locale === 'en' ? 'Hypotension' : '低血压'), code: 'I95' },
+                        { name: isKo ? '대동맥류 및 박리' : 'Aortic aneurysm', code: 'I71', riders: ['혈관수술비'], isImportant: true, deepAnalysis: isKo ? '박리형 대동맥류는 응급 수술이 필수적이며, 수술 기법(스텐트 그라프트 등)에 따라 수술비 담보 중복 수령이 가능합니다.' : 'Dissecting aneurysm requires emergency surgery; check for multiple surgical benefit payouts depending on technique.' },
+                        { name: isKo ? '하지의 정맥류' : 'Varicose veins', code: 'I83', riders: ['질병수술비'] },
+                        { name: isKo ? '치핵 (치질)' : 'Hemorrhoids', code: 'I84', riders: ['치질수술비'] }
                     ]
                 }
             ]
         },
         {
             id: 'M',
-            title: locale === 'ko' ? '[M코드] 뼈·관절·근골격계 질환' : (locale === 'en' ? '[M-Code] Bone, Joint & Musculoskeletal' : '[M代码] 骨·关节·肌肉骨骼系统疾病'),
-            shortTitle: locale === 'ko' ? 'M코드 (근골격계)' : (locale === 'en' ? 'M-Code (Musculoskeletal)' : 'M代码 (肌肉骨骼)'),
-            desc: locale === 'ko' ? '디스크, 관절염, 인대 파열, 회전근개 등 근골격계 질환 코드입니다.' : (locale === 'en' ? 'Musculoskeletal codes for discs, arthritis, rotator cuff, etc.' : '椎间盘、关节炎、韧带撕裂、旋转肌腱等肌肉骨骼系统疾病代码。'),
+            title: isKo ? '[M코드] 근골격계 및 결합조직 (상세)' : '[M-Code] Musculoskeletal (Detailed)',
+            shortTitle: 'M코드',
+            desc: isKo ? '척추, 관절, 연조직의 모든 질병 코드입니다.' : 'Detailed codes for bone, joint, and soft tissue diseases.',
             subCategories: [
                 {
-                    name: locale === 'ko' ? '관절염 및 류마티스 질환' : (locale === 'en' ? 'Arthritis & Rheumatic Diseases' : '关节炎及风湿性疾病'),
+                    name: isKo ? '관절병증 (M00-M25)' : 'Arthropathies',
                     items: [
-                        { name: locale === 'ko' ? '화농성 관절염' : (locale === 'en' ? 'Pyogenic Arthritis' : '化脓性关节炎'), code: 'M00', desc: locale === 'ko' ? '세균성 감염으로 인한 관절염' : (locale === 'en' ? 'Bacterial joint infection' : '细菌性感染引起的关节炎'), riders: riders.DISEASE },
-                        { name: locale === 'ko' ? '반응성 관절염' : (locale === 'en' ? 'Reactive Arthritis' : '反应性关节炎'), code: 'M02', riders: riders.DISEASE },
-                        { name: locale === 'ko' ? '류마티스 관절염(혈청양성)' : (locale === 'en' ? 'Seropositive Rheumatoid Arthritis' : '血清阳性类风湿性关节炎'), code: 'M05', desc: locale === 'ko' ? '자가면역 관절 질환. 희귀난치성질환 적용 가능' : (locale === 'en' ? 'Autoimmune joint disease. May qualify for rare disease coverage' : '自身免疫性关节疾病。可能适用罕见疾病覆盖'), riders: [t('rareDiseaseDiag'), ...riders.DISEASE] },
-                        { name: locale === 'ko' ? '기타 류마티스 관절염' : (locale === 'en' ? 'Other Rheumatoid Arthritis' : '其他类风湿性关节炎'), code: 'M06', riders: riders.DISEASE },
-                        { name: locale === 'ko' ? '통풍' : (locale === 'en' ? 'Gout' : '痛风'), code: 'M10', desc: locale === 'ko' ? '요산 축적으로 인한 관절 통증. 엄지발가락 발작 빈번' : (locale === 'en' ? 'Uric acid accumulation causing joint pain. Big toe attacks common' : '尿酸积累引起的关节疼痛。大脚趾发作频繁'), isImportant: true },
-                        { name: locale === 'ko' ? '건선성 관절병증' : (locale === 'en' ? 'Psoriatic Arthropathy' : '银屑病性关节病'), code: 'M07', riders: riders.DISEASE },
-                        { name: locale === 'ko' ? '전신성 결합조직 장애(루푸스 등)' : (locale === 'en' ? 'Systemic Connective Tissue Disorders (Lupus, etc.)' : '全身性结缔组织障碍（红斑狼疮等）'), code: 'M32', desc: locale === 'ko' ? '루푸스(전신홍반루푸스) 포함. 희귀난치성질환 해당' : (locale === 'en' ? 'Includes SLE (Lupus). Qualifies as rare disease' : '包括系统性红斑狼疮。属于罕见疾病'), riders: [t('rareDiseaseDiag'), ...riders.DISEASE] },
-                        { name: locale === 'ko' ? '섬유근통' : (locale === 'en' ? 'Fibromyalgia' : '纤维肌痛'), code: 'M79.1', desc: locale === 'ko' ? '전신 근육통 및 만성 피로' : (locale === 'en' ? 'Widespread muscle pain and chronic fatigue' : '全身肌肉疼痛及慢性疲劳') },
+                        { name: isKo ? '화농성 관절염' : 'Pyogenic arthritis', code: 'M00', riders: ['질병수술비'], deepAnalysis: isKo ? '관절 내 감염에 의한 긴급 상황으로, 연골 파괴 정도에 따라 관절 기능 장해(질병후유장해) 청구가 가능합니다.' : 'Septic arthritis is an emergency; cartilage destruction may qualify for disease disability benefits.' },
+                        { name: isKo ? '류마티스 관절염' : 'Seropositive RA', code: 'M05', riders: ['질병후유장해'], deepAnalysis: isKo ? '다발성 관절 침범 시 각 관절별 장해율을 합산하여 지급률 50% 이상의 고액 보험금 청구가 가능한 질환입니다.' : 'Multiple joint involvement allows for summing disability rates, often exceeding 50%.' },
+                        { name: isKo ? '통풍' : 'Gout', code: 'M10', riders: ['통풍진단비'], deepAnalysis: isKo ? '요산 수치와 관절액 검사 결과가 진단비 지급의 핵심입니다. 급성 통풍 발작 기록을 확보하십시오.' : 'Uric acid levels and synovial fluid tests confirm diagnosis. Record acute gout flares.' },
+                        { name: isKo ? '무릎의 골관절염' : 'Osteoarthritis of knee', code: 'M17.0', riders: ['인공관절수술비'], isImportant: true, deepAnalysis: isKo ? 'KL-grade 4단계 소견이 있으면 인공관절 치환술 시 보험금 분쟁 없이 100% 지급 대상입니다.' : 'KL-grade 4 guarantees 100% payout for knee replacement surgery.' }
                     ]
                 },
                 {
-                    name: locale === 'ko' ? '관절 내부 장애 (무릎·고관절)' : (locale === 'en' ? 'Internal Joint Derangement (Knee/Hip)' : '关节内部障碍（膝·髋关节）'),
+                    name: isKo ? '척추병증 및 디스크 (M40-M54)' : 'Spine & Disc (M40-M54)',
                     items: [
-                        { name: locale === 'ko' ? '무릎 반월상연골 파열' : (locale === 'en' ? 'Meniscus Tear of Knee' : '膝关节半月板损伤'), code: 'M23.2', desc: locale === 'ko' ? '반월상연골 손상. 관절경 수술 빈도 높음' : (locale === 'en' ? 'Meniscal damage. High frequency arthroscopic surgery' : '半月板损伤。关节镜手术频率高'), riders: riders.DISEASE, isImportant: true },
-                        { name: locale === 'ko' ? '무릎 내부 장애(기타)' : (locale === 'en' ? 'Internal Derangement of Knee (Other)' : '膝内部障碍（其他）'), code: 'M23', desc: locale === 'ko' ? '십자인대파열, 연골연화증 등 무릎 내부 문제 전반' : (locale === 'en' ? 'ACL tear, chondromalacia, and other knee internal issues' : '前交叉韧带撕裂、软骨软化症等膝内部问题'), riders: riders.DISEASE, isImportant: true },
-                        { name: locale === 'ko' ? '무릎 관절증(퇴행성)' : (locale === 'en' ? 'Gonarthrosis (Degenerative Knee)' : '膝关节病（退行性）'), code: 'M17', desc: locale === 'ko' ? '퇴행성 관절염. 인공관절 수술 다빈도' : (locale === 'en' ? 'Degenerative arthritis. Frequent total knee replacement' : '退行性关节炎。人工关节手术高频'), riders: [t('jointReplacementSurgery'), ...riders.DISEASE], isImportant: true },
-                        { name: locale === 'ko' ? '고관절 관절증' : (locale === 'en' ? 'Coxarthrosis (Hip)' : '髋关节病'), code: 'M16', desc: locale === 'ko' ? '고관절 퇴행성 관절염. 인공관절치환술 적용' : (locale === 'en' ? 'Hip joint degeneration. Total hip replacement applicable' : '髋关节退行性变。适用髋关节置换术'), riders: [t('jointReplacementSurgery'), ...riders.DISEASE] },
-                        { name: locale === 'ko' ? '기타 관절증' : (locale === 'en' ? 'Other Arthrosis' : '其他关节病'), code: 'M19', desc: locale === 'ko' ? '손가락·발가락 등 기타 관절 퇴행성 변화' : (locale === 'en' ? 'Degenerative changes in finger, toe joints, etc.' : '手指、脚趾等其他关节退行性变化'), riders: riders.DISEASE },
+                        { name: isKo ? '척추관 협착증 (요추)' : 'Lumbar spinal stenosis', code: 'M48.06', riders: ['질병수술비'], isImportant: true, claimTips: isKo ? '협착증은 퇴행성 질환으로 간주되어 보상이 까다롭습니다. "간헐적 파행(걷다 쉬다 반복)" 증상이 MRI 소견과 일치함을 강조하여 수술의 필연성을 주장하십시오.' : 'Emphasize that "intermittent claudication" matches MRI for surgical necessity.', deepAnalysis: isKo ? '황색인대 비대(Ligamentum flavum hypertrophy)가 신경관을 50% 이상 압박할 경우, 보존적 치료 실패 후 시행한 수술비는 100% 지급 대상입니다.' : 'Surgery post-conservative failure for 50%+ compression is 100% payable.' },
+                        { name: isKo ? '경추 디스크 (신경뿌리병증)' : 'Cervical disc w/ radiculopathy', code: 'M50.1', riders: ['질병수술비'], isImportant: true, claimTips: isKo ? '상지 방사통(팔 저림) 유무가 핵심입니다. 근전도 검사(EMG) 결과지에서 신경근 병증 소견을 확보하여 수술비 및 실비를 청구하십시오.' : 'Secure EMG evidence of radiculopathy for arm numbness claims.', deepAnalysis: isKo ? 'MRI상 Protrusion(돌출) 이상의 소견이 있고 신경학적 결손이 확인되면 기왕증 감액 없이 상해/질병 수술비 지급을 강력히 요구하십시오.' : 'Demand full payment if MRI shows protrusion+ with neurological deficits.' },
+                        { name: isKo ? '요추 디스크 (신경뿌리병증)' : 'Lumbar disc w/ radiculopathy', code: 'M51.1', riders: ['질병수술비'], isImportant: true, claimTips: isKo ? '보험사가 "기왕증 감액"을 주장할 때, 사고 전 2년간 척추 치료력이 없음을 건강보험공단 기록으로 반박하는 전략이 효과적입니다.' : 'Counter "pre-existing" claims with 2-year clean NHI records.' }
                     ]
                 },
                 {
-                    name: locale === 'ko' ? '척추 추간판·협착증·측만증' : (locale === 'en' ? 'Disc, Stenosis & Scoliosis' : '椎间盘·狭窄症·侧弯症'),
+                    name: isKo ? '연조직 및 골다공증 (M60-M99)' : 'Soft Tissue & Osteoporosis',
                     items: [
-                        { name: locale === 'ko' ? '경추 추간판 장애 (목디스크)' : (locale === 'en' ? 'Cervical Disc Disorder (Neck Disc)' : '颈椎间盘障碍（颈椎病）'), code: 'M50', desc: locale === 'ko' ? '목 디스크. 경추 신경 압박 증상. 수술비 청구 시 가입 시기 약관 확인 필요' : (locale === 'en' ? 'Cervical disc. Nerve compression. Check policy date for surgery coverage' : '颈椎间盘。颈椎神经压迫症状。手术费申请时需确认承保时期条款'), riders: [t('discSurgery'), t('nDiseaseSurgery'), t('diseaseSurgery')], isImportant: true },
-                        { name: locale === 'ko' ? '흉추 추간판 장애' : (locale === 'en' ? 'Thoracic Disc Disorder' : '胸椎间盘障碍'), code: 'M51.0', desc: locale === 'ko' ? '등 디스크. 비교적 드물지만 증상 심할 수 있음' : (locale === 'en' ? 'Thoracic disc. Uncommon but can be severe' : '胸椎间盘。相对罕见但症状可能严重'), riders: [t('discSurgery'), ...riders.DISEASE] },
-                        { name: locale === 'ko' ? '요추 추간판 탈출증 (허리디스크)' : (locale === 'en' ? 'Lumbar Disc Herniation (Lumbar Disc)' : '腰椎间盘突出症（腰椎病）'), code: 'M51.1', desc: locale === 'ko' ? '허리 디스크. 가장 흔한 수술 원인. 수술비 청구 다빈도' : (locale === 'en' ? 'Most common surgery cause. High frequency surgery claims' : '最常见手术原因。手术费申请高频'), riders: [t('discSurgery'), t('nDiseaseSurgery'), t('diseaseSurgery')], isImportant: true },
-                        { name: locale === 'ko' ? '기타 추간판 장애' : (locale === 'en' ? 'Other Intervertebral Disc Disorders' : '其他椎间盘障碍'), code: 'M51', desc: locale === 'ko' ? '추간판 퇴행, 일반 디스크 질환' : (locale === 'en' ? 'Disc degeneration and general disc disorders' : '椎间盘退变及一般性椎间盘疾病'), riders: [t('discSurgery'), ...riders.DISEASE] },
-                        { name: locale === 'ko' ? '척추관 협착증' : (locale === 'en' ? 'Spinal Stenosis' : '脊柱管狭窄症'), code: 'M48.0', desc: locale === 'ko' ? '척추관이 좁아져 신경 압박. 수술 시 수술비 청구 가능' : (locale === 'en' ? 'Narrowing of spinal canal compresses nerves. Surgery claim applicable' : '脊柱管变窄压迫神经。手术时可申请手术费'), riders: [t('discSurgery'), t('nDiseaseSurgery'), t('diseaseSurgery')], isImportant: true },
-                        { name: locale === 'ko' ? '척추병증(기타)' : (locale === 'en' ? 'Other Spondylopathies' : '其他脊柱病变'), code: 'M48', desc: locale === 'ko' ? '척추관 협착증 포함 기타 척추 구조 이상' : (locale === 'en' ? 'Spinal stenosis and other structural spinal abnormalities' : '脊柱管狭窄症及其他脊柱结构异常'), riders: [t('discSurgery'), t('nDiseaseSurgery')], isImportant: true },
-                        { name: locale === 'ko' ? '척추전방전위증' : (locale === 'en' ? 'Spondylolisthesis' : '脊柱滑脱症'), code: 'M43.1', desc: locale === 'ko' ? '척추뼈가 앞으로 밀려남. 수술 고려 시 다빈도' : (locale === 'en' ? 'Vertebra slips forward. Frequently requires surgery' : '椎骨向前滑脱。手术频率高'), riders: [t('discSurgery'), t('nDiseaseSurgery')] },
-                        { name: locale === 'ko' ? '척추측만증' : (locale === 'en' ? 'Scoliosis' : '脊柱侧弯'), code: 'M41', desc: locale === 'ko' ? '척추의 측방 만곡. 심한 경우 수술 시행' : (locale === 'en' ? 'Lateral spinal curvature. Surgery for severe cases' : '脊柱侧向弯曲。严重时进行手术'), riders: riders.DISEASE },
-                        { name: locale === 'ko' ? '강직성 척추염' : (locale === 'en' ? 'Ankylosing Spondylitis' : '强直性脊柱炎'), code: 'M45', desc: locale === 'ko' ? '척추 자가면역 염증. 희귀난치성질환 해당' : (locale === 'en' ? 'Autoimmune spinal inflammation. Qualifies as rare disease' : '脊柱自身免疫性炎症。属于罕见疾病'), riders: [t('rareDiseaseDiag'), ...riders.DISEASE] },
-                    ]
-                },
-                {
-                    name: locale === 'ko' ? '어깨 질환 (회전근개·오십견)' : (locale === 'en' ? 'Shoulder Diseases (Rotator Cuff / Frozen Shoulder)' : '肩部疾病（旋转肌腱·五十肩）'),
-                    items: [
-                        { name: locale === 'ko' ? '어깨의 병변 (전체)' : (locale === 'en' ? 'Shoulder Lesions (General)' : '肩部病变（总体）'), code: 'M75', desc: locale === 'ko' ? '회전근개파열, 오십견 포함 어깨 관련 질환 전반' : (locale === 'en' ? 'All shoulder conditions including rotator cuff tear, frozen shoulder' : '包括旋转肌腱损伤、五十肩的肩部相关疾病全体'), riders: riders.DISEASE, isImportant: true },
-                        { name: locale === 'ko' ? '회전근개 증후군' : (locale === 'en' ? 'Rotator Cuff Syndrome' : '旋转肌腱综合征'), code: 'M75.1', desc: locale === 'ko' ? '어깨 회전근개파열. 수술 시 수술비·실비 청구 빈도 높음' : (locale === 'en' ? 'Rotator cuff tear. High frequency surgery and insurance claims' : '肩旋转肌腱损伤。手术费·医疗费申请频率高'), riders: riders.DISEASE, isImportant: true },
-                        { name: locale === 'ko' ? '오십견(동결견)' : (locale === 'en' ? 'Adhesive Capsulitis (Frozen Shoulder)' : '五十肩（冻结肩）'), code: 'M75.0', desc: locale === 'ko' ? '어깨 관절 굳음증. 물리치료·주사·수술 다양한 치료' : (locale === 'en' ? 'Shoulder joint stiffness. Various treatments including PT, injection, surgery' : '肩关节僵硬症。物理治疗·注射·手术多种治疗方法'), riders: riders.DISEASE, isImportant: true },
-                        { name: locale === 'ko' ? '상완이두근 건염' : (locale === 'en' ? 'Bicipital Tendinitis' : '肱二头肌腱炎'), code: 'M75.2', riders: riders.DISEASE },
-                        { name: locale === 'ko' ? '충돌 증후군' : (locale === 'en' ? 'Shoulder Impingement Syndrome' : '肩撞击综合征'), code: 'M75.5', desc: locale === 'ko' ? '어깨뼈 충돌로 인한 통증' : (locale === 'en' ? 'Pain from shoulder bone impingement' : '肩骨撞击引起的疼痛'), riders: riders.DISEASE },
-                    ]
-                },
-                {
-                    name: locale === 'ko' ? '힘줄·건·인대 질환' : (locale === 'en' ? 'Tendon & Ligament Diseases' : '肌腱·肌腱·韧带疾病'),
-                    items: [
-                        { name: locale === 'ko' ? '활막염 및 건초염' : (locale === 'en' ? 'Synovitis & Tenosynovitis' : '滑膜炎及腱鞘炎'), code: 'M65', desc: locale === 'ko' ? '방아쇠수지(M65.3), 손목 드퀘르벵 건초염 포함' : (locale === 'en' ? 'Trigger finger (M65.3), De Quervain wrist tenosynovitis included' : '弹响指（M65.3）、腕部де克维恩腱鞘炎等'), riders: riders.DISEASE },
-                        { name: locale === 'ko' ? '방아쇠수지' : (locale === 'en' ? 'Trigger Finger' : '弹响指'), code: 'M65.3', desc: locale === 'ko' ? '손가락 건초염. 수술 가능 여부 약관 확인 필요' : (locale === 'en' ? 'Finger tendon sheath inflammation. Verify surgery coverage in policy' : '手指腱鞘炎。需确认手术承保条款'), riders: riders.DISEASE, isImportant: true },
-                        { name: locale === 'ko' ? '건염 및 건부착부염' : (locale === 'en' ? 'Tendinitis & Enthesopathy' : '腱炎及附着点病'), code: 'M77', desc: locale === 'ko' ? '테니스엘보(M77.1), 골프엘보(M77.0), 발꿈치 가시 등 포함' : (locale === 'en' ? 'Tennis elbow (M77.1), Golfers elbow (M77.0), Heel spur included' : '网球肘（M77.1）、高尔夫肘（M77.0）、跟骨刺等'), riders: riders.DISEASE },
-                        { name: locale === 'ko' ? '외측 상과염 (테니스엘보)' : (locale === 'en' ? 'Lateral Epicondylitis (Tennis Elbow)' : '外侧上髁炎（网球肘）'), code: 'M77.1', desc: locale === 'ko' ? '팔꿈치 바깥쪽 통증. 체외충격파·주사 치료 다빈도' : (locale === 'en' ? 'Outer elbow pain. Shock wave and injection therapy common' : '肘部外侧疼痛。体外冲击波·注射治疗频率高'), riders: riders.DISEASE, isImportant: true },
-                        { name: locale === 'ko' ? '내측 상과염 (골프엘보)' : (locale === 'en' ? 'Medial Epicondylitis (Golfers Elbow)' : '内侧上髁炎（高尔夫肘）'), code: 'M77.0', riders: riders.DISEASE },
-                        { name: locale === 'ko' ? '족저근막염' : (locale === 'en' ? 'Plantar Fasciitis' : '跖筋膜炎'), code: 'M72.2', desc: locale === 'ko' ? '발바닥 통증. 체외충격파 등 비급여 치료 다빈도' : (locale === 'en' ? 'Heel/foot pain. Frequent non-covered shockwave therapy' : '足底疼痛。体外冲击波等非医保治疗频率高'), isImportant: true },
-                        { name: locale === 'ko' ? '아킬레스건 파열(자발성)' : (locale === 'en' ? 'Spontaneous Rupture of Achilles Tendon' : '自发性跟腱断裂'), code: 'M66.3', desc: locale === 'ko' ? '아킬레스건 끊어짐. 수술비 청구 가능' : (locale === 'en' ? 'Achilles tendon rupture. Surgery claim applicable' : '跟腱断裂。可申请手术费'), riders: riders.DISEASE },
-                        { name: locale === 'ko' ? '어깨 힘줄 파열(자발성)' : (locale === 'en' ? 'Spontaneous Rupture of Shoulder Tendon' : '自发性肩部肌腱断裂'), code: 'M66.2', riders: riders.DISEASE },
-                    ]
-                },
-                {
-                    name: locale === 'ko' ? '손목·수근관·기타 상지' : (locale === 'en' ? 'Wrist, Carpal Tunnel & Upper Limb' : '腕部·腕管·其他上肢'),
-                    items: [
-                        { name: locale === 'ko' ? '손목 수근관 증후군' : (locale === 'en' ? 'Carpal Tunnel Syndrome' : '腕管综合征'), code: 'G54.2', desc: locale === 'ko' ? '손 저림, 야간통. 수술 시 5종 수술비 청구 가능. (G코드로도 분류)' : (locale === 'en' ? 'Hand numbness, night pain. Type 5 surgery claim applicable. (Also G-code)' : '手麻、夜间痛。手术时可申请5种手术费。（也属G代码）'), riders: riders.DISEASE, isImportant: true },
-                        { name: locale === 'ko' ? '드퀘르벵 건초염' : (locale === 'en' ? 'De Quervain Tenosynovitis' : '狄奎尔万腱鞘炎'), code: 'M65.4', desc: locale === 'ko' ? '엄지 손목 건초염. 산모, 주방 종사자 다빈도' : (locale === 'en' ? 'Thumb/wrist tenosynovitis. Common in new mothers, kitchen workers' : '拇指腕部腱鞘炎。产妇、厨房工作者高发'), riders: riders.DISEASE },
-                        { name: locale === 'ko' ? '손목 관절증' : (locale === 'en' ? 'Wrist Arthrosis' : '腕关节病'), code: 'M19.0', riders: riders.DISEASE },
-                    ]
-                },
-                {
-                    name: locale === 'ko' ? '뼈·골밀도 질환 (골다공증·골절)' : (locale === 'en' ? 'Bone Density Diseases (Osteoporosis/Fracture)' : '骨·骨密度疾病（骨质疏松·骨折）'),
-                    items: [
-                        { name: locale === 'ko' ? '골다공증 (병적골절 없음)' : (locale === 'en' ? 'Osteoporosis without Fracture' : '骨质疏松（无病理性骨折）'), code: 'M81', desc: locale === 'ko' ? '폐경후·노령성 골다공증. 골절 발생 시 골절진단비 청구' : (locale === 'en' ? 'Postmenopausal/senile osteoporosis. Fracture diagnosis benefit when fracture occurs' : '绝经后·老龄性骨质疏松。发生骨折时可申请骨折诊断金'), riders: [t('fractureDiag')] },
-                        { name: locale === 'ko' ? '병적 골절을 동반한 골다공증' : (locale === 'en' ? 'Osteoporosis with Pathological Fracture' : '伴病理性骨折的骨质疏松'), code: 'M80', desc: locale === 'ko' ? '골다공증으로 인한 골절. 척추·고관절 압박골절 포함' : (locale === 'en' ? 'Fractures due to osteoporosis. Includes spinal/hip compression fractures' : '骨质疏松引起的骨折。包括脊柱·髋关节压缩性骨折'), riders: [t('fractureDiag'), ...riders.DISEASE], isImportant: true },
-                        { name: locale === 'ko' ? '골수염' : (locale === 'en' ? 'Osteomyelitis' : '骨髓炎'), code: 'M86', desc: locale === 'ko' ? '뼈 감염. 수술 치료 필요한 경우 수술비 청구 가능' : (locale === 'en' ? 'Bone infection. Surgery claim possible when surgical treatment needed' : '骨感染。需要手术治疗时可申请手术费'), riders: riders.DISEASE },
-                        { name: locale === 'ko' ? '무혈성 골괴사 (대퇴골두)' : (locale === 'en' ? 'Avascular Necrosis (Femoral Head)' : '无血性骨坏死（股骨头）'), code: 'M87', desc: locale === 'ko' ? '혈액공급 차단으로 뼈 괴사. 인공관절수술 다빈도' : (locale === 'en' ? 'Bone death from blocked blood supply. Frequent joint replacement surgery' : '血液供应中断导致骨坏死。人工关节手术高频'), riders: [t('jointReplacementSurgery'), ...riders.DISEASE], isImportant: true },
-                    ]
-                },
-                {
-                    name: locale === 'ko' ? '연조직·기타 근골격계 질환' : (locale === 'en' ? 'Soft Tissue & Other Musculoskeletal' : '软组织及其他肌肉骨骼疾病'),
-                    items: [
-                        { name: locale === 'ko' ? '등통증 (기타)' : (locale === 'en' ? 'Back Pain (Other)' : '背部疼痛（其他）'), code: 'M54', desc: locale === 'ko' ? '좌골신경통(M54.3), 목·등·허리 통증 포함' : (locale === 'en' ? 'Includes sciatica (M54.3), neck/back/lumbar pain' : '包括坐骨神经痛（M54.3）、颈·背·腰痛'), isImportant: true },
-                        { name: locale === 'ko' ? '좌골신경통' : (locale === 'en' ? 'Sciatica' : '坐骨神经痛'), code: 'M54.3', desc: locale === 'ko' ? '디스크·협착증으로 인한 좌골신경 압박. 실비 보상 빈도 높음' : (locale === 'en' ? 'Sciatic nerve compression from disc/stenosis. High frequency insurance claims' : '椎间盘·狭窄症引起的坐骨神经压迫。实费保险赔付频率高'), isImportant: true },
-                        { name: locale === 'ko' ? '목 통증' : (locale === 'en' ? 'Neck Pain' : '颈部疼痛'), code: 'M54.2', riders: riders.DISEASE },
-                        { name: locale === 'ko' ? '근육염' : (locale === 'en' ? 'Myositis' : '肌肉炎'), code: 'M60', riders: riders.DISEASE },
-                        { name: locale === 'ko' ? '연조직 장애 (기타)' : (locale === 'en' ? 'Other Soft Tissue Disorders' : '其他软组织障碍'), code: 'M79', desc: locale === 'ko' ? '류마티즘(기타), 신경통, 근육통 등 포함' : (locale === 'en' ? 'Includes other rheumatism, neuralgia, myalgia, etc.' : '包括其他风湿病、神经痛、肌肉痛等') },
-                        { name: locale === 'ko' ? '석회성 건염' : (locale === 'en' ? 'Calcific Tendinitis' : '钙化性腱炎'), code: 'M65.2', desc: locale === 'ko' ? '어깨 힘줄 석회 침착. 체외충격파·수술 치료' : (locale === 'en' ? 'Calcium deposits in shoulder tendon. Shock wave or surgery treatment' : '肩部肌腱钙质沉积。体外冲击波·手术治疗'), riders: riders.DISEASE },
-                    ]
-                }
-            ]
-        },
-        {
-            id: 'K',
-            title: locale === 'ko' ? '[K코드] 소화기계 질환' : (locale === 'en' ? '[K-Code] Digestive System Diseases' : '[K代码] 消化系统疾病'),
-            shortTitle: locale === 'ko' ? 'K코드 (소화기)' : (locale === 'en' ? 'K-Code (Digestive)' : 'K代码 (消化系统)'),
-            desc: locale === 'ko' ? '위염, 궤양, 탈장, 충수염, 담석증 등 소화기관 질환 코드입니다.' : (locale === 'en' ? 'Digestive codes for gastritis, ulcers, stone, etc.' : '胃炎、溃疡、疝气、阑尾炎、胆结石等消化器官疾病代码。'),
-            subCategories: [
-                {
-                    name: locale === 'ko' ? '위장관 질환' : (locale === 'en' ? 'Gastrointestinal Diseases' : '胃肠道疾病'),
-                    items: [
-                        { name: locale === 'ko' ? '구내염' : (locale === 'en' ? 'Stomatitis' : '口内炎'), code: 'K12' },
-                        { name: locale === 'ko' ? '위식도 역류질환' : (locale === 'en' ? 'GERD' : '胃食管反流病'), code: 'K21', isImportant: true },
-                        { name: locale === 'ko' ? '위궤양' : (locale === 'en' ? 'Stomach Ulcer' : '胃溃疡'), code: 'K25', isImportant: true, riders: riders.DISEASE },
-                        { name: locale === 'ko' ? '십이지장 궤양' : (locale === 'en' ? 'Duodenal Ulcer' : '十二指肠溃疡'), code: 'K26', riders: riders.DISEASE },
-                        { name: locale === 'ko' ? '위염 및 십이지장염' : (locale === 'en' ? 'Gastritis & Duodenitis' : '胃炎及十二指肠炎'), code: 'K29', isImportant: true },
-                        { name: locale === 'ko' ? '급성 충수염' : (locale === 'en' ? 'Acute Appendicitis' : '急性阑尾炎'), code: 'K35', isImportant: true, riders: [t('appendicitisSurgery'), ...riders.DISEASE] },
-                        { name: locale === 'ko' ? '서혜부 탈장' : (locale === 'en' ? 'Inguinal Hernia' : '腹股沟疝'), code: 'K40', isImportant: true, riders: riders.DISEASE },
-                        { name: locale === 'ko' ? '배꼽 탈장' : (locale === 'en' ? 'Umbilical Hernia' : '脐疝'), code: 'K42', riders: riders.DISEASE },
-                        { name: locale === 'ko' ? '크론병' : (locale === 'en' ? 'Crohn Disease' : '克罗恩病'), code: 'K50', riders: [t('rareDiseaseDiag'), ...riders.DISEASE] },
-                        { name: locale === 'ko' ? '궤양성 대장염' : (locale === 'en' ? 'Ulcerative Colitis' : '溃疡性结肠炎'), code: 'K51', riders: [t('rareDiseaseDiag'), ...riders.DISEASE] },
-                        { name: locale === 'ko' ? '장폐색' : (locale === 'en' ? 'Intestinal Obstruction' : '肠梗阻'), code: 'K56', riders: riders.DISEASE },
-                        { name: locale === 'ko' ? '게실 질환' : (locale === 'en' ? 'Diverticular Disease' : '憩室病'), code: 'K57', isImportant: true, riders: riders.DISEASE },
-                    ]
-                },
-                {
-                    name: locale === 'ko' ? '간, 담낭, 췌장 질환' : (locale === 'en' ? 'Liver, Gallbladder & Pancreatic' : '肝、胆囊、胰腺疾病'),
-                    items: [
-                        { name: locale === 'ko' ? '간 섬유증 및 간경변' : (locale === 'en' ? 'Liver Fibrosis & Cirrhosis' : '肝纤维化及肝硬化'), code: 'K74', riders: [t('liverCirrhosisDiag'), ...riders.DISEASE] },
-                        { name: locale === 'ko' ? '담석증' : (locale === 'en' ? 'Cholelithiasis' : '胆结石'), code: 'K80', isImportant: true, riders: riders.DISEASE },
-                        { name: locale === 'ko' ? '담낭염' : (locale === 'en' ? 'Cholecystitis' : '胆囊炎'), code: 'K81', isImportant: true, riders: riders.DISEASE },
-                        { name: locale === 'ko' ? '급성 췌장염' : (locale === 'en' ? 'Acute Pancreatitis' : '急性胰腺炎'), code: 'K85', isImportant: true, riders: riders.DISEASE },
+                        { name: isKo ? '회전근개 증후군 (어깨 파열)' : 'Rotator cuff syndrome', code: 'M75.1', riders: ['질병수술비'], isImportant: true, deepAnalysis: isKo ? '완전 파열(Full thickness) 여부가 수술비 지급 규모를 결정합니다. 부분 파열 시 보존적 치료비 실비를 우선 청구하십시오.' : 'Full thickness tear determines surgical benefit amounts. For partial tears, claim conservative treatment expenses.' },
+                        { name: isKo ? '골다공증 (T-score -2.5 이하)' : 'Osteoporosis', code: 'M81', riders: ['실손의료비'], isImportant: true, deepAnalysis: isKo ? 'BMD(골밀도) 결과지상 T-score를 확인하십시오. -2.5 이하 시 급여 처리가 가능하여 실비 보상 범위가 확대됩니다.' : 'Verify T-score <= -2.5 for NHI coverage and expanded reimbursement.' },
+                        { name: isKo ? '대퇴골두 무혈성 괴사' : 'AVN of femur head', code: 'M87.0', riders: ['인공관절수술비'], isImportant: true, deepAnalysis: isKo ? '괴사 범위가 체중 부위(Weight bearing)를 포함하는지가 관절 치환술의 의학적 타당성 근거가 됩니다.' : 'Involvement of weight-bearing areas justifies hip replacement surgery.' }
                     ]
                 }
             ]
         },
         {
             id: 'S',
-            title: locale === 'ko' ? '[S코드] 외상 및 각종 상해' : (locale === 'en' ? '[S-Code] Trauma & Injuries' : '[S代码] 外伤及各种伤害'),
-            shortTitle: locale === 'ko' ? 'S코드 (상해/외상)' : (locale === 'en' ? 'S-Code (Injuries)' : 'S代码 (伤害/外伤)'),
-            desc: locale === 'ko' ? '외부 요인에 의한 상처, 골절, 인대손상 등 상해 코드입니다.' : (locale === 'en' ? 'Injury codes for wounds, fractures, ligament tears, etc.' : '由于外部因素导致的伤口、骨折、韧带损伤等伤害代码。'),
+            title: isKo ? '[S코드] 상해 및 외상 (전신 부위별)' : '[S-Code] Injury & Trauma (All Sites)',
+            shortTitle: 'S코드',
+            desc: isKo ? '머리부터 발끝까지 모든 골절, 탈구, 파열 코드입니다.' : 'Detailed injury codes for the entire body.',
             subCategories: [
                 {
-                    name: locale === 'ko' ? '머리, 목, 흉부, 복부 손상' : (locale === 'en' ? 'Head, Neck, Chest, Abdomen' : '头、颈、胸、腹部损伤'),
+                    name: isKo ? '두부 및 안면 골절 (S02)' : 'Head & Face Fractures',
                     items: [
-                        { name: locale === 'ko' ? '머리의 표재성 손상' : (locale === 'en' ? 'Superficial Injury of Head' : '头部的浅表损伤'), code: 'S00', riders: [t('injuryOutpatientSilbi')] },
-                        { name: locale === 'ko' ? '머리의 열린 상처' : (locale === 'en' ? 'Open Wound of Head' : '头部的开放性伤口'), code: 'S01', riders: [t('woundSutureSurgery')] },
-                        { name: locale === 'ko' ? '두개골 및 안면골 골절' : (locale === 'en' ? 'Skull & Facial Bone Fracture' : '颅骨及面骨骨折'), code: 'S02', riders: riders.INJURY },
-                        { name: locale === 'ko' ? '경추 골절' : (locale === 'en' ? 'Cervical Spine Fracture' : '颈椎骨折'), code: 'S12', riders: riders.INJURY },
-                        { name: locale === 'ko' ? '경부 척수 및 신경 손상' : (locale === 'en' ? 'Injury of Spinal Cord/Nerve at Neck' : '颈部脊髓及神经损伤'), code: 'S14', riders: riders.INJURY },
-                        { name: locale === 'ko' ? '늑골·흉골·흉추 골절' : (locale === 'en' ? 'Rib/Sternum/Thoracic Spine Fracture' : '肋骨·胸骨·胸椎骨折'), code: 'S22', riders: riders.INJURY },
-                        { name: locale === 'ko' ? '요추 및 골반 골절' : (locale === 'en' ? 'Lumbar/Pelvic Fracture' : '腰椎及骨盆骨折'), code: 'S32', riders: riders.INJURY },
+                        { name: isKo ? '코뼈 골절' : 'Nasal bone fracture', code: 'S02.2', riders: riders.INJURY, isImportant: true, deepAnalysis: isKo ? '단순 골절이라도 도수정복술 시행 시 "상해수술비" 지급 대상입니다. 비급여 재료대 실비를 정밀 확인하십시오.' : 'Nasal reduction surgery qualifies for injury surgical benefits. Check non-benefit material costs.' },
+                        { name: isKo ? '안와저 골절' : 'Orbital floor fracture', code: 'S02.3', riders: riders.INJURY, deepAnalysis: isKo ? '복시(사물이 두 개로 보임) 증상 발생 시 안구 운동 장해로 인한 상해후유장해 청구가 가능합니다.' : 'Diplopia symptoms may qualify for eye-movement related disability benefits.' }
                     ]
                 },
                 {
-                    name: locale === 'ko' ? '팔, 다리 손상' : (locale === 'en' ? 'Arm & Leg Injuries' : '胳膊、腿部损伤'),
+                    name: isKo ? '척추 및 흉부 골절 (S12-S32)' : 'Spine & Chest Fractures',
                     items: [
-                        { name: locale === 'ko' ? '어깨 및 위팔 골절' : (locale === 'en' ? 'Shoulder/Upper Arm Fracture' : '肩及上臂骨折'), code: 'S42', riders: riders.INJURY },
-                        { name: locale === 'ko' ? '요골·척골 골절' : (locale === 'en' ? 'Radius/Ulna Fracture' : '桡骨·尺骨骨折'), code: 'S52', riders: riders.INJURY },
-                        { name: locale === 'ko' ? '손목 및 손 골절' : (locale === 'en' ? 'Wrist/Hand Fracture' : '腕及手骨折'), code: 'S62', riders: riders.INJURY },
-                        { name: locale === 'ko' ? '대퇴골 골절' : (locale === 'en' ? 'Femur Fracture' : '大腿骨骨折'), code: 'S72', riders: riders.INJURY },
-                        { name: locale === 'ko' ? '경골·비골 골절' : (locale === 'en' ? 'Tibia/Fibula Fracture' : '胫骨·腓骨骨折'), code: 'S82', riders: riders.INJURY },
-                        { name: locale === 'ko' ? '무릎 탈구·염좌' : (locale === 'en' ? 'Knee Dislocation/Sprain' : '膝关节脱位·扭伤'), code: 'S83', riders: riders.INJURY },
-                        { name: locale === 'ko' ? '발목 및 발 골절' : (locale === 'en' ? 'Ankle/Foot Fracture' : '足踝及足骨折'), code: 'S92', riders: riders.INJURY },
+                        { name: isKo ? '흉/요추 압박골절' : 'Compression fracture', code: 'S22/S32', riders: riders.INJURY, isImportant: true, deepAnalysis: isKo ? '압박률(Compression %)에 따라 기형장해 15~50% 확정 수령 가능합니다. 골시멘트 시술 여부와 상관없이 장해 청구가 가능합니다.' : 'Deformity disability (15-50%) is available based on compression percentage, regardless of kyphoplasty.' },
+                        { name: isKo ? '늑골(갈비뼈) 골절' : 'Rib fracture', code: 'S22.3', riders: riders.INJURY, deepAnalysis: isKo ? '다발성 골절(여러 대 부러짐) 시 가슴 통증으로 인한 호흡 곤란을 상해입원일당 청구의 근거로 활용하십시오.' : 'Multiple rib fractures causing dyspnea justify injury inpatient benefits.' }
+                    ]
+                },
+                {
+                    name: isKo ? '사지(팔/다리) 골절 (S42-S92)' : 'Limb Fractures',
+                    items: [
+                        { name: isKo ? '손목(요골) 골절' : 'Distal radius fracture', code: 'S52.5', riders: riders.INJURY, isImportant: true, deepAnalysis: isKo ? '관절면 침범 여부가 핵심입니다. 수술 후 강직 발생 시 맥브라이드 장해 10~13% 수령이 가능합니다.' : 'Joint surface involvement is key. Post-op stiffness may qualify for 10-13% McBride disability.' },
+                        { name: isKo ? '대퇴골 경부 골절' : 'Femur neck fracture', code: 'S72.0', riders: riders.INJURY, isImportant: true, deepAnalysis: isKo ? '노인성 낙상 시 기왕증 감액이 심한 부위이나, 직접적인 외상 기여도를 입증하여 100% 수령 전략이 필요합니다.' : 'Common in elderly falls; prove direct traumatic contribution to avoid pre-existing condition reductions.' },
+                        { name: isKo ? '발목 골절' : 'Ankle fracture', code: 'S82.8', riders: riders.INJURY, isImportant: true, deepAnalysis: isKo ? '내과/외과/후과 동시 골절(삼복사 골절) 시 장해율이 매우 높으며, 금속판 제거술 시 추가 수술비 수령 여부를 확인하십시오.' : 'Trimalleolar fractures have high disability rates. Check for additional benefits during hardware removal.' }
+                    ]
+                },
+                {
+                    name: isKo ? '인대 파열 및 건 손상 (S-Code)' : 'Ligament & Tendon Injuries',
+                    items: [
+                        { name: isKo ? '무릎 전방십자인대 파열' : 'ACL tear', code: 'S83.5', riders: ['상해후유장해'], isImportant: true, claimTips: isKo ? '단순 파열보다 수술 후 "동요(흔들림)" 정도가 중요합니다. KT-2000 검사 등으로 5mm 이상의 동요를 입증하여 상해후유장해 보험금을 확보하십시오.' : 'Prove 5mm+ instability via KT-2000 for disability benefits.', deepAnalysis: isKo ? '동요 측정 결과 5mm/10mm/15mm 기준에 따라 지급률 5%/10%/20%가 결정되는 고액 장해 건입니다. 전문의의 ' : 'Instability measurements (5/10/15mm) determine 5/10/20% disability rates.' },
+                        { name: isKo ? '아킬레스건 파열' : 'Achilles tendon rupture', code: 'S86.0', riders: ['상해수술비'], claimTips: isKo ? '아킬레스건 파열은 ' : 'Achilles rupture is often 100% traumatic; ensure full benefit payout.' }
+                    ]
+                }
+            ]
+        },
+        {
+            id: 'G/F/Q/O/H/N/L/K/J',
+            title: isKo ? '[기타] 내과/소아/정신/피부' : '[Misc] Medical/Pedi/Mental',
+            shortTitle: '기타코드',
+            desc: isKo ? 'G, F, Q, O, H, N, L, K, J 등 KCD-8차의 나머지 주요 분류입니다.' : 'Comprehensive miscellaneous classification.',
+            subCategories: [
+                {
+                    name: isKo ? '신경 및 정신 (G/F)' : 'Nerve & Mental',
+                    items: [
+                        { name: isKo ? '알츠하이머 치매' : 'Alzheimer\'s', code: 'G30', riders: ['치매진단비'], isImportant: true, deepAnalysis: isKo ? 'CDR 척도(1~5점)가 보상의 절대적 기준입니다. 90일 이상 증상 지속 여부를 주치의 기록으로 증명하십시오.' : 'CDR scale (1-5) is the absolute standard. Prove 90-day symptom persistence via physician records.' },
+                        { name: isKo ? '뇌전증 (간질)' : 'Epilepsy', code: 'G40', riders: ['질병후유장해'], deepAnalysis: isKo ? '발작 빈도와 뇌파(EEG) 검사상 이상 소견 유무에 따라 장해 등급이 결정됩니다.' : 'Disability grade depends on seizure frequency and abnormal EEG findings.' }
+                    ]
+                },
+                {
+                    name: isKo ? '감각기 및 비뇨생식기 (H/N)' : 'Sensory & Urogenital',
+                    items: [
+                        { name: isKo ? '노년 백내장' : 'Senile cataract', code: 'H25.9', riders: ['질병수술비'], isImportant: true, deepAnalysis: isKo ? '다초점 인공수정체 삽입 시 실손보험 약관 시기에 따라 보상 여부가 크게 갈리므로 약관 확인이 선행되어야 합니다.' : 'Multifocal lens reimbursement depends heavily on the policy year; check terms first.' },
+                        { name: isKo ? '만성 신부전' : 'CKD', code: 'N18.5', riders: ['질병후유장해'], isImportant: true, deepAnalysis: isKo ? '혈액투석 또는 복막투석 개시 시 질병후유장해 75%에 해당하는 매우 높은 지급률이 적용됩니다.' : 'Dialysis onset qualifies for a 75% disease disability rate.' }
+                    ]
+                },
+                {
+                    name: isKo ? '소화기 및 호흡기 (K/J)' : 'Digestive & Resp (K/J)',
+                    items: [
+                        { name: isKo ? '간의 경변증(간경화)' : 'Liver cirrhosis', code: 'K74.6', riders: ['질병후유장해'], isImportant: true, deepAnalysis: isKo ? 'Child-Pugh 점수에 따른 간 기능 저하 정도를 평가하여 장해 보험금을 청구하십시오.' : 'Claim disability benefits by evaluating liver function via Child-Pugh scores.' },
+                        { name: isKo ? 'COPD (만성폐쇄성폐질환)' : 'COPD', code: 'J44', riders: ['질병후유장해'], deepAnalysis: isKo ? '폐활량(FEV1) 측정 수치에 따라 흉복부 장기로 분류되어 고액 장해 보험금 수령이 가능합니다.' : 'FEV1 levels categorize this as a thoracic/abdominal organ disability for high payouts.' }
                     ]
                 }
             ]
