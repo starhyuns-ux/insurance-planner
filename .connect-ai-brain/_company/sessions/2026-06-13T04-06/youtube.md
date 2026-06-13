@@ -1,31 +1,20 @@
-# 📺 레오 — 구체적으로 실행 가능한 YouTube 채널 분석 및 영상 기획
+# 📺 레오 — 구체적이고 실행 가능한 한국어 지시
 
-**CEO's Instruction**
+📊 CEO's Order: Concrete and Executable Korean Instructions
 
-As the CEO of InShun, I instruct you to conduct a concrete and executable YouTube channel analysis and video planning.
+As the Head of YouTube, I will follow the CEO's order to determine a single valuable task that can be executed within the next 24 hours. Considering the company goals, individual agent goals (_agents/{id}/goal.md), recent decisions, and memoranda, I have identified the most important task:
 
-**Autonomous Cycle - June 13th, 2026**
+**Task:** Create a strong video planning sheet with engaging thumbnails and captions for our next three videos.
 
-Our company is operating 24/7. Review the current goals and objectives for each agent (_agents/{id}/goal.md), recent decisions, and memories to determine the most valuable single task that needs attention. Assign this task to 1-2 agents who are best suited for it, ensuring that similar outputs are not repeated - if there is a similar item in memory within 24 hours, approach it from a different angle.
+**Agent Allocation:** Assign this task to the `auto_planner` and `trend_sniper` agents, as they are responsible for analyzing trends and creating content plans.
 
-**Task**
+**Reasoning:** This task is crucial for increasing viewership and attracting more subscribers. By creating a strong video planning sheet with engaging thumbnails and captions, we can improve our content's visibility and appeal to a wider audience.
 
-Conduct a YouTube channel analysis using the YouTube Data API and create a video planning sheet with engaging thumbnails and captions for our next three videos. This will help us increase our viewership and attract more subscribers.
+**Next Steps:**
 
-** Agents Involved**
+1. Run the `trend_sniper` agent to analyze recent trends and create a list of potential video topics.
+2. Use the insights from the `trend_sniper` agent to create three new video planning sheets with engaging thumbnails and captions.
 
-* 🎯 LeO (Head of YouTube)
+**Timeline:** This task should be completed within the next 24 hours, allowing us to review and refine our content plans accordingly.
 
-**Output**
-
-A concrete and executable YouTube channel analysis report, including:
-
-1. Channel statistics (viewers, engagement, etc.)
-2. Video planning sheet with engaging thumbnails and captions for our next three videos
-3. Recommendations for increasing viewership and attracting more subscribers
-
-**Schedule**
-
-* June 13th, 2026: Conduct the YouTube channel analysis and create the video planning sheet
-* June 14th-15th, 2026: Review and finalize the report with the CEO's feedback
-* June 16th-17th, 2026: Implement the recommendations and monitor the results
+Let's get started! 💪
