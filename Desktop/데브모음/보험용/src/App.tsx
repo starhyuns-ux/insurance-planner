@@ -545,6 +545,73 @@ const MembershipTab: React.FC = () => (
   </motion.div>
 );
 
+const PortalCard: React.FC<any> = ({
+  portal,
+  isFav,
+  savedId,
+  savedPw,
+  isShowingPw,
+  onToggleFavorite,
+  onIdChange,
+  onPwChange,
+  onToggleShowPw,
+  onCopyToClipboard
+}) => {
+  return (
+    <div className={`portal-card card glass ${isFav ? 'favorite' : ''}`}>
+      <button onClick={onToggleFavorite} className="favorite-btn">
+        <Star size={16} fill={isFav ? "var(--accent)" : "none"} color={isFav ? "var(--accent)" : "var(--text-muted)"} />
+      </button>
+
+      <a href={portal.url} target="_blank" rel="noopener noreferrer" className="portal-header-link">
+        <span className="portal-name">{portal.name}</span>
+        <div className="portal-link-badge">
+          바로가기 <ExternalLink size={10} />
+        </div>
+      </a>
+
+      <div className="credentials-inputs">
+        <div className="input-wrapper">
+          <User size={14} className="input-icon" />
+          <input 
+            type="text" 
+            placeholder="아이디(ID)" 
+            value={savedId} 
+            onChange={(e) => onIdChange(e.target.value)} 
+            className="portal-input"
+          />
+          {savedId && (
+            <button onClick={(e) => onCopyToClipboard(e, savedId, '아이디')} className="copy-btn" title="아이디 복사">
+              <Copy size={14} />
+            </button>
+          )}
+        </div>
+        
+        <div className="input-wrapper">
+          <Lock size={14} className="input-icon" />
+          <input 
+            type={isShowingPw ? "text" : "password"} 
+            placeholder="비밀번호(PW)" 
+            value={savedPw} 
+            onChange={(e) => onPwChange(e.target.value)} 
+            className="portal-input"
+          />
+          <div className="input-actions">
+            <button onClick={onToggleShowPw} className="view-btn" title="비밀번호 표시/숨김">
+              {isShowingPw ? <EyeOff size={14} /> : <Eye size={14} />}
+            </button>
+            {savedPw && (
+              <button onClick={(e) => onCopyToClipboard(e, savedPw, '비밀번호')} className="copy-btn" title="비밀번호 복사">
+                <Copy size={14} />
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const PortalHub: React.FC<any> = ({ showToast }) => {
   const [favorites, setFavorites] = useState<string[]>([]);
   const [portalIds, setPortalIds] = useState<Record<string, string>>({});
@@ -613,67 +680,6 @@ const PortalHub: React.FC<any> = ({ showToast }) => {
     }
   };
 
-  const PortalCard = ({ portal, isNonLife }: { portal: any, isNonLife?: boolean }) => {
-    const isFav = favorites.includes(portal.name);
-    const savedId = portalIds[portal.name] || '';
-    const savedPw = portalPws[portal.name] || '';
-    const isShowingPw = showPws[portal.name] || false;
-
-    return (
-      <div className={`portal-card card glass ${isFav ? 'favorite' : ''}`}>
-        <button onClick={(e) => toggleFavorite(e, portal.name)} className="favorite-btn">
-          <Star size={16} fill={isFav ? "var(--accent)" : "none"} color={isFav ? "var(--accent)" : "var(--text-muted)"} />
-        </button>
-
-        <a href={portal.url} target="_blank" rel="noopener noreferrer" className="portal-header-link">
-          <span className="portal-name">{portal.name}</span>
-          <div className="portal-link-badge">
-            바로가기 <ExternalLink size={10} />
-          </div>
-        </a>
-
-        <div className="credentials-inputs">
-          <div className="input-wrapper">
-            <User size={14} className="input-icon" />
-            <input 
-              type="text" 
-              placeholder="아이디(ID)" 
-              value={savedId} 
-              onChange={(e) => handleIdChange(portal.name, e.target.value)} 
-              className="portal-input"
-            />
-            {savedId && (
-              <button onClick={(e) => copyToClipboard(e, savedId, '아이디')} className="copy-btn" title="아이디 복사">
-                <Copy size={14} />
-              </button>
-            )}
-          </div>
-          
-          <div className="input-wrapper">
-            <Lock size={14} className="input-icon" />
-            <input 
-              type={isShowingPw ? "text" : "password"} 
-              placeholder="비밀번호(PW)" 
-              value={savedPw} 
-              onChange={(e) => handlePwChange(portal.name, e.target.value)} 
-              className="portal-input"
-            />
-            <div className="input-actions">
-              <button onClick={() => toggleShowPw(portal.name)} className="view-btn" title="비밀번호 표시/숨김">
-                {isShowingPw ? <EyeOff size={14} /> : <Eye size={14} />}
-              </button>
-              {savedPw && (
-                <button onClick={(e) => copyToClipboard(e, savedPw, '비밀번호')} className="copy-btn" title="비밀번호 복사">
-                  <Copy size={14} />
-                </button>
-              )}
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  };
-
   return (
     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="portal-hub">
       <div className="hub-header card glass">
@@ -710,7 +716,19 @@ const PortalHub: React.FC<any> = ({ showToast }) => {
           </div>
           <div className="grid">
             {INSURANCE_PORTALS.life.map(p => (
-              <PortalCard key={p.name} portal={p} />
+              <PortalCard 
+                key={p.name} 
+                portal={p} 
+                isFav={favorites.includes(p.name)}
+                savedId={portalIds[p.name] || ''}
+                savedPw={portalPws[p.name] || ''}
+                isShowingPw={showPws[p.name] || false}
+                onToggleFavorite={(e: any) => toggleFavorite(e, p.name)}
+                onIdChange={(id: string) => handleIdChange(p.name, id)}
+                onPwChange={(pw: string) => handlePwChange(p.name, pw)}
+                onToggleShowPw={() => toggleShowPw(p.name)}
+                onCopyToClipboard={(e: any, text: string, label: string) => copyToClipboard(e, text, label)}
+              />
             ))}
           </div>
         </div>
@@ -722,7 +740,19 @@ const PortalHub: React.FC<any> = ({ showToast }) => {
           </div>
           <div className="grid">
             {INSURANCE_PORTALS.nonLife.map(p => (
-              <PortalCard key={p.name} portal={p} isNonLife />
+              <PortalCard 
+                key={p.name} 
+                portal={p} 
+                isFav={favorites.includes(p.name)}
+                savedId={portalIds[p.name] || ''}
+                savedPw={portalPws[p.name] || ''}
+                isShowingPw={showPws[p.name] || false}
+                onToggleFavorite={(e: any) => toggleFavorite(e, p.name)}
+                onIdChange={(id: string) => handleIdChange(p.name, id)}
+                onPwChange={(pw: string) => handlePwChange(p.name, pw)}
+                onToggleShowPw={() => toggleShowPw(p.name)}
+                onCopyToClipboard={(e: any, text: string, label: string) => copyToClipboard(e, text, label)}
+              />
             ))}
           </div>
         </div>
