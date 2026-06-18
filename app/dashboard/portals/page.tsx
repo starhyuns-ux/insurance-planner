@@ -162,12 +162,9 @@ export default function PortalsPage() {
     
     if (list.length === 0) return alert('대상이 없습니다.')
 
-    const confirm = window.confirm(`${mode === 'all' ? '전체' : '즐겨찾기'} ${list.length}개의 포탈을 엽니다. 계속하시겠습니까?`)
-    if (confirm) {
-      list.forEach((portal, index) => {
-        setTimeout(() => window.open(portal.url, '_blank'), index * 250)
-      })
-    }
+    list.forEach((portal) => {
+      window.open(portal.url, '_blank')
+    })
   }
 
   return (
