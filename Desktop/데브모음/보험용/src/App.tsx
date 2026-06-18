@@ -32,7 +32,8 @@ import {
   Star,
   MapPin,
   Eye,
-  EyeOff
+  EyeOff,
+  FileText
 } from "lucide-react";
 import { analyzeCoverage, PRICING, PolicyData, AnalysisResult } from "./services/AnalysisEngine.js";
 import { sendTelegramMessage } from "./services/messaging.js";
@@ -41,7 +42,7 @@ import PrivacyPolicyPage from "./components/PrivacyPolicyPage.js";
 
 // --- Types & Constants ---
 type Role = "planner" | "customer";
-type PlannerViewType = "Dashboard" | "Schedule" | "Analysis" | "Portals" | "Membership" | "Developers";
+type PlannerViewType = "Dashboard" | "Schedule" | "Analysis" | "Portals" | "DesignSupport" | "Membership" | "Developers";
 
 const INSURANCE_PORTALS = {
   life: [
@@ -308,6 +309,9 @@ const PlannerWorkspace: React.FC<any> = ({ requests, onAdd, showToast, onSwitchT
           <button className={activeTab === "Portals" ? "active" : ""} onClick={() => setActiveTab("Portals")}>
             <Globe size={20} /> <span>포탈 허브</span>
           </button>
+          <button className={activeTab === "DesignSupport" ? "active" : ""} onClick={() => setActiveTab("DesignSupport")}>
+            <FileText size={20} /> <span>설계 지원</span>
+          </button>
           <button className={activeTab === "Membership" ? "active" : ""} onClick={() => setActiveTab("Membership")}>
             <Crown size={20} /> <span>멤버십</span>
           </button>
@@ -348,6 +352,7 @@ const PlannerWorkspace: React.FC<any> = ({ requests, onAdd, showToast, onSwitchT
             {activeTab === "Schedule" && <ScheduleTab key="schedule" />}
             {activeTab === "Analysis" && <AnalysisTab key="analysis" requests={requests} onAdd={onAdd} showToast={showToast} />}
             {activeTab === "Portals" && <PortalHub key="portals" showToast={showToast} />}
+            {activeTab === "DesignSupport" && <DesignSupportTab key="design" showToast={showToast} />}
             {activeTab === "Membership" && <MembershipTab key="member" />}
             {activeTab === "Developers" && <DeveloperTab key="dev" />}
           </AnimatePresence>
@@ -671,13 +676,10 @@ const PortalHub: React.FC<any> = ({ showToast }) => {
       return;
     }
 
-    const confirm = window.confirm(`${mode === 'all' ? '전체' : '즐겨찾기'} ${list.length}개의 포탈을 엽니다. 브라우저 팝업 허용이 필요합니다. 계속하시겠습니까?`);
-    if (confirm) {
-      list.forEach((portal, index) => {
-        setTimeout(() => window.open(portal.url, '_blank'), index * 250);
-      });
-      showToast(`${list.length}개의 포탈 사이트를 열고 있습니다.`);
-    }
+    list.forEach((portal) => {
+      window.open(portal.url, '_blank');
+    });
+    showToast(`${list.length}개의 포탈 사이트를 열고 있습니다. (팝업 차단이 되어있다면 주소창 우측에서 팝업 허용을 해주세요)`);
   };
 
   return (
@@ -928,6 +930,317 @@ const PortalHub: React.FC<any> = ({ showToast }) => {
           .hub-header { flex-direction: column; align-items: flex-start; gap: 16px; padding: 24px; }
           .hub-actions { width: 100%; }
           .hub-actions button { flex: 1; }
+        }
+      `}</style>
+    </motion.div>
+  );
+};
+
+const DEFAULT_RIDERS = [
+  { name: "일반암 진단비", defaultAmount: "5,000만원", category: "diagnosis" },
+  { name: "유사암 진단비", defaultAmount: "1,000만원", category: "diagnosis" },
+  { name: "뇌혈관질환 진단비", defaultAmount: "2,000만원", category: "diagnosis" },
+  { name: "허혈성심장질환 진단비", defaultAmount: "2,000만원", category: "diagnosis" },
+  { name: "심·뇌혈관질환 수술비", defaultAmount: "1,000만원", category: "diagnosis" },
+  { name: "질병 수술비", defaultAmount: "30만원", category: "surgery" },
+  { name: "상해 수술비", defaultAmount: "100만원", category: "surgery" },
+  { name: "질병 1-5종 수술비", defaultAmount: "최대 1,000만원", category: "surgery" },
+  { name: "상해 1-5종 수술비", defaultAmount: "최대 1,000만원", category: "surgery" },
+  { name: "질병 입원일당(1일이상)", defaultAmount: "3만원", category: "surgery" },
+  { name: "상해 입원일당(1일이상)", defaultAmount: "3만원", category: "surgery" },
+  { name: "질병 후유장해(3%이상)", defaultAmount: "3,000만원", category: "etc" },
+  { name: "상해 후유장해(3%이상)", defaultAmount: "5,000만원", category: "etc" },
+  { name: "가족 일상생활중 배상책임", defaultAmount: "1억원", category: "etc" },
+  { name: "독감(인플루엔자) 치료비", defaultAmount: "20만원", category: "etc" }
+];
+
+const INSURANCE_TYPES = [
+  "종합건강보험",
+  "암보험",
+  "운전자보험",
+  "어린이보험",
+  "치아보험",
+  "화재/재물보험",
+  "펫보험",
+  "간편/유병자보험"
+];
+
+const DesignSupportTab: React.FC<any> = ({ showToast }) => {
+  const [customerName, setCustomerName] = useState("");
+  const [gender, setGender] = useState<"M" | "F">("M");
+  const [birthdate, setBirthdate] = useState("");
+  const [insuranceAge, setInsuranceAge] = useState(0);
+  const [phone, setPhone] = useState("");
+  const [job, setJob] = useState("");
+  const [driving, setDriving] = useState("자가용 운전");
+  const [insuranceType, setInsuranceType] = useState("종합건강보험");
+  const [extraNotes, setExtraNotes] = useState("최저 보험료 및 가성비 좋은 플랜으로 설계 부탁드립니다.");
+
+  const [checkedRiders, setCheckedRiders] = useState<Record<string, boolean>>(() => {
+    const initial: Record<string, boolean> = {};
+    DEFAULT_RIDERS.forEach(r => {
+      initial[r.name] = false;
+    });
+    initial['일반암 진단비'] = true;
+    initial['유사암 진단비'] = true;
+    initial['뇌혈관질환 진단비'] = true;
+    initial['허혈성심장질환 진단비'] = true;
+    return initial;
+  });
+
+  const [riderAmounts, setRiderAmounts] = useState<Record<string, string>>(() => {
+    const initial: Record<string, string> = {};
+    DEFAULT_RIDERS.forEach(r => {
+      initial[r.name] = r.defaultAmount;
+    });
+    return initial;
+  });
+
+  useEffect(() => {
+    if (birthdate && birthdate.length === 6) {
+      const yy = parseInt(birthdate.substring(0, 2), 10);
+      const mm = parseInt(birthdate.substring(2, 4), 10);
+      const dd = parseInt(birthdate.substring(4, 6), 10);
+      const currentYear = new Date().getFullYear();
+      const birthYear = yy + (yy > (currentYear % 100) ? 1900 : 2000);
+      const birthDate = new Date(birthYear, mm - 1, dd);
+      const today = new Date();
+      let diffMonths = (today.getFullYear() - birthDate.getFullYear()) * 12 + (today.getMonth() - birthDate.getMonth());
+      if (today.getDate() < birthDate.getDate()) {
+        diffMonths--;
+      }
+      const insAge = Math.floor((diffMonths + 3) / 12);
+      setInsuranceAge(insAge >= 0 ? insAge : 0);
+    } else {
+      setInsuranceAge(0);
+    }
+  }, [birthdate]);
+
+  const toggleRider = (name: string) => {
+    setCheckedRiders(prev => ({ ...prev, [name]: !prev[name] }));
+  };
+
+  const handleAmountChange = (name: string, value: string) => {
+    setRiderAmounts(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleSelectAll = (category?: string) => {
+    setCheckedRiders(prev => {
+      const updated = { ...prev };
+      DEFAULT_RIDERS.forEach(r => {
+        if (!category || r.category === category) {
+          updated[r.name] = true;
+        }
+      });
+      return updated;
+    });
+  };
+
+  const handleDeselectAll = (category?: string) => {
+    setCheckedRiders(prev => {
+      const updated = { ...prev };
+      DEFAULT_RIDERS.forEach(r => {
+        if (!category || r.category === category) {
+          updated[r.name] = false;
+        }
+      });
+      return updated;
+    });
+  };
+
+  const generateMessageText = () => {
+    let text = `[매니저 설계 요청서]\n\n`;
+    text += `■ 고객 정보\n`;
+    text += `- 성함: ${customerName || '(미입력)'} (${gender === 'M' ? '남' : '여'})\n`;
+    text += `- 생년월일: ${birthdate || '(미입력)'} (보험연령: ${insuranceAge > 0 ? `${insuranceAge}세` : '계산불가'})\n`;
+    if (phone) text += `- 연락처: ${phone}\n`;
+    if (job) text += `- 직업/직무: ${job}\n`;
+    text += `- 운전 여부: ${driving}\n\n`;
+    text += `■ 요청 보험\n`;
+    text += `- 구분: ${insuranceType}\n\n`;
+    text += `■ 요청 특약 및 가입금액\n`;
+    const activeRiders = DEFAULT_RIDERS
+      .filter(r => checkedRiders[r.name])
+      .map(r => `- ${r.name}: ${riderAmounts[r.name] || r.defaultAmount}`);
+    if (activeRiders.length > 0) {
+      text += activeRiders.join('\n') + '\n';
+    } else {
+      text += `- 선택된 특약 없음 (기본 보장 기준)\n`;
+    }
+    if (extraNotes) {
+      text += `\n■ 기타 요청사항\n- ${extraNotes}\n`;
+    }
+    text += `\n담당 설계사: 김설계 위원`;
+    return text;
+  };
+
+  const messageText = generateMessageText();
+
+  const copyToClipboard = () => {
+    navigator.clipboard.writeText(messageText);
+    showToast("설계 요청서가 복사되었습니다! 문자나 카톡창에 붙여넣으세요.");
+  };
+
+  const sendSMS = () => {
+    const smsUrl = `sms:?body=${encodeURIComponent(messageText)}`;
+    window.open(smsUrl, '_blank');
+    showToast("문자 전송 앱을 열었습니다.");
+  };
+
+  return (
+    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="design-support-tab">
+      <div className="hub-header card glass mb-6">
+        <div className="info">
+          <h3>설계 매니저 지원 시스템</h3>
+          <p>설계 요청할 내용을 가입금액별로 체크하여 문자 및 카카오톡으로 즉시 전송할 수 있습니다.</p>
+        </div>
+      </div>
+
+      <div className="design-grid">
+        <div className="form-column space-y-6">
+          <div className="card glass p-6 space-y-4">
+            <h4 className="border-b pb-2 border-slate-700">고객 인적사항</h4>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="form-group">
+                <label className="form-label">고객명</label>
+                <input className="form-input text-xs" placeholder="홍길동" value={customerName} onChange={e => setCustomerName(e.target.value)} />
+              </div>
+              <div className="form-group">
+                <label className="form-label">성별</label>
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  <button type="button" onClick={() => setGender('M')} className={`btn text-xs ${gender === 'M' ? 'btn-primary' : 'btn-outline'}`} style={{ flex: 1, padding: '8px 0' }}>남</button>
+                  <button type="button" onClick={() => setGender('F')} className={`btn text-xs ${gender === 'F' ? 'btn-primary' : 'btn-outline'}`} style={{ flex: 1, padding: '8px 0' }}>여</button>
+                </div>
+              </div>
+              <div className="form-group">
+                <label className="form-label">생년월일(6자리)</label>
+                <input className="form-input text-xs" placeholder="900101" maxLength={6} value={birthdate} onChange={e => setBirthdate(e.target.value.replace(/[^0-9]/g, ''))} />
+              </div>
+              <div className="form-group">
+                <label className="form-label">보험연령</label>
+                <div className="form-input text-xs" style={{ background: 'rgba(0,0,0,0.1)', color: 'var(--text-muted)', display: 'flex', alignItems: 'center' }}>
+                  {insuranceAge > 0 ? `${insuranceAge}세` : '자동 계산'}
+                </div>
+              </div>
+              <div className="form-group">
+                <label className="form-label">연락처</label>
+                <input className="form-input text-xs" placeholder="010-0000-0000" value={phone} onChange={e => setPhone(e.target.value)} />
+              </div>
+              <div className="form-group">
+                <label className="form-label">직업</label>
+                <input className="form-input text-xs" placeholder="회사원 (1급)" value={job} onChange={e => setJob(e.target.value)} />
+              </div>
+              <div className="form-group" style={{ gridColumn: 'span 2' }}>
+                <label className="form-label">운전여부</label>
+                <select className="form-input text-xs" style={{ background: '#1E293B' }} value={driving} onChange={e => setDriving(e.target.value)}>
+                  <option value="자가용 운전">자가용 운전</option>
+                  <option value="영업용 운전">영업용 운전</option>
+                  <option value="미운전">미운전</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div className="card glass p-6 space-y-4">
+            <h4 className="border-b pb-2 border-slate-700">요청 보험구분</h4>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px' }}>
+              {INSURANCE_TYPES.map(type => (
+                <button
+                  key={type}
+                  type="button"
+                  onClick={() => setInsuranceType(type)}
+                  className={`btn text-xs ${insuranceType === type ? 'btn-primary' : 'btn-outline'}`}
+                  style={{ padding: '8px 4px' }}
+                >
+                  {type}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="card glass p-6 space-y-6">
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #334155', paddingBottom: '8px' }}>
+              <h4>특약 및 가입금액 선택</h4>
+              <div style={{ display: 'flex', gap: '8px' }}>
+                <button type="button" onClick={() => handleSelectAll()} style={{ background: 'none', border: 'none', color: 'var(--primary)', cursor: 'pointer', fontSize: '12px', fontWeight: 'bold' }}>전체선택</button>
+                <span style={{ color: '#475569', fontSize: '12px' }}>|</span>
+                <button type="button" onClick={() => handleDeselectAll()} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontSize: '12px', fontWeight: 'bold' }}>전체해제</button>
+              </div>
+            </div>
+
+            {/* Category Groups */}
+            {['diagnosis', 'surgery', 'etc'].map(category => (
+              <div key={category} className="space-y-3">
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span className="text-xs font-bold text-slate-400">
+                    {category === 'diagnosis' ? '● 진단비 특약' : category === 'surgery' ? '● 수술/입원비 특약' : '● 기타/장해 특약'}
+                  </span>
+                  <div style={{ display: 'flex', gap: '6px' }}>
+                    <button type="button" onClick={() => handleSelectAll(category)} style={{ background: 'none', border: 'none', color: 'var(--primary)', cursor: 'pointer', fontSize: '10px' }}>선택</button>
+                    <button type="button" onClick={() => handleDeselectAll(category)} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontSize: '10px' }}>해제</button>
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  {DEFAULT_RIDERS.filter(r => r.category === category).map(r => (
+                    <div key={r.name} className="rider-row" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'rgba(255,255,255,0.02)', padding: '8px 12px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                      <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
+                        <input type="checkbox" checked={checkedRiders[r.name]} onChange={() => toggleRider(r.name)} style={{ accentColor: 'var(--primary)' }} />
+                        <span className="text-xs font-bold">{r.name}</span>
+                      </label>
+                      <input
+                        type="text"
+                        value={riderAmounts[r.name]}
+                        onChange={e => handleAmountChange(r.name, e.target.value)}
+                        disabled={!checkedRiders[r.name]}
+                        style={{ width: '90px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)', color: 'white', padding: '4px 8px', borderRadius: '4px', textAlign: 'right', fontSize: '11px' }}
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="card glass p-6 space-y-2">
+            <h4 className="border-b pb-2 border-slate-700">기타 요청사항</h4>
+            <textarea
+              className="form-input text-xs"
+              style={{ width: '100%', resize: 'none', height: '80px', background: 'rgba(0,0,0,0.2)' }}
+              placeholder="추가 요청사항을 입력해 주세요."
+              value={extraNotes}
+              onChange={e => setExtraNotes(e.target.value)}
+            />
+          </div>
+        </div>
+
+        <div className="preview-column">
+          <div className="card glass p-6 sticky-preview space-y-6">
+            <div>
+              <h4>설계요청서 문자 미리보기</h4>
+              <p className="text-xs" style={{ color: 'var(--text-muted)', marginTop: '4px' }}>체크된 내역이 문자메시지 형식으로 실시간 취합됩니다.</p>
+            </div>
+
+            <div className="message-box" style={{ background: 'rgba(0,0,0,0.4)', padding: '16px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.05)', fontSize: '11px', fontFamily: 'monospace', whiteSpace: 'pre-wrap', color: '#34D399', maxHeight: '400px', overflowY: 'auto' }}>
+              {messageText}
+            </div>
+
+            <div className="space-y-3">
+              <button onClick={copyToClipboard} className="btn btn-outline text-xs" style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', padding: '12px' }}>
+                <Copy size={16} /> 설계요청서 텍스트 복사
+              </button>
+              <button onClick={sendSMS} className="btn btn-primary text-xs" style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', padding: '12px' }}>
+                <Send size={16} /> 문자로 설계요청 전송 (SMS)
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <style>{`
+        .design-grid { display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 24px; }
+        .sticky-preview { position: sticky; top: 24px; }
+        @media (max-width: 1024px) {
+          .design-grid { grid-template-columns: 1fr; }
         }
       `}</style>
     </motion.div>
