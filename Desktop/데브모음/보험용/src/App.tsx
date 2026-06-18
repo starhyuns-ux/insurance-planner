@@ -1235,7 +1235,7 @@ const DesignSupportTab: React.FC<any> = ({ showToast }) => {
               value={editedMessageText}
               onChange={e => setEditedMessageText(e.target.value)}
               className="message-box"
-              style={{ width: '100%', height: '320px', background: 'rgba(0,0,0,0.4)', padding: '16px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.05)', fontSize: '11px', fontFamily: 'monospace', color: '#34D399', overflowY: 'auto', resize: 'none', outline: 'none' }}
+              style={{ width: '100%', height: '320px', background: '#ffffff', padding: '16px', borderRadius: '12px', border: '1px solid #cbd5e1', fontSize: '11px', fontFamily: 'monospace', color: '#0f172a', overflowY: 'auto', resize: 'none', outline: 'none' }}
             />
 
             <div className="space-y-3">
