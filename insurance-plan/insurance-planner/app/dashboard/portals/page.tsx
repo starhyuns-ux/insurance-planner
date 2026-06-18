@@ -58,6 +58,54 @@ const INSURANCE_PORTALS = {
   ]
 }
 
+const PortalCard: React.FC<any> = ({
+  portal,
+  isFav,
+  savedId,
+  savedPw,
+  isShowingPw,
+  isNonLife,
+  onToggleFavorite,
+  onIdChange,
+  onPwChange,
+  onToggleShowPw,
+  onCopyToClipboard
+}) => {
+  return (
+    <div className={`group relative bg-white p-5 rounded-3xl border transition-all flex flex-col gap-5 shadow-sm hover:shadow-md ${isFav ? 'border-amber-400 bg-amber-50/20 ring-1 ring-amber-100' : 'border-gray-100 hover:border-primary-200'}`}>
+      <button onClick={onToggleFavorite} className="absolute top-3 right-3 p-1.5 rounded-lg z-20">
+        {isFav ? <StarSolid className="w-5 h-5 text-amber-500" /> : <StarOutline className="w-5 h-5 text-gray-300 hover:text-amber-400" />}
+      </button>
+
+      <a 
+        href={portal.url} 
+        target="_blank" 
+        rel="noopener noreferrer" 
+        className="flex flex-col items-center justify-center gap-1 mt-2 hover:opacity-80 transition-all group/link"
+      >
+        <span className={`text-base font-black transition-colors ${isFav ? 'text-amber-700' : isNonLife ? 'text-gray-900 group-hover:text-rose-600' : 'text-gray-900 group-hover:text-primary-600'}`}>{portal.name}</span>
+        <span className="flex items-center gap-1 text-[11px] font-bold text-gray-400 group-hover/link:text-primary-600">바로가기 <ArrowTopRightOnSquareIcon className="w-3 h-3" /></span>
+      </a>
+
+      <div className="space-y-3">
+        <div className="relative">
+          <UserIcon className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+          <input type="text" placeholder="ID" value={savedId} onChange={(e) => onIdChange(e.target.value)} className="w-full bg-gray-50 border border-gray-100 rounded-2xl pl-10 pr-10 py-3 text-xs font-bold focus:outline-none focus:ring-2 focus:ring-primary-200 transition-all" />
+          {savedId && <button onClick={(e) => onCopyToClipboard(e, savedId, '아이디')} className="absolute right-2 top-1/2 -translate-y-1/2 p-2 text-gray-300 hover:text-primary-500"><ClipboardDocumentIcon className="w-4 h-4" /></button>}
+        </div>
+        <div className="relative">
+          <LockClosedIcon className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+          <input type={isShowingPw ? "text" : "password"} placeholder="PW" value={savedPw} onChange={(e) => onPwChange(e.target.value)} className="w-full bg-gray-50 border border-gray-100 rounded-2xl pl-10 pr-20 py-3 text-xs font-bold focus:outline-none focus:ring-2 focus:ring-primary-200 transition-all" />
+          <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-0.5">
+            <button onClick={onToggleShowPw} className="p-2 text-gray-300 hover:text-gray-500">{isShowingPw ? <EyeSlashIcon className="w-4 h-4" /> : <EyeIcon className="w-4 h-4" />}</button>
+            {savedPw && <button onClick={(e) => onCopyToClipboard(e, savedPw, '비밀번호')} className="p-2 text-gray-300 hover:text-primary-500"><ClipboardDocumentIcon className="w-4 h-4" /></button>}
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 export default function PortalsPage() {
   const [favorites, setFavorites] = useState<string[]>([])
   const [portalIds, setPortalIds] = useState<Record<string, string>>({})
@@ -114,53 +162,9 @@ export default function PortalsPage() {
     
     if (list.length === 0) return alert('대상이 없습니다.')
 
-    const confirm = window.confirm(`${mode === 'all' ? '전체' : '즐겨찾기'} ${list.length}개의 포탈을 엽니다. 계속하시겠습니까?`)
-    if (confirm) {
-      list.forEach((portal, index) => {
-        setTimeout(() => window.open(portal.url, '_blank'), index * 250)
-      })
-    }
-  }
-
-  const PortalCard = ({ portal, isNonLife }: { portal: any, isNonLife?: boolean }) => {
-    const isFav = favorites.includes(portal.name)
-    const savedId = portalIds[portal.name] || ''
-    const savedPw = portalPws[portal.name] || ''
-    const isShowingPw = showPws[portal.name] || false
-
-    return (
-      <div className={`group relative bg-white p-5 rounded-3xl border transition-all flex flex-col gap-5 shadow-sm hover:shadow-md ${isFav ? 'border-amber-400 bg-amber-50/20 ring-1 ring-amber-100' : 'border-gray-100 hover:border-primary-200'}`}>
-        <button onClick={(e) => toggleFavorite(e, portal.name)} className="absolute top-3 right-3 p-1.5 rounded-lg z-20">
-          {isFav ? <StarSolid className="w-5 h-5 text-amber-500" /> : <StarOutline className="w-5 h-5 text-gray-300 hover:text-amber-400" />}
-        </button>
-
-        <a 
-          href={portal.url} 
-          target="_blank" 
-          rel="noopener noreferrer" 
-          className="flex flex-col items-center justify-center gap-1 mt-2 hover:opacity-80 transition-all group/link"
-        >
-          <span className={`text-base font-black transition-colors ${isFav ? 'text-amber-700' : isNonLife ? 'text-gray-900 group-hover:text-rose-600' : 'text-gray-900 group-hover:text-primary-600'}`}>{portal.name}</span>
-          <span className="flex items-center gap-1 text-[11px] font-bold text-gray-400 group-hover/link:text-primary-600">바로가기 <ArrowTopRightOnSquareIcon className="w-3 h-3" /></span>
-        </a>
-
-        <div className="space-y-3">
-          <div className="relative">
-            <UserIcon className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-            <input type="text" placeholder="ID" value={savedId} onChange={(e) => handleIdChange(portal.name, e.target.value)} className="w-full bg-gray-50 border border-gray-100 rounded-2xl pl-10 pr-10 py-3 text-xs font-bold focus:outline-none focus:ring-2 focus:ring-primary-200 transition-all" />
-            {savedId && <button onClick={(e) => copyToClipboard(e, savedId, '아이디')} className="absolute right-2 top-1/2 -translate-y-1/2 p-2 text-gray-300 hover:text-primary-500"><ClipboardDocumentIcon className="w-4 h-4" /></button>}
-          </div>
-          <div className="relative">
-            <LockClosedIcon className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-            <input type={isShowingPw ? "text" : "password"} placeholder="PW" value={savedPw} onChange={(e) => handlePwChange(portal.name, e.target.value)} className="w-full bg-gray-50 border border-gray-100 rounded-2xl pl-10 pr-20 py-3 text-xs font-bold focus:outline-none focus:ring-2 focus:ring-primary-200 transition-all" />
-            <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-0.5">
-              <button onClick={() => toggleShowPw(portal.name)} className="p-2 text-gray-300 hover:text-gray-500">{isShowingPw ? <EyeSlashIcon className="w-4 h-4" /> : <EyeIcon className="w-4 h-4" />}</button>
-              {savedPw && <button onClick={(e) => copyToClipboard(e, savedPw, '비밀번호')} className="p-2 text-gray-300 hover:text-primary-500"><ClipboardDocumentIcon className="w-4 h-4" /></button>}
-            </div>
-          </div>
-        </div>
-      </div>
-    )
+    list.forEach((portal) => {
+      window.open(portal.url, '_blank')
+    })
   }
 
   return (
@@ -210,13 +214,42 @@ export default function PortalsPage() {
         <div className="space-y-6">
           <div className="flex items-center justify-between px-4"><div className="flex items-center gap-3"><span className="w-4 h-4 rounded-full bg-primary-500 shadow-lg shadow-primary-200" /><h2 className="text-2xl font-black text-gray-900">생명보험사</h2></div><span className="text-xs font-bold text-gray-400">{INSURANCE_PORTALS.life.length}개 회사</span></div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {INSURANCE_PORTALS.life.map((portal) => (<PortalCard key={portal.name} portal={portal} />))}
+            {INSURANCE_PORTALS.life.map((portal) => (
+              <PortalCard 
+                key={portal.name} 
+                portal={portal} 
+                isFav={favorites.includes(portal.name)}
+                savedId={portalIds[portal.name] || ''}
+                savedPw={portalPws[portal.name] || ''}
+                isShowingPw={showPws[portal.name] || false}
+                onToggleFavorite={(e: any) => toggleFavorite(e, portal.name)}
+                onIdChange={(id: string) => handleIdChange(portal.name, id)}
+                onPwChange={(pw: string) => handlePwChange(portal.name, pw)}
+                onToggleShowPw={() => toggleShowPw(portal.name)}
+                onCopyToClipboard={(e: any, text: string, label: string) => copyToClipboard(e, text, label)}
+              />
+            ))}
           </div>
         </div>
         <div className="space-y-6">
           <div className="flex items-center justify-between px-4"><div className="flex items-center gap-3"><span className="w-4 h-4 rounded-full bg-rose-500 shadow-lg shadow-rose-200" /><h2 className="text-2xl font-black text-gray-900">손해보험사</h2></div><span className="text-xs font-bold text-gray-400">{INSURANCE_PORTALS.nonLife.length}개 회사</span></div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {INSURANCE_PORTALS.nonLife.map((portal) => (<PortalCard key={portal.name} portal={portal} isNonLife />))}
+            {INSURANCE_PORTALS.nonLife.map((portal) => (
+              <PortalCard 
+                key={portal.name} 
+                portal={portal} 
+                isFav={favorites.includes(portal.name)}
+                savedId={portalIds[portal.name] || ''}
+                savedPw={portalPws[portal.name] || ''}
+                isShowingPw={showPws[portal.name] || false}
+                isNonLife
+                onToggleFavorite={(e: any) => toggleFavorite(e, portal.name)}
+                onIdChange={(id: string) => handleIdChange(portal.name, id)}
+                onPwChange={(pw: string) => handlePwChange(portal.name, pw)}
+                onToggleShowPw={() => toggleShowPw(portal.name)}
+                onCopyToClipboard={(e: any, text: string, label: string) => copyToClipboard(e, text, label)}
+              />
+            ))}
           </div>
         </div>
       </div>

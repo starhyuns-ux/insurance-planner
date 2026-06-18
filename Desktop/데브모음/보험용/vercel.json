@@ -4,5 +4,6 @@
   "framework": "vite",
   "rewrites": [
     { "source": "/(.*)", "destination": "/index.html" }
-  ]
+  ],
+  "ignoreCommand": "git diff --quiet HEAD^ HEAD -- src index.html package.json vite.config.ts tsconfig.json vercel.json"
 }
