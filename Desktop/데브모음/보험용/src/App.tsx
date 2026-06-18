@@ -939,9 +939,19 @@ const PortalHub: React.FC<any> = ({ showToast }) => {
 const DEFAULT_RIDERS = [
   { name: "일반암 진단비", defaultAmount: "5,000만원", category: "diagnosis" },
   { name: "유사암 진단비", defaultAmount: "1,000만원", category: "diagnosis" },
+  { name: "유방암 진단비", defaultAmount: "3,000만원", category: "diagnosis" },
+  { name: "폐암·췌장·간암 진단비", defaultAmount: "3,000만원", category: "diagnosis" },
+  { name: "전립선암 진단비", defaultAmount: "2,000만원", category: "diagnosis" },
   { name: "뇌혈관질환 진단비", defaultAmount: "2,000만원", category: "diagnosis" },
   { name: "허혈성심장질환 진단비", defaultAmount: "2,000만원", category: "diagnosis" },
   { name: "심·뇌혈관질환 수술비", defaultAmount: "1,000만원", category: "diagnosis" },
+  
+  { name: "암 주요 치료비", defaultAmount: "최대 1억원", category: "treatment" },
+  { name: "순환계 치료비", defaultAmount: "2,000만원", category: "treatment" },
+  { name: "항암방사선 치료비", defaultAmount: "2,000만원", category: "treatment" },
+  { name: "표적항암 약물치료비", defaultAmount: "5,000만원", category: "treatment" },
+  { name: "중입자·양성자 치료비", defaultAmount: "5,000만원", category: "treatment" },
+  
   { name: "질병 수술비", defaultAmount: "30만원", category: "surgery" },
   { name: "상해 수술비", defaultAmount: "100만원", category: "surgery" },
   { name: "질병 1-5종 수술비", defaultAmount: "최대 1,000만원", category: "surgery" },
@@ -1180,11 +1190,11 @@ const DesignSupportTab: React.FC<any> = ({ showToast }) => {
             </div>
 
             {/* Category Groups */}
-            {['diagnosis', 'surgery', 'etc'].map(category => (
+            {['diagnosis', 'treatment', 'surgery', 'etc'].map(category => (
               <div key={category} className="space-y-3">
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <span className="text-xs font-bold text-slate-400">
-                    {category === 'diagnosis' ? '● 진단비 특약' : category === 'surgery' ? '● 수술/입원비 특약' : '● 기타/장해 특약'}
+                    {category === 'diagnosis' ? '● 진단비 특약' : category === 'treatment' ? '● 치료비 특약' : category === 'surgery' ? '● 수술/입원비 특약' : '● 기타/장해 특약'}
                   </span>
                   <div style={{ display: 'flex', gap: '6px' }}>
                     <button type="button" onClick={() => handleSelectAll(category)} style={{ background: 'none', border: 'none', color: 'var(--primary)', cursor: 'pointer', fontSize: '10px' }}>선택</button>

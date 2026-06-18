@@ -15,16 +15,26 @@ import { toast } from 'sonner'
 interface RiderItem {
   name: string
   defaultAmount: string
-  category: 'diagnosis' | 'surgery' | 'etc'
+  category: 'diagnosis' | 'surgery' | 'etc' | 'treatment'
 }
 
 const DEFAULT_RIDERS: RiderItem[] = [
   // 진단비
   { name: '일반암 진단비', defaultAmount: '5,000만원', category: 'diagnosis' },
   { name: '유사암 진단비', defaultAmount: '1,000만원', category: 'diagnosis' },
+  { name: '유방암 진단비', defaultAmount: '3,000만원', category: 'diagnosis' },
+  { name: '폐암·췌장·간암 진단비', defaultAmount: '3,000만원', category: 'diagnosis' },
+  { name: '전립선암 진단비', defaultAmount: '2,000만원', category: 'diagnosis' },
   { name: '뇌혈관질환 진단비', defaultAmount: '2,000만원', category: 'diagnosis' },
   { name: '허혈성심장질환 진단비', defaultAmount: '2,000만원', category: 'diagnosis' },
   { name: '심·뇌혈관질환 수술비', defaultAmount: '1,000만원', category: 'diagnosis' },
+  
+  // 치료비
+  { name: '암 주요 치료비', defaultAmount: '최대 1억원', category: 'treatment' },
+  { name: '순환계 치료비', defaultAmount: '2,000만원', category: 'treatment' },
+  { name: '항암방사선 치료비', defaultAmount: '2,000만원', category: 'treatment' },
+  { name: '표적항암 약물치료비', defaultAmount: '5,000만원', category: 'treatment' },
+  { name: '중입자·양성자 치료비', defaultAmount: '5,000만원', category: 'treatment' },
   
   // 수술비/입원일당
   { name: '질병 수술비', defaultAmount: '30만원', category: 'surgery' },
@@ -125,7 +135,7 @@ export default function DesignSupportPage() {
     setRiderAmounts(prev => ({ ...prev, [name]: value }))
   }
 
-  const handleSelectAll = (category?: 'diagnosis' | 'surgery' | 'etc') => {
+  const handleSelectAll = (category?: 'diagnosis' | 'surgery' | 'etc' | 'treatment') => {
     setCheckedRiders(prev => {
       const updated = { ...prev }
       DEFAULT_RIDERS.forEach(r => {
@@ -137,7 +147,7 @@ export default function DesignSupportPage() {
     })
   }
 
-  const handleDeselectAll = (category?: 'diagnosis' | 'surgery' | 'etc') => {
+  const handleDeselectAll = (category?: 'diagnosis' | 'surgery' | 'etc' | 'treatment') => {
     setCheckedRiders(prev => {
       const updated = { ...prev }
       DEFAULT_RIDERS.forEach(r => {
@@ -391,6 +401,42 @@ export default function DesignSupportPage() {
                       onChange={e => handleAmountChange(r.name, e.target.value)} 
                       disabled={!checkedRiders[r.name]}
                       className="w-28 bg-gray-50 border border-gray-100 rounded-xl px-2 py-1.5 text-xs font-bold text-right focus:outline-none focus:ring-1 focus:ring-amber-300 disabled:opacity-50"
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Rider Group 1.5: 치료비 */}
+            <div className="space-y-4 pt-2">
+              <div className="flex justify-between items-center">
+                <h4 className="text-sm font-black text-gray-700 flex items-center gap-2">
+                  <span className="w-1.5 h-3 bg-purple-500 rounded-full inline-block" />
+                  치료비 특약
+                </h4>
+                <div className="flex gap-2 text-[11px] font-semibold">
+                  <button type="button" onClick={() => handleSelectAll('treatment')} className="text-primary-500">카테고리 선택</button>
+                  <button type="button" onClick={() => handleDeselectAll('treatment')} className="text-gray-400">해제</button>
+                </div>
+              </div>
+              <div className="space-y-2">
+                {DEFAULT_RIDERS.filter(r => r.category === 'treatment').map(r => (
+                  <div key={r.name} className={`flex items-center justify-between p-3 rounded-2xl border transition-all ${checkedRiders[r.name] ? 'bg-purple-50/20 border-purple-300' : 'bg-white border-gray-100'}`}>
+                    <label className="flex items-center gap-3 cursor-pointer flex-1">
+                      <input 
+                        type="checkbox" 
+                        checked={checkedRiders[r.name]} 
+                        onChange={() => toggleRider(r.name)}
+                        className="w-4 h-4 rounded text-purple-500 border-gray-300 focus:ring-purple-200"
+                      />
+                      <span className="text-sm font-bold text-gray-800">{r.name}</span>
+                    </label>
+                    <input 
+                      type="text" 
+                      value={riderAmounts[r.name]} 
+                      onChange={e => handleAmountChange(r.name, e.target.value)} 
+                      disabled={!checkedRiders[r.name]}
+                      className="w-28 bg-gray-50 border border-gray-100 rounded-xl px-2 py-1.5 text-xs font-bold text-right focus:outline-none focus:ring-1 focus:ring-purple-300 disabled:opacity-50"
                     />
                   </div>
                 ))}
