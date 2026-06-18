@@ -972,9 +972,11 @@ const DesignSupportTab: React.FC<any> = ({ showToast }) => {
   const [insuranceAge, setInsuranceAge] = useState(0);
   const [phone, setPhone] = useState("");
   const [job, setJob] = useState("");
+  const [address, setAddress] = useState("");
   const [driving, setDriving] = useState("자가용 운전");
   const [insuranceType, setInsuranceType] = useState("종합건강보험");
   const [extraNotes, setExtraNotes] = useState("최저 보험료 및 가성비 좋은 플랜으로 설계 부탁드립니다.");
+  const [editedMessageText, setEditedMessageText] = useState("");
 
   const [checkedRiders, setCheckedRiders] = useState<Record<string, boolean>>(() => {
     const initial: Record<string, boolean> = {};
@@ -1055,6 +1057,7 @@ const DesignSupportTab: React.FC<any> = ({ showToast }) => {
     text += `- 생년월일: ${birthdate || '(미입력)'} (보험연령: ${insuranceAge > 0 ? `${insuranceAge}세` : '계산불가'})\n`;
     if (phone) text += `- 연락처: ${phone}\n`;
     if (job) text += `- 직업/직무: ${job}\n`;
+    if (address) text += `- 주소: ${address}\n`;
     text += `- 운전 여부: ${driving}\n\n`;
     text += `■ 요청 보험\n`;
     text += `- 구분: ${insuranceType}\n\n`;
@@ -1076,13 +1079,17 @@ const DesignSupportTab: React.FC<any> = ({ showToast }) => {
 
   const messageText = generateMessageText();
 
+  useEffect(() => {
+    setEditedMessageText(messageText);
+  }, [customerName, gender, birthdate, insuranceAge, phone, job, address, driving, insuranceType, checkedRiders, riderAmounts, extraNotes]);
+
   const copyToClipboard = () => {
-    navigator.clipboard.writeText(messageText);
+    navigator.clipboard.writeText(editedMessageText);
     showToast("설계 요청서가 복사되었습니다! 문자나 카톡창에 붙여넣으세요.");
   };
 
   const sendSMS = () => {
-    const smsUrl = `sms:?body=${encodeURIComponent(messageText)}`;
+    const smsUrl = `sms:?body=${encodeURIComponent(editedMessageText)}`;
     window.open(smsUrl, '_blank');
     showToast("문자 전송 앱을 열었습니다.");
   };
@@ -1137,6 +1144,10 @@ const DesignSupportTab: React.FC<any> = ({ showToast }) => {
                   <option value="영업용 운전">영업용 운전</option>
                   <option value="미운전">미운전</option>
                 </select>
+              </div>
+              <div className="form-group" style={{ gridColumn: 'span 2' }}>
+                <label className="form-label">주소 / 거주지</label>
+                <input className="form-input text-xs" placeholder="서울시 강남구 테헤란로 123 (선택입력)" value={address} onChange={e => setAddress(e.target.value)} />
               </div>
             </div>
           </div>
@@ -1220,9 +1231,12 @@ const DesignSupportTab: React.FC<any> = ({ showToast }) => {
               <p className="text-xs" style={{ color: 'var(--text-muted)', marginTop: '4px' }}>체크된 내역이 문자메시지 형식으로 실시간 취합됩니다.</p>
             </div>
 
-            <div className="message-box" style={{ background: 'rgba(0,0,0,0.4)', padding: '16px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.05)', fontSize: '11px', fontFamily: 'monospace', whiteSpace: 'pre-wrap', color: '#34D399', maxHeight: '400px', overflowY: 'auto' }}>
-              {messageText}
-            </div>
+            <textarea
+              value={editedMessageText}
+              onChange={e => setEditedMessageText(e.target.value)}
+              className="message-box"
+              style={{ width: '100%', height: '320px', background: 'rgba(0,0,0,0.4)', padding: '16px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.05)', fontSize: '11px', fontFamily: 'monospace', color: '#34D399', overflowY: 'auto', resize: 'none', outline: 'none' }}
+            />
 
             <div className="space-y-3">
               <button onClick={copyToClipboard} className="btn btn-outline text-xs" style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', padding: '12px' }}>
