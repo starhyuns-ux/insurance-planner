@@ -485,25 +485,25 @@ export default function DesignSupportPage() {
 
         {/* Right Preview Box */}
         <div className="xl:col-span-5">
-          <div className="sticky top-6 bg-white text-gray-900 rounded-[2rem] p-6 lg:p-8 space-y-6 shadow-xl shadow-gray-200/50 border border-gray-100">
+          <div className="sticky top-6 bg-gray-900 text-white rounded-[2rem] p-6 lg:p-8 space-y-6 shadow-2xl border border-gray-800">
             <div>
               <h3 className="text-lg font-black tracking-tight mb-1">설계요청 문자 미리보기</h3>
-              <p className="text-xs text-gray-500 font-medium">체크된 가입조건으로 실시간 문자 텍스트가 가공됩니다.</p>
+              <p className="text-xs text-gray-400 font-medium">체크된 가입조건으로 실시간 문자 텍스트가 가공됩니다.</p>
             </div>
             
             <textarea 
               value={editedMessageText}
               onChange={e => setEditedMessageText(e.target.value)}
-              className="w-full h-[400px] bg-gray-50 rounded-2xl border border-gray-200 p-5 font-mono text-xs leading-relaxed text-gray-800 focus:outline-none focus:ring-2 focus:ring-primary-200 resize-none"
+              className="w-full h-[400px] bg-gray-950/80 rounded-2xl border border-gray-800/80 p-5 font-mono text-xs leading-relaxed text-emerald-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 resize-none"
             />
 
             <div className="grid grid-cols-1 gap-3 pt-2">
               <button 
                 type="button" 
                 onClick={copyToClipboard}
-                className="w-full py-4 bg-gray-100 hover:bg-gray-200 text-gray-800 rounded-2xl text-sm font-black flex items-center justify-center gap-2 transition-all active:scale-95 shadow-md shadow-gray-100"
+                className="w-full py-4 bg-gray-800 hover:bg-gray-700 text-white rounded-2xl text-sm font-black flex items-center justify-center gap-2 transition-all active:scale-95 shadow-lg shadow-black/30"
               >
-                <ClipboardDocumentIcon className="w-5 h-5 text-gray-600" />
+                <ClipboardDocumentIcon className="w-5 h-5 text-emerald-400" />
                 설계요청서 텍스트 복사
               </button>
               
