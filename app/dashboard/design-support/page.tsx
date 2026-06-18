@@ -63,9 +63,11 @@ export default function DesignSupportPage() {
   const [insuranceAge, setInsuranceAge] = useState(0)
   const [phone, setPhone] = useState('')
   const [job, setJob] = useState('')
+  const [address, setAddress] = useState('')
   const [driving, setDriving] = useState('자가용 운전')
   const [insuranceType, setInsuranceType] = useState('종합건강보험')
   const [extraNotes, setExtraNotes] = useState('최저 보험료 및 가성비 좋은 플랜으로 설계 부탁드립니다.')
+  const [editedMessageText, setEditedMessageText] = useState('')
 
   // Checkbox States for Riders
   const [checkedRiders, setCheckedRiders] = useState<Record<string, boolean>>(() => {
@@ -155,6 +157,7 @@ export default function DesignSupportPage() {
     text += `- 생년월일: ${birthdate || '(미입력)'} (보험연령: ${insuranceAge > 0 ? `${insuranceAge}세` : '계산불가'})\n`
     if (phone) text += `- 연락처: ${phone}\n`
     if (job) text += `- 직업/직무: ${job}\n`
+    if (address) text += `- 주소: ${address}\n`
     text += `- 운전 여부: ${driving}\n\n`
     
     text += `■ 요청 보험\n`
@@ -185,14 +188,18 @@ export default function DesignSupportPage() {
 
   const messageText = generateMessageText()
 
+  useEffect(() => {
+    setEditedMessageText(messageText)
+  }, [customerName, gender, birthdate, insuranceAge, phone, job, address, driving, insuranceType, checkedRiders, riderAmounts, extraNotes, planner])
+
   const copyToClipboard = () => {
-    navigator.clipboard.writeText(messageText)
+    navigator.clipboard.writeText(editedMessageText)
     toast.success('설계 요청서 내용이 클립보드에 복사되었습니다! 카카오톡이나 문자창에 붙여넣기(Ctrl+V) 하세요.')
   }
 
   const sendSMS = () => {
     // Open native messaging application via sms URI scheme
-    const smsUrl = `sms:?body=${encodeURIComponent(messageText)}`
+    const smsUrl = `sms:?body=${encodeURIComponent(editedMessageText)}`
     window.open(smsUrl, '_blank')
     toast.success('문자(SMS) 앱 실행 링크가 열렸습니다. (기기에 문자 연동 프로그램이 필요합니다)')
   }
@@ -312,6 +319,16 @@ export default function DesignSupportPage() {
                   <option value="미운전 (비운전자)">미운전 (비운전자)</option>
                   <option value="오토바이 운전">이륜차(오토바이) 운전</option>
                 </select>
+              </div>
+              <div className="space-y-1.5 md:col-span-2">
+                <label className="text-xs font-black text-gray-500">주소 / 거주지</label>
+                <input 
+                  type="text" 
+                  placeholder="서울시 강남구 테헤란로 123 (선택입력)" 
+                  value={address} 
+                  onChange={e => setAddress(e.target.value)} 
+                  className="w-full bg-gray-50 border border-gray-100 rounded-2xl px-4 py-3 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-primary-200 transition-all"
+                />
               </div>
             </div>
           </div>
@@ -474,9 +491,11 @@ export default function DesignSupportPage() {
               <p className="text-xs text-gray-400 font-medium">체크된 가입조건으로 실시간 문자 텍스트가 가공됩니다.</p>
             </div>
             
-            <div className="bg-gray-950/80 rounded-2xl border border-gray-800/80 p-5 font-mono text-xs leading-relaxed max-h-[480px] overflow-y-auto whitespace-pre-wrap text-emerald-400 select-text">
-              {messageText}
-            </div>
+            <textarea 
+              value={editedMessageText}
+              onChange={e => setEditedMessageText(e.target.value)}
+              className="w-full h-[400px] bg-gray-950/80 rounded-2xl border border-gray-800/80 p-5 font-mono text-xs leading-relaxed text-emerald-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 resize-none"
+            />
 
             <div className="grid grid-cols-1 gap-3 pt-2">
               <button 
