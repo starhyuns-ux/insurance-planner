@@ -11,3 +11,4 @@ _Researcher 에이전트만 읽고 쓰는 개인 노트. 학습·교훈·자주 
 - [2026-06-17] 데이터 수집 및 분석 → 산출물 sessions/2026-06-17T01-40/researcher.md
 - [2026-06-17] YouTube 채널 분석 완료 → 산출물 sessions/2026-06-17T04-32/researcher.md
 - [2026-06-17]  트렌드 및 경쟁사 분석을 통해 마케팅 방식 선정 → 산출물 sessions/2026-06-17T07-17/researcher.md
+- [2026-06-21] 최근 3개월간의 유튜브 채널 트렌드와 경쟁사 분석 → 산출물 sessions/2026-06-21T04-07/researcher.md
