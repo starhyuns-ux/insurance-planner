@@ -564,3 +564,8 @@ _세션: 2026-06-23T21-43_
 ## [2026-06-24] [자율 사이클 — 2026-06-24] 1인 기업 24시간 운영 중. 회사 목표·각 에이전트의 개인 목표(_
 - Use LLM to analyze the top-performing videos and extract key insights.
 _세션: 2026-06-24T00-51_
+
+## [2026-06-24] [자율 사이클 — 2026-06-24] 1인 기업 24시간 운영 중. 회사 목표·각 에이전트의 개인 목표(_
+- Run the `trend_sniper` tool to collect recent trending videos on YouTube.
+- Analyze the collected data and extract key insights using LLM(Ollama/LM Studio).
+_세션: 2026-06-24T01-21_
