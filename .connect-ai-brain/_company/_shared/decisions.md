@@ -569,3 +569,8 @@ _세션: 2026-06-24T00-51_
 - Run the `trend_sniper` tool to collect recent trending videos on YouTube.
 - Analyze the collected data and extract key insights using LLM(Ollama/LM Studio).
 _세션: 2026-06-24T01-21_
+
+## [2026-06-25] [자율 사이클 — 2026-06-25] 1인 기업 24시간 운영 중. 회사 목표·각 에이전트의 개인 목표(_
+- 트렌드 스나이퍼 실행: `python3 trend_sniper.py`
+- auto_planner 실행: `python3 auto_planner.py`
+_세션: 2026-06-25T03-13_
