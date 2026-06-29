@@ -662,3 +662,11 @@ _세션: 2026-06-28T07-59_
 - Build an image recognition system using deep learning algorithms.
 - Implement a routing and recommendation system.
 _세션: 2026-06-29T14-37_
+
+## [2026-06-29] [자율 사이클 — 2026-06-29] 1인 기업 24시간 운영 중. 회사 목표·각 에이전트의 개인 목표(_
+- 개인 목표 설정 및 의사결정 작성
+- 최근 의사결정 및 메모리 검토
+- 수업자와 의사결정 의도 파악
+- 주요 타겟 채널 분석
+- 상황에 맞는 썸네일 및 카ptions 개발
+_세션: 2026-06-29T14-52_
