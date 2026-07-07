@@ -207,6 +207,16 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                   설계 지원 (요청서)
                 </Link>
                 <Link
+                  href="/dashboard/ta"
+                  className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-semibold transition-all text-sm ${
+                    isActive('/dashboard/ta') ? 'bg-primary-600 text-white shadow-md' : 'text-gray-600 hover:bg-gray-50'
+                  }`}
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  <ChatBubbleBottomCenterTextIcon className={`w-4 h-4 shrink-0 ${isActive('/dashboard/ta') ? 'text-white' : 'text-emerald-500'}`} />
+                  스크립트 / TA
+                </Link>
+                <Link
                   href="/dashboard/portals"
                   className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-semibold transition-all text-sm ${
                     isActive('/dashboard/portals') ? 'bg-primary-600 text-white shadow-md' : 'text-gray-600 hover:bg-gray-50'
