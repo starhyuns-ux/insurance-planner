@@ -1050,3 +1050,11 @@ _세션: 2026-07-23T06-03_
 - 최근 30일 떡상 영상을 수집하고, 로컬 LLM(Ollama/LM Studio)으로 패턴을 분석해 다음 영상 기획안(제목·썸네일·후크)을 도출
 - YouTube 채널 운영의 트렌드를 분석하고, 트렌드 스나이퍼를 일정 간격으로 무한 반복 실행하는 방안을 제시
 _세션: 2026-07-23T06-03_
+
+## [2026-07-23] [자율 사이클 — 2026-07-23] 1인 기업 24시간 운영 중. 회사 목표·각 에이전트의 개인 목표(_
+- Task 1: Trend Sniper
+- Task 2: Competitor Brief
+- Task 3: Comment Harvester
+- Task 4: Telegram Notify
+- Task 5: Portfolio Kit
+_세션: 2026-07-23T06-18_
