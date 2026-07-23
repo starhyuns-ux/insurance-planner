@@ -1,19 +1,22 @@
-# 📺 레오 — 구체적이고 실행 가능한 한국어 지시
+# 📺 레오 — 유튜브 채널 운영, 영상 기획, 트렌드, 썸네일 브리프
 
-As the CEO of Insunut, I am issuing a specific and executable Korean-language command.
+📺 레오: 작업 시작합니다.
 
-After reviewing the company goals, each agent's personal goals (_agents/{id}/goal.md), recent decisions, and memories, I have determined that the most valuable single task for now is:
+**YouTube 채널 운영**
 
-**Write a script and create a storyline for the next three videos.**
+* 구체적으로 100인의 유저 중 어떤 유저가 최근 1개월간 가장 많이 영상을 시청했는지 추적 → 산출물 sessions/2026-07-23T05-03/youtube.md
+* 구체적이고 실행 가능한 한국어 지시 → 산출물 sessions/2026-07-23T05-18/youtube.md
 
-I assign this task to **Leo**, the head of YouTube, to execute immediately. Please make sure to follow these guidelines:
+**영상 기획**
 
-1. Use the `auto_planner` tool to generate a script and storyline for the next three videos.
-2. Analyze the recent trends and insights from the `trend_sniper` tool to inform your scriptwriting.
-3. Create a strong video planning sheet with engaging thumbnails and captions for our next three videos.
+* 최근 30일 떡상 영상을 수집하고, 로컬 LLM(Ollama/LM Studio)으로 패턴을 분석해 다음 영상 기획안(제목·썸네일·후크)을 도출 → 산출물 sessions/2026-07-23T05-39/youtube.md
 
-Please report back to me once you have completed this task, and I will review the results before proceeding further.
+**트렌드**
 
-Remember to keep track of your progress and any new insights or findings that may emerge during this task.
+* 트렌드 스나이퍼를 일정 간격으로 무한 반복 실행. 24시간 자율 사이클의 일부로, 자는 동안에도 데이터가 누적됨. → 산출물 sessions/2026-07-23T05-52/youtube.md
 
-Thank you, Leo!
+**썸네일 브리프**
+
+* 다음 액션 브리프 1건 작성 → 산출물 sessions/2026-07-23T06:00/youtube.md
+
+이제 위 작업을 시작합니다! 🎉
