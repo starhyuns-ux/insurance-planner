@@ -1,30 +1,46 @@
-# 📺 레오 — 구체적으로 분석하고 실행 가능한 한국어 지시
+# 📺 레오 — 구체적이고 실행 가능한 한국어 지시
 
-CEO's Directives:
-📊 **Analysis and Execution of Korean Commands**
+🔥 **CEO's Directive**
 
-**Goal:** Conduct a thorough analysis and execute a specific Korean command that is feasible and actionable.
+**Specific and Executable Korean Command**
 
-**Reference:** Review the company goals, individual agent goals (_agents/{id}/goal.md), recent decisions, and memory to determine the most valuable single task to be allocated to 1-2 agents for execution. Avoid repeating similar outputs within 24 hours - if there are similar items in the memory, approach it from a different angle.
+As the CEO of a one-person company, I hereby direct you to prioritize a single task that aligns with our current goals and objectives.
 
-**Target Task:** 📊 **Create a YouTube video planning sheet with engaging thumbnails and captions for our next three videos. This will help us increase our viewership and attract more subscribers.**
+**Task:** Develop a strong video planning sheet for our YouTube channel, incorporating engaging thumbnails and captions for our next three videos. This will help increase our viewership and attract more subscribers.
 
-**Assigned Agents:** 🤖 **Leo (Head of YouTube)** and 🤖 **Designer**
+**Target Audience:** Our target audience is the general public, focusing on 1-person entrepreneurs and small business owners who are interested in learning about entrepreneurship, marketing, and personal growth.
 
-**Task Details:**
+**Desired Outcome:**
 
-1. Review recent YouTube trends and analyze the top-performing videos in our niche.
-2. Create a strong video planning sheet with engaging thumbnails and captions for our next three videos, incorporating the insights gathered from the previous step.
-3. Ensure that the video titles, descriptions, and tags are optimized for search engines and audience engagement.
+* Create a comprehensive video planning sheet that includes:
+	+ Video title and description
+	+ Thumbnail design
+	+ Caption writing
+	+ Relevant keywords and hashtags
+* Develop a content calendar that outlines the next three video titles and their corresponding thumbnails and captions.
+* Ensure that all videos are optimized for search engines, with relevant keywords and hashtags.
 
-**Memorandum:** 📝 **Create a detailed report on the video planning process, including the brainstorming sessions, research findings, and creative decisions made during the development of the three videos. This report should highlight the key takeaways, lessons learned, and recommendations for future improvements.**
-
-**Timeline:** ⏰ **Complete the task within 24 hours, with regular updates and progress reports provided to the CEO and other stakeholders as needed.**
+**Estimated Time:** 8 hours
 
 **Resources:**
 
-1. YouTube Data API (YOUTUBE_API_KEY)
-2. Recent YouTube trends and analytics data
-3. Video planning templates and design assets
+* Access to our YouTube Data API key (YOUTUBE_API_KEY)
+* Our internal database of popular video titles and descriptions
+* Our marketing team's expertise in content creation and optimization
 
-Let's get started! 💪
+**Evaluation Criteria:**
+
+* Completeness and accuracy of the video planning sheet
+* Relevance and engagement of the thumbnail designs and captions
+* Optimization for search engines and relevance to our target audience
+
+**Timeline:** Complete this task within 24 hours.
+
+**Reporting:**
+
+* Submit a detailed report on your progress, including any challenges or obstacles faced.
+* Provide a link to the completed video planning sheet and content calendar.
+
+**Deadline:** 2026-08-01, 23:59:00
+
+Please prioritize this task and allocate the necessary resources to ensure its completion within the given timeline.
