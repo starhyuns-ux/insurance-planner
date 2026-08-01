@@ -1,20 +1,30 @@
-# 💼 현빈 — 시장 분석 및 수익화 전략 수립, 컨버스 방송 수익 모델 제시 및 시스템 구축
+# 💼 현빈 — 수익화 전략 및 가격 설정 완료, KPI 설정 및 분석
 
-Based on the CEO's directive and the self-cycle data, I will determine a single task that is most valuable for this moment and assign it to 1-2 agents.
+As the CEO, I hereby issue a directive to complete the revenue strategy and pricing setting, set KPIs and analyze the data.
 
-**Task:** "Develop a comprehensive market analysis report and revenue strategy for our company"
+**Task:** "Revenue Strategy and Pricing Setting"
 
-**Reasoning:**
-
-* The CEO's directive emphasizes the importance of market analysis and revenue strategy development.
-* Our company's goals and objectives require us to stay competitive in the market and identify new opportunities for growth.
-* By analyzing market trends, consumer behavior, and competitor strategies, we can gain insights into the most effective ways to generate revenue and drive business growth.
+**Objective:** Complete the revenue strategy and pricing setting for our company's products or services, ensuring alignment with our business goals and objectives.
 
 **Agent Assignment:**
 
-I will assign this task to @Leo and @Researcher. Both agents have experience in market analysis and research, making them well-suited for this task.
+* Assign this task to 📊 Business (id: 1), as the primary agent responsible for completing the revenue strategy and pricing setting.
+* Additionally, assign this task to 🔗 Researcher (id: 2) to assist with analyzing market trends and competitor strategies, and providing insights that can inform our pricing decisions.
 
-* @Leo: Will assist in conducting market research, analyzing consumer behavior, and identifying trends.
-* @Researcher: Will conduct research on competitor strategies, analyze industry reports, and provide insights on market opportunities and challenges.
+**Constraints:**
 
-**Timeline:** The task is expected to be completed within the next 24 hours.
+* Ensure that all tasks are executed within a 24-hour cycle, as specified in our autonomous cycle.
+* Avoid repeating similar tasks within the same cycle; instead, use the insights gained from previous analyses to inform new approaches.
+* Review recent decisions and memoranda to ensure alignment with company goals and objectives.
+
+**Output:**
+
+* A comprehensive report detailing revenue strategy and pricing setting results
+* Insights into market trends, competitor strategies, and potential opportunities for our company
+
+**Timeline:** Complete the task within 24 hours from receipt of this directive.
+
+**Evaluation Criteria:**
+
+* Accuracy and completeness of revenue strategy and pricing setting
+* Effectiveness of insights gained in informing future business decisions

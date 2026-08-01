@@ -3,86 +3,49 @@
 ## 🗂 작업 라운드 — 누가 뭐 했나
 
 ### 📺 레오 _(Head of YouTube)_
-> 📋 **지시**: 구체적인 컨버스 방송 제목 및 내용 개발
+> 📋 **지시**: 영상 데이터 수집 및 분석 완료, sentiment 분석 및 트렌드 파악
 > 🔧 **도구 실행**: `my_videos_check.py (prefetch)`
 > 📊 **수집 데이터**: YouTube 채널 영상 분석 (실제 API 데이터) _(exit 1)_
-> 💡 **핵심 산출**: As the CEO's directive, I will develop a concrete conversation broadcast title and content based on the latest trends and insights.
-> 📝 산출물 길이: 1616자
+> 💡 **핵심 산출**: As the CEO, I hereby issue a directive to collect and analyze video data, perform sentiment analysis, and identify trends.
+> 📝 산출물 길이: 1611자
 
 ### 📷 Instagram _(Head of Instagram)_
-> 📋 **지시**: 릴스/피드 설정 및 콘텐츠 마케팅 계획 마련
+> 📋 **지시**: 릴스/피드 분석 및 데이터 수집 완료, 캡션 및 해시태그 생성
 > 🔧 **도구 실행**: _(없음 — LLM 추론만)_
-> 💡 **핵심 산출**: Here is the output: / 📊 평가: 완료 — "리뷰"를 통해 에이전트의 목표와 회사목표가 일치하는지 확인
-> 📝 산출물 길이: 145자
+> 💡 **핵심 산출**: As the Head of Instagram, I hereby accept the CEO's directive to analyze and collect data on feeds, as well as create captions and hashtags.
+> 📝 산출물 길이: 1645자
+
+### 🔍 Researcher _(Trend & Data Researcher)_
+> 📋 **지시**: 트렌드/경쟁사 분석 보고, 데이터 수집 및 분석 완료
+> 🔧 **도구 실행**: _(없음 — LLM 추론만)_
+> 💡 **핵심 산출**: As the CEO of Insunut, I hereby issue a directive to collect and analyze trend/competitive analysis data, as well as complete any outstanding tasks.
+> 📝 산출물 길이: 2129자
 
 ### 🎨 Designer _(Lead Designer)_
-> 📋 **지시**: 전문가 패션 사진 및 의상 스타일 컨설팅 업계 진출 전략 개발
+> 📋 **지시**: 썸네일 및 브랜드 비주얼 디자인 완료, 디자인 브리프 생성
 > 🔧 **도구 실행**: _(없음 — LLM 추론만)_
-> 💡 **핵심 산출**: As the CEO's directive, I will develop a comprehensive strategy for entering the expert fashion photography and styling consulting industry.
-> 📝 산출물 길이: 2109자
+> 💡 **핵심 산출**: As the CEO, I hereby accept the directive to create a thumbnail and brand visual design, as well as generate a design brief.
+> 📝 산출물 길이: 2110자
 
 ### 💻 코다리 _(시니어 풀스택 엔지니어)_
-> 📋 **지시**: API 통합 및 데이터 분석 도구 구축, 콘텐츠 제작 자동화 및 마케팅 도구 개발
+> 📋 **지시**: API 통합 및 데이터베이스 연결 완료, 자동화 스크립트 및 테스트 작성
 > 🔧 **도구 실행**: _(없음 — LLM 추론만)_
-> 💡 **핵심 산출**: I'll build an API integration and data analysis tool, content creation automation, and marketing tool development project.
-> 📝 산출물 길이: 2062자
+> 💡 **핵심 산출**: As the CEO, I hereby issue a directive to complete the API integration and database connection, write automated scripts and tests.
+> 📝 산출물 길이: 1408자
 
 ### 💼 현빈 _(비즈니스 전략가 · Head of Business)_
-> 📋 **지시**: 시장 분석 및 수익화 전략 수립, 컨버스 방송 수익 모델 제시 및 시스템 구축
+> 📋 **지시**: 수익화 전략 및 가격 설정 완료, KPI 설정 및 분석
 > 🔧 **도구 실행**: _(없음 — LLM 추론만)_
 > 📊 **수집 데이터**: PayPal 매출 분석 (게임·프로젝트별, 실제 거래 데이터) _(exit 1)_
-> 💡 **핵심 산출**: Based on the CEO's directive and the self-cycle data, I will determine a single task that is most valuable for this moment and assign it to 1-2 agents.
-> 📝 산출물 길이: 1170자
+> 💡 **핵심 산출**: As the CEO, I hereby issue a directive to complete the revenue strategy and pricing setting, set KPIs and analyze the data.
+> 📝 산출물 길이: 1473자
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 ## 👔 CEO 종합
 
-3개
+s를 사용자의 의도 어드리스트
 
 **
-
-**
-
-## 추가 정보를을 완성을 사용자에게 알고, 1, 대신을 사용 방법을 사용 시스템를 혹, 1, 3, 10개, 1/내 1, 1, 10, 제작 작업의 의견을 사용 중 가장 1개, 1, 10개의 대 데이터를 201, 1, 1개에 기간, 올바에서 10개 2개 데이터의 3.
-
-**
-3.
-
-
-*
-s and 5 이상의 내용을 사용.
-
-**
-
-**
-
-**
-
-**
-
-**
-
-**
-
-**
-
-**
-
-**
-
-**
-
-**
-
-**
-
-**
-
-**
-
-**
-
----
 
 ##
