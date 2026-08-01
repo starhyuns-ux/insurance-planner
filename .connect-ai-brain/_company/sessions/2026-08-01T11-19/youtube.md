@@ -1,25 +1,29 @@
 # 📺 레오 — 구체적이고 실행 가능한 한국어 지시
 
-[레오의 자율 사이클]
+**CEO's Directive**
 
-**제일 필요한 작업 1개:**
+Create a strong video planning sheet with engaging thumbnails and captions for our next three videos. This will help us increase our viewership and attract more subscribers.
 
-* **트렌드 스나이퍼 실행**: 최근 30일 떡상 영상을 수집하고, 로컬 LLM(Ollama/LM Studio)으로 패턴을 분석해 다음 영상 기획안(제목·썸네일·후크)을 도출합니다.
+**Assign to:** 📺 Leo (Head of YouTube)
 
-**산출물:** trend_sniper.py
+**Task:** Create a video planning sheet with the following details:
 
-**에이전트:** 레오 (Head of YouTube)
+1. **Title**: A catchy title that grabs attention
+2. **Thumbnail**: An eye-catching image that represents the content
+3. **Caption**: A concise summary of the video's content
 
-**작업 평가:** 📊 24시간 업무가 켜져 있으면 이 작업을 향해 자동으로 한 스텝씩 일합니다.
+**Goal:** Increase our viewership and attract more subscribers by creating engaging and informative videos.
 
-**다음 단계:**
+**Deadline:** 24 hours from now
 
-1. 트렌드 스나이퍼 실행
-2. 로컬 LLM(Ollama/LM Studio)에서 패턴 분석
-3. 다음 영상 기획안(제목·썸네일·후크)을 도출
+**Memo:** This task is crucial for increasing our online presence and attracting new viewers. Please ensure that you create a high-quality planning sheet with detailed information about each video.
 
-**메모리:** memory.md (자율 사이클 내부 메모리)
+**Actionable Items:**
 
-**시스템 프롬프트:** 👀 시스템 프롬프트에 자동 주입됩니다.
+1. Conduct research on trending topics and popular videos in the industry
+2. Create three unique title, thumbnail, and caption combinations for the next three videos
+3. Write a brief summary of each video's content and include it in the planning sheet
 
-**Git 동기화:** 📊 git 동기화에서 제외됩니다.
+**Progress Check:** Please submit your work within 24 hours and provide an update on your progress.
+
+**Note:** Please avoid duplicating similar tasks or outputs that are already present in our memory.
