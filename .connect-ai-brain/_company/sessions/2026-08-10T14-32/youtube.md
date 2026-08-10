@@ -1,34 +1,28 @@
-# 📺 레오 — 제공하는 정보와 콘텐츠의 유형과 주제를 명확하게 제시하기
+# 📺 레오 — 구체적이고 실행 가능한 한국어 지시
 
-**Task:** YouTube Channel Analysis and Planning
+**CEO's Command**
 
-**Objective:** Analyze the current state of our YouTube channel, identify trends and opportunities, and create a plan to improve our content strategy.
+As the CEO, I'm giving you a specific and executable Korean instruction.
 
-**Goal:** Increase engagement and viewership on our YouTube channel by 20% within the next 3 months.
+**Task:** Create a strong video planning sheet with engaging thumbnails and captions for our next three videos.
 
-**Agents Involved:**
+**Why:** This will help us increase our viewership and attract more subscribers.
 
-1. Leo (Head of YouTube) - responsible for analyzing the current state of our YouTube channel and creating a plan to improve our content strategy.
-2. Trend Sniper - will help identify trends and opportunities in our target audience's preferences.
-3. Comment Harvester - will analyze recent comments on our videos to gain insights into our audience's interests.
+**How:**
 
-**Task Steps:**
+1. Review recent YouTube trends and popular keywords.
+2. Analyze the performance of our previous videos and identify areas for improvement.
+3. Create a new video planning sheet with 3 engaging thumbnails and captions that incorporate relevant keywords and hashtags.
+4. Set clear goals and objectives for each video, including expected viewership and engagement metrics.
 
-1. Analyze the current state of our YouTube channel, including video performance metrics, audience demographics, and engagement patterns.
-2. Identify trends and opportunities in our target audience's preferences using Trend Sniper.
-3. Create a content plan that takes into account the findings from steps 1 and 2, and includes suggestions for new video topics, titles, and thumbnails.
-4. Analyze recent comments on our videos to gain insights into our audience's interests and suggest ways to improve engagement.
+**Deadline:** Today
 
-**Deliverables:**
+**Assignee:** Leo (Head of YouTube) and Trend Sniper
 
-1. A written report summarizing the current state of our YouTube channel, including video performance metrics, audience demographics, and engagement patterns.
-2. A content plan that includes suggestions for new video topics, titles, and thumbnails, as well as a strategy for improving engagement.
-3. A list of potential video ideas based on recent comments and trends.
+**Note:**
 
-**Timeline:** The task is expected to be completed within the next 3 days.
+* Make sure to use the `create_file` command to generate a new file with the title "Video Planning Sheet" in the format `yyyy-mm-dd-video-planning-sheet.md`.
+* Use the `edit_file` command to update the file with the relevant information.
+* Use the `run_command` command to execute the tasks assigned to Leo and Trend Sniper.
 
-**Evaluation Criteria:**
-
-1. Completeness and accuracy of the report and content plan.
-2. Relevance and feasibility of the suggested video ideas.
-3. Effectiveness in increasing engagement and viewership on our YouTube channel.
+Let's get started! 🎉
