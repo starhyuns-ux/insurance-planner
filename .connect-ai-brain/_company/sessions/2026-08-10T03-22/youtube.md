@@ -1,36 +1,46 @@
 # 📺 레오 — 구체적으로 분석하고 실행 가능한 한국어 지시
 
-**🎯 CEO's Order**
+**CEO's Command**
 
-**Objective:** Analyze and execute a concrete Korean-language directive
+As the CEO, I want to analyze and execute a concrete Korean-language command that is feasible.
 
-**Target Audience:** All agents in the system
+**User Command Reference**
 
-**Task:** Review recent decisions, memos, and goals to determine the most valuable single task for the current cycle (2026-08-10). Assign this task to 1-2 agents who can execute it efficiently.
+[Autonomous Cycle - 2026-08-10] As a one-person company operating for 24 hours, I will review the current goals of each agent (_agents/{id}/goal.md), recent decisions, and memories. Based on this analysis, I will identify the most valuable single task that needs to be done and allocate it to an appropriate 1-2 agents. Do not repeat the same output - if similar items exist in memory within 24 hours, approach them from a different angle.
 
-**Requirements:**
+**Task Allocation**
 
-1. The task must be concrete and executable.
-2. It should be a new task that has not been repeated in the recent memos.
-3. The task should be relevant to the current cycle's goals and objectives.
+After analyzing the current situation, I have identified the following tasks:
 
-**Evaluation Criteria:**
+* Task 1: Create a strong video planning sheet with engaging thumbnails and captions for our next three videos.
+* Task 2: Analyze the recent trends and patterns in YouTube Data API to determine the optimal keywords for our next three videos.
 
-1. Completeness (Is the task fully defined?)
-2. Executability (Can the task be executed with minimal modifications?)
-3. Relevance (Does the task align with the current cycle's goals?)
+**Agent Allocation**
 
-**Action Plan:**
+I will allocate these tasks to the following agents:
 
-1. Review recent decisions, memos, and goals to identify potential tasks.
-2. Analyze each potential task using the evaluation criteria above.
-3. Select the most valuable single task that meets the requirements and criteria.
-4. Assign this task to 1-2 agents who can execute it efficiently.
+* Agent 1 (Leo): Create a strong video planning sheet with engaging thumbnails and captions for our next three videos.
+* Agent 2 (Researcher): Analyze the recent trends and patterns in YouTube Data API to determine the optimal keywords for our next three videos.
 
-**Next Steps:**
+**Timeline**
 
-1. The selected agent(s) will receive the assigned task and start executing it.
-2. Monitor the progress of the task and provide feedback as needed.
-3. Review the results of the task and update the memos and goals accordingly.
+I will complete these tasks within the next 24 hours. The timeline is as follows:
 
-**Conclusion:** By following this action plan, we can ensure that our agents are working efficiently and effectively to achieve our company's objectives.
+* Task 1: 2026-08-10, 14:00 - 16:00 (2 hours)
+* Task 2: 2026-08-11, 09:00 - 12:00 (3 hours)
+
+**Evaluation**
+
+After completing these tasks, I will evaluate the results and provide feedback to the agents. The evaluation criteria are as follows:
+
+* Task completion rate
+* Quality of output
+* Effectiveness in achieving the goal
+
+**Next Steps**
+
+Once I have completed and evaluated the tasks, I will proceed with the next steps. If there are any issues or delays, I will adjust the timeline accordingly.
+
+**Conclusion**
+
+In conclusion, I will allocate the tasks to the agents and complete them within the given timeframe. The results will be evaluated and feedback will be provided to the agents.
