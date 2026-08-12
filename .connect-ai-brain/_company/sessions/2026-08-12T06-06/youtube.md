@@ -1,27 +1,33 @@
-# 📺 레오 — 유튜브 채널 최근 영상 분석 결과 분석, 보완
+# 📺 레오 — 구체적이고 실행 가능한 한국어 지시
 
-**CEO's Instruction**
+Here is the output:
 
-As the CEO, I am instructing you to analyze the recent video analysis results and provide a comprehensive report.
+**구체적이고 실행 가능한 한국어 지시**
 
-**User Command Reference**
+📊 **자율 사이클 운영**
 
-Based on the autonomous cycle for August 12th, review the company goals, individual agent goals (_agents/{id}/goal.md), recent decisions, and memories to determine the most valuable single task that can be completed within the next 24 hours. Assign this task to one or two suitable agents and execute it.
+* 1인 기업 24시간 운영 중
+* 회사 목표: 설계사 1만명 도달, 영상 기획서 3개 작성
+* 각 에이전트의 개인 목표:
+	+ 레오 (Head of YouTube): 채널 정체성 확립 + 구독자 1만 도달
+	+ 코다리 (Developer): 코드 작성·편집·디버깅, 자동화 스크립트, API 통합
 
-**Task Assignment**
+**지금 가장 가치 있는 단일 작업**
 
-To complete this task, I am assigning the following tasks:
+* **Create a strong video planning sheet with engaging thumbnails and captions for our next three videos.**
+* This will help us increase our viewership and attract more subscribers.
 
-1. **Video Analysis Report**: Analyze the recent video analysis results and provide a comprehensive report highlighting key insights, trends, and recommendations for future videos.
-2. **Content Calendar**: Create a content calendar that outlines the next three video titles, thumbnails, and captions based on the trend sniper output.
+**에이전트 분배**
 
-**Agent Assignment**
+* Assign this task to **레오 (Head of YouTube)** and **코다리 (Developer)**
+* Task description: Create a strong video planning sheet with engaging thumbnails and captions for our next three videos.
+* Task goal: Increase viewership and attract more subscribers.
 
-I am assigning these tasks to agents:
+**메모리 검토**
 
-1. **Leo**: Video Analysis Report
-2. **Koda**: Content Calendar
+* Review recent decisions and memories related to this task:
+	+ [자율 사이클 — 2026-08-12] 1인 기업 24시간 운영 중. 회사 목표·각 에이전트의 개인 목표(_agents/{id}/goal.md)·최근 의사결정·메모리를 검토해서 지금 가장 가치 있는 단일 작업 1개를 결정하고, 적절한 1~2명 에이전트에게 분배해서 실행하세요.
 
-**Task Timeline**
+**산출물**
 
-The deadline for completing this task is August 12th, 24 hours from now.
+* Output: A strong video planning sheet with engaging thumbnails and captions for our next three videos.
