@@ -66,3 +66,4 @@ _Instagram 에이전트만 읽고 쓰는 개인 노트. 학습·교훈·자주 �
 - [2026-08-06] 최근 3일 간의 Instagram 릴스/피드 수집 및 분석 report 생성 → 산출물 sessions/2026-08-06T17-29/instagram.md
 - [2026-08-07] 새로운 릴스/피드 생성 및 콘텐츠 탑재 → 산출물 sessions/2026-08-07T09-36/instagram.md
 - [2026-08-11] 최근 5일간의 인스타그램 댓글 수와  engagement 수 분석 → 산출물 sessions/2026-08-11T04-55/instagram.md
+- [2026-08-12] 릴스/피드, 캡션, 해시태그, 게시 시간, 인게이지먼트 → 산출물 sessions/2026-08-12T03-30/instagram.md
