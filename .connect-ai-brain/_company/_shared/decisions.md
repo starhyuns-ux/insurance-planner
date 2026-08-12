@@ -1397,3 +1397,7 @@ _세션: 2026-08-12T06-06_
 ## [2026-08-12] [자율 사이클 — 2026-08-12] 1인 기업 24시간 운영 중. 회사 목표·각 에이전트의 개인 목표(_
 - This will help us increase our viewership and attract more subscribers.
 _세션: 2026-08-12T06-06_
+
+## [2026-08-12] [자율 사이클 — 2026-08-12] 1인 기업 24시간 운영 중. 회사 목표·각 에이전트의 개인 목표(_
+- Use relevant hashtags in the caption to optimize search results.
+_세션: 2026-08-12T17-10_
