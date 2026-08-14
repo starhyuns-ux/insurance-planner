@@ -1,27 +1,32 @@
-# 📺 레오 — 구체적이고 실행 가능한 한국어 지시
+# 📺 레오 — 최근 5일 동안의 영상 수익화 목표 설정
 
-[CEO의 지시]
-구체적이고 실행 가능한 한국어 지시
+**CEO의 지시**
 
-**가장 가치 있는 단일 작업**
-📊 YouTube 채널 데이터 수집 및 분석
+최근 5일 동안의 영상 수익화 목표 설정
 
-**Assigned to**
-💪 1. 레오 (Head of YouTube)
-💼 2. 영숙 (Secretary)
+**자율 사이클 — 2026-08-14**
 
-**Task Description**
-📝 Collect and analyze YouTube channel data using the YouTube Data API.
-🔥 Identify key metrics such as views, engagement, and audience demographics to inform future content creation and marketing strategies.
+1. 최근 의사결정: 회사 수익화 전략 및 로드맵 마련
+2. 개인 목표: 레오, 데이터 분석 및 구독자 수 추적 → 산출물 sessions/2026-08-12T01-47/youtube.md
 
-**Target Output**
-📊 A comprehensive report on YouTube channel performance, including:
-1. Channel statistics (views, likes, comments, etc.)
-2. Audience demographics (age, gender, location, etc.)
-3. Content performance metrics (video views, engagement rates, etc.)
+**가치 있는 단일 작업 1개 결정**
 
-**Timeline**
-🕰️ Complete within 24 hours.
+* **영상 수익화 목표 설정**: 최근 5일 동안의 영상 수익화 목표를 설정하여, 내 채널의 평균 시청 지속률을 50% 이상으로 올리자. 이 목표는 3~6개월 내에 달성해야 함.
 
-**Note**
-💡 Please ensure that the output is concise and actionable, highlighting key insights and recommendations for future improvement.
+**적절한 에이전트에게 분배**
+
+* **레오**: 이 작업을 주관적으로 수행하여, 영상 수익화 목표를 설정하고, 구독자 수 추적을 통해 실제로 얼마나 올라간지 확인할 것.
+* **코다리**: 이 에이전트는 데이터 분석 및 구독자 수 추적을 지원하여, 레오의 작업에 도움을 주게 될 것.
+
+**메모리에 비슷한 항목이 24시간 내에 있으면 다른 각도로 진전시키세요**
+
+* 이 작업은 최근 의사결정에서 언급된 회사 수익화 전략 및 로드맵 마련과 직접 관련이 없음. 따라서, 이 작업을 주관적으로 수행하여, 새로운 결과물을 도출할 수 있을 것.
+
+**산출물**
+
+* **영상 수익화 목표 설정**: 최근 5일 동안의 영상 수익화 목표를 설정하여, 내 채널의 평균 시청 지속률을 50% 이상으로 올리자.
+* **구독자 수 추적**: 이 작업을 통해 실제로 얼마나 올라간지 확인할 것.
+
+**메모리**
+
+* 이 작업은 최근 의사결정에서 언급된 회사 수익화 전략 및 로드맵 마련과 직접 관련이 없음. 따라서, 이 작업을 주관적으로 수행하여, 새로운 결과물을 도출할 수 있을 것.

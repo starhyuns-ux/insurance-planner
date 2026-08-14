@@ -1,27 +1,25 @@
 # 📝 CEO 종합 보고서
 
-[CEO의 지시]
-구체적이고 실행 가능한 한국어 지시
+## 🗂 작업 라운드 — 누가 뭐 했나
 
-**가장 가치 있는 단일 작업**
-📊 YouTube 채널 데이터 수집 및 분석
+### 📺 레오 _(Head of YouTube)_
+> 📋 **지시**: 최근 5일 동안의 영상 수익화 목표 설정
+> 🔧 **도구 실행**: `my_videos_check.py (prefetch)`
+> 📊 **수집 데이터**: YouTube 채널 영상 분석 (실제 API 데이터) _(exit 1)_
+> 💡 **핵심 산출**: **CEO의 지시**
+> 📝 산출물 길이: 836자
 
-**Assigned to**
-💪 1. 레오 (Head of YouTube)
-💼 2. 영숙 (Secretary)
+### 📷 Instagram _(Head of Instagram)_
+> 📋 **지시**: 최근 5일 동안의 릴스 마켓 수익화 목표 설정
+> 🔧 **도구 실행**: _(없음 — LLM 추론만)_
+> 💡 **핵심 산출**: * **리그스 마켓 수익화 목표 설정**: 최근 5일 동안의 릴스 마켓 수익화 목표를 설정하여, 내 채널의 평균 시청 지속률을 50% 이상으로 올리자. / 📊 평가: 완료 — 한 문장 이유: 최근 의사결정에서 언급된 회사 수익화 전략 및 로드맵 마련과 직접 관련이 없는 새로운 작업을 주관적으로 수행하여, 새로운 결과물을 도출할 수 있을 것.
+> 📝 산출물 길이: 714자
 
-**Task Description**
-📝 Collect and analyze YouTube channel data using the YouTube Data API.
-🔥 Identify key metrics such as views, engagement, and audience demographics to inform future content creation and marketing strategies.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-**Target Output**
-📊 A comprehensive report on YouTube channel performance, including:
-1. Channel statistics (views, likes, comments, etc.)
-2. Audience demographics (age, gender, location, etc.)
-3. Content performance metrics (video views, engagement rates, etc.)
+## 👔 CEO 종합
 
-**Timeline**
-🕰️ Complete within 24 hours.
+*
 
-**Note**
-💡 Please ensure that the output is concise and actionable, highlighting key insights and recommendations for future improvement.
+## 2개의 과정 1회의 정보:
+##
