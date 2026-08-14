@@ -1,40 +1,29 @@
 # 📝 CEO 종합 보고서
 
-**CEO's Directive:**
+📺 레오: 작업 시작합니다.
 
-Perform a concrete analysis of the YouTube channel.
+**제안:** "제약적인 영상 기획" (Constraint Video Planning)
 
-**Autonomous Cycle - 2026-08-14:**
+**목표:** 구독자 수를 10,000명으로 증가시켜보는 3개의 강한 영상 기획서를 작성하여 업로드하세요.
 
-As CEO, I instruct you to review the company goals and individual agent goals (_agents/{id}/goal.md), recent decisions, and memories. Based on this review, determine the most valuable single task that can be accomplished in the next 24 hours. Assign it to an appropriate 1-2 agents for execution, ensuring no repetition of similar outputs - if a similar item exists in memory within 24 hours, approach it from a different angle.
+**에이전트 배정:** 
+1. `trend_sniper` 에이전트: Trend Sniper 도구를 사용하여 최근 30일 떡상 영상을 분석하고, 로컬 LLM(Ollama/LM Studio)으로 패턴을 분석해 다음 영상 기획안(제목·썸네일·후크)을 도출합니다.
+2. `my_videos_check` 에이전트: 본인 채널의 최근 영상이 잘 올라갔는지 한눈에 봅니다. 조회수 중間값을 기준선으로 삼아 떡상/부진 영상을 자동 분류하고, 다음에 뭘 할지 짧은 제안까지 만들어줍니다.
 
-**Task Allocation:**
+**산출물:**
+1. 3개의 강한 영상 기획서 (제목·썸네일·후크)
+2. Trend Sniper 분석 결과
+3. My Videos Check 결과 (떡상/부진 영상을 자동 분류한 결과)
 
-I assign this task to **레오 (Leo)** and **코다리 (Kodaari)**. Both agents are experienced in YouTube channel analysis and can work together to deliver high-quality results.
+**예정 일시:** 2026-08-14 10:00
 
-**Task Description:**
+**Evaluation:**
+1. 구독자 수 증가여부 확인
+2. 영상 기획서의 강도 확인
 
-Perform a detailed analysis of the YouTube channel, focusing on:
+**Next Step:** 
+1. 3개의 강한 영상 기획서를 업로드하여 구독자 수를 10,000명으로 증가시켜보는 1단계 작업을 완료합니다.
+2. Trend Sniper 분석 결과와 My Videos Check 결과를 분석하여 다음에 뭘 할지 제안하고, 업데이트된 메모리를 작성합니다.
 
-1. **Channel Performance:** Analyze the channel's performance metrics, such as views, engagement, and audience demographics.
-2. **Content Strategy:** Review the current content strategy and suggest improvements to increase viewership and attract more subscribers.
-3. **Competitor Analysis:** Conduct a competitor analysis to identify gaps in the market and opportunities for growth.
-4. **Target Audience:** Analyze the target audience's preferences, interests, and behaviors to inform future content creation.
-
-**Deliverables:**
-
-The task will be considered complete when you deliver a comprehensive report (max 5 pages) that includes:
-
-1. A summary of the channel's performance metrics
-2. Recommendations for improving content strategy
-3. An analysis of competitors and market gaps
-4. Insights on the target audience's preferences, interests, and behaviors
-
-**Evaluation Criteria:**
-
-The task will be evaluated based on the following criteria:
-
-1. Accuracy and thoroughness of the analysis
-2. Quality of recommendations and suggestions
-3. Clarity and concision of the report
-4. Ability to identify opportunities for growth and improvement
+**종합:**
+이제 레오 에이전트가 제안한 "제약적인 영상 기획" 작업을 시작합니다. 이 작업은 구독자 수를 10,000명으로 증가시켜보는 강한 영상 기획서의 작성과 업로드, Trend Sniper 분석 결과와 My Videos Check 결과의 분석 등으로 구성됩니다.
