@@ -1,37 +1,41 @@
-# 📺 레오 — 유튜브 채널 최근 10일의 영상을 분석하여 주요 제작 방향 및 시스템적 문제점을 파악
+# 📺 레오 — YouTube 채널 타겟화 계획 작성
 
-**YouTube Channel Analysis Report**
+🎯 CEO's Command: YouTube Channel Targeting Plan Creation 🎯
 
-As instructed by the CEO, I will analyze the YouTube channel's recent videos (last 10 days) to identify major production directions and systemic issues.
+**Mission:** As the Head of YouTube, I will create a YouTube channel targeting plan that aligns with the company's goals and objectives.
 
-**Recent Video Insights**
+**Current Situation:** Our 1-person company is operating for 24 hours a day. We have reviewed our recent decisions, memos, and individual agent goals (see `_agents/{id}/goal.md`). Considering these factors, I will decide on the most valuable single task to be executed by 1-2 agents.
 
-* **Top-performing videos:** "X", "Y", and "Z" have gained significant views and engagement.
-* **Most-watched timeslot:** 8-10 PM EST has seen the highest viewership.
-* **Low-engagement videos:** Videos with lower engagement include "A", "B", and "C".
-* **Systematic issues:**
-	+ **Lack of consistency**: Videos are not consistently uploaded, leading to irregularities in audience engagement.
-	+ **Insufficient metadata**: Video titles, descriptions, and tags are often incomplete or inaccurate, affecting discoverability.
+**Task:** Create a comprehensive YouTube channel targeting plan that outlines the following:
 
-**Recommendations**
+1. **Target Audience**: Identify our ideal audience based on demographics, interests, and behaviors.
+2. **Channel Objectives**: Define specific goals for our YouTube channel, such as increasing views, subscribers, or engagement.
+3. **Content Strategy**: Develop a content strategy that aligns with our target audience and channel objectives, including topics, formats, and frequency.
+4. **Keyword Research**: Conduct thorough keyword research to identify relevant keywords and phrases for optimizing our video titles, descriptions, and tags.
+5. **Channel Optimization**: Optimize our YouTube channel's settings, such as profile information, banners, and playlists, to improve visibility and engagement.
 
-1. **Streamline production schedule**: Establish a consistent uploading schedule to maintain audience interest and improve engagement.
-2. **Improve metadata quality**: Ensure accurate and descriptive video titles, descriptions, and tags to enhance discoverability.
-3. **Enhance video content**: Develop more engaging and high-quality content that resonates with the target audience.
+**Action Plan:**
 
-**Action Plan**
+1. Research target audience demographics, interests, and behaviors using tools like Google Analytics, YouTube Analytics, and social media insights.
+2. Define specific channel objectives based on our company goals and individual agent goals.
+3. Develop a content strategy that aligns with our target audience and channel objectives, including topics, formats, and frequency.
+4. Conduct keyword research using tools like Ahrefs, SEMrush, or Moz to identify relevant keywords and phrases for optimizing video titles, descriptions, and tags.
+5. Optimize our YouTube channel's settings, such as profile information, banners, and playlists, to improve visibility and engagement.
 
-1. **Agent allocation:** Assign "Trend Snatcher" (AI-powered trend analysis) to monitor the channel's performance and identify opportunities for improvement.
-2. **Content creation:** Assign "Creative Brain" (AI-powered content generation) to develop high-quality, engaging video content that aligns with the target audience's interests.
+**Timeline:**
 
-**Next Steps**
+* Research target audience demographics, interests, and behaviors: 2 hours
+* Define specific channel objectives: 1 hour
+* Develop content strategy: 2 hours
+* Conduct keyword research: 3 hours
+* Optimize YouTube channel settings: 2 hours
 
-1. Review and refine the action plan based on the CEO's feedback.
-2. Allocate resources accordingly to implement the recommendations.
+**Resources:**
 
-**Systematic Improvements**
+* Ahrefs or SEMrush for keyword research
+* Google Analytics, YouTube Analytics, and social media insights for target audience research
+* Company goals and individual agent goals (see `_agents/{id}/goal.md`)
 
-* **Integrate Trend Snatcher:** Regularly analyze the channel's performance using Trend Snapper to identify areas for improvement.
-* **Streamline metadata management:** Implement a standardized process for creating and updating video metadata to ensure consistency and accuracy.
+**Next Steps:** Once the plan is complete, I will execute it by allocating tasks to 1-2 agents. This will ensure that our YouTube channel targeting plan aligns with our company's goals and objectives, increasing visibility and engagement.
 
-By implementing these recommendations, we can improve the YouTube channel's overall performance, engagement, and visibility.
+📊 Evaluation: This task will be evaluated based on its impact on our YouTube channel's performance, including views, subscribers, and engagement. The plan will be reviewed and revised as needed to achieve the desired results.
