@@ -1588,3 +1588,8 @@ _세션: 2026-08-20T01-42_
 - 주요 경쟁사 채널의 콘텐츠 분석을 수행합니다.
 - 최근 의사결정과 메모리를 검토하여 가장 가치 있는 작업을 결정합니다.
 _세션: 2026-08-20T02-27_
+
+## [2026-08-20] [자율 사이클 — 2026-08-20] 1인 기업 24시간 운영 중. 회사 목표·각 에이전트의 개인 목표(_
+- Run the `trend_sniper` tool and collect data on recent trending videos.
+- Analyze the collected data using local LLM.
+_세션: 2026-08-20T02-57_
