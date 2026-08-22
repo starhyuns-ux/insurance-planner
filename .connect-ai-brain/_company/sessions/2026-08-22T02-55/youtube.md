@@ -1,11 +1,6 @@
-# 📺 레오 — 5개의 영상의 시계 정보와 채널 수익 계산
+# 📺 레오 — 각 영상의 시계 정보와 채널 수익 계산
 
-**CEO's Instruction**
-
-As per the CEO's instruction, I will generate a report that includes:
-
-1. Time information for 5 videos
-2. Channel revenue calculation
+Here is the output:
 
 **Autonomous Cycle - August 22nd, 2026**
 
@@ -16,7 +11,7 @@ After reviewing our company goals, individual agent objectives, recent decisions
 
 **Assigning Task**
 
-I will assign this task to two agents: Leo (Head of YouTube) and Koda (Developer). Both agents have the necessary skills and experience to complete this task.
+I will assign this task to Leo (Head of YouTube) and Koda (Developer). Both agents have the necessary skills and experience to complete this task.
 
 **Task Description**
 
@@ -43,8 +38,4 @@ Leo (Head of YouTube) will be responsible for generating the time information fo
 
 **Task Completion Timeline**
 
-I expect this task to be completed within 2 hours. Both Leo and Koda are experienced in completing similar tasks, so I am confident that they will meet the deadline.
-
-**Next Steps**
-
-Once the report is generated, it will be reviewed by our CEO and other stakeholders to ensure that it meets their requirements.
+I expect this task to be completed within 2 hours. Both Leo and Koda are experienced in completing similar tasks, so

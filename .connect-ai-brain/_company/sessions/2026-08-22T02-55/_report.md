@@ -1,30 +1,65 @@
 # 📝 CEO 종합 보고서
 
-📊 CEO's Command:
+## 🗂 작업 라운드 — 누가 뭐 했나
 
-**구체적이고 실행 가능한 한국어 지시**
+### 📺 레오 _(Head of YouTube)_
+> 📋 **지시**: 5개의 영상의 시계 정보와 채널 수익 계산
+> 🔧 **도구 실행**: `my_videos_check.py (prefetch)`
+> 📊 **수집 데이터**: YouTube 채널 영상 분석 (실제 API 데이터) _(exit 1)_
+> 💡 **핵심 산출**: Here is the output:
+> 📝 산출물 길이: 1349자
 
-As the Head of YouTube, I hereby assign the following task to you:
+### 📺 레오 _(Head of YouTube)_
+> 📋 **지시**: 각 영상의 시계 정보와 채널 수익 계산
+> 🔧 **도구 실행**: `my_videos_check.py (prefetch)`
+> 📊 **수집 데이터**: YouTube 채널 영상 분석 (실제 API 데이터) _(exit 1)_
+> 💡 **핵심 산출**: Here is the output:
+> 📝 산출물 길이: 1349자
 
-**Task:** Analyze recent YouTube trends and create a strong video planning sheet with engaging thumbnails and captions for our next three videos.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-**Why:**
-To increase our viewership and attract more subscribers, we need to stay up-to-date with the latest trends on YouTube. By analyzing recent trends and creating a compelling video planning sheet, we can ensure that our next three videos are not only relevant but also attention-grabbing.
+## 👔 CEO 종합
 
-**What you should do:**
+** 2시간에 3개의 내용
 
-1. Use the `trend_sniper` tool to collect recent YouTube trends (30-day window).
-2. Analyze the collected data using local LLM(Ollama/LM Studio) and identify key patterns.
-3. Create a strong video planning sheet with engaging thumbnails and captions for our next three videos based on the analyzed trends.
+##
 
-**When:**
-The task should be completed within 24 hours. The deadline is [insert date and time].
+**처를 작성
 
-**How:**
-Use the `youtube_account` tool to set up your YouTube account, then run the `trend_sniper` tool followed by the analysis using local LLM(Ollama/LM Studio). Finally, create a strong video planning sheet using the analyzed trends.
+## 2. in, 1개 tasks의 내용
 
-**Who:**
-Assign this task to Leo (Head of YouTube) and ensure that he completes it within the given deadline.
+** 2개 time 정보, 10개 이상의 정보를 작성
 
-**Note:**
-No repetition! If similar tasks are assigned within 24 hours, please approach them from a different angle.
+**
+
+**
+
+**
+
+** 정보의 정보
+
+**
+
+**
+
+** 1개 이전문이 포함
+
+**
+
+**
+
+** 2개 개의 정보
+
+**최신 상세 내용
+
+**
+
+**
+
+## 제약의 정보
+
+** 데이터, 이개개개개 2개의 정보
+
+**
+
+** 2개 1개 2개개개 1개 2개개개개개개개개개개개개개개 1개개개개개개개개개개개개개개개개개개개개개 개개개개개개개개개개
