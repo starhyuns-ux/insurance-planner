@@ -1,37 +1,65 @@
 # 📝 CEO 종합 보고서
 
-📺 레오: 작업 시작합니다.
+## 🗂 작업 라운드 — 누가 뭐 했나
 
-[CEO의 지시]
-구체적이고 실행 가능한 유튜브 채널 제작 계획
+### 📺 레오 _(Head of YouTube)_
+> 📋 **지시**: 최근 3개월 동안 제작된 영상 데이터를 수집 및 분석
+> 🔧 **도구 실행**: `my_videos_check.py (prefetch)`
+> 📊 **수집 데이터**: YouTube 채널 영상 분석 (실제 API 데이터) _(exit 1)_
+> 💡 **핵심 산출**: **CEO의 지시**: 최근 3개월 동안 제작된 영상 데이터를 수집 및 분석
+> 📝 산출물 길이: 822자
 
-**작업 제목:** "유튜브 채널 제작 계획" (1~2명 에이전트에게 분배)
+### 📷 Instagram _(Head of Instagram)_
+> 📋 **지시**: 최근 1개월 동안 제작된 릴스/피드 및 캡션 데이터를 수집 및 분석
+> 🔧 **도구 실행**: _(없음 — LLM 추론만)_
+> 💡 **핵심 산출**: **작업 계획**: 최근 1개월 동안 제작된 릴스/피드 및 캡션 데이터를 수집 및 분석
+> 📝 산출물 길이: 571자
 
-**목표:**
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-* 구체적이고 실행 가능한 유튜브 채널 기획서 3개 작성
-* 각 영상의 제목, 썸네일, 후크 설정 및 캡션 작성
+## 👔 CEO 종합
 
-**에이전트 배정:**
+** 최대한 데이터를 보여
 
-* @Trend_Sniper (1): Recent Trend Analysis 및 Keyword Extraction
-* @Video_Plan (2): Video Script Writing 및 Thumbnail Design
+## 데이터의 데이터를 사용
+** 201에 제출시, 데이터를 사용하지 마지, 10개개 데이터를 사용
 
-**작업 일정:** 2026-08-22 ~ 2026-08-25 (3일)
+**
 
-**작업 프로세스:**
+**
 
-1. Recent Trend Analysis (Trend_Sniper) → Keyword Extraction
-2. Keyword Extraction → Video Script Writing (Video_Plan)
-3. Thumbnail Design (Video_Plan) → Finalize Video Plan
+**
 
-**산출물:**
+** 텍 2개개개 데이터를 사용
 
-* 구체적이고 실행 가능한 유튜브 채널 기획서 3개 (Title, Thumbnail, Hook, Caption)
-* Recent Trend Analysis Report
-* Keyword Extraction Report
+** 10개개개개개개개까지의 데이터를 사용
 
-**메모리:**
+**
 
-* @Trend_Sniper: Recent Trend Analysis → Keyword Extraction
-* @Video_Plan: Video Script Writing → Thumbnail Design
+** 2개개개개개개개개개개개, 2개 데이터, 1개 1개의 데이터의 마** 1개개개개의 데이터를 사용
+
+## 부가 있는 경우의 분석
+
+**감
+
+** 2개 1개 데이터의 내용을 작성
+
+** 2개개개개의 내용을 **2개개의 개개개개의 데이터의 정보, 1개개개개
+
+**
+
+** 1개개개개개개의 주기준
+
+** 1개개의 데이터의 세 개개의 데이터를 사용
+
+** 2개, 1개의 데이터의 평점의 내용
+
+** 1개 2개의 각 1개 데이터, 1개 데이터의 데이터의 특징의 정보
+
+---
+
+** 1개의 특성이 제작
+
+** 1개, 1개 개의 데이터의 데이터의 정보를 3개의 데이터의 평점 1개 1개
+
+** 2개의 데이터의 정보를 사용
