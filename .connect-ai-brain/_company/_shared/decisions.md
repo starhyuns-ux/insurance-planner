@@ -2019,3 +2019,8 @@ _세션: 2026-11-19T05-23_
 - Date Extraction from video analysis data
 - Time Extraction from video analysis data
 _세션: 2026-11-19T05-43_
+
+## [2026-11-19] [자율 사이클 — 2026-11-19] 1인 기업 24시간 운영 중. 회사 목표·각 에이전트의 개인 목표(_
+- LM Studio 모델 로드 실패 (메모리 부족) — 모델 오케스트레이션 모달에서 더 작은 모델 선택
+- Ollama/LM Studio 서버 미실행
+_세션: 2026-11-19T06-55_
