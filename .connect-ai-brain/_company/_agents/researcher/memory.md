@@ -68,3 +68,4 @@ _Researcher 에이전트만 읽고 쓰는 개인 노트. 학습·교훈·자주 
 - [2026-11-10] 새로운 트렌드 또는 경쟁사 분석 및 시계열 데이터 수집 → 산출물 sessions/2026-11-10T18-01/researcher.md
 - [2026-11-19] 최근 7일의 유튜브 시계 트렌드 분석 및 반영 → 산출물 sessions/2026-11-19T16-13/researcher.md
 - [2026-11-19] YouTube 및 Instagram 데이터 수집 및 분석 → 산출물 sessions/2026-11-19T22-51/researcher.md
+- [2026-11-21] 최근 5개월간의 새로운 유튜브 영상 수익 변동 추이 분석 → 산출물 sessions/2026-11-20T23-55/researcher.md
